@@ -1,0 +1,365 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000;
+  background-color: #fff;
+}
+
+body {
+  background-color: #fff;
+  color: #000;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+
+.app-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.header-content h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.header-content p {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Container */
+
+.container {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* Upload Zone */
+
+.upload-zone {
+  border: 2px dashed #ccc;
+  border-radius: 0;
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upload-zone:hover {
+  background-color: #f9f9f9;
+}
+
+.upload-zone.drag-over {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+
+.upload-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.upload-content p {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.btn-upload {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background-color 0.2s;
+}
+
+.btn-upload:hover {
+  background-color: #f0f0f0;
+}
+
+.upload-help {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.upload-help p {
+  margin: 0.5rem 0;
+}
+
+.upload-help a {
+  color: #000;
+  text-decoration: underline;
+}
+
+.upload-help a:hover {
+  text-decoration: none;
+}
+
+/* Conversion Section */
+
+.conversion-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.section-left,
+.section-right {
+  border-left: 1px solid #ccc;
+  padding-left: 2rem;
+}
+
+.section-left h2,
+.section-right h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* Config Panel */
+
+.config-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.config-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-group label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.config-group select {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 0;
+  font-size: 0.95rem;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.config-group select:disabled {
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+  color: #666;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Buttons */
+
+.conversion-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-convert,
+.btn-cancel,
+.btn-reset,
+.btn-download {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 1px solid #000;
+}
+
+.btn-convert {
+  background-color: #000;
+  color: #fff;
+  flex: 1;
+}
+
+.btn-convert:hover:not(:disabled) {
+  background-color: #333;
+}
+
+.btn-convert:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-cancel,
+.btn-reset {
+  background-color: #fff;
+  color: #000;
+  flex: 0 1 auto;
+}
+
+.btn-cancel:hover,
+.btn-reset:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-download {
+  background-color: #000;
+  color: #fff;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.btn-download:hover {
+  background-color: #333;
+}
+
+/* Progress */
+
+.progress-info {
+  border-left: 1px solid #ccc;
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+}
+
+.progress-info p {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.progress-info strong {
+  font-weight: 600;
+}
+
+.placeholder {
+  color: #666;
+  font-style: italic;
+}
+
+/* Error */
+
+.error-message {
+  border-left: 3px solid #000;
+  padding: 1rem;
+  padding-left: 1rem;
+  background-color: #f9f9f9;
+  margin-top: 1rem;
+}
+
+.error-message p {
+  color: #333;
+  font-size: 0.9rem;
+}
+
+/* Result Section */
+
+.result-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.result-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.result-stats {
+  border-left: 1px solid #ccc;
+  padding-left: 1rem;
+  margin-bottom: 2rem;
+}
+
+.result-stats p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.result-stats strong {
+  font-weight: 600;
+}
+
+/* Footer */
+
+.app-footer {
+  border-top: 1px solid #ccc;
+  padding: 1.5rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .conversion-section {
+    grid-template-columns: 1fr;
+  }
+
+  .section-left,
+  .section-right {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid #ccc;
+    padding-top: 1.5rem;
+  }
+
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .conversion-actions {
+    flex-direction: column;
+  }
+
+  .btn-convert,
+  .btn-cancel {
+    width: 100%;
+  }
+
+  .header-content h1 {
+    font-size: 1.5rem;
+  }
+}
