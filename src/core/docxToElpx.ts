@@ -1,5 +1,7 @@
+/// <reference types="vite/client" />
 import { unzipSync, zipSync } from 'fflate';
 import mammoth from 'mammoth';
+import { buildProjectFromStructure, applyTableClasses, applyDivClasses } from './buildFromStructure';
 import type {
   DocxImportProgress,
   ImportToElpxResult,
@@ -12,6 +14,7 @@ import type {
 export async function convertDocxToElpx(
   file: File,
   options: DocxImportOptions,
+  structure?: any,
   onProgress?: (progress: DocxImportProgress) => void,
 ): Promise<ImportToElpxResult> {
   onProgress?.({
@@ -27,12 +30,25 @@ export async function convertDocxToElpx(
     messageKey: 'progress.parseDocxStyles',
   });
   const htmlValue = await extractDocxHtml(inputBuffer);
+
+  let themeEntries: Record<string, Uint8Array> | undefined;
+  if (options.themeId && options.themeId !== 'base') {
+    onProgress?.({
+      phase: 'template',
+      message: 'Cargando tema personalizado...',
+      messageKey: 'progress.loadTheme',
+    });
+    themeEntries = await loadThemeEntries(options.themeId);
+  }
+
   return convertHtmlToElpx(
     htmlValue,
     file.name,
     options,
     onProgress,
     'progress.parseDocumentStructure',
+    themeEntries,
+    structure,
   );
 }
 
@@ -42,15 +58,22 @@ export async function convertHtmlToElpx(
   options: DocxImportOptions,
   onProgress?: (progress: DocxImportProgress) => void,
   parseMessageKey = 'progress.parseDocumentStructure',
+  themeEntries?: Record<string, Uint8Array>,
+  structure?: any,
 ): Promise<ImportToElpxResult> {
   onProgress?.({
     phase: 'parse',
     message: 'Interpretando la estructura del documento...',
     messageKey: parseMessageKey,
   });
-  const project = buildProjectFromHtml(htmlValue, filename, options);
 
-  return convertProjectToElpx(project, filename, undefined, onProgress);
+  // Procesar delimitadores y tablas, aplicar clases CSS
+  let processedHtml = applyDivClasses(htmlValue);
+  processedHtml = applyTableClasses(processedHtml);
+
+  const project = buildProjectFromHtml(processedHtml, filename, options, structure);
+
+  return convertProjectToElpx(project, filename, themeEntries, onProgress, options.themeId);
 }
 
 export async function convertProjectToElpx(
@@ -58,6 +81,7 @@ export async function convertProjectToElpx(
   filename: string,
   extraEntries?: Record<string, Uint8Array>,
   onProgress?: (progress: DocxImportProgress) => void,
+  themeId?: string,
 ): Promise<ImportToElpxResult> {
   onProgress?.({
     phase: 'template',
@@ -78,7 +102,7 @@ export async function convertProjectToElpx(
     ? previewPages['index.html']
     : '<!doctype html><html lang="es"><body><p>Sin contenido para previsualizar.</p></body></html>';
 
-  const elpxData = buildElpxFromTemplate(template, project);
+  const elpxData = buildElpxFromTemplate(template, project, themeId);
 
   onProgress?.({
     phase: 'pack',
@@ -99,7 +123,7 @@ export async function convertProjectToElpx(
   };
 }
 
-async function extractDocxHtml(inputBuffer: ArrayBuffer): Promise<string> {
+export async function extractDocxHtml(inputBuffer: ArrayBuffer): Promise<string> {
   const mammothInput =
     typeof Buffer !== 'undefined'
       ? { buffer: Buffer.from(inputBuffer) }
@@ -122,16 +146,22 @@ function buildProjectFromHtml(
   htmlValue: string,
   filename: string,
   options: DocxImportOptions,
+  structure?: any,
 ): ImportedProject {
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body>${htmlValue}</body></html>`,
     'text/html',
   );
   const body = document.body;
-
-  let resourceTitle = '';
-  let resourceTitleAssigned = false;
   const pages: ImportedPage[] = [];
+
+  // Si hay estructura configurada, usarla
+  if (structure && structure.h1Sections && structure.h1Sections.length > 0) {
+    return buildProjectFromStructure(htmlValue, filename, structure) as ImportedProject;
+  }
+
+  // Si no hay estructura, usar la lógica antigua
+  let resourceTitleAssigned = false;
   let currentPage: ImportedPage | null = null;
   let currentBlock: ImportedBlock | null = null;
   let currentTopLevelPage: ImportedPage | null = null;
@@ -157,7 +187,6 @@ function buildProjectFromHtml(
       const useResourceTitle = options.heading1Mode === 'resource';
 
       if (useResourceTitle && rawLevel === 1 && !resourceTitleAssigned) {
-        resourceTitle = trimmed;
         resourceTitleAssigned = true;
         continue;
       }
@@ -266,7 +295,7 @@ function buildProjectFromHtml(
   }
 
   return {
-    title: resourceTitle || stemFromFilename(filename) || 'Documento importado',
+    title: stemFromFilename(filename) || 'Documento importado',
     subtitle: '',
     pages,
   };
@@ -409,7 +438,7 @@ function hasMeaningfulHtml(html: string): boolean {
 }
 
 async function loadBaseTemplate(): Promise<{ entries: Record<string, Uint8Array> }> {
-  const baseUrl = (import.meta.env as any).BASE_URL ?? '/';
+  const baseUrl = import.meta.env.BASE_URL ?? '/';
   const response = await fetch(`${baseUrl}base.elpx`);
   if (!response.ok) {
     throw new Error('No se ha podido cargar la plantilla base integrada.');
@@ -423,12 +452,37 @@ async function loadBaseTemplate(): Promise<{ entries: Record<string, Uint8Array>
   return { entries };
 }
 
+async function loadThemeEntries(themeId: string): Promise<Record<string, Uint8Array>> {
+  const baseUrl = import.meta.env.BASE_URL ?? '/';
+  const response = await fetch(`${baseUrl}${themeId}.zip`);
+  if (!response.ok) {
+    throw new Error(`No se ha podido cargar el tema "${themeId}".`);
+  }
+
+  const rawEntries = unzipSync(new Uint8Array(await response.arrayBuffer()));
+  const prefixedEntries: Record<string, Uint8Array> = {};
+
+  for (const [path, data] of Object.entries(rawEntries)) {
+    if (path === '__MACOSX' || path.startsWith('__MACOSX/') || path === '.DS_Store') {
+      continue;
+    }
+    // Place theme at theme/ root - this completely replaces the base theme
+    // Each ELPX contains exactly ONE theme (the selected one)
+    // The theme's config.xml contains the theme ID/name
+    prefixedEntries[`theme/${path}`] = data;
+  }
+
+  return prefixedEntries;
+}
+
 function buildElpxFromTemplate(
   template: { entries: Record<string, Uint8Array> },
   project: ImportedProject,
+  themeId?: string,
 ): Uint8Array {
   const { entries } = template;
-  entries['content.xml'] = new TextEncoder().encode(generateContentXml(project));
+  const effectiveThemeId = themeId && themeId !== 'base' ? themeId : 'base';
+  entries['content.xml'] = new TextEncoder().encode(generateContentXml(project, effectiveThemeId));
   addPreviewHtmlEntries(entries, project);
   return zipSync(entries, { level: 0 });
 }
@@ -616,7 +670,7 @@ function inlineCssAssetUrls(cssText: string, cssPath: string, entries: Record<st
   });
 }
 
-function generateContentXml(project: ImportedProject): string {
+function generateContentXml(project: ImportedProject, themeId: string = 'base'): string {
   const odeId = createResourceId();
   const odeVersionId = createResourceId();
   const modified = String(Date.now());
@@ -629,7 +683,7 @@ function generateContentXml(project: ImportedProject): string {
 <userPreferences>
   <userPreference>
     <key>theme</key>
-    <value>base</value>
+    <value>${escapeXml(themeId)}</value>
   </userPreference>
 </userPreferences>
 <odeResources>
@@ -643,7 +697,7 @@ function generateContentXml(project: ImportedProject): string {
   <odeProperty><key>pp_lang</key><value>es</value></odeProperty>
   <odeProperty><key>pp_license</key><value>creative commons: attribution - share alike 4.0</value></odeProperty>
   <odeProperty><key>pp_licenseUrl</key><value>https://creativecommons.org/licenses/by-sa/4.0/</value></odeProperty>
-  <odeProperty><key>pp_theme</key><value>base</value></odeProperty>
+  <odeProperty><key>pp_theme</key><value>${escapeXml(themeId)}</value></odeProperty>
   <odeProperty><key>pp_exelearning_version</key><value>v4.0.0-rc3</value></odeProperty>
   <odeProperty><key>pp_modified</key><value>${escapeXml(modified)}</value></odeProperty>
   <odeProperty><key>pp_addExeLink</key><value>false</value></odeProperty>
@@ -689,7 +743,7 @@ function generateNavStructurePropertyEntry(key: string, value: string): string {
 function generateOdePagStructureXml(block: ImportedBlock, pageId: string, order: number): string {
   const blockId = createBlockId();
   const ideviceId = createIdeviceId();
-  const blockName = block.title || 'Contenido';
+  const blockName = block.title;
   const html = block.html || '<p></p>';
   const wrappedHtml = `<div class="exe-text-template">\n${html}\n</div>`;
   const jsonProperties = JSON.stringify({

@@ -56,3 +56,22 @@ export interface ConversionState {
   error?: string;
   result?: ImportToElpxResult;
 }
+
+export type H2StructureOption = 'idevice-title' | 'html' | 'accordion';
+
+export interface H2Item {
+  id: string;
+  text: string;
+  option: H2StructureOption;
+}
+
+export interface H1Section {
+  id: string;
+  title: string;
+  level: 1 | 2 | 3;
+  h2Items: H2Item[];
+}
+
+export interface DocumentStructure {
+  h1Sections: H1Section[];
+}

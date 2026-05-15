@@ -1,4 +1,4 @@
-import React from 'react';
+
 import type { DocxImportOptions, HeadingMode, Heading1Mode } from '../types';
 
 interface ConfigPanelProps {
@@ -100,10 +100,16 @@ export function ConfigPanel({ options, onOptionsChange }: ConfigPanelProps) {
 
       <div className="config-group">
         <label>Estilo de salida (tema)</label>
-        <select disabled>
-          <option>Por defecto (base eXeLearning)</option>
+        <select
+          value={options.themeId || 'base'}
+          onChange={(e) => handleChange('themeId', e.target.value)}
+        >
+          <option value="base">Por defecto (base eXeLearning)</option>
+          <option value="Doctorado_26-27">Doctorado 26-27</option>
+          <option value="Doctorat_26-27">Doctorat 26-27</option>
+          <option value="PhD_26-27">PhD 26-27</option>
         </select>
-        <p className="help-text">Los temas personalizados estarán disponibles próximamente</p>
+        <p className="help-text">Selecciona el tema visual para tu recurso eXeLearning</p>
       </div>
     </div>
   );

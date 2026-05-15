@@ -1,4 +1,4 @@
-import React from 'react';
+
 import type { ImportToElpxResult } from '../types';
 
 interface DownloadButtonProps {
