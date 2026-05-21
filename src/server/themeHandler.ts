@@ -37,6 +37,11 @@ export async function extractThemeZip(
 
         // Extraer archivos
         for (const [fileName, fileData] of Object.entries(files)) {
+          // Saltar entradas de carpetas (terminan con / o son buffers vacíos)
+          if (fileName.endsWith('/') || fileData.length === 0) {
+            continue;
+          }
+
           const filePath = path.join(themeDir, fileName);
           const dirPath = path.dirname(filePath);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface ThemeConfig {
   id: string;
@@ -17,6 +17,8 @@ export function ThemeManager() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cargar temas
   const loadThemes = async () => {
@@ -28,7 +30,7 @@ export function ThemeManager() {
       }
     } catch (err) {
       console.error('Error cargando temas:', err);
-      setError('No se pudo conectar al servidor de temas. ¿Está ejecutándose en puerto 5174?');
+      setError('No se pudo conectar al servidor de temas. ¿Está ejecutándose en puerto 5175?');
     } finally {
       setLoading(false);
     }
@@ -38,10 +40,7 @@ export function ThemeManager() {
     loadThemes();
   }, []);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = async (file: File) => {
     if (!file.name.endsWith('.zip')) {
       setError('Por favor selecciona un archivo ZIP');
       return;
@@ -66,17 +65,45 @@ export function ThemeManager() {
         setSuccess(`✅ ${data.message}`);
         await loadThemes();
         // Limpiar input
-        e.target.value = '';
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       } else {
-        setError(`❌ ${data.error}`);
+        setError(`❌ Error: ${data.error}`);
       }
     } catch (err) {
       setError(
-        `Error: ${err instanceof Error ? err.message : 'Error desconocido'}`
+        `Error de red: ${err instanceof Error ? err.message : 'Error desconocido'}`
       );
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processFile(file);
+  };
+
+  const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    await processFile(file);
   };
 
   const handleDeleteTheme = async (id: string) => {
@@ -133,11 +160,18 @@ export function ThemeManager() {
         </div>
       )}
 
-      {/* Formulario de carga */}
+      {/* Formulario de carga con drag-and-drop */}
       <div className="theme-upload-section">
         <h3>Cargar nuevo tema</h3>
-        <div className="upload-input-wrapper">
+        <div
+          className={`upload-input-wrapper ${dragActive ? 'drag-active' : ''}`}
+          onDragEnter={handleDrag}
+          onDragLeave={handleDrag}
+          onDragOver={handleDrag}
+          onDrop={handleDrop}
+        >
           <input
+            ref={fileInputRef}
             type="file"
             accept=".zip"
             onChange={handleFileSelect}
@@ -145,7 +179,7 @@ export function ThemeManager() {
             id="theme-file-input"
           />
           <label htmlFor="theme-file-input" className="upload-label">
-            {uploading ? '⏳ Cargando...' : '📦 Selecciona un archivo ZIP'}
+            {uploading ? '⏳ Cargando...' : dragActive ? '📥 Suelta el archivo aquí' : '📦 Arrastra ZIP aquí o haz clic'}
           </label>
         </div>
         <p className="help-text">
@@ -170,6 +204,7 @@ export function ThemeManager() {
                   <button
                     onClick={() => handleDeleteTheme(theme.id)}
                     className="btn-delete"
+                    disabled={uploading}
                   >
                     🗑️ Eliminar
                   </button>
