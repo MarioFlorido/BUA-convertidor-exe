@@ -1,4 +1,33 @@
 /// <reference types="vite/client" />
+
+/**
+ * Orquestador Principal - Convierte documentos DOCX a formato eXeLearning (ELPX)
+ *
+ * Arquitectura Modular (Phase 8):
+ * ┌─────────────────────────────────────────────────────────────┐
+ * │ convertDocxToElpx() - Entrada principal (DOCX File)         │
+ * │   ↓ DocxParser                                              │
+ * │ convertHtmlToElpx() - Parsea HTML a proyecto               │
+ * │   ↓ HtmlTransformer + SemanticBuilder                      │
+ * │ convertProjectToElpx() - Renderiza proyecto a ELPX         │
+ * │   ↓ ElpxRenderer + ThemeService + PreviewService          │
+ * │ ELPX Blob + Preview HTML                                   │
+ * └─────────────────────────────────────────────────────────────┘
+ *
+ * Flujo:
+ * 1. convertDocxToElpx(): Recibe File DOCX, usa DocxParser, delega a convertHtmlToElpx()
+ * 2. convertHtmlToElpx(): Transforma HTML, construye proyecto, delega a convertProjectToElpx()
+ * 3. convertProjectToElpx(): Renderiza con ElpxRenderer, carga temas, genera preview
+ *
+ * Responsabilidades extraídas a módulos especializados:
+ * - DocxParser: Parsear DOCX (Fase 1)
+ * - HtmlTransformer: Transformar HTML (Fase 2)
+ * - SemanticBuilder: Construir página/bloques (Fase 4)
+ * - ElpxRenderer: Generar XML/ZIP (Fase 5)
+ * - ThemeService: Cargar temas (Fase 6)
+ * - PreviewService: Generar preview HTML (Fase 7)
+ */
+
 import { DocxParser } from './parsers/DocxParser';
 import { ElpxRenderer } from './renderers/ElpxRenderer';
 import { ThemeService } from './services/ThemeService';
@@ -13,6 +42,31 @@ import type {
   ImportedBlock,
 } from '../types';
 
+/**
+ * Convertir archivo DOCX a ELPX (eXeLearning)
+ *
+ * Flujo:
+ * 1. Parsea el archivo DOCX con DocxParser
+ * 2. Carga tema personalizado si es necesario (ThemeService)
+ * 3. Delega a convertHtmlToElpx() para procesar el HTML
+ *
+ * @param file - Archivo DOCX a convertir
+ * @param options - Opciones de importación (heading modes, tema)
+ * @param structure - Estructura optativa (H1 sections para parsing semántico)
+ * @param onProgress - Callback para reportar progreso
+ * @returns Promise<ImportToElpxResult> con blob ELPX y preview HTML
+ *
+ * @example
+ * ```typescript
+ * const result = await convertDocxToElpx(
+ *   docxFile,
+ *   { heading1Mode: 'page', heading2Mode: 'block', themeId: 'base' },
+ *   structure,
+ *   (progress) => console.log(progress.message)
+ * );
+ * downloadFile(result.blob, result.filename);
+ * ```
+ */
 export async function convertDocxToElpx(
   file: File,
   options: DocxImportOptions,
@@ -55,6 +109,28 @@ export async function convertDocxToElpx(
   );
 }
 
+/**
+ * Convertir HTML a ELPX (entrada alternativa para testing/APIs)
+ *
+ * Flujo:
+ * 1. Transforma HTML (aplica divs, tablas)
+ * 2. Construye ImportedProject desde HTML
+ * 3. Delega a convertProjectToElpx() para renderizar
+ *
+ * Usar cuando:
+ * - Tienes HTML preprocessado o manual
+ * - Quieres testing sin archivos DOCX
+ * - Necesitas control fino sobre el HTML de entrada
+ *
+ * @param htmlValue - HTML a procesar
+ * @param filename - Nombre del archivo (para resultado)
+ * @param options - Opciones de importación
+ * @param onProgress - Callback de progreso
+ * @param parseMessageKey - Clave de mensaje para progress
+ * @param themeEntries - Entries de tema precargado (opcional)
+ * @param structure - Estructura H1/H2 (opcional)
+ * @returns Promise<ImportToElpxResult>
+ */
 export async function convertHtmlToElpx(
   htmlValue: string,
   filename: string,
@@ -79,6 +155,37 @@ export async function convertHtmlToElpx(
   return convertProjectToElpx(project, filename, themeEntries, onProgress, options.themeId);
 }
 
+/**
+ * Convertir ImportedProject a ELPX (API de bajo nivel)
+ *
+ * Flujo:
+ * 1. Carga plantilla base (ThemeService)
+ * 2. Carga tema personalizado si aplica
+ * 3. Renderiza XML/ZIP con ElpxRenderer
+ * 4. Genera preview HTML con PreviewService
+ *
+ * Usar cuando:
+ * - Tienes un ImportedProject preconstruido
+ * - Necesitas máximo control sobre la renderización
+ * - Quieres reutilizar un proyecto múltiples veces
+ *
+ * @param project - Proyecto a renderizar
+ * @param filename - Nombre para el resultado ELPX
+ * @param extraEntries - Entries adicionales (temas precargados)
+ * @param onProgress - Callback de progreso
+ * @param themeId - ID del tema a usar
+ * @returns Promise<ImportToElpxResult>
+ *
+ * @example
+ * ```typescript
+ * const project: ImportedProject = {
+ *   title: 'Mi Proyecto',
+ *   subtitle: '',
+ *   pages: [...]
+ * };
+ * const result = await convertProjectToElpx(project, 'resultado.elpx');
+ * ```
+ */
 export async function convertProjectToElpx(
   project: ImportedProject,
   filename: string,
@@ -126,6 +233,24 @@ export async function convertProjectToElpx(
   };
 }
 
+/**
+ * Construir ImportedProject desde HTML (Legacy Fallback)
+ *
+ * Responsabilidad: Parsear HTML usando la lógica antigua de H1/H2/H3.
+ *
+ * Flujo:
+ * 1. Si hay estructura (structure.h1Sections), delega a buildProjectFromStructure() (SemanticBuilder)
+ * 2. Si no, usa state machine antigua: parse H1/H2/H3 según heading modes
+ *
+ * **Nota**: Esta función es un fallback compatibilidad hacia atrás.
+ * Para nuevos desarrollos, usar buildProjectFromStructure con estructura definida.
+ *
+ * @param htmlValue - HTML a parsear
+ * @param filename - Nombre del documento
+ * @param options - Heading modes y opciones
+ * @param structure - Estructura H1/H2 (opcional)
+ * @returns ImportedProject
+ */
 function buildProjectFromHtml(
   htmlValue: string,
   filename: string,
