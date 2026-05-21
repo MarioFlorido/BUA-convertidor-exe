@@ -31,9 +31,10 @@ export function App() {
 
     try {
       setState({ status: 'processing', progress: { phase: 'read', message: 'Leyendo archivo...' } });
-      const buffer = await selectedFile.arrayBuffer();
-      const { extractDocxHtml } = await import('./core/docxToElpx');
-      const htmlContent = await extractDocxHtml(buffer);
+      const { DocxParser } = await import('./core/parsers/DocxParser');
+      const parser = new DocxParser();
+      const parseResult = await parser.parse(selectedFile);
+      const htmlContent = parseResult.html;
 
       const parsedStructure = await parseDocumentStructure(htmlContent);
       setStructure(parsedStructure);

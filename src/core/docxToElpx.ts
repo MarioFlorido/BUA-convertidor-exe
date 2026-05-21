@@ -1,7 +1,8 @@
 /// <reference types="vite/client" />
 import { unzipSync, zipSync } from 'fflate';
-import mammoth from 'mammoth';
+import { DocxParser } from './parsers/DocxParser';
 import { buildProjectFromStructure, applyTableClasses, applyDivClasses } from './buildFromStructure';
+// Nota: mammoth se usa indirectamente a través de DocxParser
 import type {
   DocxImportProgress,
   ImportToElpxResult,
@@ -22,14 +23,15 @@ export async function convertDocxToElpx(
     message: 'Leyendo el archivo .docx...',
     messageKey: 'progress.readDocx',
   });
-  const inputBuffer = await file.arrayBuffer();
 
   onProgress?.({
     phase: 'parse',
     message: 'Analizando estilos y contenido del DOCX...',
     messageKey: 'progress.parseDocxStyles',
   });
-  const htmlValue = await extractDocxHtml(inputBuffer);
+  const parser = new DocxParser();
+  const parseResult = await parser.parse(file);
+  const htmlValue = parseResult.html;
 
   let themeEntries: Record<string, Uint8Array> | undefined;
   if (options.themeId && options.themeId !== 'base') {
@@ -121,25 +123,6 @@ export async function convertProjectToElpx(
     previewHtml,
     previewPages,
   };
-}
-
-export async function extractDocxHtml(inputBuffer: ArrayBuffer): Promise<string> {
-  const mammothInput =
-    typeof Buffer !== 'undefined'
-      ? { buffer: Buffer.from(inputBuffer) }
-      : { arrayBuffer: inputBuffer };
-
-  const result = await mammoth.convertToHtml(mammothInput, {
-    includeEmbeddedStyleMap: true,
-    includeDefaultStyleMap: true,
-    ignoreEmptyParagraphs: true,
-    styleMap: DOCX_STYLE_MAP,
-    convertImage: mammoth.images.imgElement(async (image) => ({
-      src: `data:${image.contentType};base64,${await image.readAsBase64String()}`,
-    })),
-  });
-
-  return result.value;
 }
 
 function buildProjectFromHtml(
@@ -1099,15 +1082,3 @@ function randomUppercase(length: number): string {
   return output;
 }
 
-const DOCX_STYLE_MAP: string[] = [
-  "p[style-name='Code'] => pre:fresh",
-  "p[style-name='Código'] => pre:fresh",
-  "p[style-name='Codigo'] => pre:fresh",
-  "p[style-name='HTML'] => pre:fresh",
-  "p[style-name='Preformatted'] => pre:fresh",
-  "p[style-name='Preformatted Text'] => pre:fresh",
-  "r[style-name='Code'] => code",
-  "r[style-name='Código'] => code",
-  "r[style-name='Codigo'] => code",
-  "r[style-name='HTML'] => code",
-];
