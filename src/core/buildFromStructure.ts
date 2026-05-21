@@ -63,6 +63,14 @@ export function buildProjectFromStructure(
     });
   }
 
+  // Construir mapa de índices de H1 para búsquedas delimitadas
+  const h1Indices = new Map<string, number>();
+  for (let i = 0; i < sections.length; i++) {
+    if (sections[i].level === 1) {
+      h1Indices.set(sections[i].text.trim(), i);
+    }
+  }
+
   // Construir páginas según la estructura configurada
   const pages: ImportedPage[] = [];
   const stemmed = filename.replace(/\.[^.]+$/, '').trim() || 'Documento importado';
@@ -95,8 +103,11 @@ export function buildProjectFromStructure(
       blocks: [],
     };
 
+    // Obtener el índice de este H1 en el array de secciones
+    const h1Index = h1Indices.get(h1Section.title.trim()) ?? -1;
+
     // Extraer contenido entre H1 y el primer H2
-    const contentBeforeFirstH2 = extractContentBeforeFirstH2(sections, h1Section.title);
+    const contentBeforeFirstH2 = extractContentBeforeFirstH2(sections, h1Index);
 
     // Crear un iDevice sin título por defecto (para contenido antes del primer H2 y H2s en HTML)
     let currentBlock: ImportedBlock | null = null;
@@ -112,7 +123,7 @@ export function buildProjectFromStructure(
     while (i < h1Section.h2Items.length) {
       const h2Item = h1Section.h2Items[i];
       const option = h2Item.option;
-      const h2Html = extractH2Content(sections, h2Item.text);
+      const h2Html = extractH2Content(sections, h2Item.text, h1Index);
 
       if (option === 'html') {
         // Terminar acordeón anterior si existe
@@ -219,44 +230,58 @@ export function buildProjectFromStructure(
   };
 }
 
-function extractContentBeforeFirstH2(sections: DocumentSection[], h1Text: string): string {
-  const cleanH1 = h1Text.trim();
-  let foundH1 = false;
+function extractContentBeforeFirstH2(sections: DocumentSection[], h1Index: number): string {
+  if (h1Index < 0) return '';
+
   let content = '';
 
-  for (const section of sections) {
-    if (section.level === 1 && section.text.trim() === cleanH1) {
-      foundH1 = true;
-      continue;
+  // Encontrar el siguiente H1 para saber dónde termina esta sección
+  let nextH1Index = sections.length;
+  for (let i = h1Index + 1; i < sections.length; i++) {
+    if (sections[i].level === 1) {
+      nextH1Index = i;
+      break;
+    }
+  }
+
+  // Extraer contenido desde h1Index+1 hasta el primer H2 o siguiente H1
+  for (let i = h1Index + 1; i < nextH1Index; i++) {
+    const section = sections[i];
+
+    if (section.level === 2) {
+      // Primer H2 encontrado, terminar
+      break;
     }
 
-    if (foundH1) {
-      if (section.level <= 1) {
-        // Encontramos el siguiente H1, terminar
-        break;
-      }
-
-      if (section.level === 2) {
-        // Encontramos el primer H2, terminar
-        break;
-      }
-
-      if (section.level === 999) {
-        // Contenido entre H1 y primer H2
-        content += section.html;
-      }
+    if (section.level === 999) {
+      // Contenido entre H1 y primer H2
+      content += section.html;
     }
   }
 
   return content;
 }
 
-function extractH2Content(sections: DocumentSection[], h2Text: string): string {
+function extractH2Content(sections: DocumentSection[], h2Text: string, h1Index: number): string {
+  if (h1Index < 0) return '';
+
   const cleanH2 = h2Text.trim();
   let foundH2 = false;
   let content = '';
 
-  for (const section of sections) {
+  // Encontrar el siguiente H1 para saber dónde termina esta sección H1
+  let nextH1Index = sections.length;
+  for (let i = h1Index + 1; i < sections.length; i++) {
+    if (sections[i].level === 1) {
+      nextH1Index = i;
+      break;
+    }
+  }
+
+  // Buscar H2 solo dentro de la sección actual (entre h1Index y nextH1Index)
+  for (let i = h1Index + 1; i < nextH1Index; i++) {
+    const section = sections[i];
+
     if (section.level === 2 && section.text.trim() === cleanH2) {
       foundH2 = true;
       continue;
@@ -264,7 +289,7 @@ function extractH2Content(sections: DocumentSection[], h2Text: string): string {
 
     if (foundH2) {
       if (section.level <= 2) {
-        // Encontramos el siguiente H2, terminar
+        // Siguiente H2 o fin de sección, terminar
         break;
       }
 
