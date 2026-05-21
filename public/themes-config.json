@@ -7,30 +7,6 @@
       "language": "es",
       "description": "Tema estándar de eXeLearning sin personalización",
       "screenshot": null
-    },
-    {
-      "id": "Doctorado_26-27",
-      "name": "Doctorado 26-27",
-      "activity": "Doctorado",
-      "language": "es",
-      "description": "Tema personalizado para programas de Doctorado",
-      "screenshot": "themes/Doctorado_26-27.png"
-    },
-    {
-      "id": "Doctorat_26-27",
-      "name": "Doctorat 26-27",
-      "activity": "Doctorat",
-      "language": "ca",
-      "description": "Tema personalizado per a programes de Doctorat",
-      "screenshot": "themes/Doctorat_26-27.png"
-    },
-    {
-      "id": "PhD_26-27",
-      "name": "PhD 26-27",
-      "activity": "PhD",
-      "language": "en",
-      "description": "Customized theme for PhD programs",
-      "screenshot": "themes/PhD_26-27.png"
     }
   ]
 }
