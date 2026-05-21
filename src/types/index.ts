@@ -26,11 +26,15 @@ export interface DocxImportOptions {
 
 // Re-exportar tipos semánticos del modelo dedicado
 export type {
+  SemanticDocument,
+  SemanticPage,
+  SemanticBlock,
+  DocumentStructure as SemanticDocumentStructure,
+  BUA_CLASSES,
+  // Alias hacia atrás para compatibilidad
   ImportedProject,
   ImportedPage,
   ImportedBlock,
-  DocumentStructure as SemanticDocumentStructure,
-  BUA_CLASSES,
 } from '../core/models/SemanticDocument';
 
 export interface Theme {

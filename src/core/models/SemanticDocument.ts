@@ -12,8 +12,10 @@
 /**
  * Un bloque de contenido dentro de una página
  * Representa una sección con título opcional y contenido HTML
+ *
+ * Agnóstico al formato - usado por ELPX, PDF, SCORM, etc.
  */
-export interface ImportedBlock {
+export interface SemanticBlock {
   /** Título del bloque (puede estar vacío para bloques sin título) */
   title: string;
 
@@ -24,8 +26,10 @@ export interface ImportedBlock {
 /**
  * Una página en el documento
  * Puede ser página principal (nivel 1), subpágina (nivel 2), o sub-subpágina (nivel 3)
+ *
+ * Agnóstico al formato - usado por ELPX, PDF, SCORM, etc.
  */
-export interface ImportedPage {
+export interface SemanticPage {
   /** Título de la página */
   title: string;
 
@@ -36,23 +40,37 @@ export interface ImportedPage {
   parentIndex: number | null;
 
   /** Bloques de contenido dentro de esta página */
-  blocks: ImportedBlock[];
+  blocks: SemanticBlock[];
 }
 
 /**
- * Proyecto completo - Documento procesado con estructura de páginas
- * Representa todo el contenido después de análisis y transformación
+ * Documento Semántico Completo
+ *
+ * Estructura intermedia agnóstica a formato entre HTML y formato de salida.
+ * Puede convertirse a ELPX, PDF, SCORM, o cualquier otro formato.
+ *
+ * NÚCLEO ARQUITECTÓNICO: El modelo semántico es lo que importa.
+ * Los renderizadores (ELPX, PDF, etc.) son implementaciones intercambiables.
  */
-export interface ImportedProject {
-  /** Título del proyecto (usualmente nombre del documento) */
+export interface SemanticDocument {
+  /** Título del documento */
   title: string;
 
-  /** Subtítulo opcional del proyecto */
+  /** Subtítulo opcional */
   subtitle: string;
 
-  /** Páginas que componen el proyecto */
-  pages: ImportedPage[];
+  /** Páginas que componen el documento */
+  pages: SemanticPage[];
 }
+
+/**
+ * Alias hacia atrás - Para compatibilidad con código legacy
+ * DEPRECADO: Usar SemanticDocument en lugar de ImportedProject
+ * @deprecated Use SemanticDocument instead
+ */
+export type ImportedProject = SemanticDocument;
+export type ImportedPage = SemanticPage;
+export type ImportedBlock = SemanticBlock;
 
 /**
  * Resultado del análisis de estructura de documento
@@ -85,9 +103,9 @@ export const BUA_CLASSES = {
  */
 export const SemanticDocumentValidation = {
   /**
-   * Valida que un ImportedBlock sea válido
+   * Valida que un SemanticBlock sea válido
    */
-  isValidBlock(block: any): block is ImportedBlock {
+  isValidBlock(block: any): block is SemanticBlock {
     return (
       typeof block.title === 'string' &&
       typeof block.html === 'string' &&
@@ -96,9 +114,9 @@ export const SemanticDocumentValidation = {
   },
 
   /**
-   * Valida que una ImportedPage sea válida
+   * Valida que una SemanticPage sea válida
    */
-  isValidPage(page: any): page is ImportedPage {
+  isValidPage(page: any): page is SemanticPage {
     return (
       typeof page.title === 'string' &&
       [1, 2, 3, 4].includes(page.level) &&
@@ -109,30 +127,38 @@ export const SemanticDocumentValidation = {
   },
 
   /**
-   * Valida que un ImportedProject sea válido
+   * Valida que un SemanticDocument sea válido
    */
-  isValidProject(project: any): project is ImportedProject {
+  isValidDocument(doc: any): doc is SemanticDocument {
     return (
-      typeof project.title === 'string' &&
-      typeof project.subtitle === 'string' &&
-      Array.isArray(project.pages) &&
-      project.pages.every((p: any) => this.isValidPage(p)) &&
-      project.pages.length > 0
+      typeof doc.title === 'string' &&
+      typeof doc.subtitle === 'string' &&
+      Array.isArray(doc.pages) &&
+      doc.pages.every((p: any) => this.isValidPage(p)) &&
+      doc.pages.length > 0
     );
   },
 
   /**
-   * Cuenta total de bloques en un proyecto
+   * Alias hacia atrás para compatibilidad
+   * @deprecated Use isValidDocument instead
    */
-  countBlocks(project: ImportedProject): number {
-    return project.pages.reduce((sum, page) => sum + page.blocks.length, 0);
+  isValidProject(project: any): project is SemanticDocument {
+    return this.isValidDocument(project);
+  },
+
+  /**
+   * Cuenta total de bloques en un documento
+   */
+  countBlocks(doc: SemanticDocument): number {
+    return doc.pages.reduce((sum, page) => sum + page.blocks.length, 0);
   },
 
   /**
    * Obtiene la profundidad máxima de jerarquía
    */
-  getMaxLevel(project: ImportedProject): number {
-    if (project.pages.length === 0) return 0;
-    return Math.max(...project.pages.map((p) => p.level));
+  getMaxLevel(doc: SemanticDocument): number {
+    if (doc.pages.length === 0) return 0;
+    return Math.max(...doc.pages.map((p) => p.level));
   },
 };
