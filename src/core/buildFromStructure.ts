@@ -1,4 +1,4 @@
-import type { ImportedProject, ImportedPage, ImportedBlock } from '../types';
+import type { ImportedProject, ImportedPage, ImportedBlock } from './models/SemanticDocument';
 // Re-exportar funciones de transformación HTML
 export { applyDivClasses, applyTableClasses } from './transformers/HtmlTransformer';
 

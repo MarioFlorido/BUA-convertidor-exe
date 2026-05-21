@@ -24,23 +24,14 @@ export interface DocxImportOptions {
   themeId?: string;
 }
 
-export interface ImportedProject {
-  title: string;
-  subtitle: string;
-  pages: ImportedPage[];
-}
-
-export interface ImportedPage {
-  title: string;
-  level: 1 | 2 | 3 | 4;
-  parentIndex: number | null;
-  blocks: ImportedBlock[];
-}
-
-export interface ImportedBlock {
-  title: string;
-  html: string;
-}
+// Re-exportar tipos semánticos del modelo dedicado
+export type {
+  ImportedProject,
+  ImportedPage,
+  ImportedBlock,
+  DocumentStructure as SemanticDocumentStructure,
+  BUA_CLASSES,
+} from '../core/models/SemanticDocument';
 
 export interface Theme {
   id: string;
