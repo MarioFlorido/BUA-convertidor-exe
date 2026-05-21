@@ -1,0 +1,50 @@
+{
+  ".metadata": {
+    "fixture": ".metadata",
+    "description": "Baseline checksums para validación de regresión",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1",
+    "fixtures_count": 5,
+    "note": "Los checksums se generarán en la primera ejecución de tests"
+  },
+  "simple.docx": {
+    "fixture": "simple.docx",
+    "zip_sha256": "pending",
+    "content_xml_sha256": "pending",
+    "ode_xml_sha256": "pending",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1"
+  },
+  "multipage.docx": {
+    "fixture": "multipage.docx",
+    "zip_sha256": "pending",
+    "content_xml_sha256": "pending",
+    "ode_xml_sha256": "pending",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1"
+  },
+  "semantic.docx": {
+    "fixture": "semantic.docx",
+    "zip_sha256": "pending",
+    "content_xml_sha256": "pending",
+    "ode_xml_sha256": "pending",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1"
+  },
+  "tables.docx": {
+    "fixture": "tables.docx",
+    "zip_sha256": "pending",
+    "content_xml_sha256": "pending",
+    "ode_xml_sha256": "pending",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1"
+  },
+  "themed.docx": {
+    "fixture": "themed.docx",
+    "zip_sha256": "pending",
+    "content_xml_sha256": "pending",
+    "ode_xml_sha256": "pending",
+    "generated_at": "2026-05-21T10:00:00Z",
+    "version": "baseline-v1"
+  }
+}
