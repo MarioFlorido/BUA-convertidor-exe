@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
-import { unzipSync } from 'fflate';
 import { DocxParser } from './parsers/DocxParser';
 import { ElpxRenderer } from './renderers/ElpxRenderer';
+import { ThemeService } from './services/ThemeService';
 import { buildProjectFromStructure, applyTableClasses, applyDivClasses } from './buildFromStructure';
 // Nota: mammoth se usa indirectamente a través de DocxParser
 import type {
@@ -41,7 +41,7 @@ export async function convertDocxToElpx(
       message: 'Cargando tema personalizado...',
       messageKey: 'progress.loadTheme',
     });
-    themeEntries = await loadThemeEntries(options.themeId);
+    themeEntries = await ThemeService.loadTheme(options.themeId);
   }
 
   return convertHtmlToElpx(
@@ -92,7 +92,7 @@ export async function convertProjectToElpx(
     messageKey: 'progress.applyTemplate',
   });
 
-  const template = await loadBaseTemplate();
+  const template = await ThemeService.loadTemplate();
 
   if (extraEntries) {
     for (const [entryPath, entryData] of Object.entries(extraEntries)) {
@@ -421,43 +421,6 @@ function hasMeaningfulHtml(html: string): boolean {
   return text.length > 0;
 }
 
-async function loadBaseTemplate(): Promise<{ entries: Record<string, Uint8Array> }> {
-  const baseUrl = import.meta.env.BASE_URL ?? '/';
-  const response = await fetch(`${baseUrl}base.elpx`);
-  if (!response.ok) {
-    throw new Error('No se ha podido cargar la plantilla base integrada.');
-  }
-
-  const entries = unzipSync(new Uint8Array(await response.arrayBuffer()));
-  if (!entries['content.xml']) {
-    throw new Error('La plantilla base no contiene content.xml.');
-  }
-
-  return { entries };
-}
-
-async function loadThemeEntries(themeId: string): Promise<Record<string, Uint8Array>> {
-  const baseUrl = import.meta.env.BASE_URL ?? '/';
-  const response = await fetch(`${baseUrl}${themeId}.zip`);
-  if (!response.ok) {
-    throw new Error(`No se ha podido cargar el tema "${themeId}".`);
-  }
-
-  const rawEntries = unzipSync(new Uint8Array(await response.arrayBuffer()));
-  const prefixedEntries: Record<string, Uint8Array> = {};
-
-  for (const [path, data] of Object.entries(rawEntries)) {
-    if (path === '__MACOSX' || path.startsWith('__MACOSX/') || path === '.DS_Store') {
-      continue;
-    }
-    // Place theme at theme/ root - this completely replaces the base theme
-    // Each ELPX contains exactly ONE theme (the selected one)
-    // The theme's config.xml contains the theme ID/name
-    prefixedEntries[`theme/${path}`] = data;
-  }
-
-  return prefixedEntries;
-}
 
 function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
