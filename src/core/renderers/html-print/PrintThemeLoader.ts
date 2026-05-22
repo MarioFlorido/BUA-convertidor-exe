@@ -1,6 +1,29 @@
 import { unzipSync } from 'fflate';
 
 /**
+ * Estilos de una caja semántica BUA (ejemplo, definición, importante).
+ * Extraídos del CSS del tema para reproducirlos fielmente en el PDF.
+ */
+export interface BuaBoxStyle {
+  /** Color del borde izquierdo */
+  borderColor: string;
+  /** Color o gradiente de fondo */
+  bgColor: string;
+  /**
+   * Etiqueta de tipo (::before content).
+   * Multilingüe: se lee directamente del CSS del tema activo.
+   * Ej: "Ejemplo" / "Example" / "Exemple"
+   */
+  label: string;
+}
+
+export interface BuaBoxStyles {
+  ejemplo:    BuaBoxStyle;
+  definicion: BuaBoxStyle;
+  importante: BuaBoxStyle;
+}
+
+/**
  * Assets del tema necesarios exclusivamente para el renderer print/PDF.
  *
  * Este objeto vive sólo dentro de html-print/ y nunca contamina
@@ -22,10 +45,10 @@ export interface PrintThemeAssets {
    */
   logoDataUrl: string | null;
 
-  /** Color primario extraído del CSS del tema (#rrggbb). Fallback: #1a3a5c */
+  /** Color primario extraído del CSS del tema (#rrggbb). Fallback: #135d87 */
   primaryColor: string;
 
-  /** Color de acento extraído del CSS del tema (#rrggbb). Fallback: #c8a951 */
+  /** Color de acento extraído del CSS del tema (#rrggbb). Fallback: #deb13c */
   accentColor: string;
 
   /** Familia tipográfica de títulos. Fallback: 'Georgia, serif' */
@@ -33,6 +56,9 @@ export interface PrintThemeAssets {
 
   /** Familia tipográfica de cuerpo. Fallback: 'Arial, sans-serif' */
   fontFamilyBody: string;
+
+  /** Estilos de las cajas semánticas BUA extraídos del CSS del tema */
+  buaStyles: BuaBoxStyles;
 }
 
 /** Extensiones de imagen aceptadas para portada_pdf */
@@ -40,6 +66,16 @@ const COVER_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp'] as const;
 
 /** Prefijos de logo reconocidos en la carpeta img/ del tema */
 const LOGO_PREFIXES = ['logo_BUA', 'logo_UA', 'logo'] as const;
+
+/**
+ * Valores por defecto para cajas BUA cuando el tema no tiene CSS propio.
+ * Coinciden con los colores del tema Doctorado_26-27 (el más común).
+ */
+const DEFAULT_BUA_STYLES: BuaBoxStyles = {
+  ejemplo:    { borderColor: '#135d87', bgColor: '#fafbfc',               label: 'Ejemplo'    },
+  definicion: { borderColor: '#6b7280', bgColor: '#fafbfc',               label: 'Definición' },
+  importante: { borderColor: '#deb13c', bgColor: 'rgba(222,177,60,0.3)', label: 'Importante' },
+};
 
 /**
  * Carga los assets del tema necesarios para el renderer print.
@@ -58,10 +94,11 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
     themeId: themeId ?? 'base',
     coverImageDataUrl: null,
     logoDataUrl: null,
-    primaryColor: '#1a3a5c',
-    accentColor: '#c8a951',
+    primaryColor: '#135d87',
+    accentColor: '#deb13c',
     fontFamilyTitle: "'Georgia', serif",
     fontFamilyBody: "'Arial', sans-serif",
+    buaStyles: DEFAULT_BUA_STYLES,
   };
 
   if (!themeId || themeId === 'base') {
@@ -80,7 +117,7 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
     themeId,
     coverImageDataUrl: extractCoverImage(entries),
     logoDataUrl: extractLogo(entries),
-    ...extractColorsAndFonts(entries),
+    ...extractThemeStyles(entries),
   };
 }
 
@@ -134,23 +171,25 @@ function extractLogo(entries: Record<string, Uint8Array>): string | null {
 }
 
 /**
- * Extrae colores primarios y familias tipográficas del style.css del tema.
- * Usa regex conservadoras sobre comentarios de paleta o variables CSS.
- * En caso de no encontrar nada, devuelve los valores por defecto.
+ * Extrae colores, tipografías y estilos BUA del style.css del tema.
+ * Usa regex sobre el CSS del tema para reproducir fielmente los estilos en PDF.
+ * En caso de no encontrar nada, devuelve valores por defecto.
  */
-function extractColorsAndFonts(entries: Record<string, Uint8Array>): {
+function extractThemeStyles(entries: Record<string, Uint8Array>): {
   primaryColor: string;
   accentColor: string;
   fontFamilyTitle: string;
   fontFamilyBody: string;
+  buaStyles: BuaBoxStyles;
 } {
   const cssEntry = entries['style.css'];
   if (!cssEntry) {
     return {
-      primaryColor: '#1a3a5c',
-      accentColor: '#c8a951',
+      primaryColor: '#135d87',
+      accentColor: '#deb13c',
       fontFamilyTitle: "'Georgia', serif",
       fontFamilyBody: "'Arial', sans-serif",
+      buaStyles: DEFAULT_BUA_STYLES,
     };
   }
 
@@ -168,13 +207,68 @@ function extractColorsAndFonts(entries: Record<string, Uint8Array>): {
   const titleFontMatch = /\.page-title[^{]*{[^}]*font-family:\s*'([^']+)'/s.exec(css);
 
   return {
-    primaryColor: paletteColors[0] ?? '#1a3a5c',
-    accentColor: paletteColors[1] ?? '#c8a951',
+    primaryColor: paletteColors[0] ?? '#135d87',
+    accentColor: paletteColors[1] ?? '#deb13c',
     fontFamilyTitle: titleFontMatch ? `'${titleFontMatch[1]}', sans-serif`
                    : fontFamilyMatch ? `'${fontFamilyMatch[1]}', sans-serif`
                    : "'Georgia', serif",
     fontFamilyBody: fontFamilyMatch ? `'${fontFamilyMatch[1]}', sans-serif`
                   : "'Arial', sans-serif",
+    buaStyles: extractBuaStyles(css),
+  };
+}
+
+/**
+ * Extrae colores y etiquetas de las cajas semánticas BUA del CSS del tema.
+ *
+ * Lee directamente las reglas `.bua_ejemplo { ... }` y `.bua_ejemplo::before { content: "..." }`,
+ * por lo que los literales son multilingües: "Ejemplo" / "Example" / "Exemple"
+ * según el idioma del tema cargado.
+ */
+function extractBuaStyles(css: string): BuaBoxStyles {
+  /**
+   * Extrae el color sólido del border-left de una clase BUA.
+   * Soporta: "border-left: 6px solid #135d87"
+   */
+  function borderColor(cls: string): string | null {
+    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*border-left:[^;]*solid\\s*(#[0-9a-fA-F]{3,8})`, 's').exec(css);
+    return m ? m[1] : null;
+  }
+
+  /**
+   * Extrae el color/gradiente de fondo de una clase BUA.
+   * Soporta: "background: #fafbfc" y "background-color: rgba(...)"
+   */
+  function bgColor(cls: string): string | null {
+    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*background(?:-color)?:\\s*(rgba\\([^)]+\\)|#[0-9a-fA-F]{3,8})`, 's').exec(css);
+    return m ? m[1] : null;
+  }
+
+  /**
+   * Extrae la etiqueta ::before { content: "..." } de una clase BUA.
+   * Soporta comillas simples y dobles.
+   */
+  function label(cls: string): string | null {
+    const m = new RegExp(`\\.${cls}::before\\s*\\{[^}]*content:\\s*["']([^"']+)["']`, 's').exec(css);
+    return m ? m[1] : null;
+  }
+
+  return {
+    ejemplo: {
+      borderColor: borderColor('bua_ejemplo') ?? DEFAULT_BUA_STYLES.ejemplo.borderColor,
+      bgColor:     bgColor('bua_ejemplo')     ?? DEFAULT_BUA_STYLES.ejemplo.bgColor,
+      label:       label('bua_ejemplo')       ?? DEFAULT_BUA_STYLES.ejemplo.label,
+    },
+    definicion: {
+      borderColor: borderColor('bua_definicion') ?? DEFAULT_BUA_STYLES.definicion.borderColor,
+      bgColor:     bgColor('bua_definicion')     ?? DEFAULT_BUA_STYLES.definicion.bgColor,
+      label:       label('bua_definicion')       ?? DEFAULT_BUA_STYLES.definicion.label,
+    },
+    importante: {
+      borderColor: borderColor('bua_importante') ?? DEFAULT_BUA_STYLES.importante.borderColor,
+      bgColor:     bgColor('bua_importante')     ?? DEFAULT_BUA_STYLES.importante.bgColor,
+      label:       label('bua_importante')       ?? DEFAULT_BUA_STYLES.importante.label,
+    },
   };
 }
 

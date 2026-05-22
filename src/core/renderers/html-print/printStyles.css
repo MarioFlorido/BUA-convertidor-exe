@@ -274,11 +274,12 @@
 }
 
 .block-html th {
-  background-color: var(--color-primary, #1a3a5c);
-  color: #fff;
+  background-color: #f5f6f7;
+  color: var(--color-primary, #135d87);
   font-weight: 700;
   padding: 6px 10px;
-  border: 1px solid var(--color-primary, #1a3a5c);
+  border: 1px solid #e5e7eb;
+  border-bottom: 3px solid var(--color-accent, #deb13c);
   text-align: left;
 }
 
@@ -294,10 +295,10 @@
 
 /* Tabla vertical: primera columna actúa como cabecera */
 .block-html .bua_tabla_vertical td:first-child {
-  background-color: var(--color-primary, #1a3a5c);
-  color: #fff;
+  background-color: #f5f6f7;
+  color: var(--color-primary, #135d87);
   font-weight: 700;
-  border-color: var(--color-primary, #1a3a5c);
+  border-right: 3px solid var(--color-accent, #deb13c);
 }
 
 /* Contenedor de tabla con clase BUA */
@@ -339,34 +340,34 @@
   opacity: 0.75;
 }
 
-/* Ejemplo */
+/* Ejemplo — colores y etiqueta inyectados por el renderer desde el CSS del tema */
 .block-html .bua_ejemplo {
-  background: #e8f4fb;
-  border-left: 4px solid #1565c0;
+  background: var(--bua-bg-ejemplo, #fafbfc);
+  border-left: 4px solid var(--bua-color-ejemplo, #135d87);
 }
 .block-html .bua_ejemplo::before {
-  content: 'Ejemplo';
-  color: #1565c0;
+  content: var(--bua-label-ejemplo, 'Ejemplo');
+  color: var(--bua-color-ejemplo, #135d87);
 }
 
 /* Definición */
 .block-html .bua_definicion {
-  background: #f3e5f5;
-  border-left: 4px solid #6a1b9a;
+  background: var(--bua-bg-definicion, #fafbfc);
+  border-left: 4px solid var(--bua-color-definicion, #6b7280);
 }
 .block-html .bua_definicion::before {
-  content: 'Definición';
-  color: #6a1b9a;
+  content: var(--bua-label-definicion, 'Definición');
+  color: var(--bua-color-definicion, #6b7280);
 }
 
 /* Importante */
 .block-html .bua_importante {
-  background: #fff3e0;
-  border-left: 4px solid #e65100;
+  background: var(--bua-bg-importante, rgba(222,177,60,0.3));
+  border-left: 4px solid var(--bua-color-importante, #deb13c);
 }
 .block-html .bua_importante::before {
-  content: 'Importante';
-  color: #e65100;
+  content: var(--bua-label-importante, 'Importante');
+  color: var(--bua-color-importante, #deb13c);
 }
 
 
@@ -406,6 +407,6 @@ p, li {
   widows: 3;
 }
 
-figure, .content-block {
+figure {
   break-inside: avoid;
 }

@@ -1,5 +1,5 @@
 import type { SemanticDocument, SemanticPage, SemanticBlock } from '../../models/SemanticDocument';
-import { loadPrintThemeAssets } from './PrintThemeLoader';
+import { loadPrintThemeAssets, type BuaBoxStyles } from './PrintThemeLoader';
 import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
 import { renderTableOfContents, sectionId } from './renderTableOfContents';
 
@@ -103,6 +103,7 @@ export async function semanticDocumentToPrintHtml(
     accentColor: assets.accentColor,
     fontFamilyTitle: assets.fontFamilyTitle,
     fontFamilyBody: assets.fontFamilyBody,
+    buaStyles: assets.buaStyles,
   });
 
   return { html, pageCount };
@@ -177,6 +178,7 @@ interface AssemblyOptions {
   accentColor: string;
   fontFamilyTitle: string;
   fontFamilyBody: string;
+  buaStyles: BuaBoxStyles;
 }
 
 /**
@@ -201,6 +203,19 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
       --color-accent:     ${opts.accentColor};
       --font-title:       ${opts.fontFamilyTitle};
       --font-body:        ${opts.fontFamilyBody};
+
+      /* Cajas semánticas BUA — colores y etiquetas extraídos del CSS del tema */
+      --bua-color-ejemplo:    ${opts.buaStyles.ejemplo.borderColor};
+      --bua-bg-ejemplo:       ${opts.buaStyles.ejemplo.bgColor};
+      --bua-label-ejemplo:    "${opts.buaStyles.ejemplo.label.replace(/"/g, '\\"')}";
+
+      --bua-color-definicion: ${opts.buaStyles.definicion.borderColor};
+      --bua-bg-definicion:    ${opts.buaStyles.definicion.bgColor};
+      --bua-label-definicion: "${opts.buaStyles.definicion.label.replace(/"/g, '\\"')}";
+
+      --bua-color-importante: ${opts.buaStyles.importante.borderColor};
+      --bua-bg-importante:    ${opts.buaStyles.importante.bgColor};
+      --bua-label-importante: "${opts.buaStyles.importante.label.replace(/"/g, '\\"')}";
     }
 
     /* Aplicar variables del tema a los elementos del renderer */
