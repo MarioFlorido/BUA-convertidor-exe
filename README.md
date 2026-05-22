@@ -1,385 +1,249 @@
-# 📚 BUA Convertidor eXe - Word → eXeLearning
+# BUA Convertidor eXe — DOCX → ELPX + PDF
 
-**ConvertidoreXe v1.0** - Herramienta para convertir documentos Word (DOCX) a formato eXeLearning (ELPX) con soporte para múltiples temas visuales.
+**ConvertidoreXe v1.1** — Herramienta web para convertir documentos Word (DOCX) a formato eXeLearning (ELPX) con exportación a PDF/impresión.
 
-**Desarrollado por:** Biblioteca Universitaria, Universidad de Alicante
-
----
-
-## 🎯 Descripción General
-
-ConvertidoreXe es una **aplicación web moderna** que permite:
-
-1. **Cargar documentos Word** (DOCX)
-2. **Configurar estructura** (elegir niveles H1, H2, H3)
-3. **Seleccionar tema visual** (Doctorado, PhD, etc.)
-4. **Generar eXeLearning** (formato ELPX)
-5. **Descargar** el archivo ELPX generado
-
-### Características principales
-
-✅ **Conversión DOCX → ELPX**
-- Preserva contenido, estructura y formato
-- Soporte para encabezados, párrafos, tablas, imágenes
-- Procesamiento en el cliente (privado, sin servidor central)
-
-✅ **Sistema de temas**
-- Temas visuales personalizables (Doctorado, PhD, Base, etc.)
-- Carga/eliminación dinámica de temas via admin panel
-- Estilos CSS aplicados automáticamente
-
-✅ **Interfaz intuitiva**
-- Flujo paso a paso guiado
-- Vista previa en tiempo real
-- Mensajes de progreso detallados
-
-✅ **Configuración flexible**
-- Elegir niveles de encabezados (H1→página, H2→sección, H3→bloque)
-- Procesamiento automático de tablas y listas
-- Manejo inteligente de imágenes incrustadas
+**Desarrollado por:** Biblioteca Universitaria, Universidad de Alicante  
+**Licencia:** CC BY-NC-SA 4.0 — Creative Commons Reconocimiento-NoComercial-CompartirIgual 4.0
 
 ---
 
-## 📁 Estructura del Proyecto
+## Descripción general
+
+ConvertidoreXe es una **aplicación web** que funciona completamente en el navegador (sin procesamiento en servidor externo). Permite:
+
+1. **Cargar** un documento Word (DOCX)
+2. **Configurar** la estructura jerárquica (qué hace cada nivel de encabezado)
+3. **Seleccionar** un tema visual de eXeLearning
+4. **Generar** el archivo ELPX listo para abrir en eXeLearning
+5. **Exportar** una vista previa de impresión / PDF con portada, índice y estilos BUA
+
+---
+
+## Arquitectura — pipeline de 3 capas
 
 ```
-BUA-convertidor-exe/
-├── src/                          # Código fuente (React + TypeScript)
-│   ├── App.tsx                   # Componente raíz (flujo principal)
-│   ├── main.tsx                  # Punto de entrada
-│   │
-│   ├── components/               # Componentes React (UI)
-│   │   ├── AppHeader.tsx         # Encabezado (logo, navegación, botón admin)
-│   │   ├── UploadZone.tsx        # Zona drag-and-drop de carga DOCX
-│   │   ├── StructureConfigurator.tsx  # Configurar H1→página, H2→sección, H3→bloque
-│   │   ├── ThemeSelector.tsx     # Seleccionar tema visual (con preview)
-│   │   ├── ThemeManager.tsx      # Admin de temas (cargar/eliminar ZIP)
-│   │   ├── ConfigPanel.tsx       # Panel de configuración y opciones
-│   │   └── DownloadButton.tsx    # Botón descargar ELPX generado
-│   │
-│   ├── core/                     # Lógica de negocio (conversión)
-│   │   ├── docxToElpx.ts         # NÚCLEO: Conversión DOCX → ELPX
-│   │   │                         #   - Extrae HTML con Mammoth
-│   │   │                         #   - Construye estructura XML
-│   │   │                         #   - Combina tema + contenido
-│   │   │                         #   - Genera ZIP final (ELPX)
-│   │   ├── buildFromStructure.ts # Construcción de estructura XML
-│   │   │                         #   - Mapea contenido a páginas/bloques
-│   │   │                         #   - Aplica clases CSS BUA
-│   │   └── parseStructure.ts     # Análisis de jerarquía H1/H2/H3
-│   │
-│   ├── server/                   # Servidor Node.js (Temas)
-│   │   ├── themeServer.ts        # Servidor Express (puerto 5175)
-│   │   │                         #   - Endpoints API de temas
-│   │   │                         #   - Manejo de uploads
-│   │   └── themeHandler.ts       # Handlers de API
-│   │                             #   - POST /api/upload-theme
-│   │                             #   - DELETE /api/themes/:id
-│   │                             #   - GET /api/themes
-│   │
-│   ├── styles/                   # Estilos CSS
-│   │   └── globals.css           # Estilos globales (colores, tipografía, layout)
-│   │
-│   └── types/                    # Tipos TypeScript (interfases)
-│       └── index.ts              # Tipos compartidos (DocxImportOptions, etc)
+DOCX
+  ↓
+[Capa 1] docxToSemanticDocument.ts
+          DocxParser  →  parseStructure  →  SemanticBuilder
+  ↓
+SemanticDocument        ← modelo agnóstico al formato de salida
+  ↓                ↓
+[Capa 2a]          [Capa 2b]
+semanticDocumentToElpx  semanticDocumentToPrintHtml
+ElpxRenderer            PrintThemeLoader + renderCoverPage
+                        + renderTableOfContents + printStyles.css
+  ↓                ↓
+ELPX (ZIP)         HTML autónomo (Paged.js → PDF)
+```
+
+**SemanticDocument** es el núcleo arquitectónico: un modelo de datos puro y agnóstico que describe el documento como páginas y bloques semánticos. Los renderers de ELPX y de impresión son independientes entre sí y no se contaminan.
+
+---
+
+## Estructura del proyecto
+
+```
+src/
+├── App.tsx                            # Orquestador UI (flujo de 5 pasos)
+├── main.tsx
 │
-├── public/                       # Archivos estáticos (servidor Vite)
-│   ├── base.elpx                 # Plantilla base eXeLearning (CRÍTICA)
-│   │                             # - XML structure
-│   │                             # - Content template
-│   │                             # - Default theme
-│   ├── Doctorado_26-27.zip       # Tema: Doctorado 2026-27
-│   ├── Doctorat_26-27.zip        # Tema: Doctorat (Catalán) 2026-27
-│   ├── PhD_26-27.zip             # Tema: PhD 2026-27
-│   └── themes-config.json        # Configuración de temas disponibles
-│                                 # { "themes": [ { "id", "name", ... } ] }
+├── components/                        # Interfaz de usuario
+│   ├── AppHeader.tsx                  # Cabecera y acceso a gestión de temas
+│   ├── UploadZone.tsx                 # Carga drag-and-drop de DOCX
+│   ├── StructureConfigurator.tsx      # Configurar H1/H2/H3 por encabezado
+│   ├── ThemeSelector.tsx              # Elegir tema visual (con preview)
+│   ├── ThemeManager.tsx               # Admin de temas (cargar/eliminar ZIP)
+│   ├── DownloadButton.tsx             # Descargar ELPX y exportar PDF
+│   └── ConfigPanel.tsx                # Opciones globales de conversión
 │
-├── index.html                    # Punto de entrada HTML
-├── vite.config.ts                # Configuración Vite (builder)
-├── tsconfig.json                 # Configuración TypeScript
-├── package.json                  # Dependencias npm
-├── package-lock.json             # Lock file de dependencias
-└── README.md                     # Este archivo
+├── types/
+│   └── index.ts                       # Tipos compartidos
+│
+└── core/
+    ├── models/
+    │   └── SemanticDocument.ts        # Modelo central: SemanticDocument/Page/Block
+    │
+    ├── parsers/
+    │   └── DocxParser.ts              # DOCX → HTML limpio (Mammoth)
+    │
+    ├── parseStructure.ts              # HTML → árbol H1/H2/H3/H4
+    │
+    ├── builders/
+    │   └── SemanticBuilder.ts         # Árbol H1/H2/H3 → SemanticDocument
+    │
+    ├── transformers/
+    │   └── HtmlTransformer.ts         # Limpieza y normalización de HTML
+    │
+    ├── docxToSemanticDocument.ts      # Orquestador Capa 1: DOCX → SemanticDocument
+    │
+    ├── converters/
+    │   └── semanticDocumentToElpx.ts  # Orquestador Capa 2a: SemanticDoc → ELPX
+    │
+    ├── renderers/
+    │   ├── ElpxRenderer.ts            # Genera content.xml del ELPX
+    │   │
+    │   └── html-print/                # Renderer Capa 2b: SemanticDoc → HTML Print/PDF
+    │       ├── semanticDocumentToPrintHtml.ts  # Punto de entrada del renderer
+    │       ├── PrintThemeLoader.ts             # Carga assets del tema para PDF
+    │       ├── renderCoverPage.ts              # Portada (imagen + metadatos + CC)
+    │       ├── renderTableOfContents.ts        # Índice con target-counter() Paged.js
+    │       └── printStyles.css                 # CSS Paged Media (@page, running elements)
+    │
+    └── services/
+        ├── ThemeService.ts            # Carga y gestión de temas ZIP
+        └── PreviewService.ts          # Vista previa HTML en tiempo real
 
+public/
+├── base.elpx                          # Plantilla base eXeLearning (CRÍTICA)
+├── themes-config.json                 # Catálogo de temas disponibles
+├── Doctorado_26-27.zip                # Tema Doctorado (ES)
+├── Doctorat_26-27.zip                 # Tema Doctorat (CA/valenciano)
+├── PhD_26-27.zip                      # Tema PhD (EN)
+└── themes/                            # Temas descomprimidos (generado automáticamente)
+    ├── Doctorado_26-27/
+    ├── Doctorat_26-27/
+    └── PhD_26-27/
+
+src/server/
+├── themeServer.ts                     # Servidor Express (puerto 5175)
+└── themeHandler.ts                    # Endpoints API de gestión de temas
 ```
 
 ---
 
-## 🔄 Flujo de la Aplicación
-
-### Vista General del Flujo
+## Flujo de la aplicación
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    USUARIO FINAL                         │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│  UPLOAD ZONE: Cargar documento Word (.docx)             │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│  STRUCTURE CONFIGURATOR: Elegir H1/H2/H3                │
-│  - H1 → página / bloque                                  │
-│  - H2 → página / bloque                                  │
-│  - H3 → bloque                                           │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│  THEME SELECTOR: Elegir tema visual                      │
-│  - Doctorado, PhD, Doctorat, Base                        │
-│  - Preview de screenshot                                │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│  CONVERSIÓN (docxToElpx.ts)                             │
-│  ├─ Extraer HTML del DOCX (Mammoth)                    │
-│  ├─ Analizar estructura H1/H2/H3                        │
-│  ├─ Cargar plantilla base (base.elpx)                  │
-│  ├─ Cargar tema personalizado                          │
-│  ├─ Aplicar estructura y contenido                     │
-│  └─ Generar ELPX (ZIP)                                 │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-┌─────────────────────────────────────────────────────────┐
-│  DOWNLOAD BUTTON: Descargar archivo.elpx               │
-│  - Muestra estadísticas (páginas, bloques, etc)        │
-└─────────────────────────────────────────────────────────┘
-                           ↓
-                    ¡ARCHIVO DESCARGADO!
+1. UPLOAD       Cargar .docx
+      ↓
+2. STRUCTURE    Por cada H1 del documento, elegir para cada H2:
+                  • Nombre de iDevice  → H2 como título del bloque eXeLearning
+                  • H2 en HTML        → H2 como encabezado dentro del bloque (por defecto)
+                  • Acordeón          → Agrupa H2 consecutivos en <div class="exe-fx exe-accordion">
+                  • Pestañas          → Agrupa H2 consecutivos en <div class="exe-fx exe-tabs">
+      ↓
+3. THEME        Elegir tema visual (Doctorado / Doctorat / PhD / Base)
+      ↓
+4. CONVERT      DOCX → SemanticDocument → ELPX
+      ↓
+5. DOWNLOAD     • Descargar .elpx
+                • Vista previa para imprimir / PDF (abre en nueva pestaña con Paged.js)
 ```
 
 ---
 
-## 🔧 Componentes Detallados
+## Modelo SemanticDocument
 
-### `src/components/` (Interfaz de Usuario)
+```typescript
+interface SemanticDocument {
+  title: string;
+  subtitle: string;
+  pages: SemanticPage[];
+}
 
-| Componente | Función | Puerto |
-|-----------|---------|--------|
-| **AppHeader.tsx** | Encabezado, logo, botón admin | Vite (5174) |
-| **UploadZone.tsx** | Drag-and-drop para cargar DOCX | Vite (5174) |
-| **StructureConfigurator.tsx** | Elegir H1/H2/H3 niveles | Vite (5174) |
-| **ThemeSelector.tsx** | Elegir tema + preview | Vite (5174) |
-| **ThemeManager.tsx** | Admin temas (cargar/eliminar) | Express (5175) |
-| **ConfigPanel.tsx** | Opciones de configuración | Vite (5174) |
-| **DownloadButton.tsx** | Descarga de ELPX | Vite (5174) |
+interface SemanticPage {
+  title: string;
+  level: 1 | 2 | 3 | 4;
+  parentIndex: number | null;
+  blocks: SemanticBlock[];
+}
 
-#### Detalles por componente:
-
-**UploadZone.tsx**
-- Interfaz drag-and-drop para archivos DOCX
-- Validación de tipo: solo `.docx`
-- Inicia el procesamiento del documento
-- Emite evento `onFileSelect(file)`
-
-**StructureConfigurator.tsx**
-- Permite configurar niveles de encabezados
-- Opciones disponibles:
-  - H1 → `page` (nueva página en eXeLearning)
-  - H1 → `block` (bloque dentro de página)
-  - H2 → `page` o `block`
-  - H3 → `block`
-- Vista previa de estructura resultante
-- Emite `onConfirm(structure)` cuando está configurado
-
-**ThemeSelector.tsx**
-- Lista de temas cargados desde `themes-config.json`
-- Muestra nombre, actividad, idioma, descripción
-- Mostrador de screenshot/vista previa
-- Selecciona tema para aplicar al ELPX
-- Emite `onConfirm(themeId)` al continuar
-
-**ThemeManager.tsx**
-- **⚠️ REQUIERE servidor ejecutándose:** `npm run theme-server`
-- Permite:
-  - Cargar temas (ZIP → `/public/themes/`)
-  - Eliminar temas existentes
-  - Auto-actualiza `themes-config.json`
-- Endpoints API (en puerto 5175):
-  - `POST /api/upload-theme` → Cargar tema ZIP
-  - `DELETE /api/themes/:id` → Eliminar tema
-  - `GET /api/themes` → Listar temas actuales
-
-**DownloadButton.tsx**
-- Botón principal para descargar ELPX generado
-- Muestra información de conversión:
-  - Nombre archivo
-  - Cantidad de páginas
-  - Cantidad de bloques
-- Genera blob del ELPX y dispara descarga
-
-**AppHeader.tsx**
-- Encabezado visual de la aplicación
-- Logo y branding
-- Botón para acceder a ThemeManager
-
-**ConfigPanel.tsx**
-- Panel secundario de opciones/configuración
-- Ajustes globales de conversión
-- Preferencias de usuario
-
----
-
-## 🔧 Módulos Core (Lógica de Conversión)
-
-### `src/core/docxToElpx.ts` (⭐ ARCHIVO CRÍTICO)
-
-**El núcleo de toda la conversión DOCX → ELPX**
-
-#### Arquitectura:
-
-```
-DOCX input
-    ↓
-convertDocxToElpx()
-    ├─ extractDocxHtml()          → Mammoth extrae HTML
-    ├─ buildProjectFromHtml()     → Estructura XML
-    ├─ loadBaseTemplate()         → base.elpx
-    ├─ loadThemeEntries()         → Tema personalizado
-    └─ buildElpxFromTemplate()    → ZIP final
-    ↓
-ELPX output
+interface SemanticBlock {
+  title: string;   // 'Contenido' = bloque sin título de iDevice
+  html: string;
+}
 ```
 
-#### Funciones principales:
+---
 
-**`convertDocxToElpx(file, options, structure, onProgress)`**
-- **Punto de entrada principal** de la conversión
-- Pasos:
-  1. Leer buffer del archivo DOCX
-  2. Extraer HTML usando Mammoth
-  3. Si tema ≠ 'base': cargar tema personalizado
-  4. Construir estructura y contenido
-  5. Generar ELPX final
-- **Retorna:** `ImportToElpxResult` (blob + metadatos)
+## Renderer HTML Print / PDF
 
-**`extractDocxHtml(buffer)`**
-- Usa librería `mammoth`
-- Convierte DOCX binario → HTML limpio
-- Preserva: párrafos, encabezados, tablas, imágenes
+El renderer de impresión vive exclusivamente en `src/core/renderers/html-print/` y **no contamina** el pipeline DOCX → ELPX ni el modelo SemanticDocument.
 
-**`buildProjectFromHtml(html, filename, options, structure)`**
-- Analiza el HTML extraído
-- Construye objeto `ImportedProject` con estructura interna
-- Asigna contenido a páginas y bloques según H1/H2/H3
-- **Clases BUA aplicadas:**
-  - `.bua_ejemplo` → Ejemplos
-  - `.bua_definicion` → Definiciones
-  - `.bua_importante` → Contenido importante
-  - `.horizontal-table` / `.vertical-table` → Tablas
+### Características del PDF generado
 
-**`loadBaseTemplate()`**
-- Carga `/public/base.elpx` desde servidor Vite
-- Extrae con `unzipSync` todos los archivos internos
-- Valida: must contain `content.xml`
-- **⚠️ CRÍTICA:** Si falta base.elpx, la conversión FALLA
+| Elemento | Descripción |
+|----------|-------------|
+| **Portada** | Imagen del tema (`portada_pdf.*`), logo BUA, título, subtítulo, año, licencia CC BY-NC-SA |
+| **Índice** | TOC con paginación automática vía `target-counter()` de Paged.js |
+| **Encabezado de página** | Logo BUA (izquierda) + título del documento (derecha) |
+| **Pie de página** | Logo UA (izquierda) + número de página (centro) |
+| **iDevices con título** | Cabecera coloreada (`--color-primary`) + borde perimetral |
+| **Cajas BUA** | `bua_ejemplo`, `bua_definicion`, `bua_importante` con colores y etiquetas extraídos del CSS del tema |
+| **Tablas** | Cabecera con `--color-primary`/`--color-accent` del tema |
+| **Acordeones** | `<details>` siempre expandidos en impresión |
+| **Imágenes** | Centradas con `margin: auto` y `box-shadow` sutil |
 
-**`loadThemeEntries(themeId)`**
-- Carga tema personalizado de `/public/{themeId}.zip`
-- Extrae archivos del ZIP
-- **Prefija con `theme/`** para insertar correctamente en ELPX
-- Retorna: `Record<string, Uint8Array>` de archivos
+### Detección de idioma
 
-**`convertProjectToElpx(project, filename, extraEntries, onProgress, themeId)`**
-- Combina:
-  - Plantilla base (base.elpx)
-  - Contenido del proyecto
-  - Archivos del tema personalizado
-- Generador final del ZIP
-- **Retorna:** `ImportToElpxResult` con blob descargable
+El idioma del tema se detecta en tres capas:
+1. **Etiquetas BUA en el CSS** (`"Exemple"` → ca, `"Example"` → en, `"Ejemplo"` → es) — más fiable, funciona para cualquier nombre de tema
+2. **Palabras clave del ID** (`PhD` → en, `Doctorat`/`Grau`/`Màster` → ca)
+3. **Fallback** → `es`
 
-**`buildElpxFromTemplate(template, project, themeId)`**
-- Construye estructura XML interna del ELPX
-- Inserta contenido en `content.xml`
-- Aplica metadata
-- Genera ZIP final con `zipSync`
+### Licencia CC en portada
+
+La licencia Creative Commons BY-SA 4.0 se muestra en el idioma del tema:
+- ES: *"Esta obra está bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional."*
+- EN: *"This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License."*
+- CA: *"Aquesta obra es troba sota una llicència Creative Commons Reconeixement-CompartirIgual 4.0 Internacional."*
 
 ---
 
-### `src/core/buildFromStructure.ts`
+## Metadatos del ELPX generado
 
-**Construye la estructura XML interna de eXeLearning**
+Cada archivo `.elpx` incluye en su `content.xml`:
 
-#### Funciones:
-
-**`buildProjectFromStructure(structure, html, options)`**
-- Procesa HTML según estructura configurada (H1/H2/H3)
-- Crea páginas y bloques en eXeLearning
-- Mapea contenido a la estructura jerárquica
-- **Retorna:** `ImportedProject` (objeto XML)
-
-**`applyTableClasses(html)`**
-- Detecta elementos `<table>` en HTML
-- Analiza estructura (filas, columnas)
-- Agrega clases CSS BUA:
-  - `.horizontal-table` → Tabla horizontal (más columnas)
-  - `.vertical-table` → Tabla vertical (más filas)
-
-**`applyDivClasses(html)`**
-- Detecta divisores y elementos especiales en HTML
-- Identifica patrones (párrafos especiales, cajas, etc)
-- Agrega clases CSS BUA:
-  - `.bua_ejemplo` → Para ejemplos
-  - `.bua_definicion` → Para definiciones
-  - `.bua_importante` → Para contenido importante
+| Campo `pp_*` | Valor |
+|---|---|
+| `pp_title` | Título del documento importado |
+| `pp_subtitle` | Subtítulo |
+| `pp_author` | `Biblioteca de la Universidad de Alicante` |
+| `pp_lang` | `es` |
+| `pp_license` | `creative commons: attribution - non commercial - share alike 4.0` |
+| `pp_licenseUrl` | `https://creativecommons.org/licenses/by-nc-sa/4.0/` |
+| `pp_theme` | ID del tema seleccionado |
 
 ---
 
-### `src/core/parseStructure.ts`
+## Sistema de temas
 
-**Análisis de la jerarquía H1/H2/H3**
-
-**`parseDocumentStructure(htmlContent)`**
-- Extrae todos los encabezados del documento
-- Detecta jerarquía: H1 > H2 > H3
-- Construye árbol de estructura
-- **Retorna:** `DocumentStructure` (para preview y análisis)
-
----
-
-## 🌐 Sistema de Temas
-
-### ¿Qué es un tema?
-
-Un **tema** es un archivo ZIP que contiene:
-- **Estilos CSS** personalizados
-- **Configuración** (metadata)
-- **Recursos** (imágenes, fuentes, iconos)
-
-### Estructura de un tema ZIP
+### Estructura del ZIP de un tema
 
 ```
-tema-name.zip/
-├── config.xml          # Metadatos (ID, nombre, descripción)
-├── style.css           # Estilos CSS principales
-├── style.js            # Scripts JavaScript (opcional)
-├── screenshot.png      # Captura para preview
-├── fonts/              # Fuentes customizadas (opcional)
-├── icons/              # Iconos personalizados (opcional)
-└── img/                # Imágenes de recursos
+{ThemeId}.zip/
+├── style.css          # Estilos CSS del tema (REQUERIDO)
+│                      # Debe incluir:
+│                      #   - Comentario "Paleta: #color1 · #color2 ..."
+│                      #   - Clases .bua_ejemplo, .bua_definicion, .bua_importante
+│                      #   - .bua_*::before { content: "Etiqueta" }
+├── style.js           # Scripts JS (opcional)
+├── config.xml         # Metadatos del tema
+├── screenshot.png     # Preview para el selector
+├── portada_pdf.png    # (o .jpg/.webp) Imagen de portada para PDF
+└── img/
+    ├── logo_BUA.png   # Logo BUA — encabezado de página en PDF y portada
+    ├── logo_UA.png    # Logo UA — pie de página en PDF
+    └── logo_CID.png   # Logo CID (opcional)
 ```
 
 ### Temas incluidos
 
-| Tema | Archivo | Descripción | Idioma |
-|------|---------|-------------|--------|
-| **Base** | (integrado en base.elpx) | Plantilla estándar eXeLearning | ES |
-| **Doctorado** | Doctorado_26-27.zip | Tema Doctorado Universidad de Alicante | ES |
-| **Doctorat** | Doctorat_26-27.zip | Doctorat (Versión en Catalán) | CA |
-| **PhD** | PhD_26-27.zip | Tema PhD | ES |
+| Tema | ID | Idioma | Descripción |
+|------|-----|--------|-------------|
+| Doctorado | `Doctorado_26-27` | ES | Doctorado UA 2026-27 |
+| Doctorat | `Doctorat_26-27` | CA | Doctorat UA 2026-27 (valenciano) |
+| PhD | `PhD_26-27` | EN | PhD UA 2026-27 |
 
-### Cargar nuevo tema
+### Cargar un tema nuevo
 
-1. En la aplicación, ir a **"Administrador de Temas"**
-2. Seleccionar archivo ZIP
-3. Sistema auto-extrae a `/public/themes/`
-4. Auto-actualiza `themes-config.json`
-5. Tema disponible inmediatamente en selector
+1. Ir a **"Gestión de temas"** en la aplicación (requiere servidor de temas)
+2. Subir el archivo ZIP
+3. El servidor descomprime en `public/themes/{id}/` y actualiza `themes-config.json`
+4. El tema aparece inmediatamente en el selector
 
 ### `themes-config.json`
-
-Define los temas disponibles:
 
 ```json
 {
@@ -387,18 +251,16 @@ Define los temas disponibles:
     {
       "id": "base",
       "name": "Base eXeLearning",
-      "activity": "Por defecto",
       "language": "es",
-      "description": "Tema estándar de eXeLearning",
+      "description": "Tema estándar",
       "screenshot": null
     },
     {
       "id": "Doctorado_26-27",
       "name": "Doctorado",
-      "activity": "Doctorado",
       "language": "es",
-      "description": "Tema Doctorado Universidad de Alicante 2026-27",
-      "screenshot": "/Doctorado_26-27/screenshot.png"
+      "description": "Tema Doctorado UA 2026-27",
+      "screenshot": "/themes/Doctorado_26-27/screenshot.png"
     }
   ]
 }
@@ -406,295 +268,119 @@ Define los temas disponibles:
 
 ---
 
-## 🚀 Instalación y Uso
+## Instalación y uso
 
-### Requisitos previos
+### Requisitos
 
-- **Node.js** >= 16
-- **npm** >= 8
+- **Node.js** ≥ 18
+- **npm** ≥ 9
 
 ### Instalación
 
 ```bash
-# Clonar repositorio
 git clone https://github.com/MarioFlorido/BUA-convertidor-exe.git
 cd BUA-convertidor-exe
-
-# Instalar dependencias
 npm install
 ```
 
-### Uso
-
-#### Opción 1: Con servidor de temas (RECOMENDADO)
+### Arranque
 
 ```bash
-# Terminal 1: Servidor de temas (puerto 5175)
-npm run theme-server
+# Terminal 1: Servidor de temas (necesario para cargar/eliminar temas)
+npm run theme-server     # puerto 5175
 
-# Terminal 2: Aplicación Vite (puerto 5174)
-npm run dev
+# Terminal 2: Aplicación Vite
+npm run dev              # puerto 5174
 ```
 
 Accede a: **http://localhost:5174**
 
-#### Opción 2: Sin servidor (solo lectura de temas)
+### Comandos
 
-```bash
-# Solo aplicación (sin admin de temas)
-npm run dev
-```
-
-Accede a: **http://localhost:5174**
-
----
-
-### Puertos
-
-| Servicio | Puerto | URL |
-|----------|--------|-----|
-| Vite (Aplicación) | 5174 | http://localhost:5174 |
-| Express (Temas) | 5175 | http://localhost:5175 |
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Vite en modo desarrollo (hot reload) |
+| `npm run build` | Compilar para producción (`dist/`) |
+| `npm run preview` | Previsualizar el build de producción |
+| `npm run theme-server` | Servidor Express para gestión de temas |
 
 ---
 
-## 📦 Comandos npm
+## Dependencias principales
 
-```bash
-npm run dev           # Inicia Vite (aplicación)
-npm run build         # Compilar para producción
-npm run preview       # Vista previa de build producción
-npm run theme-server  # Iniciar servidor de temas (Express)
-npm run type-check    # Verificar tipos TypeScript
-```
-
----
-
-## 🔗 Dependencias Principales
-
-### Frontend (Vite + React)
-- **React 18** - Framework UI
-- **TypeScript** - Tipado estático fuerte
-- **Vite** - Build tool ultra-rápido
-
-### Conversión DOCX
-- **mammoth** (^1.6.0) - Extrae HTML limpio de DOCX
-
-### Compresión/Descompresión
-- **fflate** (^0.8.0) - ZIP/DEFLATE nativo
-
-### Backend (Servidor de temas)
-- **Express.js** (^4.x) - Framework HTTP
-- **multer** - Middleware para uploads de archivos
-
-### Desarrollo
-- **TypeScript** - Tipado para TypeScript
-- **Vite** - Hot reload y bundling
+| Paquete | Uso |
+|---------|-----|
+| `mammoth` | Extrae HTML limpio de archivos DOCX |
+| `fflate` | Compresión/descompresión ZIP (ELPX y temas) |
+| `react` / `react-dom` | Framework UI |
+| `express` + `multer` | Servidor de gestión de temas |
+| `Paged.js` (CDN) | CSS Paged Media polyfill para PDF |
 
 ---
 
-## 🔐 Seguridad & Consideraciones
-
-### Privacidad
-
-✅ **Procesamiento en cliente (Vite)**
-- Archivo DOCX procesado EN el navegador
-- NO se envía a servidor externo
-- NO se guarda en servidor
-
-✅ **Archivos temporales**
-- Se almacenan solo en memoria
-- Se limpian automáticamente al terminar
-
-### Validaciones
-
-- ✅ Solo archivos `.docx` en upload
-- ✅ Solo archivos `.zip` en tema manager
-- ✅ Validación de estructura ZIP/ELPX
-- ✅ Validación MIME type
-- ✅ Límites de tamaño configurables
-
-### Consideraciones especiales
-
-⚠️ **Temas en `/public/`**
-- Son accesibles directamente vía HTTP
-- Es por diseño (necesario para cargar)
-- No contienen datos sensibles
-
-⚠️ **base.elpx crítica**
-- DEBE existir en `/public/`
-- Es la plantilla por defecto
-- Sin ella, NO funciona la aplicación
-
----
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "No se pudo cargar la plantilla base"
-
-**Causa:** Falta `/public/base.elpx`
-
-**Solución:**
+`public/base.elpx` no existe. Restaurar con:
 ```bash
-# Verificar que existe
-ls -la public/base.elpx
-
-# Si no existe, restaurar desde git
 git checkout public/base.elpx
-
-# Reiniciar servidor
-npm run dev
 ```
-
----
 
 ### "Tema no encontrado"
+El ZIP existe en `public/` pero no está en `themes-config.json`, o viceversa. Verificar coherencia y recargar la página.
 
-**Causa:** Tema en `themes-config.json` pero no existe archivo ZIP
+### "Error al conectar con el servidor de temas"
+El servidor Express no está corriendo. Ejecutar `npm run theme-server` en una terminal separada.
 
-**Solución:**
-1. Verificar `/public/{tema}.zip` existe
-2. Verificar `themes-config.json` incluye el tema
-3. Recargar página en navegador
-4. Revisar console para errores
+### "El PDF no muestra el encabezado/pie"
+Paged.js requiere conectividad para cargar desde CDN (`unpkg.com`). Si trabajas sin conexión, descargar Paged.js localmente y actualizar la URL en `semanticDocumentToPrintHtml.ts`.
 
----
-
-### "Error de servidor 5175"
-
-**Causa:** Servidor de temas no está ejecutándose
-
-**Solución:**
-```bash
-# Iniciar servidor temas en otra terminal
-npm run theme-server
-
-# Verificar puerto no está en uso
-lsof -i :5175
-
-# Si está en uso, cambiar puerto en themeServer.ts
-```
+### "Las cajas BUA no tienen colores del tema en el PDF"
+El CSS del tema debe incluir las clases `.bua_ejemplo`, `.bua_definicion`, `.bua_importante` con `border-left: N solid #color` y los `::before { content: "Etiqueta" }`. Ver la sección "Estructura del ZIP de un tema".
 
 ---
 
-### "ELPX generado pero vacío/incompleto"
+## Notas de desarrollo
 
-**Causa:** Estructura H1/H2/H3 no configurada o DOCX sin contenido
+### Añadir una nueva opción de H2
 
-**Solución:**
-1. Verificar estructura está configurada en paso 2
-2. Verificar DOCX tiene contenido en los niveles especificados
-3. Revisar console para warnings
-4. Ver logs en ThemeManager si hay errores de tema
+1. Añadir el valor al tipo `H2StructureOption` en `src/types/index.ts`
+2. Añadir el mismo al union en `src/core/models/SemanticDocument.ts`
+3. Implementar la lógica en `SemanticBuilder.ts`
+4. Añadir la etiqueta en `StructureConfigurator.tsx`
 
----
+### Añadir un nuevo renderer de salida
 
-### "Tema no se aplica al ELPX"
+1. Crear directorio `src/core/renderers/{nombre}/`
+2. La función de entrada recibe `SemanticDocument` y devuelve el formato deseado
+3. **No modificar** `SemanticDocument`, `docxToSemanticDocument.ts` ni el renderer ELPX
 
-**Causa:** Tema no está bien formado o no se cargó correctamente
+### Añadir nuevas clases BUA
 
-**Solución:**
-1. Verificar estructura ZIP del tema
-2. Verificar `themes-config.json` está actualizado
-3. Eliminar tema y recargarlo
-4. Usar tema 'base' para verificar flujo
-
----
-
-## 📊 Estadísticas del Proyecto
-
-| Métrica | Valor |
-|---------|-------|
-| Componentes React | 7 |
-| Módulos Core | 3 |
-| Archivos TypeScript | 15+ |
-| Líneas de código (core) | ~5000+ |
-| Temas incluidos | 4 (Base + 3 personalizados) |
-| Soporte de idiomas | 2 (ES, CA) |
-| Navegadores soportados | Todos (ES6+) |
+1. En `src/core/transformers/HtmlTransformer.ts` — detección y asignación de clases
+2. En el CSS del tema — estilos visuales
+3. En `src/core/renderers/html-print/printStyles.css` — estilos equivalentes para PDF
+4. En `PrintThemeLoader.ts` — extracción de colores/etiquetas si son semánticas
 
 ---
 
-## 📝 Guía de Desarrollo
+## Estado del proyecto
 
-### Agregar nuevo tema
-
-1. Preparar ZIP con estructura correcta
-2. Guardar en `/public/{nombre}.zip`
-3. Agregar entrada a `themes-config.json`
-4. Iniciar servidor y recargar página
-
-### Modificar flujo UI
-
-1. Editar componentes en `src/components/`
-2. Si afecta flujo principal: modificar `App.tsx`
-3. Ejecutar `npm run dev` para live reload
-
-### Agregar nuevas clases BUA
-
-1. Modificar `applyDivClasses()` en `buildFromStructure.ts`
-2. Agregar estilos CSS en tema
-3. Testear con DOCX de prueba
-
-### Debug de conversión
-
-1. Abrir DevTools (F12)
-2. Pestaña Console para logs
-3. Logs tienen prefijo `[PDF-DEBUG]` o `[DEBUG]`
+| Funcionalidad | Estado |
+|---|---|
+| Conversión DOCX → ELPX | ✅ Completado |
+| Sistema de temas (cargar/eliminar) | ✅ Completado |
+| Configurador de estructura H1/H2/H3 | ✅ Completado |
+| Opciones H2: iDevice / HTML / Acordeón / Pestañas | ✅ Completado |
+| Renderer HTML Print / PDF (Paged.js) | ✅ Completado |
+| Portada con imagen y licencia CC multilingüe | ✅ Completado |
+| Índice con numeración automática | ✅ Completado |
+| Cabecera/pie de página con logos BUA/UA | ✅ Completado |
+| Metadatos ELPX (Autoría, Licencia BY-NC-SA) | ✅ Completado |
+| Detección de idioma del tema (ES/EN/CA) | ✅ Completado |
 
 ---
 
-## 📚 Referencias Externas
-
-- **eXeLearning:** https://exelearning.net/
-- **Mammoth.js:** https://github.com/mwilson/mammoth.js/
-- **Vite:** https://vitejs.dev/
-- **React:** https://react.dev/
-- **TypeScript:** https://www.typescriptlang.org/
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo licencia **GPL-3.0** (ver archivo LICENSE)
-
-```
-Creative Commons Attribution-Share Alike 4.0
-Biblioteca Universitaria, Universidad de Alicante
-```
-
----
-
-## ✅ Estado del Proyecto
-
-### Phase 1: DOCX → ELPX
-- ✅ **COMPLETADO Y FUNCIONAL**
-- Cargar DOCX
-- Configurar estructura H1/H2/H3
-- Seleccionar temas
-- Generar ELPX
-- Descargar archivo
-- Sistema de temas (cargar/eliminar)
-
-### Phase 2: DOCX → PDF
-- ⏸️ **PAUSADO - En evaluación**
-- Investigación completada
-- Decisión: Requiere enfoque diferente (Backend)
-- Ver: `INFORME_PDF_EXPORT_PHASE2.md` (en la rama)
-
----
-
-## 📞 Soporte
-
-Para problemas o sugerencias:
-1. Revisar sección **Troubleshooting**
-2. Verificar console del navegador (F12)
-3. Revisar logs del servidor
-4. Contactar a Biblioteca Universitaria
-
----
-
+**Versión:** 1.1  
 **Última actualización:** Mayo 2026  
-**Versión:** 1.0.0  
-**Desarrollado por:** Biblioteca Universitaria, Universidad de Alicante  
 **Repositorio:** https://github.com/MarioFlorido/BUA-convertidor-exe
