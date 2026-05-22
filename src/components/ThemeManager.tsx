@@ -65,8 +65,8 @@ export function ThemeManager() {
   };
 
   const handleDeleteTheme = async (bundle: ThemeBundle) => {
-    if (bundle.source === 'builtin') {
-      setError('Los temas predefinidos no se pueden eliminar');
+    if (bundle.id === 'base') {
+      setError('El tema base no se puede eliminar');
       return;
     }
     if (!confirm(`¿Eliminar tema "${bundle.name}"?`)) return;
@@ -80,9 +80,6 @@ export function ThemeManager() {
       setError(`❌ ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
-
-  const userThemes = themes.filter((t) => t.source === 'user');
-  const builtinThemes = themes.filter((t) => t.source === 'builtin');
 
   return (
     <div className="theme-manager">
@@ -122,53 +119,36 @@ export function ThemeManager() {
           </label>
         </div>
         <p className="help-text">
-          El nombre del archivo ZIP será el ID del tema (ej: Doctorado_26-27.zip)
+          El nombre del archivo ZIP será el ID del tema (ej: Doctorado_27-28.zip).
+          Si ya existe un tema con ese ID, será reemplazado.
         </p>
       </div>
 
-      {/* Temas predefinidos */}
+      {/* Lista unificada de temas */}
       <div className="themes-list">
-        <h3>Temas predefinidos ({builtinThemes.length})</h3>
-        {builtinThemes.length === 0 ? (
-          <p className="no-items">No hay temas predefinidos</p>
+        <h3>Temas disponibles ({themes.length})</h3>
+        {themes.length === 0 ? (
+          <p className="no-items">No hay temas cargados</p>
         ) : (
           <div className="theme-items">
-            {builtinThemes.map((theme) => (
+            {themes.map((theme) => (
               <div key={theme.id} className="theme-item">
                 <div className="theme-item-header">
                   <div>
                     <strong>{theme.metadata.name ?? theme.name}</strong>
                     <span className="theme-id">({theme.id})</span>
                   </div>
-                  <span className="theme-badge">Predefinido</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Temas de usuario */}
-      <div className="themes-list">
-        <h3>Temas de usuario ({userThemes.length})</h3>
-        {userThemes.length === 0 ? (
-          <p className="no-items">No hay temas de usuario cargados</p>
-        ) : (
-          <div className="theme-items">
-            {userThemes.map((theme) => (
-              <div key={theme.id} className="theme-item">
-                <div className="theme-item-header">
-                  <div>
-                    <strong>{theme.name}</strong>
-                    <span className="theme-id">({theme.id})</span>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteTheme(theme)}
-                    className="btn-delete"
-                    disabled={uploading}
-                  >
-                    Eliminar
-                  </button>
+                  {theme.id === 'base' ? (
+                    <span className="theme-badge">Base</span>
+                  ) : (
+                    <button
+                      onClick={() => handleDeleteTheme(theme)}
+                      className="btn-delete"
+                      disabled={uploading}
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -183,10 +163,9 @@ export function ThemeManager() {
           <li>Arrastra o selecciona un archivo ZIP de tema</li>
           <li>El sistema lo valida y lo registra automáticamente</li>
           <li>El tema queda disponible en el selector de forma inmediata</li>
-          <li>
-            Los temas de usuario persisten en el navegador (IndexedDB) y
-            sobreviven recargas de página
-          </li>
+          <li>Los temas persisten en el navegador y sobreviven recargas de página</li>
+          <li>Para actualizar un tema (nuevo curso académico), carga el nuevo ZIP con el mismo nombre — reemplazará al anterior</li>
+          <li>Solo el tema <strong>Base</strong> no puede eliminarse</li>
         </ol>
       </div>
     </div>

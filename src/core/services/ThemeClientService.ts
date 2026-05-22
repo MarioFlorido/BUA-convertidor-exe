@@ -60,8 +60,8 @@ export class ThemeClientService {
    */
   async removeTheme(id: string): Promise<void> {
     const bundle = ThemeRegistry.get(id);
-    if (bundle?.source === 'builtin') {
-      throw new Error('Los temas predefinidos no se pueden eliminar');
+    if (bundle?.id === 'base') {
+      throw new Error('El tema base no se puede eliminar');
     }
     ThemeRegistry.remove(id);
     await UserThemeProvider.remove(id);
