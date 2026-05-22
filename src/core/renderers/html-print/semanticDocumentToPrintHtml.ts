@@ -280,9 +280,13 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
 </head>
 <body>
 
+${opts.coverHtml}
+
 <!-- ── Running elements para encabezado y pie de página ──────────────────
-     Paged.js captura estos elementos con position:running() y los repite
-     en cada página dentro de los margin boxes definidos en @page.
+     IMPORTANTE: van DESPUÉS del cover para que la propiedad page:cover no
+     genere una página vacía antes de la portada.
+     Paged.js extrae estos elementos del flujo (position:running) y los
+     repite en cada página dentro de los margin boxes definidos en @page.
      ────────────────────────────────────────────────────────────────────── -->
 <div id="page-header-logo">${opts.buaLogoDataUrl
   ? `<img src="${opts.buaLogoDataUrl}" alt="BUA">`
@@ -291,8 +295,6 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
 ${opts.uaLogoDataUrl
   ? `<div id="page-footer-logo"><img src="${opts.uaLogoDataUrl}" alt="UA"></div>`
   : ''}
-
-${opts.coverHtml}
 
 ${opts.tocHtml}
 

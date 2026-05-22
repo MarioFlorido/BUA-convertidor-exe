@@ -132,8 +132,8 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
     coverImageDataUrl: extractCoverImage(entries),
     buaLogoDataUrl: extractLogoFile(entries, 'logo_BUA') ?? extractLogoFile(entries, 'logo'),
     uaLogoDataUrl: extractLogoFile(entries, 'logo_UA'),
-    language: detectLanguage(themeId),
-    ...extractThemeStyles(entries),
+    // language viene de extractThemeStyles (usa etiquetas BUA + fallback themeId)
+    ...extractThemeStyles(entries, themeId),
   };
 }
 
@@ -186,28 +186,51 @@ function extractLogoFile(entries: Record<string, Uint8Array>, name: string): str
 }
 
 /**
- * Detecta el idioma del tema a partir de su ID.
- * Convenciones de nomenclatura BUA:
- *   "Doctorado_*" → es  |  "Doctorat_*" → ca  |  "PhD_*" → en
+ * Detecta el idioma del tema. Estrategia por capas (orden de fiabilidad):
+ *
+ *  1. Etiqueta BUA ya extraída del CSS del tema:
+ *       "Exemple"→ca · "Example"→en · "Ejemplo"→es
+ *     Es el método más fiable porque el propio CSS declara su idioma.
+ *     Funciona para cualquier nombre de tema, presente o futuro.
+ *
+ *  2. Palabras clave en el ID del tema (fallback para temas sin BUA):
+ *       PhD / _en / -en → en
+ *       Doctorat / Grau / Màster / _ca / _va → ca
+ *
+ *  3. Fallback final: 'es'
  */
-function detectLanguage(themeId: string): PrintLanguage {
+function detectLanguage(themeId: string, buaStyles?: BuaBoxStyles): PrintLanguage {
+  // Capa 1 — etiqueta BUA (discrimina con precisión entre es/en/ca)
+  if (buaStyles) {
+    const label = buaStyles.ejemplo.label.toLowerCase().trim();
+    if (label === 'exemple') return 'ca';
+    if (label === 'example') return 'en';
+    if (label === 'ejemplo') return 'es';
+  }
+
+  // Capa 2 — palabras clave del ID
   const id = themeId.toLowerCase();
   if (id.includes('phd') || id.includes('_en') || id.includes('-en')) return 'en';
-  if (id.includes('doctorat') || id.includes('_ca') || id.includes('_va') || id.includes('-ca')) return 'ca';
+  if (
+    id.includes('doctorat') || id.includes('grau') ||
+    id.includes('màster') || id.includes('mster') ||
+    id.includes('_ca') || id.includes('_va') || id.includes('-ca')
+  ) return 'ca';
+
   return 'es';
 }
 
 /**
- * Extrae colores, tipografías y estilos BUA del style.css del tema.
- * Usa regex sobre el CSS del tema para reproducir fielmente los estilos en PDF.
- * En caso de no encontrar nada, devuelve valores por defecto.
+ * Extrae colores, tipografías, estilos BUA e idioma del style.css del tema.
+ * Recibe el themeId para usarlo como fallback de detección de idioma.
  */
-function extractThemeStyles(entries: Record<string, Uint8Array>): {
+function extractThemeStyles(entries: Record<string, Uint8Array>, themeId: string): {
   primaryColor: string;
   accentColor: string;
   fontFamilyTitle: string;
   fontFamilyBody: string;
   buaStyles: BuaBoxStyles;
+  language: PrintLanguage;
 } {
   const cssEntry = entries['style.css'];
   if (!cssEntry) {
@@ -217,10 +240,12 @@ function extractThemeStyles(entries: Record<string, Uint8Array>): {
       fontFamilyTitle: "'Georgia', serif",
       fontFamilyBody: "'Arial', sans-serif",
       buaStyles: DEFAULT_BUA_STYLES,
+      language: detectLanguage(themeId),
     };
   }
 
   const css = new TextDecoder().decode(cssEntry);
+  const buaStyles = extractBuaStyles(css);
 
   // Extraer colores de la paleta documentada en el comentario de cabecera
   // Formato: "Paleta: #color1 · #color2 · ..."
@@ -241,7 +266,9 @@ function extractThemeStyles(entries: Record<string, Uint8Array>): {
                    : "'Georgia', serif",
     fontFamilyBody: fontFamilyMatch ? `'${fontFamilyMatch[1]}', sans-serif`
                   : "'Arial', sans-serif",
-    buaStyles: extractBuaStyles(css),
+    buaStyles,
+    // Las etiquetas BUA son la fuente más fiable; el themeId actúa de fallback
+    language: detectLanguage(themeId, buaStyles),
   };
 }
 
