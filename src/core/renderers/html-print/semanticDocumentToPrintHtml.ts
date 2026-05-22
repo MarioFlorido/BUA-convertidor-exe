@@ -139,14 +139,17 @@ function renderSection(page: SemanticPage, idx: number): string {
 }
 
 function renderBlock(block: SemanticBlock): string {
-  // Bloques sin título y sin contenido significativo → omitir
-  if (!block.title && (!block.html || block.html.trim() === '<p></p>')) {
+  // Omitir bloques vacíos
+  if (!block.html || block.html.trim() === '<p></p>') {
     return '';
   }
 
-  const titleHtml = block.title
-    ? `<h4 class="block-title">${escHtml(block.title)}</h4>`
-    : '';
+  // "Contenido" es el título genérico por defecto asignado a bloques sin H2/H3.
+  // No añade valor visual en PDF — lo omitimos para no crear una cabecera fantasma.
+  const isDefaultTitle = !block.title || block.title === 'Contenido';
+  const titleHtml = isDefaultTitle
+    ? ''
+    : `<h4 class="block-title">${escHtml(block.title)}</h4>`;
 
   return `<div class="content-block">
   ${titleHtml}
@@ -235,8 +238,18 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
   <style>${printStylesCss}</style>
 
   <!-- Paged.js — polyfill CSS Paged Media en el navegador -->
-  <!-- Resuelve: @page, target-counter(), leader(), bookmarks -->
+  <!-- Registrar hook ANTES de que Paged.js empiece a paginar (DOMContentLoaded) -->
   <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+  <script>
+    // Abrir el diálogo de impresión automáticamente cuando Paged.js termine de paginar.
+    // afterRendered() se llama una sola vez, justo cuando la paginación está completa.
+    class PrintAfterRender extends Paged.Handler {
+      afterRendered() {
+        window.print();
+      }
+    }
+    Paged.registerHandlers(PrintAfterRender);
+  </script>
 </head>
 <body>
 

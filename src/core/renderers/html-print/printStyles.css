@@ -12,7 +12,6 @@
    1. CONFIGURACIÓN DE PÁGINAS
    ============================================================ */
 
-/* Página estándar de contenido */
 @page {
   size: A4;
   margin: 20mm 25mm 25mm 25mm;
@@ -25,22 +24,16 @@
   }
 }
 
-/* Portada: sin márgenes, sin numeración */
 @page cover {
   margin: 0;
 
-  @bottom-center {
-    content: none;
-  }
+  @bottom-center { content: none; }
 }
 
-/* Página de índice: sin numeración de página visible */
 @page toc {
   margin: 20mm 25mm 25mm 25mm;
 
-  @bottom-center {
-    content: none;
-  }
+  @bottom-center { content: none; }
 }
 
 
@@ -60,7 +53,6 @@
   overflow: hidden;
 }
 
-/* Overlay semitransparente sobre imagen de fondo */
 .cover-overlay {
   position: absolute;
   inset: 0;
@@ -77,11 +69,6 @@
   color: #fff;
 }
 
-/* Portada SIN imagen: texto oscuro sobre fondo color */
-.cover-page:not([style*="background-image"]) .cover-content {
-  color: #fff;
-}
-
 .cover-logo {
   max-width: 160px;
   max-height: 80px;
@@ -90,7 +77,6 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
-  /* Filtro para logos oscuros sobre fondo oscuro */
   filter: brightness(0) invert(1);
 }
 
@@ -100,9 +86,6 @@
   line-height: 1.2;
   margin: 0 0 16px 0;
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  /* Bookmarks PDF via Paged.js */
-  bookmark-level: 1;
-  bookmark-label: attr(content);
 }
 
 .cover-subtitle {
@@ -122,10 +105,9 @@
   opacity: 0.88;
 }
 
-.cover-author     { font-weight: 600; font-size: 11pt; }
+.cover-author       { font-weight: 600; font-size: 11pt; }
 .cover-organization { font-style: italic; }
-.cover-date       { }
-.cover-license    { font-size: 9pt; opacity: 0.75; }
+.cover-license      { font-size: 9pt; opacity: 0.75; }
 
 
 /* ============================================================
@@ -159,7 +141,6 @@
   margin-bottom: 0;
 }
 
-/* Numeración de página via Paged.js target-counter() */
 .toc-entry a {
   display: flex;
   width: 100%;
@@ -177,19 +158,18 @@
   margin-left: 4px;
 }
 
-/* Jerarquía visual */
-.toc-level-1 a         { font-weight: 700; font-size: 11pt; }
-.toc-level-1           { margin-top: 10px; }
+.toc-level-1          { margin-top: 10px; }
+.toc-level-1 a        { font-weight: 700; font-size: 11pt; }
 
-.toc-level-2 a         { font-weight: 400; font-size: 10pt; padding-left: 16px; }
-.toc-level-2           { margin-top: 2px; }
+.toc-level-2          { margin-top: 2px; }
+.toc-level-2 a        { font-weight: 400; font-size: 10pt; padding-left: 16px; }
 
-.toc-level-3 a         { font-weight: 400; font-size: 9pt; padding-left: 32px; color: #555; }
-.toc-level-3           { margin-top: 1px; }
+.toc-level-3          { margin-top: 1px; }
+.toc-level-3 a        { font-weight: 400; font-size: 9pt; padding-left: 32px; color: #555; }
 
 
 /* ============================================================
-   4. CONTENIDO — SECCIONES
+   4. CONTENIDO — SECCIONES Y TÍTULOS
    ============================================================ */
 
 /* H1 siempre abre nueva página */
@@ -203,45 +183,45 @@
   break-before: auto;
 }
 
-/* Títulos de sección */
+/* FIX: sin break-after: avoid en los títulos.
+   La combinación break-before:page (sección) + break-after:avoid (título)
+   hace que Paged.js deje el título solo en la página y añada espacio en blanco.
+   El H1 ya está al inicio de la página nueva — no necesita break-after. */
+
 .section-title-1 {
   font-size: 20pt;
   font-weight: 700;
-  margin: 0 0 20px 0;
-  padding-bottom: 10px;
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
   border-bottom: 3px solid;
   bookmark-level: 1;
   bookmark-label: content();
-  break-after: avoid;
 }
 
 .section-title-2 {
   font-size: 15pt;
   font-weight: 700;
-  margin: 24px 0 14px 0;
-  padding-bottom: 6px;
+  margin: 20px 0 12px 0;
+  padding-bottom: 5px;
   border-bottom: 2px solid;
   bookmark-level: 2;
   bookmark-label: content();
-  break-after: avoid;
 }
 
 .section-title-3 {
   font-size: 12pt;
   font-weight: 700;
-  margin: 18px 0 10px 0;
-  padding-bottom: 4px;
+  margin: 16px 0 8px 0;
+  padding-bottom: 3px;
   border-bottom: 1px solid;
   bookmark-level: 3;
   bookmark-label: content();
-  break-after: avoid;
 }
 
 .section-title-4 {
   font-size: 11pt;
   font-weight: 700;
-  margin: 14px 0 8px 0;
-  break-after: avoid;
+  margin: 12px 0 6px 0;
 }
 
 
@@ -250,87 +230,182 @@
    ============================================================ */
 
 .content-block {
-  margin: 0 0 20px 0;
+  margin: 0 0 14px 0;
 }
 
+/* Título real de un bloque (H2/H3 que no es sección separada).
+   Sin caja ni borde — solo un sub-epígrafe limpio. */
 .block-title {
   font-size: 11pt;
   font-weight: 700;
-  margin: 14px 0 8px 0;
-  break-after: avoid;
+  margin: 12px 0 6px 0;
+  color: inherit;
 }
 
-/* Contenido HTML del bloque */
 .block-html {
   font-size: 10.5pt;
   line-height: 1.65;
 }
 
-.block-html p          { margin: 0 0 8px 0; }
+.block-html p          { margin: 0 0 7px 0; }
 .block-html ul,
-.block-html ol         { margin: 8px 0; padding-left: 22px; }
-.block-html li         { margin-bottom: 4px; }
+.block-html ol         { margin: 7px 0; padding-left: 20px; }
+.block-html li         { margin-bottom: 3px; }
 .block-html strong     { font-weight: 700; }
 .block-html em         { font-style: italic; }
-.block-html blockquote { margin: 10px 0 10px 16px; padding-left: 12px; border-left: 3px solid #ccc; }
+.block-html blockquote { margin: 8px 0 8px 16px; padding-left: 10px; border-left: 3px solid #ccc; }
 .block-html pre,
-.block-html code       { font-family: 'Courier New', monospace; font-size: 9pt; }
-.block-html img        { max-width: 100%; height: auto; break-inside: avoid; }
-.block-html table      { width: 100%; border-collapse: collapse; margin: 12px 0; break-inside: avoid; }
-.block-html th         { background: #f0f0f0; font-weight: 700; padding: 6px 10px;
-                          border: 1px solid #ccc; text-align: left; }
-.block-html td         { padding: 6px 10px; border: 1px solid #ddd; }
-.block-html tr:nth-child(even) td { background: #fafafa; }
+.block-html code       { font-family: 'Courier New', monospace; font-size: 9pt; background: #f5f5f5; padding: 2px 4px; }
+.block-html img        { max-width: 100%; height: auto; display: block; break-inside: avoid; }
 
 
 /* ============================================================
-   6. CLASES BUA — SEMÁNTICA DOCUMENTAL
+   6. TABLAS
    ============================================================ */
 
+.block-html table,
+.block-html .bua_tabla_horizontal table,
+.block-html .bua_tabla_vertical table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 9.5pt;
+  break-inside: avoid;
+}
+
+.block-html th {
+  background-color: var(--color-primary, #1a3a5c);
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 10px;
+  border: 1px solid var(--color-primary, #1a3a5c);
+  text-align: left;
+}
+
+.block-html td {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  vertical-align: top;
+}
+
+.block-html tr:nth-child(even) td {
+  background: #f7f7f7;
+}
+
+/* Tabla vertical: primera columna actúa como cabecera */
+.block-html .bua_tabla_vertical td:first-child {
+  background-color: var(--color-primary, #1a3a5c);
+  color: #fff;
+  font-weight: 700;
+  border-color: var(--color-primary, #1a3a5c);
+}
+
+/* Contenedor de tabla con clase BUA */
+.block-html .bua_tabla_horizontal,
+.block-html .bua_tabla_vertical {
+  margin: 10px 0;
+  break-inside: avoid;
+}
+
+
+/* ============================================================
+   7. CAJAS SEMÁNTICAS BUA
+   Incluyen etiqueta ::before para identificar el tipo,
+   ya que el PDF no carga el CSS del tema que las genera.
+   Colores via CSS variables — resueltos por el renderer en :root.
+   ============================================================ */
+
+.block-html .bua_ejemplo,
+.block-html .bua_definicion,
+.block-html .bua_importante,
+.block-html .bua_tabla_horizontal,
+.block-html .bua_tabla_vertical {
+  margin: 10px 0;
+  padding: 10px 14px;
+  break-inside: avoid;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Etiqueta de tipo — arriba a la izquierda, negrita, color del borde */
+.block-html .bua_ejemplo::before,
+.block-html .bua_definicion::before,
+.block-html .bua_importante::before {
+  display: block;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  opacity: 0.75;
+}
+
+/* Ejemplo */
 .block-html .bua_ejemplo {
   background: #e8f4fb;
   border-left: 4px solid #1565c0;
-  padding: 10px 14px;
-  margin: 10px 0;
-  break-inside: avoid;
-  border-radius: 0 3px 3px 0;
+}
+.block-html .bua_ejemplo::before {
+  content: 'Ejemplo';
+  color: #1565c0;
 }
 
+/* Definición */
 .block-html .bua_definicion {
   background: #f3e5f5;
   border-left: 4px solid #6a1b9a;
-  padding: 10px 14px;
-  margin: 10px 0;
-  break-inside: avoid;
-  border-radius: 0 3px 3px 0;
+}
+.block-html .bua_definicion::before {
+  content: 'Definición';
+  color: #6a1b9a;
 }
 
+/* Importante */
 .block-html .bua_importante {
   background: #fff3e0;
   border-left: 4px solid #e65100;
-  padding: 10px 14px;
-  margin: 10px 0;
-  break-inside: avoid;
-  border-radius: 0 3px 3px 0;
 }
-
-/* Acordeones: siempre expandidos en print */
-.block-html details        { break-inside: avoid; }
-.block-html details summary { font-weight: 700; margin-bottom: 6px; list-style: none; }
-.block-html details summary::before { content: '▼  '; font-size: 8pt; }
+.block-html .bua_importante::before {
+  content: 'Importante';
+  color: #e65100;
+}
 
 
 /* ============================================================
-   7. UTILIDADES
+   8. ACORDEONES (siempre expandidos en print)
    ============================================================ */
 
-/* Evitar huérfanos y viudas tipográficas */
+.block-html details {
+  margin: 8px 0;
+  break-inside: avoid;
+}
+
+.block-html details summary {
+  font-weight: 700;
+  margin-bottom: 5px;
+  list-style: none;
+}
+
+.block-html details summary::marker,
+.block-html details summary::-webkit-details-marker {
+  display: none;
+}
+
+.block-html details summary::before {
+  content: '▼  ';
+  font-size: 8pt;
+  color: var(--color-primary, #1a3a5c);
+}
+
+
+/* ============================================================
+   9. UTILIDADES
+   ============================================================ */
+
 p, li {
   orphans: 3;
   widows: 3;
 }
 
-/* No cortar imágenes ni tablas a mitad de página */
-figure, table, .content-block {
+figure, .content-block {
   break-inside: avoid;
 }
