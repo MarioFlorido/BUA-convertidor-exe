@@ -82,9 +82,10 @@ export class ElpxRenderer {
 <odeProperties>
   <odeProperty><key>pp_title</key><value>${escapeXml(this.project.title || 'Documento importado')}</value></odeProperty>
   <odeProperty><key>pp_subtitle</key><value>${escapeXml(this.project.subtitle || '')}</value></odeProperty>
+  <odeProperty><key>pp_author</key><value>Biblioteca de la Universidad de Alicante</value></odeProperty>
   <odeProperty><key>pp_lang</key><value>es</value></odeProperty>
-  <odeProperty><key>pp_license</key><value>creative commons: attribution - share alike 4.0</value></odeProperty>
-  <odeProperty><key>pp_licenseUrl</key><value>https://creativecommons.org/licenses/by-sa/4.0/</value></odeProperty>
+  <odeProperty><key>pp_license</key><value>creative commons: attribution - non commercial - share alike 4.0</value></odeProperty>
+  <odeProperty><key>pp_licenseUrl</key><value>https://creativecommons.org/licenses/by-nc-sa/4.0/</value></odeProperty>
   <odeProperty><key>pp_theme</key><value>${escapeXml(themeId)}</value></odeProperty>
   <odeProperty><key>pp_exelearning_version</key><value>v4.0.0-rc3</value></odeProperty>
   <odeProperty><key>pp_modified</key><value>${escapeXml(modified)}</value></odeProperty>
