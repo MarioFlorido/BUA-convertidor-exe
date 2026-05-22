@@ -1,47 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
-
-interface ThemeConfig {
-  id: string;
-  name: string;
-  activity: string;
-  language: string;
-  description: string;
-  screenshot?: string | null;
-}
-
-const API_URL = 'http://localhost:5175';
+import { useState, useRef } from 'react';
+import { themeClientService } from '../core/services/ThemeClientService';
+import { ThemeRegistry } from '../core/services/ThemeRegistry';
+import type { ThemeBundle } from '../core/services/ThemeBundle';
 
 export function ThemeManager() {
-  const [themes, setThemes] = useState<ThemeConfig[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [themes, setThemes] = useState<ThemeBundle[]>(() =>
+    ThemeRegistry.getAll()
+  );
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Cargar temas
-  const loadThemes = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/themes`);
-      if (response.ok) {
-        const data = await response.json();
-        setThemes(data.themes || []);
-      }
-    } catch (err) {
-      console.error('Error cargando temas:', err);
-      setError('No se pudo conectar al servidor de temas. ¿Está ejecutándose en puerto 5175?');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadThemes();
-  }, []);
+  const refreshThemes = () => setThemes(ThemeRegistry.getAll());
 
   const processFile = async (file: File) => {
-    if (!file.name.endsWith('.zip')) {
+    if (!file.name.toLowerCase().endsWith('.zip')) {
       setError('Por favor selecciona un archivo ZIP');
       return;
     }
@@ -51,30 +26,14 @@ export function ThemeManager() {
     setSuccess(null);
 
     try {
-      const formData = new FormData();
-      formData.append('theme', file);
-
-      const response = await fetch(`${API_URL}/api/upload-theme`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess(`✅ ${data.message}`);
-        await loadThemes();
-        // Limpiar input
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      } else {
-        setError(`❌ Error: ${data.error}`);
+      const bundle = await themeClientService.loadThemeZip(file);
+      setSuccess(`✅ Tema "${bundle.name}" cargado correctamente`);
+      refreshThemes();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     } catch (err) {
-      setError(
-        `Error de red: ${err instanceof Error ? err.message : 'Error desconocido'}`
-      );
+      setError(`❌ Error: ${err instanceof Error ? err.message : 'Error desconocido'}`);
     } finally {
       setUploading(false);
     }
@@ -100,65 +59,41 @@ export function ThemeManager() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
     await processFile(file);
   };
 
-  const handleDeleteTheme = async (id: string) => {
-    if (!confirm(`¿Eliminar tema "${id}"? Se borrará la carpeta y la configuración.`)) {
+  const handleDeleteTheme = async (bundle: ThemeBundle) => {
+    if (bundle.source === 'builtin') {
+      setError('Los temas predefinidos no se pueden eliminar');
       return;
     }
+    if (!confirm(`¿Eliminar tema "${bundle.name}"?`)) return;
 
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/themes/${id}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setSuccess(`✅ ${data.message}`);
-        await loadThemes();
-      } else {
-        setError(`❌ ${data.error}`);
-      }
+      await themeClientService.removeTheme(bundle.id);
+      setSuccess(`✅ Tema "${bundle.name}" eliminado`);
+      refreshThemes();
     } catch (err) {
-      setError(
-        `Error: ${err instanceof Error ? err.message : 'Error desconocido'}`
-      );
+      setError(`❌ ${err instanceof Error ? err.message : 'Error desconocido'}`);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="theme-manager">
-        <p>Cargando administrador de temas...</p>
-      </div>
-    );
-  }
+  const userThemes = themes.filter((t) => t.source === 'user');
+  const builtinThemes = themes.filter((t) => t.source === 'builtin');
 
   return (
     <div className="theme-manager">
       <h2>Administrador de Temas</h2>
       <p className="help-text">
-        Carga archivos ZIP de temas. El sistema automáticamente los extrae y
-        configura.
+        Carga archivos ZIP de temas. El sistema los procesa directamente en el
+        navegador, sin necesidad de servidor.
       </p>
 
-      {/* Mensajes de estado */}
-      {error && (
-        <div className="alert alert-error">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="alert alert-success">
-          {success}
-        </div>
-      )}
+      {error && <div className="alert alert-error">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
       {/* Formulario de carga con drag-and-drop */}
       <div className="theme-upload-section">
@@ -179,7 +114,11 @@ export function ThemeManager() {
             id="theme-file-input"
           />
           <label htmlFor="theme-file-input" className="upload-label">
-            {uploading ? '⏳ Cargando...' : dragActive ? '📥 Suelta el archivo aquí' : '📦 Arrastra ZIP aquí o haz clic'}
+            {uploading
+              ? '⏳ Cargando...'
+              : dragActive
+              ? '📥 Suelta el archivo aquí'
+              : '📦 Arrastra ZIP aquí o haz clic'}
           </label>
         </div>
         <p className="help-text">
@@ -187,14 +126,36 @@ export function ThemeManager() {
         </p>
       </div>
 
-      {/* Lista de temas */}
+      {/* Temas predefinidos */}
       <div className="themes-list">
-        <h3>Temas configurados ({themes.length})</h3>
-        {themes.length === 0 ? (
-          <p className="no-items">No hay temas configurados</p>
+        <h3>Temas predefinidos ({builtinThemes.length})</h3>
+        {builtinThemes.length === 0 ? (
+          <p className="no-items">No hay temas predefinidos</p>
         ) : (
           <div className="theme-items">
-            {themes.map((theme) => (
+            {builtinThemes.map((theme) => (
+              <div key={theme.id} className="theme-item">
+                <div className="theme-item-header">
+                  <div>
+                    <strong>{theme.metadata.name ?? theme.name}</strong>
+                    <span className="theme-id">({theme.id})</span>
+                  </div>
+                  <span className="theme-badge">Predefinido</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Temas de usuario */}
+      <div className="themes-list">
+        <h3>Temas de usuario ({userThemes.length})</h3>
+        {userThemes.length === 0 ? (
+          <p className="no-items">No hay temas de usuario cargados</p>
+        ) : (
+          <div className="theme-items">
+            {userThemes.map((theme) => (
               <div key={theme.id} className="theme-item">
                 <div className="theme-item-header">
                   <div>
@@ -202,11 +163,11 @@ export function ThemeManager() {
                     <span className="theme-id">({theme.id})</span>
                   </div>
                   <button
-                    onClick={() => handleDeleteTheme(theme.id)}
+                    onClick={() => handleDeleteTheme(theme)}
                     className="btn-delete"
                     disabled={uploading}
                   >
-                    🗑️ Eliminar
+                    Eliminar
                   </button>
                 </div>
               </div>
@@ -219,12 +180,13 @@ export function ThemeManager() {
       <div className="manager-instructions">
         <h4>Instrucciones:</h4>
         <ol>
-          <li>Asegúrate de tener el servidor ejecutándose (npm run theme-server)</li>
-          <li>Carga archivos ZIP de temas (Doctorado_26-27.zip, etc.)</li>
-          <li>El sistema automáticamente los extrae a <code>public/themes/</code></li>
-          <li>El archivo <code>themes-config.json</code> se actualiza automáticamente</li>
-          <li>Los temas aparecen en el selector de la aplicación</li>
-          <li>Haz commit y push a GitHub cuando termines</li>
+          <li>Arrastra o selecciona un archivo ZIP de tema</li>
+          <li>El sistema lo valida y lo registra automáticamente</li>
+          <li>El tema queda disponible en el selector de forma inmediata</li>
+          <li>
+            Los temas de usuario persisten en el navegador (IndexedDB) y
+            sobreviven recargas de página
+          </li>
         </ol>
       </div>
     </div>

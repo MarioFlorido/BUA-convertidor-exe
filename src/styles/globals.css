@@ -965,6 +965,23 @@ body {
   color: #1b5e20;
 }
 
+.theme-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.theme-badge--user {
+  background: #f3e5f5;
+  color: #6a1b9a;
+  border-color: #ce93d8;
+}
+
 .manager-instructions {
   background: #e3f2fd;
   border-left: 4px solid #2196f3;

@@ -1,4 +1,5 @@
 import { unzipSync } from 'fflate';
+import { ThemeRegistry } from '../../services/ThemeRegistry';
 
 /** Idioma del tema, detectado desde el ID. Controla los textos CC y etiquetas. */
 export type PrintLanguage = 'es' | 'en' | 'ca';
@@ -140,6 +141,13 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
 // ─── Helpers privados ────────────────────────────────────────────────────────
 
 async function fetchAndUnzip(themeId: string): Promise<Record<string, Uint8Array>> {
+  // Consultar ThemeRegistry primero (evita re-fetch para temas ya cargados)
+  const bundle = ThemeRegistry.get(themeId);
+  if (bundle && Object.keys(bundle.files).length > 0) {
+    return bundle.files;
+  }
+
+  // Fallback: fetch desde URL estática (built-ins en public/ o dev middleware)
   const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
   const url = `${baseUrl}${themeId}.zip`;
   const response = await fetch(url);

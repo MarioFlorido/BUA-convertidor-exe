@@ -1,4 +1,5 @@
 import { unzipSync } from 'fflate';
+import { ThemeRegistry } from './ThemeRegistry';
 
 export interface TemplateData {
   entries: Record<string, Uint8Array>;
@@ -51,6 +52,15 @@ export class ThemeService {
       return this.cache.get(themeId)!;
     }
 
+    // Consultar ThemeRegistry primero (temas built-in pre-cargados + temas de usuario)
+    const bundle = ThemeRegistry.get(themeId);
+    if (bundle && Object.keys(bundle.files).length > 0) {
+      const prefixedEntries = this.filterAndPrefixThemeEntries(bundle.files);
+      this.cache.set(themeId, prefixedEntries);
+      return prefixedEntries;
+    }
+
+    // Fallback: fetch desde URL (compatibilidad dev sin registry completo)
     const baseUrl = import.meta.env.BASE_URL ?? '/';
     const url = `${baseUrl}${themeId}.zip`;
 
