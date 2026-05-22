@@ -5,9 +5,10 @@ import { ThemeSelector } from './components/ThemeSelector';
 import { ThemeManager } from './components/ThemeManager';
 import { DownloadButton } from './components/DownloadButton';
 import { AppHeader } from './components/AppHeader';
-import { convertDocxToElpx } from './core/docxToElpx';
+import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
+import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/parseStructure';
-import type { DocxImportOptions, ConversionState, DocxImportProgress, DocumentStructure } from './types';
+import type { DocxImportOptions, ConversionState, DocxImportProgress, DocumentStructure, SemanticDocument } from './types';
 import './styles/globals.css';
 
 type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager';
@@ -17,6 +18,7 @@ export function App() {
   const [screen, setScreen] = useState<AppScreen>('upload');
   const [structure, setStructure] = useState<DocumentStructure | null>(null);
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
+  const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
   const [options, setOptions] = useState<DocxImportOptions>({
     heading1Mode: 'page',
     heading2Mode: 'page',
@@ -75,9 +77,15 @@ export function App() {
     setState({ status: 'processing' });
 
     try {
-      const result = await convertDocxToElpx(file, options, structure, (progress: DocxImportProgress) => {
+      const onProgress = (progress: DocxImportProgress) =>
         setState({ status: 'processing', progress });
-      });
+
+      // Paso 1: DOCX → SemanticDocument (semántica pura, agnóstica)
+      const doc = await convertDocxToSemanticDocument(file, options, structure, onProgress);
+      setSemanticDoc(doc);
+
+      // Paso 2: SemanticDocument → ELPX (renderizador específico)
+      const result = await semanticDocumentToElpx(doc, file.name, { themeId: options.themeId }, onProgress);
 
       setState({ status: 'complete', result });
       setScreen('result');
@@ -92,6 +100,7 @@ export function App() {
   const handleReset = () => {
     setFile(null);
     setStructure(null);
+    setSemanticDoc(null);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -169,7 +178,11 @@ export function App() {
               </p>
             </div>
 
-            <DownloadButton result={state.result} />
+            <DownloadButton
+              result={state.result}
+              semanticDoc={semanticDoc}
+              themeId={options.themeId}
+            />
           </div>
         )}
       </main>

@@ -1002,3 +1002,44 @@ body {
   font-style: italic;
   margin: 1rem 0;
 }
+
+/* ── Botones de descarga múltiple ──────────────────────────────────────── */
+
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-download-pdf {
+  background-color: #0066cc;
+  color: #fff;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid #0066cc;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.btn-download-pdf:hover:not(:disabled) {
+  background-color: #0052a3;
+}
+
+.btn-download-pdf:disabled {
+  background-color: #99ccff;
+  border-color: #99ccff;
+  cursor: not-allowed;
+}
+
+.download-error {
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ef5350;
+  border-left: 4px solid #d32f2f;
+  padding: 1rem;
+  border-radius: 0;
+  font-size: 0.9rem;
+}
