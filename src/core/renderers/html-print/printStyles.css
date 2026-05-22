@@ -1,0 +1,336 @@
+/* ============================================================
+   BUA Print Renderer — CSS Paged Media
+   Utiliza Paged.js para polyfill de:
+     - @page (márgenes, cabeceras, pies de página)
+     - target-counter() (numeración TOC)
+     - leader() (puntos conductores TOC)
+     - bookmark-level (marcadores PDF)
+   ============================================================ */
+
+
+/* ============================================================
+   1. CONFIGURACIÓN DE PÁGINAS
+   ============================================================ */
+
+/* Página estándar de contenido */
+@page {
+  size: A4;
+  margin: 20mm 25mm 25mm 25mm;
+
+  @bottom-center {
+    content: counter(page);
+    font-size: 9pt;
+    color: #888;
+    font-family: Arial, sans-serif;
+  }
+}
+
+/* Portada: sin márgenes, sin numeración */
+@page cover {
+  margin: 0;
+
+  @bottom-center {
+    content: none;
+  }
+}
+
+/* Página de índice: sin numeración de página visible */
+@page toc {
+  margin: 20mm 25mm 25mm 25mm;
+
+  @bottom-center {
+    content: none;
+  }
+}
+
+
+/* ============================================================
+   2. PORTADA
+   ============================================================ */
+
+.cover-page {
+  page: cover;
+  break-after: page;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Overlay semitransparente sobre imagen de fondo */
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 1;
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 40px 60px;
+  max-width: 600px;
+  color: #fff;
+}
+
+/* Portada SIN imagen: texto oscuro sobre fondo color */
+.cover-page:not([style*="background-image"]) .cover-content {
+  color: #fff;
+}
+
+.cover-logo {
+  max-width: 160px;
+  max-height: 80px;
+  object-fit: contain;
+  margin-bottom: 32px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  /* Filtro para logos oscuros sobre fondo oscuro */
+  filter: brightness(0) invert(1);
+}
+
+.cover-title {
+  font-size: 28pt;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  /* Bookmarks PDF via Paged.js */
+  bookmark-level: 1;
+  bookmark-label: attr(content);
+}
+
+.cover-subtitle {
+  font-size: 15pt;
+  font-weight: 300;
+  line-height: 1.4;
+  margin: 0 0 32px 0;
+  opacity: 0.92;
+}
+
+.cover-meta {
+  margin-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.4);
+  padding-top: 24px;
+  font-size: 10pt;
+  line-height: 2;
+  opacity: 0.88;
+}
+
+.cover-author     { font-weight: 600; font-size: 11pt; }
+.cover-organization { font-style: italic; }
+.cover-date       { }
+.cover-license    { font-size: 9pt; opacity: 0.75; }
+
+
+/* ============================================================
+   3. ÍNDICE (TOC)
+   ============================================================ */
+
+.toc-page {
+  page: toc;
+  break-after: page;
+  padding: 0;
+}
+
+.toc-heading {
+  font-size: 18pt;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid currentColor;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-entry {
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+  margin-bottom: 0;
+}
+
+/* Numeración de página via Paged.js target-counter() */
+.toc-entry a {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  text-decoration: none;
+  color: inherit;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* leader() + target-counter() — Paged.js los resuelve al paginar */
+.toc-entry a::after {
+  content: leader(dotted) target-counter(attr(href url), page);
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+/* Jerarquía visual */
+.toc-level-1 a         { font-weight: 700; font-size: 11pt; }
+.toc-level-1           { margin-top: 10px; }
+
+.toc-level-2 a         { font-weight: 400; font-size: 10pt; padding-left: 16px; }
+.toc-level-2           { margin-top: 2px; }
+
+.toc-level-3 a         { font-weight: 400; font-size: 9pt; padding-left: 32px; color: #555; }
+.toc-level-3           { margin-top: 1px; }
+
+
+/* ============================================================
+   4. CONTENIDO — SECCIONES
+   ============================================================ */
+
+/* H1 siempre abre nueva página */
+.section-level-1 {
+  break-before: page;
+}
+
+.section-level-2,
+.section-level-3,
+.section-level-4 {
+  break-before: auto;
+}
+
+/* Títulos de sección */
+.section-title-1 {
+  font-size: 20pt;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid;
+  bookmark-level: 1;
+  bookmark-label: content();
+  break-after: avoid;
+}
+
+.section-title-2 {
+  font-size: 15pt;
+  font-weight: 700;
+  margin: 24px 0 14px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid;
+  bookmark-level: 2;
+  bookmark-label: content();
+  break-after: avoid;
+}
+
+.section-title-3 {
+  font-size: 12pt;
+  font-weight: 700;
+  margin: 18px 0 10px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid;
+  bookmark-level: 3;
+  bookmark-label: content();
+  break-after: avoid;
+}
+
+.section-title-4 {
+  font-size: 11pt;
+  font-weight: 700;
+  margin: 14px 0 8px 0;
+  break-after: avoid;
+}
+
+
+/* ============================================================
+   5. BLOQUES DE CONTENIDO
+   ============================================================ */
+
+.content-block {
+  margin: 0 0 20px 0;
+}
+
+.block-title {
+  font-size: 11pt;
+  font-weight: 700;
+  margin: 14px 0 8px 0;
+  break-after: avoid;
+}
+
+/* Contenido HTML del bloque */
+.block-html {
+  font-size: 10.5pt;
+  line-height: 1.65;
+}
+
+.block-html p          { margin: 0 0 8px 0; }
+.block-html ul,
+.block-html ol         { margin: 8px 0; padding-left: 22px; }
+.block-html li         { margin-bottom: 4px; }
+.block-html strong     { font-weight: 700; }
+.block-html em         { font-style: italic; }
+.block-html blockquote { margin: 10px 0 10px 16px; padding-left: 12px; border-left: 3px solid #ccc; }
+.block-html pre,
+.block-html code       { font-family: 'Courier New', monospace; font-size: 9pt; }
+.block-html img        { max-width: 100%; height: auto; break-inside: avoid; }
+.block-html table      { width: 100%; border-collapse: collapse; margin: 12px 0; break-inside: avoid; }
+.block-html th         { background: #f0f0f0; font-weight: 700; padding: 6px 10px;
+                          border: 1px solid #ccc; text-align: left; }
+.block-html td         { padding: 6px 10px; border: 1px solid #ddd; }
+.block-html tr:nth-child(even) td { background: #fafafa; }
+
+
+/* ============================================================
+   6. CLASES BUA — SEMÁNTICA DOCUMENTAL
+   ============================================================ */
+
+.block-html .bua_ejemplo {
+  background: #e8f4fb;
+  border-left: 4px solid #1565c0;
+  padding: 10px 14px;
+  margin: 10px 0;
+  break-inside: avoid;
+  border-radius: 0 3px 3px 0;
+}
+
+.block-html .bua_definicion {
+  background: #f3e5f5;
+  border-left: 4px solid #6a1b9a;
+  padding: 10px 14px;
+  margin: 10px 0;
+  break-inside: avoid;
+  border-radius: 0 3px 3px 0;
+}
+
+.block-html .bua_importante {
+  background: #fff3e0;
+  border-left: 4px solid #e65100;
+  padding: 10px 14px;
+  margin: 10px 0;
+  break-inside: avoid;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Acordeones: siempre expandidos en print */
+.block-html details        { break-inside: avoid; }
+.block-html details summary { font-weight: 700; margin-bottom: 6px; list-style: none; }
+.block-html details summary::before { content: '▼  '; font-size: 8pt; }
+
+
+/* ============================================================
+   7. UTILIDADES
+   ============================================================ */
+
+/* Evitar huérfanos y viudas tipográficas */
+p, li {
+  orphans: 3;
+  widows: 3;
+}
+
+/* No cortar imágenes ni tablas a mitad de página */
+figure, table, .content-block {
+  break-inside: avoid;
+}
