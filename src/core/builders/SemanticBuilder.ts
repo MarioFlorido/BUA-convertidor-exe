@@ -110,8 +110,25 @@ export class SemanticBuilder {
       page.blocks.push(currentBlock);
     }
 
-    let accordionItems: Array<{ title: string; html: string }> = [];
+    // Acumula items de un grupo exe-fx (acordeón o pestañas) mientras el tipo sea consistente
+    let groupItems: Array<{ title: string; html: string }> = [];
+    let groupType: 'accordion' | 'tabs' | null = null;
     let i = 0;
+
+    /** Cierra el grupo activo y lo añade al bloque actual */
+    const flushGroup = () => {
+      if (groupItems.length === 0 || !groupType) return;
+      if (!currentBlock) {
+        currentBlock = { title: '', html: '' };
+        page.blocks.push(currentBlock);
+      }
+      currentBlock.html = this.appendParagraphHtml(
+        currentBlock.html,
+        this.buildFxGroupDiv(groupItems, groupType),
+      );
+      groupItems = [];
+      groupType = null;
+    };
 
     while (i < h1Section.h2Items.length) {
       const h2Item = h1Section.h2Items[i];
@@ -119,77 +136,46 @@ export class SemanticBuilder {
       const h2Html = this.extractH2Content(h2Item.text, h1Index);
 
       if (option === 'html') {
-        // Terminar acordeón anterior si existe
-        if (accordionItems.length > 0) {
-          if (!currentBlock) {
-            currentBlock = { title: '', html: '' };
-            page.blocks.push(currentBlock);
-          }
-          const accordionDiv = this.buildAccordionDiv(accordionItems);
-          currentBlock.html = this.appendParagraphHtml(currentBlock.html, accordionDiv);
-          accordionItems = [];
-        }
+        flushGroup();
 
         // Mantener como H2 en HTML dentro del iDevice sin título
         if (!currentBlock) {
           currentBlock = { title: '', html: '' };
           page.blocks.push(currentBlock);
         }
-
-        // Agregar H2 como encabezado en HTML
         const h2Heading = `<h2>${escapeHtml(h2Item.text)}</h2>`;
         currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Heading);
-
-        // Agregar contenido
         if (h2Html) {
           currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Html);
         }
-
         i++;
+
       } else if (option === 'idevice-title') {
-        // Terminar acordeón anterior si existe
-        if (accordionItems.length > 0) {
-          if (!currentBlock) {
-            currentBlock = { title: '', html: '' };
-            page.blocks.push(currentBlock);
-          }
-          const accordionDiv = this.buildAccordionDiv(accordionItems);
-          currentBlock.html = this.appendParagraphHtml(currentBlock.html, accordionDiv);
-          accordionItems = [];
-        }
+        flushGroup();
 
         // Crear un nuevo iDevice con este H2 como título
         currentBlock = { title: h2Item.text, html: h2Html || '<p></p>' };
         page.blocks.push(currentBlock);
-
-        i++;
-      } else if (option === 'accordion') {
-        // Agregar a la lista de items del acordeón
-        accordionItems.push({ title: h2Item.text, html: h2Html || '<p></p>' });
         i++;
 
-        // Si el siguiente H2 no es acordeón, terminar el acordeón
-        if (i >= h1Section.h2Items.length || h1Section.h2Items[i].option !== 'accordion') {
-          if (!currentBlock) {
-            currentBlock = { title: '', html: '' };
-            page.blocks.push(currentBlock);
-          }
-          const accordionDiv = this.buildAccordionDiv(accordionItems);
-          currentBlock.html = this.appendParagraphHtml(currentBlock.html, accordionDiv);
-          accordionItems = [];
+      } else if (option === 'accordion' || option === 'tabs') {
+        // Si cambia el tipo de grupo (p.ej. acordeón→pestañas), cerrar el anterior
+        if (groupType && groupType !== option) {
+          flushGroup();
+        }
+        groupType = option;
+        groupItems.push({ title: h2Item.text, html: h2Html || '<p></p>' });
+        i++;
+
+        // Cerrar el grupo cuando el siguiente H2 es de distinto tipo o no existe
+        if (i >= h1Section.h2Items.length || h1Section.h2Items[i].option !== option) {
+          flushGroup();
         }
       }
     }
 
-    // Terminar acordeón si queda pendiente
-    if (accordionItems.length > 0) {
-      if (!currentBlock) {
-        currentBlock = { title: '', html: '' };
-        page.blocks.push(currentBlock);
-      }
-      const accordionDiv = this.buildAccordionDiv(accordionItems);
-      currentBlock.html = this.appendParagraphHtml(currentBlock.html, accordionDiv);
-    }
+    // Cerrar grupo pendiente al final de la sección
+    flushGroup();
 
     return page;
   }
@@ -292,17 +278,15 @@ export class SemanticBuilder {
   /**
    * Construir div acordeón con múltiples items
    */
-  private buildAccordionDiv(items: Array<{ title: string; html: string }>): string {
+  private buildFxGroupDiv(
+    items: Array<{ title: string; html: string }>,
+    type: 'accordion' | 'tabs',
+  ): string {
     const itemsHtml = items
-      .map(
-        (item) => `<h2>${escapeHtml(item.title)}</h2>
-${item.html}`,
-      )
+      .map((item) => `<h2>${escapeHtml(item.title)}</h2>\n${item.html}`)
       .join('\n');
 
-    return `<div class="exe-fx exe-accordion">
-${itemsHtml}
-</div>`;
+    return `<div class="exe-fx exe-${type}">\n${itemsHtml}\n</div>`;
   }
 
   /**

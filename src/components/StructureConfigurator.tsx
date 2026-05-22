@@ -44,6 +44,7 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
     'idevice-title': 'Nombre de iDevice',
     'html': 'H2 en HTML',
     'accordion': 'Acordeón',
+    'tabs': 'Pestañas',
   };
 
   return (

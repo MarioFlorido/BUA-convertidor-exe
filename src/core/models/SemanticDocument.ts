@@ -82,7 +82,7 @@ export interface DocumentStructure {
     level: 1 | 2 | 3;
     h2Items: Array<{
       text: string;
-      option: 'html' | 'idevice-title' | 'accordion';
+      option: 'html' | 'idevice-title' | 'accordion' | 'tabs';
     }>;
   }>;
 }

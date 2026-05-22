@@ -52,7 +52,7 @@ export interface ConversionState {
   result?: ImportToElpxResult;
 }
 
-export type H2StructureOption = 'idevice-title' | 'html' | 'accordion';
+export type H2StructureOption = 'idevice-title' | 'html' | 'accordion' | 'tabs';
 
 export interface H2Item {
   id: string;
