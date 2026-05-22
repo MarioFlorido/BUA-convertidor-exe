@@ -146,14 +146,20 @@ function renderBlock(block: SemanticBlock): string {
   }
 
   // "Contenido" es el título genérico por defecto asignado a bloques sin H2/H3.
-  // No añade valor visual en PDF — lo omitimos para no crear una cabecera fantasma.
   const isDefaultTitle = !block.title || block.title === 'Contenido';
-  const titleHtml = isDefaultTitle
-    ? ''
-    : `<h4 class="block-title">${escHtml(block.title)}</h4>`;
 
-  return `<div class="content-block">
-  ${titleHtml}
+  if (isDefaultTitle) {
+    // Bloque sin título de iDevice: sólo contenido
+    return `<div class="content-block">
+  <div class="block-html">${expandAccordions(block.html)}</div>
+</div>`;
+  }
+
+  // iDevice con título: cabecera coloreada + borde perimetral (igual que en eXeLearning)
+  return `<div class="content-block idevice-with-title">
+  <header class="idevice-header">
+    <h4 class="idevice-title">${escHtml(block.title)}</h4>
+  </header>
   <div class="block-html">${expandAccordions(block.html)}</div>
 </div>`;
 }

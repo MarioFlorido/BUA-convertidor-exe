@@ -233,13 +233,34 @@
   margin: 0 0 14px 0;
 }
 
-/* Título real de un bloque (H2/H3 que no es sección separada).
-   Sin caja ni borde — solo un sub-epígrafe limpio. */
-.block-title {
+/* ── iDevice con título ──────────────────────────────────────────────────────
+   Bloques cuyo SemanticBlock.title no es el genérico "Contenido".
+   Reproducen el aspecto del tema eXeLearning:
+     - Cabecera coloreada con el título en blanco (color primario del tema)
+     - Borde perimetral del mismo color
+   break-inside:avoid mantiene cabecera y primer párrafo juntos en la misma página.
+   ──────────────────────────────────────────────────────────────────────────── */
+.idevice-with-title {
+  border: 1px solid var(--color-primary, #135d87);
+  margin: 14px 0;
+  break-inside: avoid;
+}
+
+.idevice-header {
+  background-color: var(--color-primary, #135d87);
+  padding: 6px 14px;
+}
+
+.idevice-title {
+  font-family: var(--font-title);
   font-size: 11pt;
   font-weight: 700;
-  margin: 12px 0 6px 0;
-  color: inherit;
+  color: #fff;
+  margin: 0;
+}
+
+.idevice-with-title > .block-html {
+  padding: 10px 14px;
 }
 
 .block-html {
@@ -256,7 +277,15 @@
 .block-html blockquote { margin: 8px 0 8px 16px; padding-left: 10px; border-left: 3px solid #ccc; }
 .block-html pre,
 .block-html code       { font-family: 'Courier New', monospace; font-size: 9pt; background: #f5f5f5; padding: 2px 4px; }
-.block-html img        { max-width: 100%; height: auto; display: block; break-inside: avoid; }
+.block-html img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+  break-inside: avoid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
+}
 
 
 /* ============================================================
