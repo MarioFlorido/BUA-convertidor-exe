@@ -12,27 +12,92 @@
    1. CONFIGURACIÓN DE PÁGINAS
    ============================================================ */
 
+/* ── Running elements — Paged.js los coloca en los márgenes de página ──── */
+
+#page-header-logo {
+  position: running(page-header-logo);
+}
+#page-header-logo img {
+  height: 18pt;
+  width: auto;
+  display: block;
+}
+
+#page-header-title {
+  position: running(page-header-title);
+}
+#page-header-title span {
+  font-size: 8pt;
+  color: #888;
+  font-family: Arial, sans-serif;
+  display: block;
+  text-align: right;
+  max-width: 200pt;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#page-footer-logo {
+  position: running(page-footer-logo);
+}
+#page-footer-logo img {
+  height: 14pt;
+  width: auto;
+  display: block;
+  opacity: 0.65;
+}
+
+/* ── Páginas ────────────────────────────────────────────────────────────── */
+
 @page {
   size: A4;
-  margin: 20mm 25mm 25mm 25mm;
+  /* Margen superior ampliado 6mm para alojar el encabezado */
+  margin: 26mm 25mm 22mm 25mm;
 
+  /* Encabezado: logo BUA a la izquierda, título del documento a la derecha */
+  @top-left {
+    content: element(page-header-logo);
+    vertical-align: middle;
+    border-bottom: 0.5pt solid #e5e7eb;
+    padding-bottom: 3pt;
+  }
+  @top-right {
+    content: element(page-header-title);
+    vertical-align: middle;
+    border-bottom: 0.5pt solid #e5e7eb;
+    padding-bottom: 3pt;
+  }
+
+  /* Pie: logo UA a la izquierda, número de página centrado */
+  @bottom-left {
+    content: element(page-footer-logo);
+    vertical-align: middle;
+  }
   @bottom-center {
     content: counter(page);
     font-size: 9pt;
     color: #888;
     font-family: Arial, sans-serif;
+    vertical-align: middle;
   }
 }
 
+/* Portada: sin márgenes ni cabecera/pie */
 @page cover {
   margin: 0;
-
+  @top-left    { content: none; }
+  @top-right   { content: none; }
+  @bottom-left { content: none; }
   @bottom-center { content: none; }
 }
 
+/* TOC: con cabecera, sin pie numerado */
 @page toc {
-  margin: 20mm 25mm 25mm 25mm;
-
+  margin: 26mm 25mm 22mm 25mm;
+  @top-left  { content: element(page-header-logo); vertical-align: middle; border-bottom: 0.5pt solid #e5e7eb; padding-bottom: 3pt; }
+  @top-right { content: element(page-header-title); vertical-align: middle; border-bottom: 0.5pt solid #e5e7eb; padding-bottom: 3pt; }
+  @bottom-left   { content: none; }
   @bottom-center { content: none; }
 }
 
@@ -108,6 +173,42 @@
 .cover-author       { font-weight: 600; font-size: 11pt; }
 .cover-organization { font-style: italic; }
 .cover-license      { font-size: 9pt; opacity: 0.75; }
+
+/* Bloque Creative Commons — pie interior de la portada */
+.cover-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 12px 40px;
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cover-cc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  opacity: 0.85;
+}
+
+.cover-cc-badge {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.cover-cc-text {
+  font-size: 8pt;
+  line-height: 1.4;
+}
 
 
 /* ============================================================

@@ -1,5 +1,14 @@
 import type { SemanticDocument } from '../../models/SemanticDocument';
-import type { PrintThemeAssets } from './PrintThemeLoader';
+import type { PrintThemeAssets, PrintLanguage } from './PrintThemeLoader';
+
+// ─── Licencia Creative Commons ────────────────────────────────────────────────
+
+/** Textos de licencia CC BY-SA 4.0 por idioma */
+const CC_TEXT: Record<PrintLanguage, string> = {
+  es: 'Esta obra está bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional.',
+  en: 'This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.',
+  ca: 'Aquesta obra es troba sota una llicència Creative Commons Reconeixement-CompartirIgual 4.0 Internacional.',
+};
 
 /**
  * Metadatos opcionales para la portada PDF.
@@ -43,8 +52,8 @@ export function renderCoverPage(
     ? buildImageBackground(assets.coverImageDataUrl)
     : buildColorBackground(assets.primaryColor, assets.accentColor);
 
-  const logoHtml = assets.logoDataUrl
-    ? `<img class="cover-logo" src="${assets.logoDataUrl}" alt="Logo" />`
+  const logoHtml = assets.buaLogoDataUrl
+    ? `<img class="cover-logo" src="${assets.buaLogoDataUrl}" alt="Logo BUA" />`
     : '';
 
   const subtitleHtml = doc.subtitle
@@ -72,6 +81,16 @@ export function renderCoverPage(
     ? `<div class="cover-overlay"></div>`
     : '';
 
+  // Bloque CC BY-SA 4.0 en el idioma del tema — siempre visible en portada
+  const ccText = CC_TEXT[assets.language];
+  const ccHtml = `
+  <footer class="cover-footer">
+    <div class="cover-cc">
+      <span class="cover-cc-badge">CC BY-SA 4.0</span>
+      <span class="cover-cc-text">${escHtml(ccText)}</span>
+    </div>
+  </footer>`;
+
   return `
 <section class="cover-page" style="${bgStyle}">
   ${overlayHtml}
@@ -86,6 +105,7 @@ export function renderCoverPage(
       ${licenseHtml}
     </div>
   </div>
+  ${ccHtml}
 </section>`.trim();
 }
 

@@ -104,6 +104,8 @@ export async function semanticDocumentToPrintHtml(
     fontFamilyTitle: assets.fontFamilyTitle,
     fontFamilyBody: assets.fontFamilyBody,
     buaStyles: assets.buaStyles,
+    buaLogoDataUrl: assets.buaLogoDataUrl,
+    uaLogoDataUrl: assets.uaLogoDataUrl,
   });
 
   return { html, pageCount };
@@ -185,6 +187,10 @@ interface AssemblyOptions {
   fontFamilyTitle: string;
   fontFamilyBody: string;
   buaStyles: BuaBoxStyles;
+  /** Data URL del logo BUA — aparece en encabezado de cada página */
+  buaLogoDataUrl: string | null;
+  /** Data URL del logo UA — aparece en pie de cada página */
+  uaLogoDataUrl: string | null;
 }
 
 /**
@@ -273,6 +279,18 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
   </script>
 </head>
 <body>
+
+<!-- ── Running elements para encabezado y pie de página ──────────────────
+     Paged.js captura estos elementos con position:running() y los repite
+     en cada página dentro de los margin boxes definidos en @page.
+     ────────────────────────────────────────────────────────────────────── -->
+<div id="page-header-logo">${opts.buaLogoDataUrl
+  ? `<img src="${opts.buaLogoDataUrl}" alt="BUA">`
+  : ''}</div>
+<div id="page-header-title"><span>${escHtml(opts.title)}</span></div>
+${opts.uaLogoDataUrl
+  ? `<div id="page-footer-logo"><img src="${opts.uaLogoDataUrl}" alt="UA"></div>`
+  : ''}
 
 ${opts.coverHtml}
 

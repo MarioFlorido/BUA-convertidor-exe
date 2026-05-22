@@ -1,5 +1,8 @@
 import { unzipSync } from 'fflate';
 
+/** Idioma del tema, detectado desde el ID. Controla los textos CC y etiquetas. */
+export type PrintLanguage = 'es' | 'en' | 'ca';
+
 /**
  * Estilos de una caja semántica BUA (ejemplo, definición, importante).
  * Extraídos del CSS del tema para reproducirlos fielmente en el PDF.
@@ -40,10 +43,21 @@ export interface PrintThemeAssets {
   coverImageDataUrl: string | null;
 
   /**
-   * Data URL base64 del primer logo encontrado en img/ del tema.
-   * null si el tema no incluye logos.
+   * Data URL base64 del logo BUA (img/logo_BUA.*) del tema.
+   * Se usa en la portada y en el encabezado de página.
+   * null si el tema no incluye logo BUA.
    */
-  logoDataUrl: string | null;
+  buaLogoDataUrl: string | null;
+
+  /**
+   * Data URL base64 del logo UA (img/logo_UA.*) del tema.
+   * Se usa en el pie de página.
+   * null si el tema no incluye logo UA.
+   */
+  uaLogoDataUrl: string | null;
+
+  /** Idioma del tema detectado del ID: 'es', 'en' o 'ca'. Controla textos CC. */
+  language: PrintLanguage;
 
   /** Color primario extraído del CSS del tema (#rrggbb). Fallback: #135d87 */
   primaryColor: string;
@@ -64,8 +78,6 @@ export interface PrintThemeAssets {
 /** Extensiones de imagen aceptadas para portada_pdf */
 const COVER_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp'] as const;
 
-/** Prefijos de logo reconocidos en la carpeta img/ del tema */
-const LOGO_PREFIXES = ['logo_BUA', 'logo_UA', 'logo'] as const;
 
 /**
  * Valores por defecto para cajas BUA cuando el tema no tiene CSS propio.
@@ -93,7 +105,9 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
   const base: PrintThemeAssets = {
     themeId: themeId ?? 'base',
     coverImageDataUrl: null,
-    logoDataUrl: null,
+    buaLogoDataUrl: null,
+    uaLogoDataUrl: null,
+    language: detectLanguage(themeId ?? 'base'),
     primaryColor: '#135d87',
     accentColor: '#deb13c',
     fontFamilyTitle: "'Georgia', serif",
@@ -116,7 +130,9 @@ export async function loadPrintThemeAssets(themeId?: string): Promise<PrintTheme
   return {
     themeId,
     coverImageDataUrl: extractCoverImage(entries),
-    logoDataUrl: extractLogo(entries),
+    buaLogoDataUrl: extractLogoFile(entries, 'logo_BUA') ?? extractLogoFile(entries, 'logo'),
+    uaLogoDataUrl: extractLogoFile(entries, 'logo_UA'),
+    language: detectLanguage(themeId),
     ...extractThemeStyles(entries),
   };
 }
@@ -152,22 +168,33 @@ function extractCoverImage(entries: Record<string, Uint8Array>): string | null {
 }
 
 /**
- * Busca el primer logo disponible en img/ del ZIP.
+ * Busca un logo concreto (sin extensión) en img/ del ZIP.
+ * Prueba .png, .svg, .jpg en ese orden.
  * Devuelve data URL base64 o null si no existe.
  */
-function extractLogo(entries: Record<string, Uint8Array>): string | null {
-  for (const prefix of LOGO_PREFIXES) {
-    for (const ext of ['png', 'svg', 'jpg'] as const) {
-      const key = `img/${prefix}.${ext}`;
-      if (entries[key]) {
-        const mime = ext === 'svg' ? 'image/svg+xml'
-                   : ext === 'jpg' ? 'image/jpeg'
-                   : 'image/png';
-        return toDataUrl(entries[key], mime);
-      }
+function extractLogoFile(entries: Record<string, Uint8Array>, name: string): string | null {
+  for (const ext of ['png', 'svg', 'jpg'] as const) {
+    const key = `img/${name}.${ext}`;
+    if (entries[key]) {
+      const mime = ext === 'svg' ? 'image/svg+xml'
+                 : ext === 'jpg' ? 'image/jpeg'
+                 : 'image/png';
+      return toDataUrl(entries[key], mime);
     }
   }
   return null;
+}
+
+/**
+ * Detecta el idioma del tema a partir de su ID.
+ * Convenciones de nomenclatura BUA:
+ *   "Doctorado_*" → es  |  "Doctorat_*" → ca  |  "PhD_*" → en
+ */
+function detectLanguage(themeId: string): PrintLanguage {
+  const id = themeId.toLowerCase();
+  if (id.includes('phd') || id.includes('_en') || id.includes('-en')) return 'en';
+  if (id.includes('doctorat') || id.includes('_ca') || id.includes('_va') || id.includes('-ca')) return 'ca';
+  return 'es';
 }
 
 /**
