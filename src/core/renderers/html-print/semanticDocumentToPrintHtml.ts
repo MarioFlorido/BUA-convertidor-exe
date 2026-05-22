@@ -3,9 +3,9 @@ import { loadPrintThemeAssets } from './PrintThemeLoader';
 import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
 import { renderTableOfContents, sectionId } from './renderTableOfContents';
 
-// CSS inline del renderer (importado como string por Vite con ?inline)
-// Si no está disponible el import, se usa la URL de referencia en el <link>
-import printStylesUrl from './printStyles.css?url';
+// CSS importado como string raw para inyectarlo inline en el HTML generado.
+// Necesario porque el HTML se abre como blob: URL — rutas relativas no resuelven.
+import printStylesCss from './printStyles.css?raw';
 
 /**
  * Opciones del renderer HTML Print.
@@ -231,8 +231,8 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
     }
   </style>
 
-  <!-- Estilos Paged Media del renderer print -->
-  <link rel="stylesheet" href="${printStylesUrl}">
+  <!-- Estilos Paged Media del renderer print (inline — funciona desde blob: URL) -->
+  <style>${printStylesCss}</style>
 
   <!-- Paged.js — polyfill CSS Paged Media en el navegador -->
   <!-- Resuelve: @page, target-counter(), leader(), bookmarks -->

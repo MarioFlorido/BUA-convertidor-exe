@@ -58,10 +58,14 @@ export function sectionId(_page: SemanticPage, pageIndex: number): string {
 // ─── Helpers privados ─────────────────────────────────────────────────────────
 
 function buildTocEntries(pages: SemanticPage[]): TocEntry[] {
+  // CRÍTICO: usar el índice original del array completo, NO el del array filtrado.
+  // El content renderer usa doc.pages[idx] para asignar id="section-{idx}".
+  // Si filtramos primero y luego usamos el idx del array filtrado, los IDs no coinciden.
   return pages
-    .filter(p => p.level <= 3)          // H1, H2, H3 — excluir H4
-    .map((page, idx) => ({
-      id: sectionId(page, idx),
+    .map((page, originalIdx) => ({ page, originalIdx }))
+    .filter(({ page }) => page.level <= 3)
+    .map(({ page, originalIdx }) => ({
+      id: sectionId(page, originalIdx),
       title: page.title,
       level: page.level as 1 | 2 | 3 | 4,
     }));
