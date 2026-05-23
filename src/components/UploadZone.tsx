@@ -57,15 +57,6 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
 
         <div className="upload-help">
           <p>Tamaño máximo recomendado: 20 MB</p>
-          <p>
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              Descargar plantilla Word
-            </a>{' '}
-            |{' '}
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              Ver guía de preparación
-            </a>
-          </p>
         </div>
       </div>
     </div>
