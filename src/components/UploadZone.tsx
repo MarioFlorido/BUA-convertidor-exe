@@ -38,10 +38,26 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
   };
 
   return (
-    <div className="upload-zone" onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+    <div
+      className="upload-zone"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      onClick={() => inputRef.current?.click()}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
+      aria-label="Área de carga de documento Word"
+    >
       <div className="upload-content">
-        <h2>Sube tu archivo Word</h2>
-        <p>Arrastra y suelta un archivo .docx o haz click para seleccionar</p>
+        <img
+          src={`${import.meta.env.BASE_URL}docx.svg`}
+          alt=""
+          className="upload-icon"
+          aria-hidden="true"
+        />
+        <h2>Sube tu documento Word</h2>
+        <p>Arrastra y suelta un archivo .docx o haz clic para seleccionar</p>
 
         <input
           ref={inputRef}
@@ -49,9 +65,16 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
           accept=".docx"
           onChange={handleFileInputChange}
           style={{ display: 'none' }}
+          tabIndex={-1}
         />
 
-        <button className="btn-upload" onClick={() => inputRef.current?.click()}>
+        <button
+          className="btn-upload"
+          onClick={(e) => {
+            e.stopPropagation();
+            inputRef.current?.click();
+          }}
+        >
           Seleccionar archivo
         </button>
 
