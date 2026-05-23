@@ -1,3 +1,20 @@
+# Agradecimientos
+
+## eXeConvert — Juanjo de Haro
+
+Este proyecto no existiría sin el trabajo previo de **Juanjo de Haro** y su herramienta **eXeConvert**.
+
+eXeConvert demostró que era posible convertir documentos Word a formato eXeLearning directamente desde el navegador, sin instalaciones ni servidores, con una arquitectura completamente client-side. Esa idea fue la semilla de **BUA ConvertidoreXe** para los editores de temas de la BUA (Biblioteca de la Universidad de Alicante).
+
+El código de eXeConvert es abierto, generoso y está bien pensado. Estudiar cómo resolvía el problema de la conversión DOCX → ELPX fue el punto de partida real de este proyecto.
+
+
+---
+
+**BUA ConvertidoreXe** es un desarrollo independiente orientado a las necesidades específicas de la Biblioteca Universitaria de la Universidad de Alicante, pero reconoce en eXeConvert su inspiración original.
+
+
+
 # eXeConvert y BUA ConvertidoreXe — diferencias
 
 BUA ConvertidoreXe nació como una herramienta específica para la Biblioteca Universitaria de la Universidad de Alicante, tomando como inspiración el trabajo de Juan José de Haro en eXeConvert. Aunque comparten el objetivo central de convertir documentos al formato eXeLearning, ambas herramientas han evolucionado con enfoques y prioridades distintas.
@@ -16,9 +33,9 @@ Este documento describe las diferencias sin establecer una jerarquía entre ella
 
 ## Fórmulas matemáticas
 
-**eXeConvert** incorpora soporte completo para expresiones matemáticas: convierte fórmulas OMML (Office Math Markup Language) a LaTeX, y renderiza LaTeX y MathML a SVG mediante MathJax. Es una funcionalidad relevante para contenidos técnicos y científicos.
+**eXeConvert** incorpora soporte completo convierte fórmulas OMML (Office Math Markup Language) a LaTeX, y renderiza LaTeX y MathML a SVG mediante MathJax.
 
-**BUA ConvertidoreXe** no incluye procesamiento matemático. Los materiales de la Biblioteca Universitaria no contienen fórmulas, por lo que esta capacidad quedó fuera del alcance del proyecto desde el principio.
+**BUA ConvertidoreXe** no incluye procesamiento matemático. Los materiales de BUA no contienen expresiones matemáticas, por lo que esta capacidad quedó desechada del proyecto desde el principio.
 
 ---
 
@@ -26,7 +43,7 @@ Este documento describe las diferencias sin establecer una jerarquía entre ella
 
 **eXeConvert** divide el documento automáticamente en páginas y bloques según la jerarquía de encabezados, sin intervención del usuario.
 
-**BUA ConvertidoreXe** introduce un paso de configuración entre la carga del documento y la conversión: el usuario decide qué hace cada nivel de encabezado (página principal, subpágina, iDevice, acordeón, pestañas). Esto permite adaptar la estructura del ELPX resultante a documentos con organizaciones diversas, sin modificar el Word original. Además se pueden etiquetar elementos del word con corchetes para aplicar efectos, cajas semántias, etc definidas en los estilos
+**BUA ConvertidoreXe** introduce un paso de configuración entre la carga del documento y la conversión: el usuario decide qué hace cada nivel de encabezado (página principal, subpágina, iDevice, acordeón, pestañas). Esto permite adaptar la estructura del ELPX, sin modificar el Word original. Además se pueden etiquetar elementos del Word con corchetes para aplicar efectos, cajas semántias, etc. definidas en los estilos [Definición], [Importante], [Ejemplo]...
 
 ---
 
@@ -34,7 +51,7 @@ Este documento describe las diferencias sin establecer una jerarquía entre ella
 
 **eXeConvert** genera ELPX con el tema por defecto de eXeLearning. La personalización visual queda en manos del usuario una vez abierto el proyecto en eXeLearning.
 
-**BUA ConvertidoreXe** incorpora un sistema de control de temas institucionales en formato ZIP. El ELPX generado ya incluye el tema seleccionado (Doctorado, Doctorat, PhD u otros), con sus estilos CSS, tipografías, iconos y configuración. El recurso está listo para publicar sin necesidad de intervención posterior en eXeLearning.
+**BUA ConvertidoreXe** incorpora un sistema de control de estilos institucionales en formato ZIP. El ELPX generado ya incluye el tema seleccionado (Doctorado, CID, TFG u otros), con sus estilos CSS, tipografías, iconos y configuración. El recurso está listo para publicar sin necesidad de intervención posterior en eXeLearning.
 
 ---
 
@@ -71,8 +88,10 @@ Este documento describe las diferencias sin establecer una jerarquía entre ella
 | Fórmulas matemáticas | Sí | No |
 | Configuración de estructura | Automática | Configurable por el usuario |
 | Temas / estilos | No | Sí |
-| PDF | Funcional | Con maquetación tomada de los temas |
+| PDF | Funcional | Con maquetación tomada de los estilos |
 | CLI / escritorio | Sí | No |
 | Despliegue | Requiere Node.js | 100% estático |
 
-Ambas herramientas son soluciones válidas para convertir documentos a eXeLearning. Sus diferencias reflejan contextos de uso distintos, no una relación de superioridad entre ellas. Para el autor de Juan Jose de HAro sigue siendo el auténtico gurú de eXeLearning y sus hacks
+Ambas herramientas son soluciones válidas para convertir documentos a eXeLearning. Sus diferencias reflejan contextos de uso distintos. Para mi, Mario Florido,  Juanjo de Haro sigue siendo el auténtico gurú de eXeLearning y sus hacks.
+Gracias, por compartir tu trabajo y por hacer las cosas en abierto.
+
