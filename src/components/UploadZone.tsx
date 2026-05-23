@@ -78,9 +78,6 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
           Seleccionar archivo
         </button>
 
-        <div className="upload-help">
-          <p>Tamaño máximo recomendado: 20 MB</p>
-        </div>
       </div>
     </div>
   );

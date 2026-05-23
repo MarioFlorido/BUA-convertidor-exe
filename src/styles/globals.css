@@ -318,11 +318,6 @@ button {
   background: var(--blue-hover);
 }
 
-.upload-help {
-  margin-top: 1.25rem;
-  font-size: 0.775rem;
-  color: var(--text-3);
-}
 
 /* ── Processing / Pipeline ───────────────────────────────────────────────── */
 @keyframes spin {
