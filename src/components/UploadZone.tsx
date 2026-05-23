@@ -81,16 +81,16 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
           <p>
             Inspirado en el trabajo de{' '}
             <a
-              href="https://execonvert.github.io/"
+              href="https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
             >
-              Juan José de Haro
+              Juanjo de Haro
             </a>
             {' · '}
             <a
-              href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/docs/ACKNOWLEDGEMENTS.md"
+              href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/docs/COMPARISON.md"
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
