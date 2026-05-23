@@ -4,7 +4,7 @@
 
 Este proyecto no existiría sin el trabajo previo de **Juan José de Haro** y su herramienta **eXeConvert** (https://execonvert.github.io/).
 
-eXeConvert demostró que era posible convertir documentos Word a formato eXeLearning directamente desde el navegador, sin instalaciones ni servidores, con una arquitectura completamente client-side. Esa idea fue la semilla de BUA ConvertidoreXe.
+eXeConvert demostró que era posible convertir documentos Word a formato eXeLearning directamente desde el navegador, sin instalaciones ni servidores, con una arquitectura completamente client-side. Esa idea fue la semilla de BUA ConvertidoreXe para los editores de temas de la BUA (Biblioteca de la Universidad de Alicante).
 
 El código de eXeConvert es abierto, generoso y está bien pensado. Estudiar cómo resolvía el problema de la conversión DOCX → ELPX fue el punto de partida real de este proyecto.
 
