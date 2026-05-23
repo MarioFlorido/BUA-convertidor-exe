@@ -19,7 +19,6 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.currentTarget.classList.remove('drag-over');
-
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
@@ -51,7 +50,7 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
     >
       <div className="upload-content">
         <img
-          src={`${import.meta.env.BASE_URL}docx.svg`}
+          src={`${import.meta.env.BASE_URL}docx.png`}
           alt=""
           className="upload-icon"
           aria-hidden="true"
@@ -78,6 +77,37 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
           Seleccionar archivo
         </button>
 
+        <div className="upload-disclaimer">
+          <p>
+            Inspirado en el trabajo de{' '}
+            <a
+              href="https://execonvert.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Juan José de Haro
+            </a>
+            {' · '}
+            <a
+              href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/docs/ACKNOWLEDGEMENTS.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Agradecimientos
+            </a>
+            {' · '}
+            <a
+              href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              GNU GPL v3.0
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

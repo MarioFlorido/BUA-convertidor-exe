@@ -92,23 +92,9 @@ button {
   gap: 0.875rem;
 }
 
-.header-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.header-logo-books {
+.header-bua-logo {
   height: 34px;
   width: auto;
-}
-
-.header-bua-text {
-  font-size: 1.55rem;
-  font-weight: 800;
-  color: #C5C3C1;
-  letter-spacing: -0.04em;
-  line-height: 1;
 }
 
 .header-divider {
@@ -318,6 +304,32 @@ button {
   background: var(--blue-hover);
 }
 
+
+/* ── Upload disclaimer ───────────────────────────────────────────────────── */
+.upload-disclaimer {
+  margin-top: 1.75rem;
+  padding-top: 1.125rem;
+  border-top: 1px solid var(--border-light);
+  width: 100%;
+}
+
+.upload-disclaimer p {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.upload-disclaimer a {
+  color: var(--text-2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.upload-disclaimer a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
 
 /* ── Processing / Pipeline ───────────────────────────────────────────────── */
 @keyframes spin {
@@ -746,10 +758,10 @@ button {
   gap: 1rem;
 }
 
-.footer-ua {
-  font-size: 0.68rem;
-  color: var(--text-3);
-  line-height: 1.35;
+.footer-ua-logo {
+  height: 22px;
+  width: auto;
+  opacity: 0.65;
 }
 
 .footer-sep {
@@ -757,11 +769,10 @@ button {
   font-size: 0.875rem;
 }
 
-.footer-cid {
-  font-size: 0.72rem;
-  color: #4AAFD5;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+.footer-cid-logo {
+  height: 20px;
+  width: auto;
+  opacity: 0.75;
 }
 
 .footer-copy {

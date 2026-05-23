@@ -292,12 +292,17 @@ export function App() {
 
       <footer className="app-footer">
         <div className="footer-logos">
-          <span className="footer-ua">
-            Universitat d&apos;Alacant<br />
-            Universidad de Alicante
-          </span>
+          <img
+            src={`${import.meta.env.BASE_URL}logo_UA.png`}
+            alt="Universidad de Alicante"
+            className="footer-ua-logo"
+          />
           <span className="footer-sep" aria-hidden="true">·</span>
-          <span className="footer-cid">CID</span>
+          <img
+            src={`${import.meta.env.BASE_URL}logo_CID.png`}
+            alt="CID — Centro de Información Documental"
+            className="footer-cid-logo"
+          />
         </div>
         <span className="footer-copy">Biblioteca Universitaria · ConvertidoreXe v0.2.0</span>
       </footer>
