@@ -111,11 +111,31 @@ export function ThemeManager() {
             id="theme-file-input"
           />
           <label htmlFor="theme-file-input" className="upload-label">
-            {uploading
-              ? '⏳ Cargando...'
-              : dragActive
-              ? '📥 Suelta el archivo aquí'
-              : '📦 Arrastra ZIP aquí o haz clic'}
+            {uploading ? (
+              <span className="upload-label-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="upload-label-icon" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" strokeDasharray="4 2" />
+                </svg>
+                Cargando...
+              </span>
+            ) : dragActive ? (
+              <span className="upload-label-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="upload-label-icon" aria-hidden="true">
+                  <path d="M12 4v12M8 12l4 4 4-4" />
+                  <path d="M4 20h16" />
+                </svg>
+                Suelta el archivo aquí
+              </span>
+            ) : (
+              <span className="upload-label-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="upload-label-icon" aria-hidden="true">
+                  <path d="M12 16V8M9 11l3-3 3 3" />
+                  <path d="M5 20h14" />
+                  <rect x="3" y="4" width="18" height="14" rx="2" />
+                </svg>
+                Arrastra ZIP aquí o haz clic
+              </span>
+            )}
           </label>
         </div>
         <p className="help-text">

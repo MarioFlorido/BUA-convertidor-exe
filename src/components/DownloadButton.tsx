@@ -101,21 +101,7 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
         <DownloadArrow />
       </button>
 
-      {/* Opción imagen de portada */}
-      <label className="pdf-cover-toggle">
-        <span className="pdf-cover-toggle__label">Imagen de portada en PDF</span>
-        <button
-          role="switch"
-          aria-checked={useCoverImage}
-          onClick={() => setUseCoverImage((v) => !v)}
-          className={`toggle-switch ${useCoverImage ? 'toggle-switch--on' : ''}`}
-          title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
-        >
-          <span className="toggle-switch__thumb" />
-        </button>
-      </label>
-
-      {/* Exportar PDF */}
+      {/* Exportar PDF + switch imagen de portada */}
       <button
         onClick={handleExportPrint}
         className="btn-download-pdf"
@@ -133,10 +119,25 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
           <span className="download-btn-title">
             {printLoading ? 'Generando vista de impresión…' : 'Vista previa para imprimir / PDF'}
           </span>
-          <span className="download-btn-sub">
-            {printLoading ? 'Por favor espera' : 'Abre Paged.js · Ctrl+P para guardar como PDF'}
-          </span>
         </div>
+        <span
+          className="pdf-cover-toggle-inline"
+          onClick={(e) => { e.stopPropagation(); setUseCoverImage((v) => !v); }}
+          title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
+        >
+          <span className="pdf-cover-toggle-inline__label">
+            {useCoverImage ? 'Con foto portada' : 'Sin foto portada'}
+          </span>
+          <button
+            role="switch"
+            aria-checked={useCoverImage}
+            aria-label="Imagen de portada"
+            onClick={(e) => { e.stopPropagation(); setUseCoverImage((v) => !v); }}
+            className={`toggle-switch ${useCoverImage ? 'toggle-switch--on' : ''}`}
+          >
+            <span className="toggle-switch__thumb" />
+          </button>
+        </span>
         {!printLoading && <DownloadArrow />}
       </button>
 

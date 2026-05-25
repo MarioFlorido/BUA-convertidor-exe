@@ -536,21 +536,17 @@ button {
 }
 
 /* ── Switch imagen de portada PDF ─────────────────────────── */
-.pdf-cover-toggle {
+.pdf-cover-toggle-inline {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.45rem 0.75rem;
-  background: #f8f9fa;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
-.pdf-cover-toggle__label {
-  font-size: 0.82rem;
-  color: #4b5563;
+.pdf-cover-toggle-inline__label {
+  font-size: 0.72rem;
+  color: var(--text-2, #6b7280);
+  white-space: nowrap;
   user-select: none;
 }
 
@@ -1401,6 +1397,19 @@ button {
   background: var(--blue-light);
   border-color: var(--blue);
   color: var(--blue);
+}
+
+.upload-label-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-label-icon {
+  width: 28px;
+  height: 28px;
+  opacity: 0.55;
 }
 
 #theme-file-input:disabled ~ .upload-label {
