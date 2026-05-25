@@ -302,11 +302,33 @@
 .section-title-2 {
   font-size: 15pt;
   font-weight: 700;
-  margin: 20px 0 12px 0;
-  padding-bottom: 5px;
-  border-bottom: 2px solid;
+  margin: 24px 0 12px 0;
+  padding-bottom: 0;
+  border-bottom: none;
   bookmark-level: 2;
   bookmark-label: content();
+}
+
+.section-title-2::after,
+.block-html h2::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 3px;
+  background-color: var(--color-accent, #deb13c);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+  margin-top: 5px;
+}
+
+/* H2 dentro de bloques de contenido (opción "H2 en HTML") */
+.block-html h2 {
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--color-primary, #135d87);
+  margin: 20px 0 4px 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .section-title-3 {
@@ -382,10 +404,17 @@
   max-width: 100%;
   height: auto;
   display: block;
-  margin: 10px auto;
+  margin: 12px auto;
   break-inside: avoid;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   border-radius: 2px;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Párrafos que contienen solo una imagen: centrar el bloque */
+.block-html p:has(> img:only-child) {
+  text-align: center;
 }
 
 

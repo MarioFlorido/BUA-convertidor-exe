@@ -37,29 +37,53 @@ function mapDelimiterToClass(delimitador: string): string | null {
  * Procesa delimitadores [nombre] y [fin] en el HTML
  * Envuelve el contenido entre ellos en un <div class="bua_nombre">
  *
- * Soporta:
- * - [ejemplo]....[fin] → <div class="bua_ejemplo">
- * - [definición]....[fin] → <div class="bua_definicion">
- * - [importante]....[fin] → <div class="bua_importante">
+ * Soporta dos estructuras:
+ *
+ * Caso A — párrafos separados (etiqueta en su propio párrafo):
+ *   <p>[Importante]</p>
+ *   <p>Contenido...</p>
+ *   <p>[fin]</p>
+ *   → <div class="bua_importante"><p>Contenido...</p></div>
+ *
+ * Caso B — inline (etiqueta y contenido en el mismo párrafo):
+ *   <p>[importante]Contenido[fin]</p>
+ *   → <p><div class="bua_importante">Contenido</div></p>
  *
  * Case-insensitive: [EJEMPLO], [Ejemplo], [ejemplo] todos funcionan
  * Normaliza tildes: [definición] y [definicion] son equivalentes
  */
 export function applyDivClasses(htmlValue: string): string {
-  // Expresión regular case-insensitive para encontrar delimitadores [nombre] y [fin]
-  const delimiterRegex = /\[([^\[\]]+?)\]([\s\S]*?)\[fin\]/gi;
+  const wrap = (cls: string, content: string) => `<div class="${cls}">${content}</div>`;
 
-  return htmlValue.replace(delimiterRegex, (_match, delimitador, content) => {
-    const mappedClass = mapDelimiterToClass(delimitador);
+  // Pre-normalización: eliminar anclas vacías (<a id="..."></a>) que Mammoth inserta
+  // como bookmarks de Word dentro de posibles [etiquetas]. Word puede insertar varios
+  // bookmarks consecutivos, por eso se hace dentro de cada [...] individualmente.
+  const normalized = htmlValue.replace(
+    /\[([^\]]*?)\]/g,
+    (match) => match.replace(/<a[^>]*><\/a>/g, ''),
+  );
 
-    // Si no coincide con un delimitador válido, devolver sin procesar
-    if (!mappedClass) {
-      return _match;
-    }
+  // Caso A: etiqueta en párrafo propio → consume los <p> de apertura y cierre
+  let result = normalized.replace(
+    /<p>\s*\[([^\[\]]+?)\]\s*<\/p>([\s\S]*?)<p>\s*\[fin\]\s*<\/p>/gi,
+    (_match, delimitador, content) => {
+      const mappedClass = mapDelimiterToClass(delimitador);
+      if (!mappedClass) return _match;
+      return wrap(mappedClass, content);
+    },
+  );
 
-    // Retornar el contenido envuelto en un div con la clase BUA correspondiente
-    return `<div class="${mappedClass}">${content}</div>`;
-  });
+  // Caso B: etiqueta inline dentro del mismo párrafo
+  result = result.replace(
+    /\[([^\[\]]+?)\]([\s\S]*?)\[fin\]/gi,
+    (_match, delimitador, content) => {
+      const mappedClass = mapDelimiterToClass(delimitador);
+      if (!mappedClass) return _match;
+      return wrap(mappedClass, content);
+    },
+  );
+
+  return result;
 }
 
 /**

@@ -194,6 +194,37 @@ interface AssemblyOptions {
 }
 
 /**
+ * Inyecta los running elements (header/footer) dentro de la sección cover.
+ *
+ * ESTRATEGIA: Los running elements deben estar dentro de una named-page
+ * para que Paged.js no cree una página anónima antes de la cover.
+ * Al inyectarlos dentro del <section class="cover-page"> (que tiene page: cover),
+ * quedan registrados desde la primera página. @page cover los suprime con
+ * content: none, y @page / @page toc los muestran donde corresponde.
+ *
+ * position: running() los extrae del flujo, así que no afectan al layout
+ * visual de la portada.
+ */
+function injectRunningElements(
+  coverHtml: string,
+  opts: { buaLogoDataUrl: string | null; uaLogoDataUrl: string | null; title: string },
+): string {
+  const runningHtml = [
+    `<div id="page-header-logo">${opts.buaLogoDataUrl ? `<img src="${opts.buaLogoDataUrl}" alt="BUA">` : ''}</div>`,
+    `<div id="page-header-title"><span>${escHtml(opts.title)}</span></div>`,
+    opts.uaLogoDataUrl ? `<div id="page-footer-logo"><img src="${opts.uaLogoDataUrl}" alt="UA"></div>` : '',
+  ].filter(Boolean).join('\n');
+
+  // Insertar justo antes del cierre de la sección cover
+  if (coverHtml.includes('</section>')) {
+    return coverHtml.replace(/(<\/section>)(?![\s\S]*<\/section>)/, `${runningHtml}\n$1`);
+  }
+
+  // Fallback: si no hay </section>, añadir al final del cover
+  return coverHtml + '\n' + runningHtml;
+}
+
+/**
  * Ensambla el documento HTML completo autónomo con:
  * - Variables CSS del tema (colores, tipografías)
  * - Referencia al printStyles.css
@@ -280,25 +311,15 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
 </head>
 <body>
 
-${opts.coverHtml}
+${injectRunningElements(opts.coverHtml, {
+  buaLogoDataUrl: opts.buaLogoDataUrl,
+  uaLogoDataUrl: opts.uaLogoDataUrl,
+  title: opts.title,
+})}
 
 ${opts.tocHtml}
 
 ${opts.contentHtml}
-
-<!-- ── Running elements para encabezado y pie de página ──────────────────
-     Colocados AL FINAL del documento para no interferir con ninguna
-     transición de página (cover→toc→content).
-     Paged.js los extrae en su pre-pass antes de paginar, por lo que su
-     posición en el DOM no afecta a los margin boxes de @page.
-     ────────────────────────────────────────────────────────────────────── -->
-<div id="page-header-logo">${opts.buaLogoDataUrl
-  ? `<img src="${opts.buaLogoDataUrl}" alt="BUA">`
-  : ''}</div>
-<div id="page-header-title"><span>${escHtml(opts.title)}</span></div>
-${opts.uaLogoDataUrl
-  ? `<div id="page-footer-logo"><img src="${opts.uaLogoDataUrl}" alt="UA"></div>`
-  : ''}
 
 </body>
 </html>`;
