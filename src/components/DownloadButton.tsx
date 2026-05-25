@@ -29,6 +29,7 @@ function DownloadArrow() {
 export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonProps) {
   const [printLoading, setPrintLoading] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
+  const [useCoverImage, setUseCoverImage] = useState(true);
 
   const base = import.meta.env.BASE_URL;
 
@@ -56,6 +57,7 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
         cover: { date: String(new Date().getFullYear()) },
         includeCover: true,
         includeToc: true,
+        useCoverImage,
       });
 
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
@@ -98,6 +100,20 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
         </div>
         <DownloadArrow />
       </button>
+
+      {/* Opción imagen de portada */}
+      <label className="pdf-cover-toggle">
+        <span className="pdf-cover-toggle__label">Imagen de portada en PDF</span>
+        <button
+          role="switch"
+          aria-checked={useCoverImage}
+          onClick={() => setUseCoverImage((v) => !v)}
+          className={`toggle-switch ${useCoverImage ? 'toggle-switch--on' : ''}`}
+          title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
+        >
+          <span className="toggle-switch__thumb" />
+        </button>
+      </label>
 
       {/* Exportar PDF */}
       <button

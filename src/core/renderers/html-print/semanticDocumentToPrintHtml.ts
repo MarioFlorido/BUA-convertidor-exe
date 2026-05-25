@@ -29,6 +29,12 @@ export interface PrintRenderOptions {
    * Incluir TOC. Default: true.
    */
   includeToc?: boolean;
+
+  /**
+   * Usar imagen de portada del tema (portada_pdf.*). Default: true.
+   * Si es false, la portada se muestra sin imagen de fondo aunque el tema la tenga.
+   */
+  useCoverImage?: boolean;
 }
 
 /**
@@ -77,10 +83,14 @@ export async function semanticDocumentToPrintHtml(
     cover = {},
     includeCover = true,
     includeToc = true,
+    useCoverImage = true,
   } = options;
 
   // 1. Cargar assets del tema (portada_pdf.*, logos, colores)
-  const assets = await loadPrintThemeAssets(themeId);
+  const rawAssets = await loadPrintThemeAssets(themeId);
+  const assets = useCoverImage
+    ? rawAssets
+    : { ...rawAssets, coverImageDataUrl: null };
 
   // 2. Generar secciones
   const coverHtml = includeCover
