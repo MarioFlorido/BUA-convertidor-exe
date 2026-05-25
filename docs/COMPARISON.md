@@ -1,97 +1,87 @@
 # Agradecimientos
-
+ 
 ## eXeConvert — Juanjo de Haro
+ 
+Este proyecto no existiría sin **Juanjo de Haro** y **eXeConvert**.
+ 
+eXeConvert hizo algo que parecía imposible: convertir documentos Word a formato eXeLearning sin instalar nada, sin servidores, sin complicaciones. Todo en el navegador, arquitectura limpia client-side. Esa idea fue el punto de partida de **BUA ConvertidoreXe**.
+ 
+El código de eXeConvert es abierto y está bien pensado. Estudiar cómo resolvía el problema DOCX → ELPX es lo que me decidió a intentar este proyecto
 
-Este proyecto no existiría sin el trabajo previo de **Juanjo de Haro** y su herramienta **eXeConvert**.
+ 
+**BUA ConvertidoreXe** es un desarrollo independiente para las necesidades específicas de la Biblioteca Universitaria de la Universidad de Alicante. Pero la deuda con eXeConvert es real.
 
-eXeConvert demostró que era posible convertir documentos Word a formato eXeLearning directamente desde el navegador, sin instalaciones ni servidores, con una arquitectura completamente client-side. Esa idea fue la semilla de **BUA ConvertidoreXe** para los editores de temas de la BUA (Biblioteca de la Universidad de Alicante).
-
-El código de eXeConvert es abierto, generoso y está bien pensado. Estudiar cómo resolvía el problema de la conversión DOCX → ELPX fue el punto de partida real de este proyecto.
-
-
+Debido a su especificidad, la arquitectura interna de *BUA ConvertidoreXe* es diferente. Mientras *eXeConvert *construye el ELPX directo del HTML extraído del DOCX. Sin modelos intermedios, *BUA ConvertidoreXe* introduce `SemanticDocument` en el medio. Un modelo independiente del formato que representa el documento como páginas y bloques semánticos. Los renderers de ELPX y PDF consumen este modelo por su lado. Si mañana quieres añadir un nuevo formato, migrar de tecnología no haría falta tocar el parser.
+ 
 ---
-
-**BUA ConvertidoreXe** es un desarrollo independiente orientado a las necesidades específicas de la Biblioteca Universitaria de la Universidad de Alicante, pero reconoce en eXeConvert su inspiración original.
-
-
-
+ 
 # eXeConvert y BUA ConvertidoreXe — diferencias
-
-BUA ConvertidoreXe nació como una herramienta específica para la Biblioteca Universitaria de la Universidad de Alicante, tomando como inspiración el trabajo de Juan José de Haro en eXeConvert. Aunque comparten el objetivo central de convertir documentos al formato eXeLearning, ambas herramientas han evolucionado con enfoques y prioridades distintas.
-
-Este documento describe las diferencias sin establecer una jerarquía entre ellas: cada una responde a necesidades diferentes.
-
+ 
+Ambas herramientas comparten el mismo objetivo: convertir documentos a eXeLearning. Pero han tomado caminos distintos según sus contextos de uso. Aquí van las diferencias.
+ 
 ---
-
+ 
 ## Alcance y formatos soportados
-
-**eXeConvert** es una herramienta generalista. Soporta múltiples formatos de entrada y salida: `.docx`, `.elpx`, `.elp`, `.md` y `.pdf`. Permite convertir en varias direcciones, incluyendo la exportación de proyectos ELPX existentes a Word o HTML, y la migración de proyectos `.elp` (formato antiguo) al formato `.elpx` moderno. Dispone además de una interfaz de línea de comandos (CLI) y paquetes de escritorio instalables. Esta diseñada para daar oporte y servir de ayuda a toda la comunidad de eXeLearning
-
-**BUA ConvertidoreXe** se centra en un único flujo: DOCX → ELPX y DOCX → PDF. No contempla conversiones inversas ni otros formatos de entrada. Esta especialización es una decisión deliberada: los materiales de la Biblioteca Universitaria parten siempre de documentos Word, y el objetivo es transformarlos en recursos eXeLearning con la identidad visual institucional. Su objetivo es servir de herramienta al personal de la Biblioteca en la eleboración de los recursos docentes.
-
+ 
+**eXeConvert** es agnóstica. Soporta múltiples entrada/salida: `.docx`, `.elpx`, `.elp`, `.md`, `.pdf`. Convierte en varias direcciones. Exportas un ELPX existente a Word. Migras un proyecto antiguo `.elp` al formato moderno. Incluso tiene CLI e instalables de escritorio. Es herramienta para toda la comunidad eXeLearning.
+ 
+**BUA ConvertidoreXe** hace una sola cosa: DOCX → ELPX y DOCX → PDF. Nada de conversiones al revés. Los materiales de la Biblioteca salen siempre de Word y necesitan convertirse a recursos eXeLearning con la identidad visual institucional. Es una herramienta para el personal de la Biblioteca, nada más.
+ 
 ---
-
+ 
 ## Fórmulas matemáticas
-
-**eXeConvert** incorpora soporte completo convierte fórmulas OMML (Office Math Markup Language) a LaTeX, y renderiza LaTeX y MathML a SVG mediante MathJax.
-
-**BUA ConvertidoreXe** no incluye procesamiento matemático. Los materiales de BUA no contienen expresiones matemáticas, por lo que esta capacidad quedó desechada del proyecto desde el principio.
-
+ 
+**eXeConvert** las maneja completas. Convierte OMML (Office Math Markup Language) a LaTeX, renderiza LaTeX y MathML a SVG mediante MathJax.
+ 
+**BUA ConvertidoreXe** no toca matemáticas. Los materiales de BUA no las tienen, así que decidimos no complicarnos.
+ 
 ---
-
+ 
 ## Control sobre la estructura del documento
-
-**eXeConvert** divide el documento automáticamente en páginas y bloques según la jerarquía de encabezados, sin intervención del usuario.
-
-**BUA ConvertidoreXe** introduce un paso de configuración entre la carga del documento y la conversión: el usuario decide qué hace cada nivel de encabezado (página principal, subpágina, iDevice, acordeón, pestañas). Esto permite adaptar la estructura del ELPX, sin modificar el Word original. Además se pueden etiquetar elementos del Word con corchetes para aplicar efectos, cajas semántias, etc. definidas en los estilos [Definición], [Importante], [Ejemplo]...
-
+ 
+**eXeConvert** divide el documento automáticamente. Lee la jerarquía de encabezados y genera páginas y bloques sin que hagas nada.
+ 
+**BUA ConvertidoreXe** da un paso intermedio: configuración. Antes de convertir, dices qué hace cada nivel de encabezado. Uno puede ser página principal, otro subpágina, otro iDevice. Si necesitas un acordeón, lo defines. Si quieres pestañas, también. Todo sin tocar el Word original. Además, puedes etiquetar elementos con corchetes para aplicar efectos semánticos: [Definición], [Importante], [Ejemplo]. Los estilos se encargan del resto.
+ 
 ---
-
+ 
 ## Sistema de temas
-
-**eXeConvert** genera ELPX con el tema por defecto de eXeLearning. La personalización visual queda en manos del usuario una vez abierto el proyecto en eXeLearning.
-
-**BUA ConvertidoreXe** incorpora un sistema de control de estilos institucionales en formato ZIP. El ELPX generado ya incluye el tema seleccionado (Doctorado, CID, TFG u otros), con sus estilos CSS, tipografías, iconos y configuración. El recurso está listo para publicar sin necesidad de intervención posterior en eXeLearning.
-
+ 
+**eXeConvert** genera ELPX con el tema por defecto de eXeLearning. La personalización visual corre por tu cuenta una vez lo abres en eXeLearning.
+ 
+**BUA ConvertidoreXe** viene con temas institucionales en ZIP. El ELPX que genera ya incluye el tema seleccionado (Doctorado, CID, TFG u otros). Estilos CSS, tipografías, iconos, todo. El recurso está listo para publicar.
+ 
 ---
-
+ 
 ## Exportación PDF
-
-**eXeConvert** genera el PDF mediante `pdfmake` (navegador) o `puppeteer` (servidor), produciendo un documento funcional a partir del contenido del ELPX.
-
-**BUA ConvertidoreXe** genera el PDF directamente desde el `SemanticDocument` mediante Paged.js y CSS Paged Media. Lo que confoiere mayor control editorial. El resultado incluye portada con imagen institucional, logos BUA y UA, índice con numeración automática de páginas, cabeceras y pies de página, y los estilos visuales del tema activo. El documento está pensado para ser entregado o impreso como material de apoyo.
-
+ 
+**eXeConvert** usa `pdfmake` (navegador) o `puppeteer` (servidor). Genera un PDF funcional del contenido del ELPX.
+ 
+**BUA ConvertidoreXe** lo hace directo desde el `SemanticDocument` con Paged.js y CSS Paged Media. Control editorial mejor. El resultado lleva portada con imagen institucional, logos BUA y UA, índice con numeración automática, cabeceras, pies de página, y los estilos del tema activo. Es material que puedes entregar o imprimir.
+ 
 ---
-
-## Arquitectura interna
-
-**eXeConvert** construye el proyecto ELPX directamente a partir del HTML extraído del DOCX, sin un modelo de datos intermedio.
-
-**BUA ConvertidoreXe** introduce `SemanticDocument` como capa central: un modelo agnóstico al formato de salida que representa el documento como páginas y bloques semánticos. Los renderers ELPX y PDF consumen este modelo de forma independiente, lo que facilita añadir nuevos formatos de salida sin modificar el pipeline de parsing.
-
----
-
+ 
 ## Despliegue
-
-**eXeConvert** incluye un componente de servidor (Puppeteer) para la generación de PDF en Node.js, además de paquetes de escritorio para distintas plataformas.
-
-**BUA ConvertidoreXe** es completamente estático: no requiere servidor, se despliega directamente en GitHub Pages y funciona en cualquier navegador moderno sin instalación.
-
+ 
+**eXeConvert** tiene servidor (Puppeteer) para PDF en Node.js, además de instalables de escritorio.
+ 
+**BUA ConvertidoreXe** no requiere servidor. Se despliega en GitHub Pages. Funciona en cualquier navegador moderno. Nada de instalar.
+ 
 ---
-
+ 
 ## Resumen
-
+ 
 | Característica | eXeConvert | BUA ConvertidoreXe |
 |---|---|---|
 | Formatos de entrada | DOCX, ELPX, ELP, MD | DOCX |
 | Formatos de salida | ELPX, DOCX, HTML, PDF | ELPX, PDF |
 | Fórmulas matemáticas | Sí | No |
-| Configuración de estructura | Automática | Configurable por el usuario |
+| Configuración de estructura | Automática | Por el usuario |
 | Temas / estilos | No | Sí |
-| PDF | Funcional | Con maquetación tomada de los estilos |
+| PDF | Funcional | Con maquetación |
 | CLI / escritorio | Sí | No |
-| Despliegue | Requiere Node.js | 100% estático |
-
-Ambas herramientas son soluciones válidas para convertir documentos a eXeLearning. Sus diferencias reflejan contextos de uso distintos. Para mi, Mario Florido,  Juanjo de Haro sigue siendo el auténtico gurú de eXeLearning y sus hacks.
-Gracias, por compartir tu trabajo y por hacer las cosas en abierto.
-
+| Despliegue | Node.js | 100% estático |
+ 
+Para mí, Juanjo sigue siendo el auténtico gurú de eXeLearning.
+ 
+Gracias por el código abierto. Gracias por hacerlo bien.
