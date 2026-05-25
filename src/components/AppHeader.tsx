@@ -6,11 +6,18 @@ export function AppHeader({ onThemeManagerClick }: AppHeaderProps) {
   return (
     <header className="app-header">
       <div className="header-brand">
-        <img
-          src={`${import.meta.env.BASE_URL}logo_BUA.png`}
-          alt="BUA — Biblioteca Universitaria de la Universidad de Alicante"
-          className="header-bua-logo"
-        />
+        <a
+          href="https://biblioteca.ua.es/es/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Biblioteca Universitaria de la Universidad de Alicante"
+        >
+          <img
+            src={`${import.meta.env.BASE_URL}logo_BUA.png`}
+            alt="BUA — Biblioteca Universitaria de la Universidad de Alicante"
+            className="header-bua-logo"
+          />
+        </a>
 
         <div className="header-divider" aria-hidden="true" />
 

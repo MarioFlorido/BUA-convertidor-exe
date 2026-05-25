@@ -76,7 +76,14 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
               {/* CABECERA — siempre visible */}
               <div className="h1-card-header">
                 <div className="h1-card-title">
-                  <span className="h1-card-icon">📄</span>
+                  <span className="h1-card-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                      <path d="M14 3v5h5" />
+                      <line x1="9" y1="13" x2="15" y2="13" />
+                      <line x1="9" y1="17" x2="13" y2="17" />
+                    </svg>
+                  </span>
                   <span className="h1-card-text">{h1.title}</span>
                 </div>
 

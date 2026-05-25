@@ -292,17 +292,31 @@ export function App() {
 
       <footer className="app-footer">
         <div className="footer-logos">
-          <img
-            src={`${import.meta.env.BASE_URL}logo_UA.png`}
-            alt="Universidad de Alicante"
-            className="footer-ua-logo"
-          />
+          <a
+            href="https://www.ua.es/es/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Universidad de Alicante"
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}logo_UA.png`}
+              alt="Universidad de Alicante"
+              className="footer-ua-logo"
+            />
+          </a>
           <span className="footer-sep" aria-hidden="true">·</span>
-          <img
-            src={`${import.meta.env.BASE_URL}logo_CID.png`}
-            alt="CID — Centro de Información Documental"
-            className="footer-cid-logo"
-          />
+          <a
+            href="https://biblioteca.ua.es/es/cid/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="CID — Competencia Informacional y Digital"
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}logo_CID.png`}
+              alt="CID — Centro de Información Documental"
+              className="footer-cid-logo"
+            />
+          </a>
         </div>
         <span className="footer-copy">Biblioteca Universitaria · ConvertidoreXe v0.2.0</span>
       </footer>

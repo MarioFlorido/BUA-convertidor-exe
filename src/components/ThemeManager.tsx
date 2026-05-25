@@ -176,18 +176,6 @@ export function ThemeManager() {
         )}
       </div>
 
-      {/* Instrucciones */}
-      <div className="manager-instructions">
-        <h4>Instrucciones:</h4>
-        <ol>
-          <li>Arrastra o selecciona un archivo ZIP de tema</li>
-          <li>El sistema lo valida y lo registra automáticamente</li>
-          <li>El tema queda disponible en el selector de forma inmediata</li>
-          <li>Los temas persisten en el navegador y sobreviven recargas de página</li>
-          <li>Para actualizar un tema (nuevo curso académico), carga el nuevo ZIP con el mismo nombre — reemplazará al anterior</li>
-          <li>Solo el tema <strong>Base</strong> no puede eliminarse</li>
-        </ol>
-      </div>
     </div>
   );
 }
