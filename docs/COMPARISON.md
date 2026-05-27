@@ -11,7 +11,7 @@ El código de eXeConvert es abierto y está bien pensado. Estudiar cómo resolv�
  
 **BUA ConvertidoreXe** es un desarrollo independiente para las necesidades específicas de la Biblioteca Universitaria de la Universidad de Alicante. Pero la deuda con eXeConvert es real.
 
-Debido a su especificidad, la arquitectura interna de *BUA ConvertidoreXe* es diferente. Mientras *eXeConvert *construye el ELPX directo del HTML extraído del DOCX. Sin modelos intermedios, *BUA ConvertidoreXe* introduce `SemanticDocument` en el medio. Un modelo independiente del formato que representa el documento como páginas y bloques semánticos. Los renderers de ELPX y PDF consumen este modelo por su lado. Si mañana quieres añadir un nuevo formato, migrar de tecnología no haría falta tocar el parser.
+Debido a su especificidad, la arquitectura interna de *BUA ConvertidoreXe* es diferente. Mientras *eXeConvert* construye el ELPX directo del HTML extraído del DOCX. Sin modelos intermedios, *BUA ConvertidoreXe* introduce `SemanticDocument` en el medio. Un modelo independiente del formato que representa el documento como páginas y bloques semánticos. Los renderers de ELPX y PDF consumen este modelo. Si mañana queremos añadir un nuevo formato, migrar de tecnología no haría falta tocar el parser.
  
 ---
  
@@ -41,7 +41,7 @@ Ambas herramientas comparten el mismo objetivo: convertir documentos a eXeLearni
  
 **eXeConvert** divide el documento automáticamente. Lee la jerarquía de encabezados y genera páginas y bloques sin que hagas nada.
  
-**BUA ConvertidoreXe** da un paso intermedio: configuración. Antes de convertir, dices qué hace cada nivel de encabezado. Uno puede ser página principal, otro subpágina, otro iDevice. Si necesitas un acordeón, lo defines. Si quieres pestañas, también. Todo sin tocar el Word original. Además, puedes etiquetar elementos con corchetes para aplicar efectos semánticos: [Definición], [Importante], [Ejemplo]. Los estilos se encargan del resto.
+**BUA ConvertidoreXe** ofrece un paso intermedio: configuración. Antes de convertir, sé decide qué hace cada nivel de encabezado. Uno puede ser página principal, otro subpágina, otro iDevice. Si necesitas un acordeón, lo defines. Si quieres pestañas, también. Todo sin tocar el Word original. Además, puedes etiquetar elementos con corchetes para aplicar efectos semánticos: [Definición], [Importante], [Ejemplo]. Los estilos se encargan del resto.
  
 ---
  
@@ -49,7 +49,7 @@ Ambas herramientas comparten el mismo objetivo: convertir documentos a eXeLearni
  
 **eXeConvert** genera ELPX con el tema por defecto de eXeLearning. La personalización visual corre por tu cuenta una vez lo abres en eXeLearning.
  
-**BUA ConvertidoreXe** viene con temas institucionales en ZIP. El ELPX que genera ya incluye el tema seleccionado (Doctorado, CID, TFG u otros). Estilos CSS, tipografías, iconos, todo. El recurso está listo para publicar.
+**BUA ConvertidoreXe** viene con temas institucionales en ZIP. El ELPX que genera ya incluye el tema seleccionado (Doctorado, CID, Ciencia Abierta u otros). Estilos CSS, tipografías, iconos, todo. El recurso está listo para publicar.
  
 ---
  
@@ -57,7 +57,7 @@ Ambas herramientas comparten el mismo objetivo: convertir documentos a eXeLearni
  
 **eXeConvert** usa `pdfmake` (navegador) o `puppeteer` (servidor). Genera un PDF funcional del contenido del ELPX.
  
-**BUA ConvertidoreXe** lo hace directo desde el `SemanticDocument` con Paged.js y CSS Paged Media. Control editorial mejor. El resultado lleva portada con imagen institucional, logos BUA y UA, índice con numeración automática, cabeceras, pies de página, y los estilos del tema activo. Es material que puedes entregar o imprimir.
+**BUA ConvertidoreXe** lo hace directo desde el `SemanticDocument` con Paged.js y CSS Paged Media. Eso nos ofrece un control editorial muchísimo mejor. El resultado lleva portada con imagen institucional, logos BUA y UA, índice con numeración automática, cabeceras, pies de página, así como parte de los estilos del tema activo. Es material que puedes entregar o imprimir.
  
 ---
  
@@ -83,5 +83,4 @@ Ambas herramientas comparten el mismo objetivo: convertir documentos a eXeLearni
 | Despliegue | Node.js | 100% estático |
  
 Para mí, Juanjo sigue siendo el auténtico gurú de eXeLearning.
- 
-Gracias por el código abierto. Gracias por hacerlo bien.
+Gracias por tu código abierto. Gracias por hacerlo bien.
