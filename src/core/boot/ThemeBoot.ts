@@ -32,7 +32,17 @@ export interface BootResult {
 export async function bootThemeSystem(): Promise<BootResult> {
   const errors: string[] = [];
 
-  // FASE 3 — Temas built-in (tolerante a fallos individuales)
+  // FASE 3a — Inicializar IndexedDB primero (necesario para que built-ins
+  // puedan consultar la lista de built-ins marcados como eliminados)
+  try {
+    await UserThemeProvider.init();
+  } catch (err) {
+    const msg = `Error inicializando IndexedDB: ${err instanceof Error ? err.message : err}`;
+    console.warn('[ThemeBoot]', msg);
+    errors.push(msg);
+  }
+
+  // FASE 3b — Temas built-in (omite los marcados como eliminados)
   try {
     await BuiltInThemeProvider.loadAll();
   } catch (err) {
@@ -43,7 +53,6 @@ export async function bootThemeSystem(): Promise<BootResult> {
 
   // FASE 4 — Temas de usuario desde IndexedDB
   try {
-    await UserThemeProvider.init();
     await UserThemeProvider.loadAll();
   } catch (err) {
     const msg = `Error cargando temas de usuario: ${err instanceof Error ? err.message : err}`;

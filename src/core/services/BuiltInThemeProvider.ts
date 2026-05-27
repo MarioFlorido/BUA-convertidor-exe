@@ -11,7 +11,9 @@
 import { unzipSync } from 'fflate';
 import type { ThemeBundle, ThemeMetadata } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
+import { UserThemeProvider } from './UserThemeProvider';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { extractLanguageFromConfigXml } from './themeConfigParser';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
 
@@ -32,8 +34,14 @@ class BuiltInThemeProviderClass {
   async loadAll(): Promise<void> {
     const configEntries = await this.fetchThemesConfig();
 
+    // Lista de built-ins marcados como eliminados por el usuario (persistente)
+    // El tema 'base' nunca se omite (es fijo y no borrable)
+    const deletedBuiltIns = await UserThemeProvider.getDeletedBuiltIns();
+
     await Promise.allSettled(
-      configEntries.map((entry) => this.loadOne(entry))
+      configEntries
+        .filter((entry) => entry.id === 'base' || !deletedBuiltIns.has(entry.id))
+        .map((entry) => this.loadOne(entry)),
     );
   }
 
@@ -94,6 +102,12 @@ class BuiltInThemeProviderClass {
           validation.errors
         );
         return;
+      }
+
+      // El <language> del config.xml tiene prioridad sobre themes-config.json
+      const langFromConfig = extractLanguageFromConfigXml(files);
+      if (langFromConfig) {
+        metadata.language = langFromConfig;
       }
 
       const bundle: ThemeBundle = {

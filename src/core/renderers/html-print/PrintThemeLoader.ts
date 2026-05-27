@@ -1,5 +1,6 @@
 import { unzipSync } from 'fflate';
 import { ThemeRegistry } from '../../services/ThemeRegistry';
+import { extractLanguageFromConfigXml } from '../../services/themeConfigParser';
 
 /** Idioma del tema, detectado desde el ID. Controla los textos CC y etiquetas. */
 export type PrintLanguage = 'es' | 'en' | 'ca';
@@ -196,18 +197,27 @@ function extractLogoFile(entries: Record<string, Uint8Array>, name: string): str
 /**
  * Detecta el idioma del tema. Estrategia por capas (orden de fiabilidad):
  *
+ *  0. Tag <language> del config.xml del tema (declaración explícita).
+ *     Es la fuente más fiable: el tema declara su propio idioma.
+ *
  *  1. Etiqueta BUA ya extraída del CSS del tema:
  *       "Exemple"→ca · "Example"→en · "Ejemplo"→es
- *     Es el método más fiable porque el propio CSS declara su idioma.
- *     Funciona para cualquier nombre de tema, presente o futuro.
+ *     Funciona para temas antiguos sin tag <language>.
  *
- *  2. Palabras clave en el ID del tema (fallback para temas sin BUA):
+ *  2. Palabras clave en el ID del tema (fallback adicional):
  *       PhD / _en / -en → en
  *       Doctorat / Grau / Màster / _ca / _va → ca
  *
  *  3. Fallback final: 'es'
  */
-function detectLanguage(themeId: string, buaStyles?: BuaBoxStyles): PrintLanguage {
+function detectLanguage(
+  themeId: string,
+  buaStyles?: BuaBoxStyles,
+  configLang?: PrintLanguage | null,
+): PrintLanguage {
+  // Capa 0 — declaración explícita del config.xml (máxima prioridad)
+  if (configLang) return configLang;
+
   // Capa 1 — etiqueta BUA (discrimina con precisión entre es/en/ca)
   if (buaStyles) {
     const label = buaStyles.ejemplo.label.toLowerCase().trim();
@@ -240,6 +250,9 @@ function extractThemeStyles(entries: Record<string, Uint8Array>, themeId: string
   buaStyles: BuaBoxStyles;
   language: PrintLanguage;
 } {
+  // Idioma declarado en config.xml (si existe) — máxima prioridad
+  const configLang = extractLanguageFromConfigXml(entries);
+
   const cssEntry = entries['style.css'];
   if (!cssEntry) {
     return {
@@ -248,7 +261,7 @@ function extractThemeStyles(entries: Record<string, Uint8Array>, themeId: string
       fontFamilyTitle: "'Georgia', serif",
       fontFamilyBody: "'Arial', sans-serif",
       buaStyles: DEFAULT_BUA_STYLES,
-      language: detectLanguage(themeId),
+      language: detectLanguage(themeId, undefined, configLang),
     };
   }
 
@@ -275,8 +288,8 @@ function extractThemeStyles(entries: Record<string, Uint8Array>, themeId: string
     fontFamilyBody: fontFamilyMatch ? `'${fontFamilyMatch[1]}', sans-serif`
                   : "'Arial', sans-serif",
     buaStyles,
-    // Las etiquetas BUA son la fuente más fiable; el themeId actúa de fallback
-    language: detectLanguage(themeId, buaStyles),
+    // Orden: config.xml → etiquetas BUA → palabras clave del ID → 'es'
+    language: detectLanguage(themeId, buaStyles, configLang),
   };
 }
 

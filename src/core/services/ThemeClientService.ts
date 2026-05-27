@@ -11,6 +11,7 @@ import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { UserThemeProvider } from './UserThemeProvider';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { extractLanguageFromConfigXml } from './themeConfigParser';
 
 export class ThemeClientService {
   /**
@@ -37,6 +38,8 @@ export class ThemeClientService {
     }
 
     const id = file.name.replace(/\.zip$/i, '');
+    // Leer idioma declarado en config.xml; fallback 'es' si no existe
+    const langFromConfig = extractLanguageFromConfigXml(files);
     const bundle: ThemeBundle = {
       id,
       name: id.replace(/_/g, ' '),
@@ -44,9 +47,13 @@ export class ThemeClientService {
       files,
       metadata: {
         name: id.replace(/_/g, ' '),
-        language: 'es',
+        language: langFromConfig ?? 'es',
       },
     };
+
+    // Si el usuario re-sube un tema que había marcado como eliminado, quitar
+    // la marca (restauración natural — la próxima recarga lo verá de nuevo).
+    await UserThemeProvider.unmarkBuiltInDeleted(id);
 
     ThemeRegistry.register(bundle);
     await UserThemeProvider.save(bundle, zipBuffer);
@@ -55,16 +62,27 @@ export class ThemeClientService {
   }
 
   /**
-   * Elimina un tema de usuario del registry y de IndexedDB.
-   * Los temas built-in no pueden eliminarse con este método.
+   * Elimina un tema del registry.
+   * - El tema 'base' no se puede eliminar (es fijo).
+   * - Temas 'user': se borran de IndexedDB (desaparecen permanentemente).
+   * - Temas 'builtin': se marcan como eliminados en IndexedDB
+   *   (BuiltInThemeProvider los omitirá en próximas recargas).
    */
   async removeTheme(id: string): Promise<void> {
     const bundle = ThemeRegistry.get(id);
     if (bundle?.id === 'base') {
       throw new Error('El tema base no se puede eliminar');
     }
+
     ThemeRegistry.remove(id);
-    await UserThemeProvider.remove(id);
+
+    if (bundle?.source === 'builtin') {
+      // Marcar como eliminado para que la próxima recarga no lo cargue
+      await UserThemeProvider.markBuiltInDeleted(id);
+    } else {
+      // Tema de usuario: borrar del store de IndexedDB
+      await UserThemeProvider.remove(id);
+    }
   }
 
   /** Todos los temas disponibles (built-in + usuario) */
