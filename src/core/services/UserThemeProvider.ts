@@ -97,10 +97,14 @@ class UserThemeProviderClass {
         }
 
         const screenshot = screenshotToObjectUrl(files);
-        // Diagnóstico temporal — ayuda a ver por qué la miniatura no se detecta
+        // Diagnóstico temporal — buscar cualquier archivo que contenga "screen" o "preview"
+        const screenshotMatches = Object.keys(files).filter((k) =>
+          /screen|preview|thumb/i.test(k),
+        );
         console.log(`[UserThemeProvider] Cargado "${record.id}"`, {
           totalFiles: Object.keys(files).length,
-          fileKeys: Object.keys(files).slice(0, 15),
+          screenshotMatches,
+          allFileKeys: Object.keys(files),
           screenshotDetected: !!screenshot,
         });
 
