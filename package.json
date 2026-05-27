@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "publish-theme": "tsx scripts/publish-theme.ts",
+    "unpublish-theme": "tsx scripts/unpublish-theme.ts"
   },
   "dependencies": {
     "fflate": "^0.8.1",
