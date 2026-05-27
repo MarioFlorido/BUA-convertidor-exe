@@ -1208,6 +1208,12 @@ button {
   border: 1px solid var(--blue-border);
 }
 
+.theme-badge--official {
+  background: var(--blue-light);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
 .theme-badge--user {
   background: #f3e5f5;
   color: #6a1b9a;

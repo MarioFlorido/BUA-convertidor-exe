@@ -11,7 +11,6 @@
 import { unzipSync } from 'fflate';
 import type { ThemeBundle, ThemeMetadata } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
-import { UserThemeProvider } from './UserThemeProvider';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
 import { extractLanguageFromConfigXml } from './themeConfigParser';
 
@@ -28,19 +27,18 @@ interface ThemesConfigEntry {
 
 class BuiltInThemeProviderClass {
   /**
-   * Carga todos los temas predefinidos desde themes-config.json + ZIPs.
-   * Los fallos individuales no bloquean el boot.
+   * Carga los temas predefinidos.
+   *
+   * FASE DE TESTEO: solo se carga el tema 'base'. Los demás ZIPs siguen
+   * físicamente en public/ y en themes-config.json, pero no se registran.
+   * Cuando termine la fase de pruebas, eliminar el filtro `id === 'base'`
+   * para volver a cargar todos los temas oficiales.
    */
   async loadAll(): Promise<void> {
     const configEntries = await this.fetchThemesConfig();
-
-    // Lista de built-ins marcados como eliminados por el usuario (persistente)
-    // El tema 'base' nunca se omite (es fijo y no borrable)
-    const deletedBuiltIns = await UserThemeProvider.getDeletedBuiltIns();
-
     await Promise.allSettled(
       configEntries
-        .filter((entry) => entry.id === 'base' || !deletedBuiltIns.has(entry.id))
+        .filter((entry) => entry.id === 'base')
         .map((entry) => this.loadOne(entry)),
     );
   }

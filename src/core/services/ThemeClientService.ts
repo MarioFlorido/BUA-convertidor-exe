@@ -51,10 +51,6 @@ export class ThemeClientService {
       },
     };
 
-    // Si el usuario re-sube un tema que había marcado como eliminado, quitar
-    // la marca (restauración natural — la próxima recarga lo verá de nuevo).
-    await UserThemeProvider.unmarkBuiltInDeleted(id);
-
     ThemeRegistry.register(bundle);
     await UserThemeProvider.save(bundle, zipBuffer);
 
@@ -62,27 +58,26 @@ export class ThemeClientService {
   }
 
   /**
-   * Elimina un tema del registry.
-   * - El tema 'base' no se puede eliminar (es fijo).
-   * - Temas 'user': se borran de IndexedDB (desaparecen permanentemente).
-   * - Temas 'builtin': se marcan como eliminados en IndexedDB
-   *   (BuiltInThemeProvider los omitirá en próximas recargas).
+   * Elimina un tema del registry y de IndexedDB.
+   * - 'base' (oficial): no se puede eliminar.
+   * - Cualquier tema oficial (source 'builtin'): tampoco se puede eliminar desde
+   *   la UI; los temas oficiales se gestionan vía repo Git (`npm run unpublish-theme`).
+   * - Temas locales (source 'user'): se borran de IndexedDB.
    */
   async removeTheme(id: string): Promise<void> {
     const bundle = ThemeRegistry.get(id);
-    if (bundle?.id === 'base') {
-      throw new Error('El tema base no se puede eliminar');
+    if (!bundle) return;
+
+    if (bundle.source === 'builtin') {
+      throw new Error(
+        bundle.id === 'base'
+          ? 'El tema base no se puede eliminar'
+          : 'Los temas oficiales se gestionan desde el repositorio',
+      );
     }
 
     ThemeRegistry.remove(id);
-
-    if (bundle?.source === 'builtin') {
-      // Marcar como eliminado para que la próxima recarga no lo cargue
-      await UserThemeProvider.markBuiltInDeleted(id);
-    } else {
-      // Tema de usuario: borrar del store de IndexedDB
-      await UserThemeProvider.remove(id);
-    }
+    await UserThemeProvider.remove(id);
   }
 
   /** Todos los temas disponibles (built-in + usuario) */

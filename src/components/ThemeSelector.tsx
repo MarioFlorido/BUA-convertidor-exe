@@ -48,9 +48,11 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
               {theme.metadata.description && (
                 <div className="theme-description">{theme.metadata.description}</div>
               )}
-              {theme.source === 'user' && (
-                <span className="theme-badge theme-badge--user">Personalizado</span>
-              )}
+              <span
+                className={`theme-badge theme-badge--${theme.source === 'builtin' ? 'official' : 'user'}`}
+              >
+                {theme.source === 'builtin' ? 'Oficial' : 'Local'}
+              </span>
             </div>
             {theme.metadata.screenshot && (
               <img

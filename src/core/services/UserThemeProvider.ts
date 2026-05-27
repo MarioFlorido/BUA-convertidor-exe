@@ -16,8 +16,11 @@ import { screenshotToObjectUrl } from './themeConfigParser';
 
 const DB_NAME = 'bua-themes';
 const STORE_NAME = 'user-themes';
-const DELETED_BUILTINS_STORE = 'deleted-builtins';
 const DB_VERSION = 2;
+// Nota: en v2 había además un store 'deleted-builtins' para marcar built-ins
+// secundarios como eliminados. Ya no se usa (en testeo solo existe 'base',
+// y en producción los oficiales se gestionan vía repo Git). Si la BD lo
+// contiene, se ignora — no causa problemas.
 
 /** Estructura almacenada en IndexedDB (sin los Uint8Array, que no serializan bien como objetos planos) */
 interface StoredTheme {
@@ -40,9 +43,6 @@ class UserThemeProviderClass {
           if (!db.objectStoreNames.contains(STORE_NAME)) {
             db.createObjectStore(STORE_NAME, { keyPath: 'id' });
           }
-          if (!db.objectStoreNames.contains(DELETED_BUILTINS_STORE)) {
-            db.createObjectStore(DELETED_BUILTINS_STORE, { keyPath: 'id' });
-          }
         },
         blocked() {
           console.warn('[UserThemeProvider] Migración bloqueada — cierra otras pestañas con la app abierta');
@@ -54,11 +54,8 @@ class UserThemeProviderClass {
 
     const db = await openWithUpgrade();
 
-    // Verificación post-apertura: si faltan stores (BD corrupta o migración incompleta),
-    // resetear la BD y re-crear desde cero. Se pierden los temas guardados pero
-    // la app queda operativa.
-    const requiredStores = [STORE_NAME, DELETED_BUILTINS_STORE];
-    const missing = requiredStores.filter((s) => !db.objectStoreNames.contains(s));
+    // Verificación post-apertura: si falta el store (BD corrupta), resetear.
+    const missing = [STORE_NAME].filter((s) => !db.objectStoreNames.contains(s));
     if (missing.length > 0) {
       console.warn(`[UserThemeProvider] Stores faltantes: ${missing.join(', ')} — reseteando BD`);
       db.close();
@@ -141,29 +138,6 @@ class UserThemeProviderClass {
     await this.db.delete(STORE_NAME, id);
   }
 
-  // ─── Gestión de built-ins eliminados ───────────────────────────────────────
-  // Los temas built-in viven en public/*.zip y se recargan en cada arranque.
-  // Para que "eliminar" sea persistente, marcamos el ID en IndexedDB
-  // y BuiltInThemeProvider los omite durante la carga.
-
-  /** Marca un built-in como eliminado para que no se cargue en próximos arranques */
-  async markBuiltInDeleted(id: string): Promise<void> {
-    if (!this.hasStore(DELETED_BUILTINS_STORE)) return;
-    await this.db!.put(DELETED_BUILTINS_STORE, { id });
-  }
-
-  /** Quita la marca de eliminación de un built-in (re-aparecerá en próximos arranques) */
-  async unmarkBuiltInDeleted(id: string): Promise<void> {
-    if (!this.hasStore(DELETED_BUILTINS_STORE)) return;
-    await this.db!.delete(DELETED_BUILTINS_STORE, id);
-  }
-
-  /** Devuelve el Set de IDs de built-ins eliminados */
-  async getDeletedBuiltIns(): Promise<Set<string>> {
-    if (!this.hasStore(DELETED_BUILTINS_STORE)) return new Set();
-    const records: Array<{ id: string }> = await this.db!.getAll(DELETED_BUILTINS_STORE);
-    return new Set(records.map((r) => r.id));
-  }
 }
 
 export const UserThemeProvider = new UserThemeProviderClass();

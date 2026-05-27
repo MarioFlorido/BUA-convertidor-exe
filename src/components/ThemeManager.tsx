@@ -85,8 +85,8 @@ export function ThemeManager() {
     <div className="theme-manager">
       <h2>Administrador de Temas</h2>
       <p className="help-text">
-        Carga archivos ZIP de temas. El sistema los procesa directamente en el
-        navegador, sin necesidad de servidor.
+        Importa temas en ZIP para usarlos en este navegador. Los temas locales
+        se guardan en el almacenamiento del navegador y solo son visibles aquí.
       </p>
 
       {error && <div className="alert alert-error">{error}</div>}
@@ -94,7 +94,7 @@ export function ThemeManager() {
 
       {/* Formulario de carga con drag-and-drop */}
       <div className="theme-upload-section">
-        <h3>Cargar nuevo tema</h3>
+        <h3>Importar tema local</h3>
         <div
           className={`upload-input-wrapper ${dragActive ? 'drag-active' : ''}`}
           onDragEnter={handleDrag}
@@ -158,17 +158,24 @@ export function ThemeManager() {
                     <strong>{theme.metadata.name ?? theme.name}</strong>
                     <span className="theme-id">({theme.id})</span>
                   </div>
-                  {theme.id === 'base' ? (
-                    <span className="theme-badge">Base</span>
-                  ) : (
-                    <button
-                      onClick={() => handleDeleteTheme(theme)}
-                      className="btn-delete"
-                      disabled={uploading}
+                  <div className="theme-item-actions">
+                    <span
+                      className={`theme-badge theme-badge--${
+                        theme.source === 'builtin' ? 'official' : 'user'
+                      }`}
                     >
-                      Eliminar
-                    </button>
-                  )}
+                      {theme.source === 'builtin' ? 'Oficial' : 'Local'}
+                    </span>
+                    {theme.source === 'user' && (
+                      <button
+                        onClick={() => handleDeleteTheme(theme)}
+                        className="btn-delete"
+                        disabled={uploading}
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
