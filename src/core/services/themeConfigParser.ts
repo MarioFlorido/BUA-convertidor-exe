@@ -38,11 +38,27 @@ function findFile(
 export function screenshotToObjectUrl(
   files: Record<string, Uint8Array>,
 ): string | null {
-  const png = findFile(files, 'screenshot.png');
-  const jpg = png ? undefined : findFile(files, 'screenshot.jpg');
-  const bytes = png ?? jpg;
-  if (!bytes) return null;
-  const type = png ? 'image/png' : 'image/jpeg';
+  // Aceptar singular o plural, .png o .jpg/.jpeg
+  const candidates = [
+    'screenshot.png',
+    'screenshots.png',
+    'screenshot.jpg',
+    'screenshots.jpg',
+    'screenshot.jpeg',
+    'screenshots.jpeg',
+  ];
+  let bytes: Uint8Array | undefined;
+  let matched: string | undefined;
+  for (const name of candidates) {
+    const found = findFile(files, name);
+    if (found) {
+      bytes = found;
+      matched = name;
+      break;
+    }
+  }
+  if (!bytes || !matched) return null;
+  const type = matched.endsWith('.png') ? 'image/png' : 'image/jpeg';
   // Slice garantiza ArrayBuffer (no SharedArrayBuffer), requerido por Blob
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
   return URL.createObjectURL(new Blob([buffer], { type }));

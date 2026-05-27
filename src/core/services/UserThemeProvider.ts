@@ -96,25 +96,13 @@ class UserThemeProviderClass {
           continue;
         }
 
-        const screenshot = screenshotToObjectUrl(files);
-        // Diagnóstico temporal — buscar cualquier archivo que contenga "screen" o "preview"
-        const screenshotMatches = Object.keys(files).filter((k) =>
-          /screen|preview|thumb/i.test(k),
-        );
-        console.log(`[UserThemeProvider] Cargado "${record.id}"`, {
-          totalFiles: Object.keys(files).length,
-          screenshotMatches,
-          allFileKeys: Object.keys(files),
-          screenshotDetected: !!screenshot,
-        });
-
         const bundle: ThemeBundle = {
           id: record.id,
           name: record.name,
           source: 'user',
           files,
           // El Object URL de la sesión anterior ya no es válido — regenerar
-          metadata: { ...record.metadata, screenshot },
+          metadata: { ...record.metadata, screenshot: screenshotToObjectUrl(files) },
         };
 
         ThemeRegistry.register(bundle);
