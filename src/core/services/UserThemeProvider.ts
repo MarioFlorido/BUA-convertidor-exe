@@ -12,6 +12,7 @@ import { unzipSync } from 'fflate';
 import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { screenshotToObjectUrl } from './themeConfigParser';
 
 const DB_NAME = 'bua-themes';
 const STORE_NAME = 'user-themes';
@@ -103,7 +104,8 @@ class UserThemeProviderClass {
           name: record.name,
           source: 'user',
           files,
-          metadata: record.metadata,
+          // El Object URL de la sesión anterior ya no es válido — regenerar
+          metadata: { ...record.metadata, screenshot: screenshotToObjectUrl(files) },
         };
 
         ThemeRegistry.register(bundle);

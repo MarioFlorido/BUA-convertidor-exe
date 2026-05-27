@@ -110,6 +110,12 @@ class BuiltInThemeProviderClass {
         metadata.language = langFromConfig;
       }
 
+      // Screenshot servido directamente desde public/ — no necesita conversión
+      if (files['screenshot.png'] || files['screenshot.jpg']) {
+        const ext = files['screenshot.png'] ? 'png' : 'jpg';
+        metadata.screenshot = `${BASE_URL}themes/${entry.id}/screenshot.${ext}`;
+      }
+
       const bundle: ThemeBundle = {
         id: entry.id,
         name: entry.name,

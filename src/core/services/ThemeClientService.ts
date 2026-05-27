@@ -11,7 +11,7 @@ import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { UserThemeProvider } from './UserThemeProvider';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
-import { extractLanguageFromConfigXml } from './themeConfigParser';
+import { extractLanguageFromConfigXml, screenshotToObjectUrl } from './themeConfigParser';
 
 export class ThemeClientService {
   /**
@@ -38,7 +38,6 @@ export class ThemeClientService {
     }
 
     const id = file.name.replace(/\.zip$/i, '');
-    // Leer idioma declarado en config.xml; fallback 'es' si no existe
     const langFromConfig = extractLanguageFromConfigXml(files);
     const bundle: ThemeBundle = {
       id,
@@ -48,6 +47,7 @@ export class ThemeClientService {
       metadata: {
         name: id.replace(/_/g, ' '),
         language: langFromConfig ?? 'es',
+        screenshot: screenshotToObjectUrl(files),
       },
     };
 

@@ -10,6 +10,24 @@
 export type ThemeLanguage = 'es' | 'en' | 'ca';
 
 /**
+ * Convierte `screenshot.png` (o `.jpg`) de los archivos de un tema en un
+ * Object URL utilizable como `src` de una imagen.
+ *
+ * Devuelve `null` si el archivo no existe. El URL es válido durante la
+ * sesión del navegador; no hace falta revocarlo (se limpia al descargar la página).
+ */
+export function screenshotToObjectUrl(
+  files: Record<string, Uint8Array>,
+): string | null {
+  const bytes = files['screenshot.png'] ?? files['screenshot.jpg'];
+  if (!bytes) return null;
+  const type = files['screenshot.png'] ? 'image/png' : 'image/jpeg';
+  // Slice garantiza ArrayBuffer (no SharedArrayBuffer), requerido por Blob
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return URL.createObjectURL(new Blob([buffer], { type }));
+}
+
+/**
  * Extrae el código de idioma declarado en el `<language>` del config.xml.
  *
  * Estructura esperada:

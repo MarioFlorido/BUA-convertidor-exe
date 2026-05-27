@@ -1101,11 +1101,36 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.theme-option:has(input[type="radio"]:checked) {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 5%, var(--surface));
+  box-shadow: var(--shadow-sm);
+}
+
 .theme-option input[type="radio"] {
   margin-top: 0.2rem;
   cursor: pointer;
   flex-shrink: 0;
   accent-color: var(--blue);
+}
+
+.theme-thumbnail {
+  width: 120px;
+  height: 50px;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+  align-self: center;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.theme-option:hover .theme-thumbnail,
+.theme-option:has(input[type="radio"]:checked) .theme-thumbnail {
+  opacity: 1;
+  border-color: var(--blue-border);
 }
 
 .theme-content { flex: 1; }

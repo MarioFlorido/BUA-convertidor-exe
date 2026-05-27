@@ -14,8 +14,6 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
   );
   const [selectedThemeId, setSelectedThemeId] = useState<string>('base');
 
-  const selectedTheme = availableThemes.find((t) => t.id === selectedThemeId);
-
   return (
     <div className="theme-selector">
       <h2>Seleccionar tema visual</h2>
@@ -54,25 +52,18 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
                 <span className="theme-badge theme-badge--user">Personalizado</span>
               )}
             </div>
+            {theme.metadata.screenshot && (
+              <img
+                className="theme-thumbnail"
+                src={theme.metadata.screenshot}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+            )}
           </label>
         ))}
       </div>
-
-      {selectedTheme?.metadata.screenshot && (
-        <div className="theme-info">
-          <h3>Vista previa de tema</h3>
-          <p>
-            <strong>{selectedTheme.metadata.name ?? selectedTheme.name}</strong>
-          </p>
-          <div className="theme-screenshot">
-            <img
-              src={selectedTheme.metadata.screenshot}
-              alt={`Screenshot de ${selectedTheme.metadata.name ?? selectedTheme.name}`}
-              style={{ maxWidth: '100%', borderRadius: '4px', marginTop: '1rem' }}
-            />
-          </div>
-        </div>
-      )}
 
       <div className="theme-actions">
         <button onClick={() => onConfirm(selectedThemeId)} className="btn-confirm">
