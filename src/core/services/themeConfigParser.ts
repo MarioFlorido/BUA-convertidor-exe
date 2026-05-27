@@ -10,8 +10,27 @@
 export type ThemeLanguage = 'es' | 'en' | 'ca';
 
 /**
+ * Busca un archivo por su nombre base, aceptando que esté en la raíz del ZIP
+ * o dentro de un único directorio raíz (estructura típica de eXeLearning).
+ * Devuelve el primer match.
+ */
+function findFile(
+  files: Record<string, Uint8Array>,
+  basename: string,
+): Uint8Array | undefined {
+  if (files[basename]) return files[basename];
+  for (const [path, data] of Object.entries(files)) {
+    if (path.endsWith(`/${basename}`)) return data;
+  }
+  return undefined;
+}
+
+/**
  * Convierte `screenshot.png` (o `.jpg`) de los archivos de un tema en un
  * Object URL utilizable como `src` de una imagen.
+ *
+ * Acepta el archivo tanto en la raíz del ZIP como dentro de un directorio raíz
+ * (p.ej. `MiTema/screenshot.png`).
  *
  * Devuelve `null` si el archivo no existe. El URL es válido durante la
  * sesión del navegador; no hace falta revocarlo (se limpia al descargar la página).
@@ -19,9 +38,11 @@ export type ThemeLanguage = 'es' | 'en' | 'ca';
 export function screenshotToObjectUrl(
   files: Record<string, Uint8Array>,
 ): string | null {
-  const bytes = files['screenshot.png'] ?? files['screenshot.jpg'];
+  const png = findFile(files, 'screenshot.png');
+  const jpg = png ? undefined : findFile(files, 'screenshot.jpg');
+  const bytes = png ?? jpg;
   if (!bytes) return null;
-  const type = files['screenshot.png'] ? 'image/png' : 'image/jpeg';
+  const type = png ? 'image/png' : 'image/jpeg';
   // Slice garantiza ArrayBuffer (no SharedArrayBuffer), requerido por Blob
   const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
   return URL.createObjectURL(new Blob([buffer], { type }));
@@ -45,7 +66,7 @@ export function screenshotToObjectUrl(
 export function extractLanguageFromConfigXml(
   files: Record<string, Uint8Array>,
 ): ThemeLanguage | null {
-  const configXmlBytes = files['config.xml'];
+  const configXmlBytes = findFile(files, 'config.xml');
   if (!configXmlBytes) return null;
 
   try {
