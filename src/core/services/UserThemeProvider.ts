@@ -96,13 +96,21 @@ class UserThemeProviderClass {
           continue;
         }
 
+        const screenshot = screenshotToObjectUrl(files);
+        // Diagnóstico temporal — ayuda a ver por qué la miniatura no se detecta
+        console.log(`[UserThemeProvider] Cargado "${record.id}"`, {
+          totalFiles: Object.keys(files).length,
+          fileKeys: Object.keys(files).slice(0, 15),
+          screenshotDetected: !!screenshot,
+        });
+
         const bundle: ThemeBundle = {
           id: record.id,
           name: record.name,
           source: 'user',
           files,
           // El Object URL de la sesión anterior ya no es válido — regenerar
-          metadata: { ...record.metadata, screenshot: screenshotToObjectUrl(files) },
+          metadata: { ...record.metadata, screenshot },
         };
 
         ThemeRegistry.register(bundle);
