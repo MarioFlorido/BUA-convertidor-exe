@@ -1468,6 +1468,22 @@ button {
   font-weight: 600;
 }
 
+/* Texto de ayuda más discreto dentro del panel de carga de temas */
+.theme-upload-section .help-text {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  line-height: 1.45;
+  margin-top: 0.5rem;
+}
+.theme-upload-section .help-link {
+  font-size: 0.72rem;
+  font-weight: 400;
+}
+.theme-upload-section .help-link-icon {
+  width: 12px;
+  height: 12px;
+}
+
 .upload-input-wrapper {
   position: relative;
   margin-bottom: 1rem;
