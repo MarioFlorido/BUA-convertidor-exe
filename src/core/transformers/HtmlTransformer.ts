@@ -63,9 +63,18 @@ export function applyDivClasses(htmlValue: string): string {
     (match) => match.replace(/<a[^>]*><\/a>/g, ''),
   );
 
+  // Etiquetas semánticas reconocidas. Limitar el regex a esta lista evita que
+  // delimitadores no-semánticos como [horizontal] o [vertical] (que se procesan
+  // después en applyTableClasses) consuman el siguiente [fin] y "se coman" la
+  // siguiente caja semántica del documento.
+  const SEMANTIC_LABEL = /(ejemplo|definici[oó]n|importante)/i;
+
   // Caso A: etiqueta en párrafo propio → consume los <p> de apertura y cierre
   let result = normalized.replace(
-    /<p>\s*\[([^\[\]]+?)\]\s*<\/p>([\s\S]*?)<p>\s*\[fin\]\s*<\/p>/gi,
+    new RegExp(
+      `<p>\\s*\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]\\s*</p>([\\s\\S]*?)<p>\\s*\\[fin\\]\\s*</p>`,
+      'gi',
+    ),
     (_match, delimitador, content) => {
       const mappedClass = mapDelimiterToClass(delimitador);
       if (!mappedClass) return _match;
@@ -75,7 +84,10 @@ export function applyDivClasses(htmlValue: string): string {
 
   // Caso B: etiqueta inline dentro del mismo párrafo
   result = result.replace(
-    /\[([^\[\]]+?)\]([\s\S]*?)\[fin\]/gi,
+    new RegExp(
+      `\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]([\\s\\S]*?)\\[fin\\]`,
+      'gi',
+    ),
     (_match, delimitador, content) => {
       const mappedClass = mapDelimiterToClass(delimitador);
       if (!mappedClass) return _match;
