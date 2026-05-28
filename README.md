@@ -1,26 +1,26 @@
 # BUA ConvertidoreXe — DOCX → eXeLearning + PDF
 
-**ConvertidoreXe v0.2.0** — Aplicación web 100% cliente que convierte documentos Word (DOCX) a proyectos eXeLearning (ELPX) y los exporta a PDF con tema visual institucional.
+**ConvertidoreXe v0.2.0**. Aplicación web que convierte documentos Word a proyectos eXeLearning (ELPX) y a PDF con un tema visual a elegir. Todo el procesamiento sucede en el propio navegador; no hay servidor que reciba los archivos.
 
-**Desarrollado por:** Biblioteca Universitaria, Universidad de Alicante
-**Licencia:** GNU GPL v3.0
-**Demo:** https://marioflorido.github.io/BUA-convertidor-exe/
-
----
-
-## ✨ Qué hace
-
-1. **Sube** un documento Word (DOCX) — el proceso ocurre completamente en tu navegador
-2. **Configura** la jerarquía (qué hace cada encabezado H1 y H2)
-3. **Elige** un tema visual con colores, tipografías y logos institucionales
-4. **Descarga** el `.elpx` listo para abrir en eXeLearning
-5. **Exporta a PDF** con portada, índice, encabezados/pies y estilos del tema
-
-> 🔒 **Privacidad total**: no hay servidor backend. Ni tu DOCX ni el ELPX salen nunca de tu navegador.
+Desarrollado por la Biblioteca Universitaria de la Universidad de Alicante.
+Licencia: GNU GPL v3.0.
+Versión en vivo: https://marioflorido.github.io/BUA-convertidor-exe/
 
 ---
 
-## 🏗️ Arquitectura — pipeline de 3 capas
+## Qué hace
+
+1. Subes un documento Word (DOCX).
+2. Configuras la jerarquía: qué hace cada H1 y cada H2.
+3. Eliges un tema visual.
+4. Descargas el `.elpx` para abrirlo en eXeLearning.
+5. Exportas a PDF con portada, índice, encabezados, pies y los estilos del tema.
+
+No hay servidor backend. El documento que subes nunca sale de la pestaña del navegador.
+
+---
+
+## Arquitectura: pipeline de tres capas
 
 ```
 DOCX
@@ -38,11 +38,11 @@ ElpxRenderer                 PrintThemeLoader + renderCoverPage
 ELPX (ZIP)         HTML autónomo (Paged.js → PDF)
 ```
 
-El **SemanticDocument** es el corazón de la arquitectura: un modelo de datos puro y agnóstico que describe el documento como páginas y bloques. Los renderers ELPX y PDF son intercambiables — añadir un nuevo formato (SCORM, EPUB, etc.) solo requiere un renderer adicional sin tocar el resto del pipeline.
+El SemanticDocument es el modelo central. Describe el documento como páginas y bloques, sin asumir nada sobre el formato final. Esto deja los renderers ELPX y PDF como piezas intercambiables: añadir un nuevo formato (SCORM, EPUB, lo que sea) es escribir un renderer adicional sin tocar lo demás.
 
 ---
 
-## 🚀 Inicio rápido
+## Inicio rápido
 
 ### Requisitos
 - **Node.js** ≥ 18
@@ -74,7 +74,7 @@ npm run deploy       # Publicar en GitHub Pages
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 src/
@@ -163,7 +163,7 @@ docs/
 
 ---
 
-## 🎯 Flujo del wizard (5 pasos)
+## Flujo del wizard
 
 ```
 1. UPLOAD       Cargar .docx
@@ -182,7 +182,7 @@ docs/
 
 ---
 
-## 🏷️ Etiquetas semánticas BUA en el DOCX
+## Etiquetas semánticas BUA en el DOCX
 
 Dentro del documento Word puedes marcar cajas semánticas:
 
@@ -216,7 +216,7 @@ Los colores, etiquetas (multilingües) y estilos vienen del CSS del tema activo.
 
 ---
 
-## 🎨 Sistema de temas
+## Sistema de temas
 
 ### Dos categorías
 
@@ -244,16 +244,13 @@ Los colores, etiquetas (multilingües) y estilos vienen del CSS del tema activo.
     └── logo_CID.png           # (opcional)
 ```
 
-Se admite tanto la estructura plana (`style.css` en raíz) como la encapsulada (`{id}/style.css` dentro de una carpeta única).
+El ZIP puede tener los archivos en la raíz o agrupados dentro de una carpeta única (`{id}/style.css`). Ambas estructuras se aceptan.
 
 ### Cargar un tema local desde la UI
 
-1. Pulsar **Importar tema local** en la cabecera
-2. Arrastrar el ZIP al área de carga (o pulsar para seleccionar)
-3. El tema se valida, se persiste en **IndexedDB** y queda inmediatamente disponible
-4. Para actualizar, cargar un ZIP con el mismo ID → reemplaza al anterior
+Pulsa **Importar tema local** en la cabecera y arrastra el ZIP al recuadro (o haz clic para abrir el selector). El tema se valida, se guarda en IndexedDB y queda disponible al momento. Si más tarde subes otro ZIP con el mismo ID, sustituye al anterior.
 
-Los temas locales **no salen del navegador del usuario**. Para distribuir un tema a toda la organización hay que publicarlo en el repo (sección siguiente).
+Los temas locales no salen del navegador. Para que un tema esté disponible para el resto del equipo hay que publicarlo en el repositorio, como se explica abajo.
 
 ### Reordenar temas (drag-and-drop)
 
@@ -266,7 +263,7 @@ npm run publish-theme /ruta/al/MiTema.zip
 git add -A public/ && git commit -m "feat(themes): publicar MiTema" && git push
 ```
 
-El script copia el ZIP a `public/`, lo descomprime en `public/themes/<id>/` (para servir la miniatura), añade la entrada al `themes-config.json` y deja todo listo para `git push`. GitHub Pages redespliega en 1-2 min y todos los compañeros ven el tema al recargar.
+El script copia el ZIP a `public/`, lo descomprime en `public/themes/<id>/` para que la miniatura quede accesible, y añade la entrada en `themes-config.json`. No hace el commit por ti; te muestra el comando exacto que falta. Cuando empujes los cambios, GitHub Pages redespliega en uno o dos minutos y el tema aparece para cualquiera que recargue la página.
 
 Para retirarlo:
 ```bash
@@ -277,7 +274,7 @@ Documentación completa: [docs/gestion-temas-oficiales.md](docs/gestion-temas-of
 
 ---
 
-## 📄 Características del PDF generado
+## El PDF generado
 
 | Elemento | Descripción |
 |----------|-------------|
@@ -299,9 +296,9 @@ Documentación completa: [docs/gestion-temas-oficiales.md](docs/gestion-temas-of
 
 ---
 
-## 🌐 Despliegue
+## Despliegue
 
-El proyecto se publica automáticamente en GitHub Pages mediante GitHub Actions cada vez que hay push a `main`. Configuración:
+Cada push a `main` lanza una GitHub Action que construye el proyecto y publica el resultado en GitHub Pages. La configuración está repartida en tres sitios:
 
 - `vite.config.ts` → `base: '/BUA-convertidor-exe/'`
 - `.github/workflows/deploy.yml` → build + deploy automático
@@ -315,7 +312,7 @@ npm run deploy
 
 ---
 
-## 📚 Dependencias principales
+## Dependencias principales
 
 | Paquete | Uso |
 |---------|-----|
@@ -327,7 +324,7 @@ npm run deploy
 
 ---
 
-## 🛠️ Comandos
+## Comandos
 
 | Comando | Descripción |
 |---------|-------------|
@@ -341,7 +338,7 @@ npm run deploy
 
 ---
 
-## ❓ Troubleshooting
+## Problemas habituales
 
 **"No se pudo cargar la plantilla base"**
 Falta `public/base.elpx`. Restaurar con `git checkout public/base.elpx`.
@@ -369,13 +366,13 @@ Si modificas la posición de los running elements en `semanticDocumentToPrintHtm
 
 ---
 
-## 🤝 Inspiración y agradecimientos
+## Inspiración y agradecimientos
 
-Inspirado en el trabajo de [Juanjo de Haro](https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe) sobre HACKeXe. Consulta [docs/COMPARISON.md](docs/COMPARISON.md) para una comparación detallada entre ambas herramientas.
+Este proyecto se inspira en el trabajo de [Juanjo de Haro](https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe) sobre HACKeXe. En [docs/COMPARISON.md](docs/COMPARISON.md) hay una comparación detallada entre ambas herramientas.
 
 ---
 
-## 📋 Estado del proyecto
+## Estado del proyecto
 
 | Funcionalidad | Estado |
 |---|---|
