@@ -55,12 +55,28 @@ function mapDelimiterToClass(delimitador: string): string | null {
 export function applyDivClasses(htmlValue: string): string {
   const wrap = (cls: string, content: string) => `<div class="${cls}">${content}</div>`;
 
-  // Pre-normalización: eliminar anclas vacías (<a id="..."></a>) que Mammoth inserta
+  // Pre-normalización 1: eliminar anclas vacías (<a id="..."></a>) que Mammoth inserta
   // como bookmarks de Word dentro de posibles [etiquetas]. Word puede insertar varios
   // bookmarks consecutivos, por eso se hace dentro de cada [...] individualmente.
-  const normalized = htmlValue.replace(
+  let normalized = htmlValue.replace(
     /\[([^\]]*?)\]/g,
     (match) => match.replace(/<a[^>]*><\/a>/g, ''),
+  );
+
+  // Pre-normalización 2: si el usuario en Word usó Shift+Enter (salto de línea)
+  // en vez de Enter (salto de párrafo) cerca de un marcador, Mammoth produce
+  // <br/> en lugar de </p><p>. Eso impide que la regex de Caso A matchee y
+  // genera HTML inválido (<div> dentro de <p>) cuando entra Caso B. Convertimos
+  // todo <br/> contiguo a un marcador en una ruptura real de párrafo.
+  const MARKER = /\[\s*(?:ejemplo|definici[oó]n|importante|fin)\s*\]/.source;
+  const BR = /<br\s*\/?>/.source;
+  normalized = normalized.replace(
+    new RegExp(`${BR}\\s*(${MARKER})`, 'gi'),
+    '</p><p>$1',
+  );
+  normalized = normalized.replace(
+    new RegExp(`(${MARKER})\\s*${BR}`, 'gi'),
+    '$1</p><p>',
   );
 
   // Etiquetas semánticas reconocidas. Limitar el regex a esta lista evita que
