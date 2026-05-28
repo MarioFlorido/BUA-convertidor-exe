@@ -27,20 +27,12 @@ interface ThemesConfigEntry {
 
 class BuiltInThemeProviderClass {
   /**
-   * Carga los temas predefinidos.
-   *
-   * FASE DE TESTEO: solo se carga el tema 'base'. Los demás ZIPs siguen
-   * físicamente en public/ y en themes-config.json, pero no se registran.
-   * Cuando termine la fase de pruebas, eliminar el filtro `id === 'base'`
-   * para volver a cargar todos los temas oficiales.
+   * Carga todos los temas predefinidos declarados en themes-config.json.
+   * Los fallos individuales no bloquean el boot.
    */
   async loadAll(): Promise<void> {
     const configEntries = await this.fetchThemesConfig();
-    await Promise.allSettled(
-      configEntries
-        .filter((entry) => entry.id === 'base')
-        .map((entry) => this.loadOne(entry)),
-    );
+    await Promise.allSettled(configEntries.map((entry) => this.loadOne(entry)));
   }
 
   private async fetchThemesConfig(): Promise<ThemesConfigEntry[]> {
