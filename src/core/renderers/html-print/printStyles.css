@@ -480,7 +480,7 @@
 .block-html .bua_importante,
 .block-html .bua_tabla_horizontal,
 .block-html .bua_tabla_vertical {
-  margin: 10px 0;
+  margin: 10px 25px;
   padding: 10px 14px;
   break-inside: avoid;
   border-radius: 0 3px 3px 0;
