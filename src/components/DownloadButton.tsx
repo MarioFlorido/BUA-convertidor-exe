@@ -29,7 +29,7 @@ function DownloadArrow() {
 export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonProps) {
   const [printLoading, setPrintLoading] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
-  const [useCoverImage, setUseCoverImage] = useState(true);
+  const [useCoverImage, setUseCoverImage] = useState(false);
 
   const base = import.meta.env.BASE_URL;
 
