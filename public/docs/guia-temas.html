@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guía de temas — BUA Convertidor</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      header .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--blue);
+        margin: 0 0 0.35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 0.5rem; color: var(--text); }
+      h2 {
+        font-size: 1.2rem;
+        margin: 2rem 0 0.8rem;
+        color: var(--text);
+        padding-bottom: 0.3rem;
+        border-bottom: 1px solid var(--border);
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 1.4rem 0 0.4rem;
+        color: var(--text);
+      }
+      h3::before {
+        content: "";
+        display: inline-block;
+        width: 6px;
+        height: 16px;
+        background: var(--mostaza);
+        border-radius: 1px;
+        margin-right: 0.55rem;
+        vertical-align: -3px;
+      }
+      p, li { font-size: 0.95rem; }
+      ul, ol { padding-left: 1.4rem; }
+      li { margin-bottom: 0.35rem; }
+      strong { color: var(--text); }
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.85em;
+        background: var(--code-bg);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.9rem 1rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        line-height: 1.45;
+      }
+      pre code { background: none; border: none; padding: 0; }
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: #fff8e8;
+        padding: 0.8rem 1rem;
+        margin: 1rem 0;
+        border-radius: 0 6px 6px 0;
+        font-size: 0.92rem;
+      }
+      .callout--info {
+        border-left-color: var(--blue);
+        background: var(--blue-soft);
+      }
+      .callout strong:first-child { color: var(--blue); }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.8rem 0 1rem;
+        font-size: 0.9rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.7rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th { background: var(--blue-soft); font-weight: 600; }
+      .pill {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.12rem 0.5rem;
+        border-radius: 999px;
+        background: var(--blue);
+        color: white;
+        vertical-align: 1px;
+      }
+      .pill--local {
+        background: white;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-soft);
+      }
+      a { color: var(--blue); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <p class="eyebrow">Guía de uso</p>
+        <h1>Cargar y gestionar temas</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          Cómo importar plantillas visuales para tus exportaciones a
+          eXeLearning y PDF, cómo cambiarlas y cómo eliminarlas.
+        </p>
+      </header>
+
+      <h2>¿Qué es un tema?</h2>
+      <p>
+        Un tema es una <strong>plantilla visual</strong> que define la
+        apariencia del recurso final: colores, tipografías, logos,
+        iconos, portada y estilos para títulos, párrafos, listas, cajas
+        de definición/ejemplo/etc.
+      </p>
+      <p>
+        El convertidor aplica el tema activo cuando exportas a
+        eXeLearning (<code>.elpx</code>) o a PDF.
+      </p>
+
+      <h2>Tipos de tema</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Dónde vive</th>
+            <th>Quién lo ve</th>
+            <th>Se puede borrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill">Oficial</span> Base</td>
+            <td>Servidor de la aplicación</td>
+            <td>Todos los usuarios</td>
+            <td>No (es fijo)</td>
+          </tr>
+          <tr>
+            <td><span class="pill pill--local">Local</span></td>
+            <td>Tu navegador (almacenamiento local)</td>
+            <td>Solo tú, en este navegador</td>
+            <td>Sí</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout--info">
+        <strong>Importante:</strong> los temas que tú importas son
+        <strong>locales a este navegador</strong>. Si abres la
+        aplicación en otro navegador o en otro ordenador, esos temas
+        no estarán ahí. Esto es totalmente esperado.
+      </div>
+
+      <h2>Cómo importar un tema</h2>
+      <ol>
+        <li>Ve al panel <strong>"Importar tema local"</strong>.</li>
+        <li>
+          <strong>Arrastra</strong> el archivo ZIP del tema al recuadro,
+          o haz <strong>clic</strong> en él para abrir el selector de
+          archivos.
+        </li>
+        <li>
+          La aplicación valida el ZIP. Si todo está bien, el tema
+          aparece inmediatamente en la lista marcado como
+          <span class="pill pill--local">Local</span>.
+        </li>
+        <li>
+          Para usarlo: en el conversor, cuando elijas el tema, selecciónalo
+          en la lista.
+        </li>
+      </ol>
+
+      <h3>Qué debe contener el ZIP</h3>
+      <p>El archivo ZIP debe incluir al menos estos archivos en su raíz:</p>
+      <pre><code>MiTema_27-28.zip
+├── config.xml         ← obligatorio (metadatos del tema)
+├── style.css          ← obligatorio (estilos visuales)
+├── screenshots.png    ← opcional pero recomendado (miniatura)
+├── fonts/             ← tipografías del tema
+├── icons/             ← iconos para las cajas semánticas
+└── img/               ← imágenes (logos, portada, etc.)</code></pre>
+
+      <h3>El nombre del archivo importa</h3>
+      <p>
+        El nombre del ZIP (sin extensión) se convierte en el
+        <strong>identificador del tema</strong>. Por ejemplo:
+      </p>
+      <ul>
+        <li><code>Doctorado_27-28.zip</code> → identificador <code>Doctorado_27-28</code></li>
+        <li><code>Master_Bibliotecas.zip</code> → identificador <code>Master_Bibliotecas</code></li>
+      </ul>
+      <p>
+        Recomendación: usa guiones bajos (<code>_</code>) en lugar de
+        espacios, y evita acentos y caracteres especiales en el nombre
+        del archivo.
+      </p>
+
+      <h3>Recomendaciones para la miniatura</h3>
+      <p>
+        Incluye <code>screenshots.png</code> (o <code>screenshot.png</code>)
+        en la raíz del ZIP. Se mostrará como miniatura en el selector
+        de temas. Tamaño recomendado:
+        <strong>1200×500 px</strong> (banner apaisado mostrando la
+        portada o cabecera del tema).
+      </p>
+
+      <h2>Cómo cambiar entre temas</h2>
+      <p>
+        Cuando hayas importado tus temas, cuando vayas a generar el
+        recurso (exportar a ELPX o PDF), la aplicación te mostrará la
+        lista de temas disponibles. Solo tienes que seleccionar el que
+        quieras y continuar.
+      </p>
+
+      <h2>Cómo eliminar un tema</h2>
+      <ol>
+        <li>Localiza el tema en la lista de "Temas disponibles".</li>
+        <li>
+          Haz clic en el botón <strong>Eliminar</strong> a la derecha
+          de su nombre.
+        </li>
+        <li>Confirma la operación en el diálogo.</li>
+      </ol>
+
+      <div class="callout">
+        <strong>Atención:</strong> al eliminar un tema local
+        <strong>se borra definitivamente</strong> de este navegador.
+        Si quieres volver a tenerlo, deberás importarlo de nuevo desde
+        el archivo ZIP original. El tema <strong>Base</strong> no se
+        puede eliminar.
+      </div>
+
+      <h2>Volver a usar un tema borrado</h2>
+      <p>
+        Guarda siempre una copia del archivo ZIP fuera de la aplicación
+        (por ejemplo en tu carpeta de trabajo). Si borras el tema y
+        quieres recuperarlo, basta con importarlo de nuevo.
+      </p>
+
+      <h2>Preguntas frecuentes</h2>
+
+      <h3>¿Mis compañeros verán mis temas?</h3>
+      <p>
+        No. Los temas que tú importas viven en el almacenamiento de
+        <strong>tu navegador</strong>. Para que los demás los usen,
+        cada uno debe importar el mismo archivo ZIP.
+      </p>
+
+      <h3>¿Qué pasa si limpio la caché del navegador?</h3>
+      <p>
+        Si limpias el almacenamiento local del navegador (no la simple
+        caché de páginas, sino "Datos del sitio" / "IndexedDB"), tus
+        temas locales se perderán. Conserva siempre los ZIPs originales.
+      </p>
+
+      <h3>El idioma del tema sale incorrecto en la interfaz</h3>
+      <p>
+        La aplicación lee el idioma del archivo <code>config.xml</code>
+        dentro del tema, en la etiqueta:
+      </p>
+      <pre><code>&lt;language&gt;es&lt;/language&gt;</code></pre>
+      <p>
+        Valores aceptados: <code>es</code> (español),
+        <code>ca</code> (catalán/valenciano), <code>en</code> (inglés).
+        Si la etiqueta falta o tiene otro valor, se asume español por defecto.
+      </p>
+
+      <h3>El tema no muestra miniatura</h3>
+      <p>
+        Comprueba que el ZIP contenga un archivo
+        <code>screenshots.png</code> (o <code>screenshot.png</code>) en
+        la raíz. Si no lo tiene, el tema funcionará igual pero sin
+        miniatura.
+      </p>
+
+      <h3>¿Puedo subir un tema mal formado?</h3>
+      <p>
+        La aplicación valida los archivos mínimos
+        (<code>config.xml</code> y <code>style.css</code>). Si faltan,
+        verás un mensaje de error y el tema no se importará. Sin embargo,
+        no se valida el contenido CSS: un CSS erróneo puede producir
+        resultados visuales inesperados sin ser bloqueado.
+      </p>
+
+      <footer>
+        BUA Convertidor — Biblioteca Universitaria de la Universidad de
+        Alicante.
+      </footer>
+    </div>
+  </body>
+</html>

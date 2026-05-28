@@ -763,6 +763,27 @@ button {
   margin-top: 0.2rem;
 }
 
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+  border-bottom: 1px dotted color-mix(in srgb, var(--blue) 50%, transparent);
+  padding-bottom: 1px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.help-link:hover {
+  color: color-mix(in srgb, var(--blue) 80%, black);
+  border-bottom-color: var(--blue);
+}
+.help-link-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .section-heading {
   font-size: 1.05rem;
   font-weight: 600;

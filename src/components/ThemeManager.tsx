@@ -142,6 +142,20 @@ export function ThemeManager() {
           El nombre del archivo ZIP será el ID del tema (ej: Doctorado_27-28.zip).
           Si ya existe un tema con ese ID, será reemplazado.
         </p>
+        <p className="help-text">
+          <a
+            href={`${import.meta.env.BASE_URL}docs/guia-temas.html`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="help-link"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="help-link-icon">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 8h.01M11 12h1v4h1" />
+            </svg>
+            Ver guía completa de carga y gestión de temas
+          </a>
+        </p>
       </div>
 
       {/* Lista unificada de temas */}
