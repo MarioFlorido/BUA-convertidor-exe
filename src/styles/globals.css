@@ -1268,6 +1268,7 @@ button {
 }
 
 .theme-item {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
@@ -1276,16 +1277,52 @@ button {
   flex-direction: column;
   gap: 0.35rem;
   box-shadow: var(--shadow-xs);
+  transition: opacity 0.12s, transform 0.12s, box-shadow 0.12s;
 }
+
+.theme-item--dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+/* Indicador visual de zona de drop */
+.theme-item--drop-above::before,
+.theme-item--drop-below::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--blue);
+  border-radius: 2px;
+  z-index: 1;
+}
+.theme-item--drop-above::before { top: -4px; }
+.theme-item--drop-below::after { bottom: -4px; }
+
+.theme-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-3);
+  cursor: grab;
+  flex-shrink: 0;
+  transition: color 0.12s;
+}
+.theme-drag-handle:hover { color: var(--text); }
+.theme-drag-handle svg { width: 14px; height: 14px; }
+.theme-item--dragging .theme-drag-handle { cursor: grabbing; }
 
 .theme-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
-.theme-item-header > div:first-child { flex: 1; }
+.theme-item-header > div:first-of-type { flex: 1; }
 
 .theme-id {
   color: var(--text-3);

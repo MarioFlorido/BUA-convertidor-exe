@@ -1,19 +1,59 @@
 import { useState, useRef } from 'react';
 import { themeClientService } from '../core/services/ThemeClientService';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
+import { ThemeOrderService } from '../core/services/ThemeOrderService';
 import type { ThemeBundle } from '../core/services/ThemeBundle';
 
 export function ThemeManager() {
   const [themes, setThemes] = useState<ThemeBundle[]>(() =>
-    ThemeRegistry.getAll()
+    ThemeOrderService.applyOrder(ThemeRegistry.getAll())
   );
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const refreshThemes = () => setThemes(ThemeRegistry.getAll());
+  const refreshThemes = () =>
+    setThemes(ThemeOrderService.applyOrder(ThemeRegistry.getAll()));
+
+  const reorder = (from: number, to: number) => {
+    if (from === to) return;
+    const next = themes.slice();
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setThemes(next);
+    ThemeOrderService.save(next.map((t) => t.id));
+  };
+
+  const handleRowDragStart = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+    setDraggingIdx(idx);
+    e.dataTransfer.effectAllowed = 'move';
+    // Necesario en Firefox para que arranque el drag
+    e.dataTransfer.setData('text/plain', String(idx));
+  };
+
+  const handleRowDragOver = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+    if (draggingIdx === null) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (overIdx !== idx) setOverIdx(idx);
+  };
+
+  const handleRowDrop = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (draggingIdx === null) return;
+    reorder(draggingIdx, idx);
+    setDraggingIdx(null);
+    setOverIdx(null);
+  };
+
+  const handleRowDragEnd = () => {
+    setDraggingIdx(null);
+    setOverIdx(null);
+  };
 
   const processFile = async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.zip')) {
@@ -165,34 +205,58 @@ export function ThemeManager() {
           <p className="no-items">No hay temas cargados</p>
         ) : (
           <div className="theme-items">
-            {themes.map((theme) => (
-              <div key={theme.id} className="theme-item">
-                <div className="theme-item-header">
-                  <div>
-                    <strong>{theme.metadata.name ?? theme.name}</strong>
-                    <span className="theme-id">({theme.id})</span>
-                  </div>
-                  <div className="theme-item-actions">
-                    <span
-                      className={`theme-badge theme-badge--${
-                        theme.source === 'builtin' ? 'official' : 'user'
-                      }`}
-                    >
-                      {theme.source === 'builtin' ? 'Oficial' : 'Local'}
+            {themes.map((theme, idx) => {
+              const isDragging = draggingIdx === idx;
+              const isOver = overIdx === idx && draggingIdx !== null && draggingIdx !== idx;
+              const dropAbove = isOver && (draggingIdx ?? -1) > idx;
+              const dropBelow = isOver && (draggingIdx ?? -1) < idx;
+              return (
+                <div
+                  key={theme.id}
+                  className={`theme-item${isDragging ? ' theme-item--dragging' : ''}${dropAbove ? ' theme-item--drop-above' : ''}${dropBelow ? ' theme-item--drop-below' : ''}`}
+                  draggable
+                  onDragStart={handleRowDragStart(idx)}
+                  onDragOver={handleRowDragOver(idx)}
+                  onDrop={handleRowDrop(idx)}
+                  onDragEnd={handleRowDragEnd}
+                >
+                  <div className="theme-item-header">
+                    <span className="theme-drag-handle" aria-hidden="true" title="Arrastra para reordenar">
+                      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                        <circle cx="5.5" cy="4" r="0.8" fill="currentColor" />
+                        <circle cx="10.5" cy="4" r="0.8" fill="currentColor" />
+                        <circle cx="5.5" cy="8" r="0.8" fill="currentColor" />
+                        <circle cx="10.5" cy="8" r="0.8" fill="currentColor" />
+                        <circle cx="5.5" cy="12" r="0.8" fill="currentColor" />
+                        <circle cx="10.5" cy="12" r="0.8" fill="currentColor" />
+                      </svg>
                     </span>
-                    {theme.source === 'user' && (
-                      <button
-                        onClick={() => handleDeleteTheme(theme)}
-                        className="btn-delete"
-                        disabled={uploading}
+                    <div>
+                      <strong>{theme.metadata.name ?? theme.name}</strong>
+                      <span className="theme-id">({theme.id})</span>
+                    </div>
+                    <div className="theme-item-actions">
+                      <span
+                        className={`theme-badge theme-badge--${
+                          theme.source === 'builtin' ? 'official' : 'user'
+                        }`}
                       >
-                        Eliminar
-                      </button>
-                    )}
+                        {theme.source === 'builtin' ? 'Oficial' : 'Local'}
+                      </span>
+                      {theme.source === 'user' && (
+                        <button
+                          onClick={() => handleDeleteTheme(theme)}
+                          className="btn-delete"
+                          disabled={uploading}
+                        >
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

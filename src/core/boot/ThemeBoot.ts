@@ -22,6 +22,7 @@ import { BuiltInThemeProvider } from '../services/BuiltInThemeProvider';
 import { UserThemeProvider } from '../services/UserThemeProvider';
 import { ThemeRegistry } from '../services/ThemeRegistry';
 import { ThemeCssManager } from '../services/ThemeCssManager';
+import { ThemeOrderService } from '../services/ThemeOrderService';
 
 export interface BootResult {
   activeThemeId: string;
@@ -31,6 +32,9 @@ export interface BootResult {
 
 export async function bootThemeSystem(): Promise<BootResult> {
   const errors: string[] = [];
+
+  // Orden personalizado de temas elegido por el usuario (localStorage)
+  ThemeOrderService.load();
 
   // FASE 3a — Inicializar IndexedDB primero (necesario para que built-ins
   // puedan consultar la lista de built-ins marcados como eliminados)
