@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Guía de temas — BUA Convertidor</title>
+    <title>Guía de estilos — BUA Convertidor</title>
     <style>
       :root {
         --blue: #135d87;
@@ -144,26 +144,26 @@
     <div class="container">
       <header>
         <p class="eyebrow">Guía de uso</p>
-        <h1>Cargar y gestionar temas</h1>
+        <h1>Cargar y gestionar estilos</h1>
         <p style="color: var(--text-soft); margin: 0">
           Cómo importar plantillas visuales para tus exportaciones a
           eXeLearning y PDF, cómo cambiarlas y cómo eliminarlas.
         </p>
       </header>
 
-      <h2>¿Qué es un tema?</h2>
+      <h2>¿Qué es un estilo?</h2>
       <p>
-        Un tema es una <strong>plantilla visual</strong> que define la
+        Un estilo es una <strong>plantilla visual</strong> que define la
         apariencia del recurso final: colores, tipografías, logos,
         iconos, portada y estilos para títulos, párrafos, listas, cajas
         de definición/ejemplo/etc.
       </p>
       <p>
-        El convertidor aplica el tema activo cuando exportas a
+        El convertidor aplica el estilo activo cuando exportas a
         eXeLearning (<code>.elpx</code>) o a PDF.
       </p>
 
-      <h2>Tipos de tema</h2>
+      <h2>Tipos de estilo</h2>
       <table>
         <thead>
           <tr>
@@ -190,27 +190,27 @@
       </table>
 
       <div class="callout callout--info">
-        <strong>Importante:</strong> los temas que tú importas son
+        <strong>Importante:</strong> los estilos que tú importas son
         <strong>locales a este navegador</strong>. Si abres la
-        aplicación en otro navegador o en otro ordenador, esos temas
+        aplicación en otro navegador o en otro ordenador, esos estilos
         no estarán ahí. Esto es totalmente esperado.
       </div>
 
-      <h2>Cómo importar un tema</h2>
+      <h2>Cómo importar un estilo</h2>
       <ol>
-        <li>Ve al panel <strong>"Importar tema local"</strong>.</li>
+        <li>Ve al panel <strong>"Importar estilo local"</strong>.</li>
         <li>
-          <strong>Arrastra</strong> el archivo ZIP del tema al recuadro,
+          <strong>Arrastra</strong> el archivo ZIP del estilo al recuadro,
           o haz <strong>clic</strong> en él para abrir el selector de
           archivos.
         </li>
         <li>
-          La aplicación valida el ZIP. Si todo está bien, el tema
+          La aplicación valida el ZIP. Si todo está bien, el estilo
           aparece inmediatamente en la lista marcado como
           <span class="pill pill--local">Local</span>.
         </li>
         <li>
-          Para usarlo: en el conversor, cuando elijas el tema, selecciónalo
+          Para usarlo: en el conversor, cuando elijas el estilo, selecciónalo
           en la lista.
         </li>
       </ol>
@@ -218,17 +218,17 @@
       <h3>Qué debe contener el ZIP</h3>
       <p>El archivo ZIP debe incluir al menos estos archivos en su raíz:</p>
       <pre><code>MiTema_27-28.zip
-├── config.xml         ← obligatorio (metadatos del tema)
+├── config.xml         ← obligatorio (metadatos del estilo)
 ├── style.css          ← obligatorio (estilos visuales)
 ├── screenshots.png    ← opcional pero recomendado (miniatura)
-├── fonts/             ← tipografías del tema
+├── fonts/             ← tipografías del estilo
 ├── icons/             ← iconos para las cajas semánticas
 └── img/               ← imágenes (logos, portada, etc.)</code></pre>
 
       <h3>El nombre del archivo importa</h3>
       <p>
         El nombre del ZIP (sin extensión) se convierte en el
-        <strong>identificador del tema</strong>. Por ejemplo:
+        <strong>identificador del estilo</strong>. Por ejemplo:
       </p>
       <ul>
         <li><code>Doctorado_27-28.zip</code> → identificador <code>Doctorado_27-28</code></li>
@@ -244,22 +244,22 @@
       <p>
         Incluye <code>screenshots.png</code> (o <code>screenshot.png</code>)
         en la raíz del ZIP. Se mostrará como miniatura en el selector
-        de temas. Tamaño recomendado:
+        de estilos. Tamaño recomendado:
         <strong>1200×500 px</strong> (banner apaisado mostrando la
-        portada o cabecera del tema).
+        portada o cabecera del estilo).
       </p>
 
-      <h2>Cómo cambiar entre temas</h2>
+      <h2>Cómo cambiar entre estilos</h2>
       <p>
-        Cuando hayas importado tus temas, cuando vayas a generar el
+        Cuando hayas importado tus estilos, cuando vayas a generar el
         recurso (exportar a ELPX o PDF), la aplicación te mostrará la
-        lista de temas disponibles. Solo tienes que seleccionar el que
+        lista de estilos disponibles. Solo tienes que seleccionar el que
         quieras y continuar.
       </p>
 
-      <h2>Cómo eliminar un tema</h2>
+      <h2>Cómo eliminar un estilo</h2>
       <ol>
-        <li>Localiza el tema en la lista de "Temas disponibles".</li>
+        <li>Localiza el estilo en la lista de "Estilos disponibles".</li>
         <li>
           Haz clic en el botón <strong>Eliminar</strong> a la derecha
           de su nombre.
@@ -268,25 +268,25 @@
       </ol>
 
       <div class="callout">
-        <strong>Atención:</strong> al eliminar un tema local
+        <strong>Atención:</strong> al eliminar un estilo local
         <strong>se borra definitivamente</strong> de este navegador.
         Si quieres volver a tenerlo, deberás importarlo de nuevo desde
-        el archivo ZIP original. El tema <strong>Base</strong> no se
+        el archivo ZIP original. El estilo <strong>Base</strong> no se
         puede eliminar.
       </div>
 
-      <h2>Volver a usar un tema borrado</h2>
+      <h2>Volver a usar un estilo borrado</h2>
       <p>
         Guarda siempre una copia del archivo ZIP fuera de la aplicación
-        (por ejemplo en tu carpeta de trabajo). Si borras el tema y
+        (por ejemplo en tu carpeta de trabajo). Si borras el estilo y
         quieres recuperarlo, basta con importarlo de nuevo.
       </p>
 
       <h2>Preguntas frecuentes</h2>
 
-      <h3>¿Mis compañeros verán mis temas?</h3>
+      <h3>¿Mis compañeros verán mis estilos?</h3>
       <p>
-        No. Los temas que tú importas viven en el almacenamiento de
+        No. Los estilos que tú importas viven en el almacenamiento de
         <strong>tu navegador</strong>. Para que los demás los usen,
         cada uno debe importar el mismo archivo ZIP.
       </p>
@@ -295,13 +295,13 @@
       <p>
         Si limpias el almacenamiento local del navegador (no la simple
         caché de páginas, sino "Datos del sitio" / "IndexedDB"), tus
-        temas locales se perderán. Conserva siempre los ZIPs originales.
+        estilos locales se perderán. Conserva siempre los ZIPs originales.
       </p>
 
-      <h3>El idioma del tema sale incorrecto en la interfaz</h3>
+      <h3>El idioma del estilo sale incorrecto en la interfaz</h3>
       <p>
         La aplicación lee el idioma del archivo <code>config.xml</code>
-        dentro del tema, en la etiqueta:
+        dentro del estilo, en la etiqueta:
       </p>
       <pre><code>&lt;language&gt;es&lt;/language&gt;</code></pre>
       <p>
@@ -310,19 +310,19 @@
         Si la etiqueta falta o tiene otro valor, se asume español por defecto.
       </p>
 
-      <h3>El tema no muestra miniatura</h3>
+      <h3>El estilo no muestra miniatura</h3>
       <p>
         Comprueba que el ZIP contenga un archivo
         <code>screenshots.png</code> (o <code>screenshot.png</code>) en
-        la raíz. Si no lo tiene, el tema funcionará igual pero sin
+        la raíz. Si no lo tiene, el estilo funcionará igual pero sin
         miniatura.
       </p>
 
-      <h3>¿Puedo subir un tema mal formado?</h3>
+      <h3>¿Puedo subir un estilo mal formado?</h3>
       <p>
         La aplicación valida los archivos mínimos
         (<code>config.xml</code> y <code>style.css</code>). Si faltan,
-        verás un mensaje de error y el tema no se importará. Sin embargo,
+        verás un mensaje de error y el estilo no se importará. Sin embargo,
         no se valida el contenido CSS: un CSS erróneo puede producir
         resultados visuales inesperados sin ser bloqueado.
       </p>
@@ -331,7 +331,7 @@
         BUA Convertidor — Biblioteca Universitaria de la Universidad de
         Alicante.
         &nbsp;·&nbsp;
-        <a href="gestionar-temas-oficiales.html">Publicar, descargar y eliminar temas oficiales</a>
+        <a href="gestionar-temas-oficiales.html">Publicar, descargar y eliminar estilos oficiales</a>
       </footer>
     </div>
   </body>
