@@ -17,9 +17,9 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
 
   return (
     <div className="theme-selector">
-      <h2>Seleccionar tema visual</h2>
+      <h2>Seleccionar estilo visual</h2>
       <p className="help-text">
-        Elige el tema que deseas aplicar a tu recurso eXeLearning:
+        Elige el estilo que deseas aplicar a tu recurso eXeLearning:
       </p>
 
       <div className="theme-list">
@@ -70,7 +70,7 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
 
       <div className="theme-actions">
         <button onClick={() => onConfirm(selectedThemeId)} className="btn-confirm">
-          Continuar con este tema
+          Continuar con este estilo
         </button>
         <button onClick={onCancel} className="btn-cancel">
           Volver

@@ -106,6 +106,15 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
             >
               GNU GPL v3.0
             </a>
+            {' · '}
+            <a
+              href={`${import.meta.env.BASE_URL}docs/README.html`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              README
+            </a>
           </p>
         </div>
       </div>

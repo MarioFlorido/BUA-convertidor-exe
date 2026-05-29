@@ -143,6 +143,38 @@ button {
   border-color: var(--border);
 }
 
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0;
+}
+
+.btn-help:hover {
+  background: var(--bg);
+  color: var(--blue);
+  border-color: var(--blue-border);
+}
+
+.help-icon {
+  color: inherit;
+}
+
 /* ── Step Bar ─────────────────────────────────────────────────────────────── */
 .step-bar {
   background: var(--surface);

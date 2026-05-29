@@ -67,7 +67,7 @@ export function ThemeManager() {
 
     try {
       const bundle = await themeClientService.loadThemeZip(file);
-      setSuccess(`✅ Tema "${bundle.name}" cargado correctamente`);
+      setSuccess(`✅ Estilo "${bundle.name}" cargado correctamente`);
       refreshThemes();
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -106,15 +106,15 @@ export function ThemeManager() {
 
   const handleDeleteTheme = async (bundle: ThemeBundle) => {
     if (bundle.id === 'base') {
-      setError('El tema base no se puede eliminar');
+      setError('El estilo base no se puede eliminar');
       return;
     }
-    if (!confirm(`¿Eliminar tema "${bundle.name}"?`)) return;
+    if (!confirm(`¿Eliminar estilo "${bundle.name}"?`)) return;
 
     try {
       setError(null);
       await themeClientService.removeTheme(bundle.id);
-      setSuccess(`✅ Tema "${bundle.name}" eliminado`);
+      setSuccess(`✅ Estilo "${bundle.name}" eliminado`);
       refreshThemes();
     } catch (err) {
       setError(`❌ ${err instanceof Error ? err.message : 'Error desconocido'}`);
@@ -123,9 +123,9 @@ export function ThemeManager() {
 
   return (
     <div className="theme-manager">
-      <h2>Administrador de Temas</h2>
+      <h2>Administrador de Estilos eXeLearning</h2>
       <p className="help-text">
-        Importa temas en ZIP para usarlos en este navegador. Los temas locales
+        Importa estilos en ZIP para usarlos en este navegador. Los estilos locales
         se guardan en el almacenamiento del navegador y solo son visibles aquí.
       </p>
 
@@ -134,7 +134,7 @@ export function ThemeManager() {
 
       {/* Formulario de carga con drag-and-drop */}
       <div className="theme-upload-section">
-        <h3>Importar tema local</h3>
+        <h3>Importar estilo local</h3>
         <div
           className={`upload-input-wrapper ${dragActive ? 'drag-active' : ''}`}
           onDragEnter={handleDrag}
@@ -179,8 +179,8 @@ export function ThemeManager() {
           </label>
         </div>
         <p className="help-text">
-          El nombre del archivo ZIP será el ID del tema (ej: Doctorado_27-28.zip).
-          Si ya existe un tema con ese ID, será reemplazado.
+          El nombre del archivo ZIP será el ID del estilo (ej: Doctorado_27-28.zip).
+          Si ya existe un estilo con ese ID, será reemplazado.
         </p>
         <p className="help-text">
           <a
@@ -193,16 +193,16 @@ export function ThemeManager() {
               <circle cx="12" cy="12" r="9" />
               <path d="M12 8h.01M11 12h1v4h1" />
             </svg>
-            Ver guía completa de carga y gestión de temas
+            Ver guía completa de carga y gestión de estilos
           </a>
         </p>
       </div>
 
-      {/* Lista unificada de temas */}
+      {/* Lista unificada de estilos */}
       <div className="themes-list">
-        <h3>Temas disponibles ({themes.length})</h3>
+        <h3>Estilos disponibles ({themes.length})</h3>
         {themes.length === 0 ? (
-          <p className="no-items">No hay temas cargados</p>
+          <p className="no-items">No hay estilos cargados</p>
         ) : (
           <div className="theme-items">
             {themes.map((theme, idx) => {

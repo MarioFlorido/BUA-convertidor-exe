@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>README: ConvertidoreXe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: white;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      border-bottom: 4px solid #3498db;
+      padding-bottom: 15px;
+    }
+
+    h2 {
+      color: #34495e;
+      font-size: 1.8em;
+      margin-top: 40px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    h3 {
+      color: #5b6776;
+      font-size: 1.3em;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    h4 {
+      color: #7f8c8d;
+      font-size: 1.1em;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 30px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    strong {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    em {
+      color: #7f8c8d;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      border-bottom: 1px solid #3498db;
+    }
+
+    a:hover {
+      color: #2980b9;
+      background: #ecf0f1;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: "Courier New", monospace;
+      font-size: 0.95em;
+      color: #c0392b;
+    }
+
+    pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+
+    pre code {
+      background: none;
+      color: #ecf0f1;
+      padding: 0;
+      border: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: #34495e;
+      color: white;
+    }
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #bdc3c7;
+    }
+
+    td {
+      padding: 12px;
+      border: 1px solid #ecf0f1;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background: #ecf0f1;
+    }
+
+    .divider {
+      border-top: 2px solid #ecf0f1;
+      margin: 40px 0;
+      padding: 0;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7f8c8d;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ecf0f1;
+      font-size: 0.9em;
+    }
+
+    .header-nav {
+      position: sticky;
+      top: 0;
+      background: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-nav a {
+      color: #ecf0f1;
+      margin: 0 10px;
+      border: none;
+    }
+
+    .header-nav a:hover {
+      color: #3498db;
+      background: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+        margin-top: 30px;
+      }
+
+      h3 {
+        font-size: 1.1em;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      pre {
+        padding: 10px;
+        font-size: 0.8em;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      h1, h2 {
+        page-break-after: avoid;
+      }
+
+      table {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-nav">
+    <a href="#inicio">Inicio</a>
+    <a href="#arquitectura">Arquitectura</a>
+    <a href="#uso">Uso</a>
+    <a href="#despliegue">Despliegue</a>
+  </div>
+
+  <div class="container">
+    <h1 id="inicio">BUA ConvertidoreXe — DOCX → eXeLearning + PDF</h1>
+
+    <p><strong>ConvertidoreXe v0.2.0</strong>. Aplicación web que convierte documentos Word a proyectos eXeLearning (ELPX) y a PDF con un tema visual a elegir. Todo el procesamiento sucede en el propio navegador; no hay servidor que reciba los archivos.</p>
+
+    <p>Desarrollado por la Biblioteca Universitaria de la Universidad de Alicante.<br>
+    Licencia: GNU GPL v3.0.<br>
+    Versión en vivo: <a href="https://marioflorido.github.io/BUA-convertidor-exe/">https://marioflorido.github.io/BUA-convertidor-exe/</a></p>
+
+    <div class="divider"></div>
+
+    <h2>Qué hace</h2>
+
+    <ol>
+      <li>Subes un documento Word (DOCX).</li>
+      <li>Configuras la jerarquía: qué hace cada H1 y cada H2.</li>
+      <li>Eliges un tema visual.</li>
+      <li>Descargas el <code>.elpx</code> para abrirlo en eXeLearning.</li>
+      <li>Exportas a PDF con portada, índice, encabezados, pies y los estilos del tema.</li>
+    </ol>
+
+    <p>No hay servidor backend. El documento que subes nunca sale de la pestaña del navegador.</p>
+
+    <div class="divider"></div>
+
+    <h2 id="arquitectura">Arquitectura: pipeline de tres capas</h2>
+
+    <pre>DOCX
+  ↓
+[Capa 1] docxToSemanticDocument.ts
+        DocxParser (Mammoth) → parseStructure → SemanticBuilder
+  ↓
+SemanticDocument        ← núcleo: modelo agnóstico al formato de salida
+  ↓                ↓
+[Capa 2a]          [Capa 2b]
+semanticDocumentToElpx       semanticDocumentToPrintHtml
+ElpxRenderer                 PrintThemeLoader + renderCoverPage
+                             + renderTableOfContents + printStyles.css
+  ↓                ↓
+ELPX (ZIP)         HTML autónomo (Paged.js → PDF)</pre>
+
+    <p>El SemanticDocument es el modelo central. Describe el documento como páginas y bloques, sin asumir nada sobre el formato final. Esto deja los renderers ELPX y PDF como piezas intercambiables: añadir un nuevo formato (SCORM, EPUB, lo que sea) es escribir un renderer adicional sin tocar lo demás.</p>
+
+    <div class="divider"></div>
+
+    <h2 id="uso">Inicio rápido</h2>
+
+    <h3>Requisitos</h3>
+    <ul>
+      <li><strong>Node.js</strong> ≥ 18</li>
+      <li><strong>npm</strong> ≥ 9</li>
+    </ul>
+
+    <h3>Instalación</h3>
+
+    <pre>git clone https://github.com/MarioFlorido/BUA-convertidor-exe.git
+cd BUA-convertidor-exe
+npm install</pre>
+
+    <h3>Desarrollo</h3>
+
+    <pre>npm run dev          # Vite dev server con HMR</pre>
+
+    <p>Accede a <code>http://localhost:5173/BUA-convertidor-exe/</code></p>
+
+    <h3>Build</h3>
+
+    <pre>npm run build        # Compilación de producción → dist/
+npm run preview      # Previsualizar el build
+npm run deploy       # Publicar en GitHub Pages</pre>
+
+    <div class="divider"></div>
+
+    <h2>Etiquetas semánticas BUA en el DOCX</h2>
+
+    <p>Dentro del documento Word puedes marcar cajas semánticas:</p>
+
+    <pre>[Importante]
+Contenido del bloque importante.
+[fin]
+
+[ejemplo]
+Texto del ejemplo.
+[fin]
+
+[definición]
+Texto de la definición.
+[fin]</pre>
+
+    <p>Y clases de tabla aplicadas a la siguiente tabla:</p>
+
+    <pre>[horizontal]   →  tabla horizontal estilizada
+[vertical]     →  tabla vertical estilizada</pre>
+
+    <p>Los colores, etiquetas (multilingües) y estilos vienen del CSS del tema activo. La detección es robusta frente a las particularidades de Word:
+    <ul>
+      <li>Case-insensitive: <code>[IMPORTANTE]</code>, <code>[Importante]</code>, <code>[importante]</code></li>
+      <li>Tildes: <code>[definición]</code> ≡ <code>[definicion]</code></li>
+      <li>Bookmarks invisibles de Word dentro de los corchetes — se limpian automáticamente</li>
+      <li><code>[horizontal]</code> y <code>[vertical]</code> entre dos cajas no rompen la detección</li>
+      <li>Saltos de línea (Shift+Enter) junto a marcadores se normalizan a saltos de párrafo</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <h2>Sistema de temas</h2>
+
+    <h3>Dos categorías</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Vive en</th>
+          <th>Visible para</th>
+          <th>Cómo se gestiona</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Base</strong> (oficial, fijo)</td>
+          <td>Repo: <code>public/base.elpx</code></td>
+          <td>Todos los usuarios</td>
+          <td>Inmutable, no borrable</td>
+        </tr>
+        <tr>
+          <td><strong>Oficiales</strong></td>
+          <td>Repo: <code>public/&lt;id&gt;.zip</code></td>
+          <td>Todos los usuarios</td>
+          <td>Scripts <code>npm run publish-theme</code></td>
+        </tr>
+        <tr>
+          <td><strong>Locales</strong></td>
+          <td>IndexedDB del navegador</td>
+          <td>Solo ese usuario</td>
+          <td>UI "Importar estilo local"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Estructura de un ZIP de tema</h3>
+
+    <pre>{ThemeId}.zip/
+├── style.css                  # CSS del tema (REQUERIDO)
+├── style.js                   # JavaScript del tema (opcional)
+├── config.xml                 # Metadatos · &lt;language&gt;es|ca|en&lt;/language&gt;
+├── screenshots.png            # Miniatura del selector
+├── portada_pdf.png            # (opcional) Imagen A4 para portada PDF
+└── img/
+    ├── logo_BUA.png           # Encabezado del PDF + portada
+    ├── logo_UA.png            # Pie del PDF
+    └── logo_CID.png           # (opcional)</pre>
+
+    <div class="divider"></div>
+
+    <h2 id="despliegue">Despliegue</h2>
+
+    <p>Cada push a <code>main</code> lanza una GitHub Action que construye el proyecto y publica el resultado en GitHub Pages. La configuración está repartida en tres sitios:</p>
+
+    <ul>
+      <li><code>vite.config.ts</code> → <code>base: '/BUA-convertidor-exe/'</code></li>
+      <li><code>.github/workflows/deploy.yml</code> → build + deploy automático</li>
+      <li>Branch <code>gh-pages</code> → contiene el build estático</li>
+    </ul>
+
+    <p>Para desplegar manualmente:</p>
+
+    <pre>npm run deploy</pre>
+
+    <div class="divider"></div>
+
+    <h2>Dependencias principales</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Paquete</th>
+          <th>Uso</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>mammoth</code></td>
+          <td>DOCX → HTML</td>
+        </tr>
+        <tr>
+          <td><code>fflate</code></td>
+          <td>Compresión/descompresión ZIP</td>
+        </tr>
+        <tr>
+          <td><code>idb</code></td>
+          <td>Wrapper de IndexedDB para persistir temas de usuario</td>
+        </tr>
+        <tr>
+          <td><code>react</code> + <code>react-dom</code></td>
+          <td>UI</td>
+        </tr>
+        <tr>
+          <td><code>Paged.js</code> (CDN)</td>
+          <td>CSS Paged Media polyfill para PDF</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <h2>Comandos</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Comando</th>
+          <th>Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>npm run dev</code></td>
+          <td>Servidor de desarrollo (Vite + HMR) en puerto 5173</td>
+        </tr>
+        <tr>
+          <td><code>npm run build</code></td>
+          <td>Build de producción → <code>dist/</code></td>
+        </tr>
+        <tr>
+          <td><code>npm run preview</code></td>
+          <td>Previsualizar el build de producción</td>
+        </tr>
+        <tr>
+          <td><code>npm run deploy</code></td>
+          <td>Build + publicación en <code>gh-pages</code></td>
+        </tr>
+        <tr>
+          <td><code>npm run publish-theme &lt;ruta.zip&gt;</code></td>
+          <td>Publica un tema oficial</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <h2>Problemas habituales</h2>
+
+    <p><strong>"No se pudo cargar la plantilla base"</strong><br>
+    Falta <code>public/base.elpx</code>. Restaurar con <code>git checkout public/base.elpx</code>.</p>
+
+    <p><strong>"El tema no aparece en el selector tras subirlo"</strong><br>
+    La validación falló (ZIP sin <code>style.css</code> o con estructura inválida). Mira la consola del navegador.</p>
+
+    <p><strong>"El tema se carga pero no muestra miniatura"</strong><br>
+    El ZIP no incluye <code>screenshots.png</code>. El tema funciona igual, pero sin imagen en el selector.</p>
+
+    <p><strong>"Las cajas BUA no tienen colores en el PDF"</strong><br>
+    El <code>style.css</code> del tema debe declarar <code>.bua_ejemplo</code>, <code>.bua_definicion</code>, <code>.bua_importante</code> con estilos.</p>
+
+    <div class="divider"></div>
+
+    <h2>Estado del proyecto</h2>
+
+    <p>Todas las funcionalidades principales están implementadas y estables:</p>
+
+    <ul>
+      <li>✅ Conversión DOCX → ELPX</li>
+      <li>✅ Sistema de temas client-side con IndexedDB</li>
+      <li>✅ Configurador de estructura H1/H2</li>
+      <li>✅ Etiquetas semánticas [importante]/[ejemplo]/[definición]</li>
+      <li>✅ Renderer PDF (Paged.js) con portada/índice/encabezado/pie</li>
+      <li>✅ Reordenación drag-and-drop de estilos</li>
+      <li>✅ Despliegue automático en GitHub Pages</li>
+    </ul>
+
+    <div class="footer">
+      <p><strong>ConvertidoreXe</strong> — Conversión DOCX a eXeLearning + PDF</p>
+      <p><a href="https://github.com/MarioFlorido/BUA-convertidor-exe">Repositorio en GitHub</a></p>
+      <p>Desarrollado por la Biblioteca Universitaria de la Universidad de Alicante</p>
+    </div>
+  </div>
+</body>
+</html>
