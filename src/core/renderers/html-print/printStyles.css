@@ -367,6 +367,7 @@
   border: 1px solid var(--color-primary, #135d87);
   margin: 14px 0;
   break-inside: avoid;
+  box-sizing: border-box;
 }
 
 .idevice-header {
@@ -389,6 +390,7 @@
 .block-html {
   font-size: 10.5pt;
   line-height: 1.65;
+  box-sizing: border-box;
 }
 
 .block-html p          { margin: 0 0 7px 0; }
