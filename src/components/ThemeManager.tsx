@@ -196,6 +196,20 @@ export function ThemeManager() {
             Ver guía completa de carga y gestión de estilos
           </a>
         </p>
+        <p className="help-text">
+          <a
+            href={`${import.meta.env.BASE_URL}docs/gestionar-temas-oficiales.html`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="help-link"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="help-link-icon">
+              <path d="M12 16V4M8 8l4-4 4 4" />
+              <path d="M4 20h16" />
+            </svg>
+            Cómo publicar, descargar y eliminar temas oficiales
+          </a>
+        </p>
       </div>
 
       {/* Lista unificada de estilos */}

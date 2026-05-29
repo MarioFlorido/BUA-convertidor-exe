@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestionar temas oficiales — BUA Convertidor</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --green: #1a7f4b;
+        --green-soft: #e6f4ec;
+        --red: #b91c1c;
+        --red-soft: #fef2f2;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--blue);
+        margin: 0 0 0.35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 0.5rem; }
+      h2 {
+        font-size: 1.15rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid var(--border);
+      }
+      p { font-size: 0.95rem; margin: 0 0 0.8rem; }
+      .prereq {
+        background: var(--blue-soft);
+        border: 1px solid #c2d9ea;
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 2rem;
+      }
+      .prereq p { margin: 0; font-size: 0.93rem; }
+      .prereq strong { color: var(--blue); }
+
+      /* Tarjetas de acción */
+      .action-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+      .action-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.9rem 1.2rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+      }
+      .action-card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .icon--publish { background: var(--green-soft); color: var(--green); }
+      .icon--download { background: var(--blue-soft); color: var(--blue); }
+      .icon--delete { background: var(--red-soft); color: var(--red); }
+      .action-card-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .action-card-body {
+        padding: 1.2rem;
+      }
+
+      /* Pasos */
+      ol.steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: steps;
+      }
+      ol.steps li {
+        counter-increment: steps;
+        display: flex;
+        gap: 0.9rem;
+        margin-bottom: 0.9rem;
+        font-size: 0.93rem;
+      }
+      ol.steps li::before {
+        content: counter(steps);
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        background: var(--blue);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      ol.steps li span { padding-top: 2px; }
+
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.875em;
+        background: var(--code-bg);
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      .cmd {
+        display: block;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.9rem;
+        background: #1d2733;
+        color: #e2e8f0;
+        padding: 0.7rem 1rem;
+        border-radius: 6px;
+        margin: 0.5rem 0 0.3rem;
+        letter-spacing: 0.01em;
+      }
+      .note {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin-top: 0.4rem;
+      }
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: #fff8e8;
+        padding: 0.7rem 1rem;
+        border-radius: 0 6px 6px 0;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-soft);
+      }
+      a { color: var(--blue); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <p class="eyebrow">Administración · Solo para Mario</p>
+        <h1>Gestionar temas oficiales</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          Cómo publicar, descargar y eliminar los temas que aparecen para todos los usuarios.
+        </p>
+      </header>
+
+      <!-- Requisitos previos -->
+      <div class="prereq">
+        <p>
+          <strong>Antes de empezar:</strong> necesitas tener el proyecto descargado en tu Mac
+          en la carpeta <code>/Users/mario/BUA-convertidor-exe</code>. Si no lo tienes,
+          clónalo con <code>git clone git@github.com:MarioFlorido/BUA-convertidor-exe.git</code>
+          y luego ejecuta <code>npm install</code> dentro de esa carpeta.
+        </p>
+      </div>
+
+      <h2>Abrir la herramienta</h2>
+
+      <ol class="steps">
+        <li>
+          <span>
+            Abre el <strong>Terminal</strong>
+            (búscalo con <kbd>⌘ Espacio</kbd> y escribe "Terminal").
+          </span>
+        </li>
+        <li>
+          <span>
+            Navega a la carpeta del proyecto:<br>
+            <samp class="cmd">cd /Users/mario/BUA-convertidor-exe</samp>
+          </span>
+        </li>
+        <li>
+          <span>
+            Ejecuta la herramienta:<br>
+            <samp class="cmd">npm run themes</samp>
+            <span class="note">Aparecerá el menú. Elige la opción correspondiente.</span>
+          </span>
+        </li>
+      </ol>
+
+      <!-- Publicar -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--publish">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 20h16"/>
+            </svg>
+          </div>
+          <span class="action-card-title">1 · Publicar un tema nuevo</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En el menú, escribe <code>1</code> y pulsa <kbd>Enter</kbd>.</span></li>
+            <li>
+              <span>
+                Se abrirá el <strong>Finder</strong> para que selecciones el ZIP del tema.
+                Localízalo y haz doble clic (o selecciona y pulsa <kbd>Return</kbd>).
+              </span>
+            </li>
+            <li>
+              <span>
+                El script te pedirá el <strong>nombre visible</strong> del tema
+                (el que verán los usuarios en el selector). Si el nombre entre corchetes
+                ya está bien, pulsa <kbd>Enter</kbd> sin escribir nada.
+              </span>
+            </li>
+            <li>
+              <span>
+                Te pedirá la <strong>actividad</strong> (ej: <em>Doctorado</em>, <em>Grado</em>)
+                y una <strong>descripción</strong> corta. Ambos son opcionales — pulsa
+                <kbd>Enter</kbd> para dejarlos en blanco.
+              </span>
+            </li>
+            <li>
+              <span>
+                Cuando pregunte <em>"¿Hacer commit y push ahora?"</em>, pulsa <kbd>Enter</kbd>
+                (o escribe <code>s</code>) para publicarlo.
+                En 1-2 minutos el tema estará visible para todos.
+              </span>
+            </li>
+          </ol>
+          <div class="callout">
+            El nombre del archivo ZIP determina el ID interno del tema. Usa guiones bajos
+            en lugar de espacios: <code>Doctorado_27-28.zip</code> ✓ &nbsp; <code>Doctorado 27-28.zip</code> ✗
+          </div>
+        </div>
+      </div>
+
+      <!-- Descargar -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4v12M8 12l4 4 4-4"/><path d="M4 20h16"/>
+            </svg>
+          </div>
+          <span class="action-card-title">2 · Descargar un tema existente</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En el menú, escribe <code>2</code> y pulsa <kbd>Enter</kbd>.</span></li>
+            <li><span>Aparece la lista de temas. Escribe el número del que quieres y pulsa <kbd>Enter</kbd>.</span></li>
+            <li>
+              <span>
+                El script genera el ZIP y abre el Finder mostrando su ubicación.
+                Desde ahí puedes copiarlo donde necesites.
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Eliminar -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--delete">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </div>
+          <span class="action-card-title">3 · Eliminar un tema</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En el menú, escribe <code>3</code> y pulsa <kbd>Enter</kbd>.</span></li>
+            <li><span>Aparece la lista de temas. Escribe el número del que quieres eliminar y pulsa <kbd>Enter</kbd>.</span></li>
+            <li>
+              <span>
+                El script pide confirmación. Escribe <code>s</code> y pulsa <kbd>Enter</kbd>
+                para confirmar. <strong>Esta acción no se puede deshacer.</strong>
+              </span>
+            </li>
+            <li>
+              <span>
+                Cuando pregunte si hacer push, pulsa <kbd>Enter</kbd> para confirmar.
+                En 1-2 minutos el tema desaparecerá para todos los usuarios.
+              </span>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <footer>
+        <p>BUA Convertidor · <a href="../docs/guia-temas.html">Guía de estilos para usuarios</a></p>
+      </footer>
+
+    </div>
+  </body>
+</html>
