@@ -430,6 +430,7 @@
   margin: 10px 0;
   font-size: 9.5pt;
   break-inside: avoid;
+  box-sizing: border-box;
 }
 
 .block-html th {
@@ -465,6 +466,7 @@
 .block-html .bua_tabla_vertical {
   margin: 10px 0;
   break-inside: avoid;
+  box-sizing: border-box;
 }
 
 
@@ -484,6 +486,7 @@
   padding: 10px 14px;
   break-inside: avoid;
   border-radius: 0 3px 3px 0;
+  box-sizing: border-box;
 }
 
 /* Etiqueta de tipo — arriba a la izquierda, negrita, color del borde */
