@@ -7,6 +7,38 @@
       "language": "es",
       "description": "Tema estándar de eXeLearning sin personalización",
       "screenshot": null
+    },
+    {
+      "id": "Doctorado_26-27",
+      "name": "Doctorado 26-27",
+      "activity": "",
+      "language": "es",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "PhD_26_27",
+      "name": "PhD 26 27",
+      "activity": "",
+      "language": "en",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "CID_va_26-27",
+      "name": "CID va 26-27",
+      "activity": "",
+      "language": "ca",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "Open_Science_26_27",
+      "name": "Open Science 26 27",
+      "activity": "",
+      "language": "en",
+      "description": "",
+      "screenshot": null
     }
   ]
 }
