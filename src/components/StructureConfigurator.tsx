@@ -60,7 +60,6 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
 
   return (
     <div className="structure-configurator">
-      <h2>Configurar estructura del documento</h2>
       <p className="help-text">
         Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
       </p>

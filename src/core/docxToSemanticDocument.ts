@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+import { escapeHtml } from './utils/html';
+
 /**
  * Pipeline Semántica - Convierte DOCX/HTML a SemanticDocument (SemanticDocument)
  *
@@ -23,6 +25,7 @@ import type {
   SemanticDocument,
   SemanticPage,
   SemanticBlock,
+  DocumentStructure,
 } from '../types';
 
 /**
@@ -54,8 +57,9 @@ import type {
 export async function convertDocxToSemanticDocument(
   file: File,
   options: DocxImportOptions,
-  structure?: any,
+  structure?: DocumentStructure,
   onProgress?: (progress: DocxImportProgress) => void,
+  precomputedHtml?: string,
 ): Promise<SemanticDocument> {
   onProgress?.({
     phase: 'read',
@@ -69,9 +73,14 @@ export async function convertDocxToSemanticDocument(
     messageKey: 'progress.parseDocxStyles',
   });
 
-  const parser = new DocxParser();
-  const parseResult = await parser.parse(file);
-  const htmlValue = parseResult.html;
+  let htmlValue: string;
+  if (precomputedHtml !== undefined) {
+    htmlValue = precomputedHtml;
+  } else {
+    const parser = new DocxParser();
+    const parseResult = await parser.parse(file);
+    htmlValue = parseResult.html;
+  }
 
   return convertHtmlToSemanticDocument(
     htmlValue,
@@ -111,7 +120,7 @@ export async function convertHtmlToSemanticDocument(
   options: DocxImportOptions,
   onProgress?: (progress: DocxImportProgress) => void,
   parseMessageKey = 'progress.parseDocumentStructure',
-  structure?: any,
+  structure?: DocumentStructure,
 ): Promise<SemanticDocument> {
   onProgress?.({
     phase: 'parse',
@@ -149,7 +158,7 @@ function buildProjectFromHtml(
   htmlValue: string,
   filename: string,
   options: DocxImportOptions,
-  structure?: any,
+  structure?: DocumentStructure,
 ): SemanticDocument {
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body>${htmlValue}</body></html>`,
@@ -448,14 +457,6 @@ function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function stemFromFilename(filename: string): string {
   return filename.replace(/\.[^.]+$/, '').trim();

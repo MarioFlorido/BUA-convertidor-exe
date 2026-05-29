@@ -7,8 +7,8 @@
  * Qué hace:
  *   1. Valida el ZIP (debe contener config.xml + style.css)
  *   2. Lee <language> del config.xml
- *   3. Copia el ZIP a public/
- *   4. Descomprime el ZIP en public/themes/<id>/
+ *   3. Descomprime el ZIP en public/themes/<id>/
+ *   4. Genera public/<id>.zip desde esa carpeta (artefacto local, no va a git)
  *   5. Añade/actualiza la entrada en public/themes-config.json
  *
  * No hace commit ni push: te muestra el comando para hacerlo cuando quieras.
@@ -18,6 +18,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
+import { packThemeDir } from './pack-themes.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -100,23 +101,21 @@ function main() {
   const language = extractLanguage(configXmlText) ?? 'es';
   console.log(`  Idioma detectado: ${language}`);
 
-  // 1. Copiar ZIP a public/
-  const destZip = path.join(PUBLIC_DIR, `${id}.zip`);
-  fs.copyFileSync(zipPath, destZip);
-  console.log(`✓ ZIP copiado a public/${id}.zip`);
-
-  // 2. Descomprimir a public/themes/<id>/
+  // 1. Extraer a public/themes/<id>/
   const destDir = path.join(THEMES_DIR, id);
   if (fs.existsSync(destDir)) {
     fs.rmSync(destDir, { recursive: true });
   }
   for (const [name, bytes] of Object.entries(files)) {
-    if (name.endsWith('/')) continue; // entradas-directorio del ZIP
+    if (name.endsWith('/')) continue;
     const filePath = path.join(destDir, name);
     fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, bytes);
   }
-  console.log(`✓ Descomprimido en public/themes/${id}/`);
+  console.log(`✓ Extraído en public/themes/${id}/`);
+
+  // 2. Generar ZIP local (artefacto de build, no va a git)
+  packThemeDir(id);
 
   // 3. Actualizar themes-config.json
   const config: ThemesConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
@@ -145,7 +144,7 @@ function main() {
   console.log(`Tema "${id}" preparado para publicación.`);
   console.log('Para distribuirlo a todos los compañeros:');
   console.log('');
-  console.log(`  git add public/${id}.zip public/themes/${id}/ public/themes-config.json`);
+  console.log(`  git add public/themes/${id}/ public/themes-config.json`);
   console.log(`  git commit -m "feat(themes): publicar ${id}"`);
   console.log(`  git push`);
   console.log('');

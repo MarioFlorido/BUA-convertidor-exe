@@ -4,6 +4,9 @@
   "version": "0.2.0",
   "type": "module",
   "scripts": {
+    "pack-themes": "tsx scripts/pack-themes.ts",
+    "predev": "tsx scripts/pack-themes.ts",
+    "prebuild": "tsx scripts/pack-themes.ts",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

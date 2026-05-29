@@ -1,6 +1,7 @@
 import { zipSync } from 'fflate';
 import type { ImportedProject, ImportedPage, ImportedBlock } from '../models/SemanticDocument';
 import { PreviewService } from '../services/PreviewService';
+import { escapeHtml } from '../utils/html';
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -37,10 +38,10 @@ export class ElpxRenderer {
     // Generar content.xml
     entries['content.xml'] = new TextEncoder().encode(this.generateContentXml(effectiveThemeId));
 
-    // Generar páginas de preview
+    // Generar páginas de preview (una sola vez)
     const previewService = new PreviewService(this.project);
     const previewPages = previewService.buildPages();
-    previewService.addToZipEntries(entries);
+    previewService.addToZipEntries(entries, previewPages);
 
     // Empaquetar como ZIP
     const blobData = zipSync(entries, { level: 0 });
@@ -198,15 +199,6 @@ ${this.generatePagStructurePropertyEntry('visibility', 'true')}${this.generatePa
 // ============================================================================
 // Funciones auxiliares
 // ============================================================================
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function escapeXml(value: string): string {
   return escapeHtml(value);

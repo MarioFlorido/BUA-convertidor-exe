@@ -132,13 +132,13 @@ export function applyTableClasses(htmlValue: string): string {
       // Busca <p>[horizontal]</p> seguido de tabla
       pattern: /<p>\s*\[\s*horizontal\s*\]\s*<\/p>\s*(<table[^>]*>)/gi,
       class: 'bua_tabla_horizontal',
-      replacement: '<p><br /></p><$1',
+      replacement: '<p><br /></p>$1',
     },
     {
       // Busca <p>[vertical]</p> seguido de tabla
       pattern: /<p>\s*\[\s*vertical\s*\]\s*<\/p>\s*(<table[^>]*>)/gi,
       class: 'bua_tabla_vertical',
-      replacement: '<p><br /></p><$1',
+      replacement: '<p><br /></p>$1',
     },
   ];
 

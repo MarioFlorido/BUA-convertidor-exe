@@ -34,20 +34,15 @@ function main() {
     process.exit(1);
   }
 
-  const zipPath = path.join(PUBLIC_DIR, `${id}.zip`);
   const themeDir = path.join(THEMES_DIR, id);
   const config: { themes: Array<{ id: string }> } = JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf-8'));
   const entryIdx = config.themes.findIndex((t) => t.id === id);
 
-  if (!fs.existsSync(zipPath) && !fs.existsSync(themeDir) && entryIdx === -1) {
+  if (!fs.existsSync(themeDir) && entryIdx === -1) {
     console.error(`✗ No se encontró nada relacionado con "${id}"`);
     process.exit(1);
   }
 
-  if (fs.existsSync(zipPath)) {
-    fs.unlinkSync(zipPath);
-    console.log(`✓ Eliminado public/${id}.zip`);
-  }
   if (fs.existsSync(themeDir)) {
     fs.rmSync(themeDir, { recursive: true });
     console.log(`✓ Eliminado public/themes/${id}/`);

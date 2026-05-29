@@ -17,14 +17,21 @@ export interface TemplateData {
  */
 export class ThemeService {
   private static readonly cache = new Map<string, Record<string, Uint8Array>>();
+  private static templateCache: TemplateData | null = null;
 
   /**
    * Cargar plantilla base de eXeLearning
+   * Cacheada en memoria para evitar fetch repetidos en la misma sesión.
    *
    * @returns TemplateData con entries descomprimidas de base.elpx
    * @throws Error si no se puede cargar o no contiene content.xml
    */
   static async loadTemplate(): Promise<TemplateData> {
+    if (this.templateCache) {
+      // Devolver copia para que el caller pueda mutar entries sin afectar la caché
+      return { entries: { ...this.templateCache.entries } };
+    }
+
     const baseUrl = import.meta.env.BASE_URL ?? '/';
     const url = `${baseUrl}base.elpx`;
 
@@ -34,7 +41,8 @@ export class ThemeService {
       throw new Error('La plantilla base no contiene content.xml.');
     }
 
-    return { entries };
+    this.templateCache = { entries };
+    return { entries: { ...entries } };
   }
 
   /**
@@ -91,6 +99,7 @@ export class ThemeService {
    */
   static clearCache(): void {
     this.cache.clear();
+    this.templateCache = null;
   }
 
   /**

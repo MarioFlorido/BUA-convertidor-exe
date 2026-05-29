@@ -9,6 +9,7 @@ import { StepIndicator } from './components/StepIndicator';
 import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/parseStructure';
+import { ThemeRegistry } from './core/services/ThemeRegistry';
 import type {
   DocxImportOptions,
   ConversionState,
@@ -39,6 +40,7 @@ export function App() {
   const [structure, setStructure] = useState<DocumentStructure | null>(null);
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
   const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
+  const [parsedDocxHtml, setParsedDocxHtml] = useState<string | null>(null);
   const [options, setOptions] = useState<DocxImportOptions>({
     heading1Mode: 'page',
     heading2Mode: 'page',
@@ -67,6 +69,7 @@ export function App() {
       const parser = new DocxParser();
       const parseResult = await parser.parse(selectedFile);
 
+      setParsedDocxHtml(parseResult.html);
       const parsedStructure = await parseDocumentStructure(parseResult.html);
       setStructure(parsedStructure);
       setScreen('structure');
@@ -87,6 +90,7 @@ export function App() {
   const handleStructureCancel = () => {
     setFile(null);
     setStructure(null);
+    setParsedDocxHtml(null);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -116,6 +120,7 @@ export function App() {
         { ...options, themeId: effectiveThemeId },
         structure,
         onProgress,
+        parsedDocxHtml ?? undefined,
       );
       setSemanticDoc(doc);
 
@@ -140,6 +145,7 @@ export function App() {
     setFile(null);
     setStructure(null);
     setSemanticDoc(null);
+    setParsedDocxHtml(null);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -266,7 +272,7 @@ export function App() {
                   <div className="stat-item">
                     <span className="stat-label">Tema</span>
                     <span className="stat-value" style={{ fontSize: '0.825rem' }}>
-                      {options.themeId}
+                      {ThemeRegistry.get(options.themeId ?? '')?.metadata.name ?? options.themeId}
                     </span>
                   </div>
                 </div>

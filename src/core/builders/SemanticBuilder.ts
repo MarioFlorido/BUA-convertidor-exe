@@ -1,4 +1,5 @@
 import type { ImportedPage, ImportedBlock } from '../models/SemanticDocument';
+import { escapeHtml } from '../utils/html';
 
 interface DocumentSection {
   level: number;
@@ -298,11 +299,3 @@ export class SemanticBuilder {
   }
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}

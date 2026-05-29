@@ -1,5 +1,6 @@
 import type { ImportedProject } from './models/SemanticDocument';
 import { SemanticBuilder } from './builders/SemanticBuilder';
+import type { DocumentStructure } from '../types';
 
 // Re-exportar funciones de transformación HTML
 export { applyDivClasses, applyTableClasses } from './transformers/HtmlTransformer';
@@ -21,7 +22,7 @@ interface DocumentSection {
 export function buildProjectFromStructure(
   htmlValue: string,
   filename: string,
-  structure: any,
+  structure: DocumentStructure,
 ): ImportedProject {
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body>${htmlValue}</body></html>`,

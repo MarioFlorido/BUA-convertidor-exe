@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# ZIPs de temas oficiales — artefactos generados por pack-themes, no van a git
+public/*.zip

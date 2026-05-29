@@ -37,7 +37,7 @@ import type {
   DocxImportProgress,
   ImportToElpxResult,
   DocxImportOptions,
-  SemanticDocument,
+  DocumentStructure,
 } from '../types';
 
 /**
@@ -67,7 +67,7 @@ import type {
 export async function convertDocxToElpx(
   file: File,
   options: DocxImportOptions,
-  structure?: any,
+  structure?: DocumentStructure,
   onProgress?: (progress: DocxImportProgress) => void,
 ): Promise<ImportToElpxResult> {
   // Paso 1: Extraer semántica
@@ -106,7 +106,7 @@ export async function convertHtmlToElpx(
   options: DocxImportOptions,
   onProgress?: (progress: DocxImportProgress) => void,
   parseMessageKey = 'progress.parseDocumentStructure',
-  structure?: any,
+  structure?: DocumentStructure,
 ): Promise<ImportToElpxResult> {
   // Paso 1: Extraer semántica desde HTML
   const project = await convertHtmlToSemanticDocument(
@@ -122,38 +122,4 @@ export async function convertHtmlToElpx(
   return semanticDocumentToElpx(project, filename, { themeId: options.themeId }, onProgress);
 }
 
-/**
- * Convertir SemanticDocument a ELPX (API de bajo nivel)
- *
- * API pública para máximo control. Útil cuando:
- * - Tienes un SemanticDocument preconstruido
- * - Necesitas reutilizar un documento con diferentes temas
- * - Quieres experimentar con renderización ELPX
- *
- * @param project - Documento semántico a renderizar
- * @param filename - Nombre para el resultado ELPX
- * @param onProgress - Callback de progreso
- * @param themeId - ID del tema a usar (opcional)
- * @returns Promise<ImportToElpxResult> con blob ELPX y preview
- *
- * @example
- * ```typescript
- * // Obtener semántica
- * const doc = await convertDocxToSemanticDocument(file, options);
- *
- * // Renderizar a ELPX
- * const result = await convertProjectToElpx(doc, 'resultado.elpx');
- * ```
- *
- * @deprecated Use semanticDocumentToElpx instead
- */
-export async function convertProjectToElpx(
-  project: SemanticDocument,
-  filename: string,
-  onProgress?: (progress: DocxImportProgress) => void,
-  themeId?: string,
-): Promise<ImportToElpxResult> {
-  // Delegar a la nueva API
-  return semanticDocumentToElpx(project, filename, { themeId }, onProgress);
-}
 

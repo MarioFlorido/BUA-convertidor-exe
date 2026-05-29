@@ -1,4 +1,5 @@
 import type { ImportedProject, ImportedBlock } from '../models/SemanticDocument';
+import { escapeHtml } from '../utils/html';
 
 export interface PreviewPageInfo {
   title: string;
@@ -46,7 +47,7 @@ export class PreviewService {
    *
    * @param entries Record de entries del ZIP - se modifica in-place
    */
-  addToZipEntries(entries: Record<string, Uint8Array>): void {
+  addToZipEntries(entries: Record<string, Uint8Array>, prebuiltPages?: Record<string, string>): void {
     // Eliminar páginas HTML antiguas
     for (const existingPath of Object.keys(entries)) {
       if (existingPath.startsWith('html/') && existingPath.endsWith('.html')) {
@@ -54,8 +55,8 @@ export class PreviewService {
       }
     }
 
-    // Agregar nuevas páginas de preview
-    const previewPages = this.buildPages();
+    // Usar páginas ya construidas si se pasan, o construirlas ahora
+    const previewPages = prebuiltPages ?? this.buildPages();
     for (const [href, html] of Object.entries(previewPages)) {
       entries[href] = new TextEncoder().encode(html);
     }
@@ -240,14 +241,6 @@ ${sanitizedHtml}
 // Funciones auxiliares
 // ============================================================================
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
 
 function createPageDomId(pageNumber: number): string {
   return `page-preview-${pageNumber}`;

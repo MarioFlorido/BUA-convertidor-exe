@@ -17,7 +17,6 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
 
   return (
     <div className="theme-selector">
-      <h2>Seleccionar estilo visual</h2>
       <p className="help-text">
         Elige el estilo que deseas aplicar a tu recurso eXeLearning:
       </p>
@@ -25,6 +24,15 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
       <div className="theme-list">
         {availableThemes.map((theme) => (
           <label key={theme.id} className="theme-option">
+            {theme.metadata.screenshot && (
+              <img
+                className="theme-thumbnail"
+                src={theme.metadata.screenshot}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+            )}
             <input
               type="radio"
               name="theme"
@@ -55,15 +63,6 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
                 {theme.source === 'builtin' ? 'Oficial' : 'Local'}
               </span>
             </div>
-            {theme.metadata.screenshot && (
-              <img
-                className="theme-thumbnail"
-                src={theme.metadata.screenshot}
-                alt=""
-                aria-hidden="true"
-                loading="lazy"
-              />
-            )}
           </label>
         ))}
       </div>
