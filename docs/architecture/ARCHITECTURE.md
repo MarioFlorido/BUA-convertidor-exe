@@ -2,20 +2,16 @@
 
 ## Pipeline de conversión (3 capas)
 
-```
-DOCX
-  ↓
-[Capa 1] docxToSemanticDocument.ts
-          DocxParser  →  parseStructure  →  SemanticBuilder
-  ↓
-SemanticDocument        ← modelo agnóstico al formato de salida
-  ↓                ↓
-[Capa 2a]          [Capa 2b]
-semanticDocumentToElpx  semanticDocumentToPrintHtml
-ElpxRenderer            PrintThemeLoader + renderCoverPage
-                        + renderTableOfContents + printStyles.css
-  ↓                ↓
-ELPX (ZIP)         HTML autónomo (Paged.js → PDF)
+```mermaid
+flowchart TD
+    DOCX([DOCX]) --> Parser["DocxParser\n(Mammoth.js)"]
+    Parser --> HTML[HTML intermedio]
+    HTML --> Struct[parseDocumentStructure]
+    HTML --> Builder[SemanticBuilder]
+    Struct --> Builder
+    Builder --> SemDoc(["SemanticDocument\n― modelo agnóstico ―"])
+    SemDoc --> ELPX["ElpxRenderer\n→ .elpx"]
+    SemDoc --> PDF["PrintHtmlRenderer\n→ HTML autónomo (Paged.js → PDF)"]
 ```
 
 **SemanticDocument** es el núcleo: un modelo puro y agnóstico que describe el documento como páginas y bloques semánticos. Los renderers ELPX y print son completamente independientes entre sí.
@@ -46,26 +42,52 @@ interface SemanticBlock {
 
 ---
 
-## Sistema de temas (ThemeSystem)
+## Sistema de estilos (ThemeSystem)
 
-Los temas son plugins ZIP cargados en runtime, sin backend:
+Los estilos son plugins ZIP cargados en runtime, sin backend:
 
+```mermaid
+flowchart TD
+    subgraph Oficiales["Estilos oficiales (todos los usuarios)"]
+        Repo["public/themes/id/\n(en git)"] -->|pack-themes| ZIP["id.zip\n(generado, no en git)"]
+        ZIP -->|fetch al arrancar| BIP[BuiltInThemeProvider]
+    end
+    subgraph Locales["Estilos locales (solo este navegador)"]
+        Upload[ZIP subido por el usuario] --> IDB[IndexedDB]
+        IDB --> UTP[UserThemeProvider]
+    end
+    BIP --> Reg[ThemeRegistry]
+    UTP --> Reg
+    Reg --> Sel[Selector de estilos]
 ```
-ThemeSystem
- ├── BuiltInThemeProvider   → carga ZIPs de public/ via fetch
- ├── UserThemeProvider      → persistencia IndexedDB (idb)
- ├── ThemeValidator         → valida estructura mínima del ZIP
- ├── ThemeRegistry          → fuente de verdad (Map<id, ThemeBundle>)
- ├── ThemeCssManager        → inyección CSS con id="theme-css"
- └── BlobUrlRegistry        → ciclo de vida de Blob URLs
+
+### Secuencia de arranque (ThemeBoot.ts)
+
+```mermaid
+sequenceDiagram
+    participant App
+    participant ThemeBoot
+    participant BuiltIn as BuiltInThemeProvider
+    participant User as UserThemeProvider
+    participant Registry as ThemeRegistry
+
+    App->>ThemeBoot: bootThemeSystem()
+    ThemeBoot->>User: init() IndexedDB
+    ThemeBoot->>BuiltIn: loadAll()
+    BuiltIn-->>Registry: register(estilos oficiales)
+    ThemeBoot->>User: loadAll()
+    User-->>Registry: register(estilos locales)
+    ThemeBoot-->>App: activeThemeId, themeCount
 ```
 
-Boot sequence (ThemeBoot.ts):
-1. Carga temas built-in desde `public/*.zip`
-2. Carga temas de usuario desde IndexedDB
-3. Valida el registry (mínimo 1 tema)
-4. Inyecta CSS del tema activo
-5. Habilita la UI
+| Servicio | Responsabilidad |
+|---|---|
+| `BuiltInThemeProvider` | Carga ZIPs de `public/` via fetch |
+| `UserThemeProvider` | Persistencia IndexedDB (idb) |
+| `ThemeValidator` | Valida estructura mínima del ZIP |
+| `ThemeRegistry` | Fuente de verdad (`Map<id, ThemeBundle>`) |
+| `ThemeCssManager` | Inyección CSS con `id="theme-css"` |
+| `BlobUrlRegistry` | Ciclo de vida de Blob URLs |
 
 ---
 

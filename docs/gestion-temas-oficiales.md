@@ -13,14 +13,35 @@ usuario sube desde la UI y viven en su IndexedDB).
 
 ## 1. Modelo mental
 
-| Tipo de tema | Vive en | Visible para |
+| Tipo de estilo | Vive en | Visible para |
 |---|---|---|
 | **Oficiales** (incluido `base`) | El repositorio Git, en `public/` | Todos los usuarios |
 | **Locales** | IndexedDB del navegador del usuario | Solo ese usuario, en ese navegador |
 
 La aplicación es una SPA estática alojada en GitHub Pages. **No hay
-backend**: la única forma de que un tema sea visible para todos es que
+backend**: la única forma de que un estilo sea visible para todos es que
 viva en el repositorio.
+
+### Flujo de gestión
+
+```mermaid
+flowchart TD
+    Start([npm run themes]) --> Menu{Menú}
+    Menu -->|1 Publicar| Pub[Seleccionar ZIP\nFinder]
+    Pub --> Extract["Extraer a\npublic/themes/id/"]
+    Extract --> Config[Actualizar\nthemes-config.json]
+    Config --> Push[git commit + push]
+
+    Menu -->|2 Descargar| Down[Generar ZIP\ndesde directorio]
+    Down --> Finder[Abrir en Finder]
+
+    Menu -->|3 Eliminar| Del["Eliminar\npublic/themes/id/"]
+    Del --> Config2[Actualizar\nthemes-config.json]
+    Config2 --> Push2[git commit + push]
+
+    Push --> GH([GitHub Pages\n1-2 min])
+    Push2 --> GH
+```
 
 ---
 
