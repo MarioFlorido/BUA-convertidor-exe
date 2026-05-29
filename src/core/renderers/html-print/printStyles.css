@@ -428,10 +428,10 @@
 .block-html table,
 .block-html .bua_tabla_horizontal table,
 .block-html .bua_tabla_vertical table {
-  width: 100%;
+  width: calc(100% - 4px);
   max-width: 100%;
   border-collapse: collapse;
-  margin: 10px 0;
+  margin: 10px 2px;
   font-size: 9.5pt;
   break-inside: avoid;
   box-sizing: border-box;
