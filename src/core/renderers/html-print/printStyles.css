@@ -385,6 +385,7 @@
 
 .idevice-with-title > .block-html {
   padding: 10px 14px;
+  overflow: hidden;
 }
 
 .block-html {
@@ -445,12 +446,18 @@
   border: 1px solid #e5e7eb;
   border-bottom: 3px solid var(--color-accent, #deb13c);
   text-align: left;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .block-html td {
   padding: 5px 10px;
   border: 1px solid #ccc;
   vertical-align: top;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
 }
 
 .block-html tr:nth-child(even) td {
@@ -471,6 +478,7 @@
   margin: 10px 0;
   break-inside: avoid;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 
