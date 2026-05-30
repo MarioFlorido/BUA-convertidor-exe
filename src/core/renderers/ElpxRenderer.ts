@@ -217,11 +217,11 @@ function createPageId(): string {
 }
 
 function createBlockId(): string {
-  return `block-${Date.now()}-${randomSuffix()}`;
+  return `block-${crypto.randomUUID()}`;
 }
 
 function createIdeviceId(): string {
-  return `idevice-${Date.now()}-${randomSuffix()}`;
+  return `idevice-${crypto.randomUUID()}`;
 }
 
 function createResourceId(): string {
@@ -240,14 +240,7 @@ function timestampStamp(): string {
   ].join('');
 }
 
-function randomSuffix(length = 9): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let output = '';
-  for (let index = 0; index < length; index += 1) {
-    output += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return output;
-}
+
 
 function randomUppercase(length: number): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

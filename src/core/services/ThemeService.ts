@@ -106,7 +106,21 @@ export class ThemeService {
    * Helper privado: Fetch y descomprimir ZIP desde URL
    */
   private static async fetchAndUnzip(url: string): Promise<Record<string, Uint8Array>> {
-    const response = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+    let response: Response;
+    try {
+      response = await fetch(url, { signal: controller.signal });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        throw new Error(`Tiempo de espera agotado al cargar: ${url}`);
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
     if (!response.ok) {
       throw new Error(`No se ha podido cargar: ${url}`);
     }

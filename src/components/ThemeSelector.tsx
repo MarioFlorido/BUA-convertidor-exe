@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
 import { ThemeOrderService } from '../core/services/ThemeOrderService';
-import type { ThemeBundle } from '../core/services/ThemeBundle';
+
 
 interface ThemeSelectorProps {
   onConfirm: (themeId: string) => void;
@@ -9,10 +9,8 @@ interface ThemeSelectorProps {
 }
 
 export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
-  // ThemeRegistry está poblado desde el boot — lectura síncrona, sin fetch
-  const [availableThemes] = useState<ThemeBundle[]>(() =>
-    ThemeOrderService.applyOrder(ThemeRegistry.getAll())
-  );
+  // Leer del registry en cada montaje para recoger temas añadidos desde ThemeManager
+  const availableThemes = ThemeOrderService.applyOrder(ThemeRegistry.getAll());
   const [selectedThemeId, setSelectedThemeId] = useState<string>('base');
 
   return (
