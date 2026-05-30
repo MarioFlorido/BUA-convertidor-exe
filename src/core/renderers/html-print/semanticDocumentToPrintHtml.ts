@@ -333,7 +333,7 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
 
   <!-- Paged.js — polyfill CSS Paged Media en el navegador -->
   <!-- Registrar hook ANTES de que Paged.js empiece a paginar (DOMContentLoaded) -->
-  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+  <script src="https://unpkg.com/pagedjs@0.4.3/dist/paged.polyfill.js"></script>
   <script>
     // Abrir el diálogo de impresión automáticamente cuando Paged.js termine de paginar.
     // afterRendered() se llama una sola vez, justo cuando la paginación está completa.

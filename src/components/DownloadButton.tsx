@@ -102,29 +102,28 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
       </button>
 
       {/* Exportar PDF + switch imagen de portada */}
-      <button
-        onClick={handleExportPrint}
-        className="btn-download-pdf"
-        disabled={pdfDisabled}
-        title={!semanticDoc ? 'El documento semántico no está disponible' : undefined}
-      >
-        <img
-          src={`${base}pdf.png`}
-          alt=""
-          className="download-btn-icon"
-          aria-hidden="true"
-          style={{ opacity: pdfDisabled ? 0.4 : 1 }}
-        />
-        <div className="download-btn-body">
-          <span className="download-btn-title">
-            {printLoading ? 'Generando vista de impresión…' : 'Vista previa para imprimir / PDF'}
-          </span>
-        </div>
-        <span
-          className="pdf-cover-toggle-inline"
-          onClick={(e) => { e.stopPropagation(); setUseCoverImage((v) => !v); }}
-          title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
+      <div className="pdf-download-group">
+        <button
+          onClick={handleExportPrint}
+          className="btn-download-pdf"
+          disabled={pdfDisabled}
+          title={!semanticDoc ? 'El documento semántico no está disponible' : undefined}
         >
+          <img
+            src={`${base}pdf.png`}
+            alt=""
+            className="download-btn-icon"
+            aria-hidden="true"
+            style={{ opacity: pdfDisabled ? 0.4 : 1 }}
+          />
+          <div className="download-btn-body">
+            <span className="download-btn-title">
+              {printLoading ? 'Generando vista de impresión…' : 'Vista previa para imprimir / PDF'}
+            </span>
+          </div>
+          {!printLoading && <DownloadArrow />}
+        </button>
+        <span className="pdf-cover-toggle-inline">
           <span className="pdf-cover-toggle-inline__label">
             {useCoverImage ? 'Con foto portada' : 'Sin foto portada'}
           </span>
@@ -132,14 +131,14 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
             role="switch"
             aria-checked={useCoverImage}
             aria-label="Imagen de portada"
-            onClick={(e) => { e.stopPropagation(); setUseCoverImage((v) => !v); }}
+            title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
+            onClick={() => setUseCoverImage((v) => !v)}
             className={`toggle-switch ${useCoverImage ? 'toggle-switch--on' : ''}`}
           >
             <span className="toggle-switch__thumb" />
           </button>
         </span>
-        {!printLoading && <DownloadArrow />}
-      </button>
+      </div>
 
       {printError && (
         <div className="download-error">

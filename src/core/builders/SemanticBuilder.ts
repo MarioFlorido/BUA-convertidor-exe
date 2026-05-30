@@ -1,4 +1,5 @@
 import type { ImportedPage, ImportedBlock } from '../models/SemanticDocument';
+import type { DocumentStructure, H1Section } from '../../types';
 import { escapeHtml } from '../utils/html';
 
 interface DocumentSection {
@@ -21,10 +22,10 @@ interface DocumentSection {
  */
 export class SemanticBuilder {
   private sections: DocumentSection[];
-  private structure: any;
+  private structure: DocumentStructure;
   private h1Indices: Map<string, number>;
 
-  constructor(sections: DocumentSection[], structure: any) {
+  constructor(sections: DocumentSection[], structure: DocumentStructure) {
     this.sections = sections;
     this.structure = structure;
     this.h1Indices = this.buildH1Map();
@@ -72,7 +73,7 @@ export class SemanticBuilder {
   /**
    * Construir una página individual a partir de un H1
    */
-  private buildPageFromH1(h1Section: any, h1Index: number, pages: ImportedPage[]): ImportedPage {
+  private buildPageFromH1(h1Section: H1Section, h1Index: number, pages: ImportedPage[]): ImportedPage {
     // Calcular parentIndex basándose en el nivel
     let parentIndex: number | null = null;
     if (h1Section.level === 2) {

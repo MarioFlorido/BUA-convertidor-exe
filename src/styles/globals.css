@@ -580,6 +580,19 @@ button {
   gap: 0.625rem;
 }
 
+/* ── Grupo PDF: botón + switch de portada (elementos hermanos, no anidados) ── */
+.pdf-download-group {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.pdf-download-group .btn-download-pdf {
+  flex: 1;
+  width: auto;
+}
+
 /* ── Switch imagen de portada PDF ─────────────────────────── */
 .pdf-cover-toggle-inline {
   display: flex;
