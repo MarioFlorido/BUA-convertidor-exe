@@ -162,7 +162,7 @@ function renderBlock(block: SemanticBlock): string {
 
   if (isDefaultTitle) {
     // Bloque sin título de iDevice: sólo contenido
-    const htmlUpperH2 = expandAccordions(block.html).replace(
+    const htmlUpperH2 = convertIframesToLinks(expandAccordions(block.html)).replace(
       /<h2([^>]*)>([^<]*)<\/h2>/gi,
       (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
     );
@@ -172,7 +172,7 @@ function renderBlock(block: SemanticBlock): string {
   }
 
   // iDevice con título: cabecera coloreada + borde perimetral (igual que en eXeLearning)
-  const blockHtmlUpperH2 = expandAccordions(block.html).replace(
+  const blockHtmlUpperH2 = convertIframesToLinks(expandAccordions(block.html)).replace(
     /<h2([^>]*)>([^<]*)<\/h2>/gi,
     (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
   );
@@ -182,6 +182,24 @@ function renderBlock(block: SemanticBlock): string {
   </header>
   <div class="block-html">${blockHtmlUpperH2}</div>
 </div>`;
+}
+
+/**
+ * Convierte iframes en enlaces para el PDF.
+ * Los iframes no se renderizan en Paged.js — se sustituyen por la URL de destino.
+ * Para embeds de YouTube extrae la URL de watch a partir del src del embed.
+ */
+function convertIframesToLinks(html: string): string {
+  return html.replace(
+    /<iframe[^>]*\bsrc="([^"]*)"[^>]*>[\s\S]*?<\/iframe>/gi,
+    (_, src: string) => {
+      const ytMatch = src.match(/youtube(?:-nocookie)?\.com\/embed\/([^?&"]+)/i);
+      const url = ytMatch
+        ? `https://www.youtube.com/watch?v=${ytMatch[1]}`
+        : src;
+      return url ? `<a href="${url}">${url}</a>` : '';
+    },
+  );
 }
 
 /**
