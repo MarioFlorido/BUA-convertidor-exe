@@ -138,6 +138,15 @@
         color: var(--text-soft);
       }
       a { color: var(--blue); }
+      .diagram-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        margin: 0.5rem 0 1.5rem;
+        overflow-x: auto;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -150,6 +159,19 @@
           eXeLearning y PDF, cómo cambiarlas y cómo eliminarlas.
         </p>
       </header>
+
+      <h2>Flujo de conversión</h2>
+      <p>Los estilos se aplican en el paso 3 del proceso de conversión.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart LR
+    A([Subir DOCX]) --> B[Parsear con Mammoth]
+    B --> C[Configurar estructura]
+    C --> D[Seleccionar estilo]
+    D --> E[Convertir]
+    E --> F([Descargar ELPX / PDF])
+        </pre>
+      </div>
 
       <h2>¿Qué es un estilo?</h2>
       <p>
@@ -334,5 +356,8 @@
         <a href="gestionar-temas-oficiales.html">Publicar, descargar y eliminar estilos oficiales</a>
       </footer>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
   </body>
 </html>

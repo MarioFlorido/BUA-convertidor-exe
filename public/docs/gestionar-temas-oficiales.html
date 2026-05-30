@@ -172,6 +172,15 @@
         color: var(--text-soft);
       }
       a { color: var(--blue); }
+      .diagram-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        margin: 0.5rem 0 1.5rem;
+        overflow-x: auto;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -193,6 +202,28 @@
           clónalo con <code>git clone git@github.com:MarioFlorido/BUA-convertidor-exe.git</code>
           y luego ejecuta <code>npm install</code> dentro de esa carpeta.
         </p>
+      </div>
+
+      <h2>Flujo general</h2>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    Start([npm run themes]) --> Menu{Menu}
+    Menu -->|1 Publicar| Pub[Seleccionar ZIP en Finder]
+    Pub --> Extract[Extraer a public/themes/id/]
+    Extract --> Config[Actualizar themes-config.json]
+    Config --> Push[git commit + push]
+
+    Menu -->|2 Descargar| Down[Generar ZIP desde directorio]
+    Down --> Finder[Abrir en Finder]
+
+    Menu -->|3 Eliminar| Del[Eliminar public/themes/id/]
+    Del --> Config2[Actualizar themes-config.json]
+    Config2 --> Push2[git commit + push]
+
+    Push --> GH([GitHub Pages en 1-2 min])
+    Push2 --> GH
+        </pre>
       </div>
 
       <h2>Abrir la herramienta</h2>
@@ -326,5 +357,8 @@
       </footer>
 
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
   </body>
 </html>

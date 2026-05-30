@@ -895,6 +895,27 @@ button {
   color: var(--text-3);
 }
 
+.footer-docs {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.7rem;
+}
+
+.footer-docs a {
+  color: var(--text-3);
+  text-decoration: none;
+}
+
+.footer-docs a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.footer-docs span {
+  color: var(--text-3);
+}
+
 /* ── Structure Configurator ──────────────────────────────────────────────── */
 .structure-configurator {
   max-width: 860px;
