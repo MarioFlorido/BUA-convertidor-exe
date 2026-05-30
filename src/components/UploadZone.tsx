@@ -89,21 +89,12 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
 
       <div className="upload-disclaimer">
         <p>
-          Inspirado en el trabajo de{' '}
-          <a href="https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe" target="_blank" rel="noopener noreferrer">
-            Juanjo de Haro
-          </a>
-          {' · '}
-          <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/docs/COMPARISON.md" target="_blank" rel="noopener noreferrer">
-            Agradecimientos
-          </a>
-          {' · '}
           <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
             GNU GPL v3.0
           </a>
           {' · '}
           <a href={`${import.meta.env.BASE_URL}docs/README.html`} target="_blank" rel="noopener noreferrer">
-            README
+            Léeme
           </a>
         </p>
       </div>
