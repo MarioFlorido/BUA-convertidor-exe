@@ -4,14 +4,14 @@
 
 ```mermaid
 flowchart TD
-    DOCX([DOCX]) --> Parser["DocxParser\n(Mammoth.js)"]
+    DOCX([DOCX]) --> Parser[DocxParser / Mammoth.js]
     Parser --> HTML[HTML intermedio]
     HTML --> Struct[parseDocumentStructure]
     HTML --> Builder[SemanticBuilder]
     Struct --> Builder
-    Builder --> SemDoc(["SemanticDocument\n― modelo agnóstico ―"])
-    SemDoc --> ELPX["ElpxRenderer\n→ .elpx"]
-    SemDoc --> PDF["PrintHtmlRenderer\n→ HTML autónomo (Paged.js → PDF)"]
+    Builder --> SemDoc([SemanticDocument])
+    SemDoc --> ELPX[ElpxRenderer / .elpx]
+    SemDoc --> PDF[PrintHtmlRenderer / Paged.js / PDF]
 ```
 
 **SemanticDocument** es el núcleo: un modelo puro y agnóstico que describe el documento como páginas y bloques semánticos. Los renderers ELPX y print son completamente independientes entre sí.
@@ -48,11 +48,11 @@ Los estilos son plugins ZIP cargados en runtime, sin backend:
 
 ```mermaid
 flowchart TD
-    subgraph Oficiales["Estilos oficiales (todos los usuarios)"]
-        Repo["public/themes/id/\n(en git)"] -->|pack-themes| ZIP["id.zip\n(generado, no en git)"]
+    subgraph Oficiales[Estilos oficiales - todos los usuarios]
+        Repo[public/themes/id/ - en git] -->|pack-themes| ZIP[id.zip - generado]
         ZIP -->|fetch al arrancar| BIP[BuiltInThemeProvider]
     end
-    subgraph Locales["Estilos locales (solo este navegador)"]
+    subgraph Locales[Estilos locales - solo este navegador]
         Upload[ZIP subido por el usuario] --> IDB[IndexedDB]
         IDB --> UTP[UserThemeProvider]
     end

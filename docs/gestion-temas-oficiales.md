@@ -26,20 +26,20 @@ viva en el repositorio.
 
 ```mermaid
 flowchart TD
-    Start([npm run themes]) --> Menu{Menú}
-    Menu -->|1 Publicar| Pub[Seleccionar ZIP\nFinder]
-    Pub --> Extract["Extraer a\npublic/themes/id/"]
-    Extract --> Config[Actualizar\nthemes-config.json]
+    Start([npm run themes]) --> Menu{Menu}
+    Menu -->|1 Publicar| Pub[Seleccionar ZIP en Finder]
+    Pub --> Extract[Extraer a public/themes/id/]
+    Extract --> Config[Actualizar themes-config.json]
     Config --> Push[git commit + push]
 
-    Menu -->|2 Descargar| Down[Generar ZIP\ndesde directorio]
+    Menu -->|2 Descargar| Down[Generar ZIP desde directorio]
     Down --> Finder[Abrir en Finder]
 
-    Menu -->|3 Eliminar| Del["Eliminar\npublic/themes/id/"]
-    Del --> Config2[Actualizar\nthemes-config.json]
+    Menu -->|3 Eliminar| Del[Eliminar public/themes/id/]
+    Del --> Config2[Actualizar themes-config.json]
     Config2 --> Push2[git commit + push]
 
-    Push --> GH([GitHub Pages\n1-2 min])
+    Push --> GH([GitHub Pages en 1-2 min])
     Push2 --> GH
 ```
 

@@ -24,14 +24,14 @@ No hay servidor backend. El documento que subes nunca sale de la pestaña del na
 
 ```mermaid
 flowchart TD
-    DOCX([DOCX]) --> Parser["DocxParser\n(Mammoth.js)"]
+    DOCX([DOCX]) --> Parser[DocxParser / Mammoth.js]
     Parser --> HTML[HTML intermedio]
     HTML --> Struct[parseDocumentStructure]
     HTML --> Builder[SemanticBuilder]
     Struct --> Builder
-    Builder --> SemDoc(["SemanticDocument\n― núcleo agnóstico ―"])
-    SemDoc --> ELPX["ElpxRenderer\n→ .elpx"]
-    SemDoc --> PDF["PrintHtmlRenderer\n→ PDF (Paged.js)"]
+    Builder --> SemDoc([SemanticDocument])
+    SemDoc --> ELPX[ElpxRenderer / .elpx]
+    SemDoc --> PDF[PrintHtmlRenderer / PDF]
 ```
 
 El **SemanticDocument** es el modelo central. Describe el documento como páginas y bloques, sin asumir nada sobre el formato final. Los renderers ELPX y PDF son piezas independientes: añadir un nuevo formato (SCORM, EPUB…) es escribir un renderer adicional sin tocar lo demás.
@@ -163,11 +163,11 @@ docs/
 
 ```mermaid
 flowchart LR
-    A([Subir DOCX]) --> B[Parsear\ncon Mammoth]
-    B --> C["Configurar estructura\nH1 · H2 · niveles"]
+    A([Subir DOCX]) --> B[Parsear con Mammoth]
+    B --> C[Configurar estructura]
     C --> D[Seleccionar estilo]
     D --> E[Convertir]
-    E --> F([Descargar\nELPX · PDF])
+    E --> F([Descargar ELPX / PDF])
 ```
 
 | Paso | Descripción |
@@ -220,11 +220,11 @@ Los colores, etiquetas (multilingües) y estilos vienen del CSS del tema activo.
 
 ```mermaid
 flowchart TD
-    subgraph Oficiales["Estilos oficiales (todos los usuarios)"]
-        Repo["public/themes/id/\n(en git)"] -->|pack-themes| ZIP["id.zip\n(generado, no en git)"]
+    subgraph Oficiales[Estilos oficiales - todos los usuarios]
+        Repo[public/themes/id/ - en git] -->|pack-themes| ZIP[id.zip - generado]
         ZIP -->|fetch al arrancar| BIP[BuiltInThemeProvider]
     end
-    subgraph Locales["Estilos locales (solo este navegador)"]
+    subgraph Locales[Estilos locales - solo este navegador]
         Upload[ZIP subido por el usuario] --> IDB[IndexedDB]
         IDB --> UTP[UserThemeProvider]
     end
