@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Licencia — BUA ConvertidoreXe</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--blue);
+        margin: 0 0 .35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 .5rem; }
+      h2 {
+        font-size: 1.1rem;
+        margin: 2rem 0 .8rem;
+        padding-bottom: .3rem;
+        border-bottom: 2px solid var(--border);
+      }
+      p { font-size: .95rem; margin: 0 0 .8rem; }
+      ul { font-size: .95rem; padding-left: 1.4rem; margin: 0 0 1rem; }
+      li { margin-bottom: .4rem; }
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: #fff8e8;
+        padding: .8rem 1rem;
+        border-radius: 0 6px 6px 0;
+        font-size: .92rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .callout--info {
+        border-left-color: var(--blue);
+        background: var(--blue-soft);
+      }
+      .permit-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .permit-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: .9rem 1rem;
+      }
+      .permit-card h3 {
+        font-size: .82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin: 0 0 .6rem;
+      }
+      .permit-card.green h3 { color: #1a7f4b; }
+      .permit-card.red h3 { color: #b91c1c; }
+      .permit-card ul { margin: 0; padding-left: 1.1rem; font-size: .88rem; }
+      .permit-card li { margin-bottom: .25rem; }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: .82rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        line-height: 1.5;
+        color: var(--text);
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: .82rem;
+        color: var(--text-soft);
+      }
+      a { color: var(--blue); }
+      @media (max-width: 540px) {
+        .permit-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <p class="eyebrow">Licencia de uso</p>
+        <h1>GNU General Public License v3.0</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          BUA ConvertidoreXe es software libre distribuido bajo los términos de la GNU GPL v3.
+        </p>
+      </header>
+
+      <div class="callout callout--info">
+        <strong>Resumen:</strong> puedes usar, copiar, modificar y distribuir este software
+        libremente, siempre que mantengas la misma licencia en los trabajos derivados
+        y atribuyas la autoría original.
+      </div>
+
+      <h2>¿Qué permite y qué prohíbe?</h2>
+
+      <div class="permit-grid">
+        <div class="permit-card green">
+          <h3>✓ Permitido</h3>
+          <ul>
+            <li>Usar el software para cualquier fin</li>
+            <li>Estudiar y modificar el código fuente</li>
+            <li>Distribuir copias del original</li>
+            <li>Distribuir versiones modificadas</li>
+            <li>Uso comercial</li>
+            <li>Uso privado</li>
+          </ul>
+        </div>
+        <div class="permit-card red">
+          <h3>✗ Condiciones</h3>
+          <ul>
+            <li>Las obras derivadas deben usar la misma licencia (GPL v3)</li>
+            <li>Debe incluirse el aviso de copyright original</li>
+            <li>Debe incluirse el texto de la licencia</li>
+            <li>Los cambios al código fuente deben documentarse</li>
+            <li>No se puede sublicenciar</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>Copyright</h2>
+      <pre>Copyright (C) 2024  Biblioteca Universitaria de la Universidad de Alicante
+Repositorio: https://github.com/MarioFlorido/BUA-convertidor-exe
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.</pre>
+
+      <h2>Texto completo</h2>
+      <p>
+        El texto íntegro de la GNU GPL v3.0 está disponible en:
+        <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">
+          gnu.org/licenses/gpl-3.0.html
+        </a>
+      </p>
+
+      <footer>
+        BUA ConvertidoreXe ·
+        <a href="README.html">Léeme</a> ·
+        <a href="https://github.com/MarioFlorido/BUA-convertidor-exe" target="_blank" rel="noopener noreferrer">Repositorio</a>
+      </footer>
+
+    </div>
+  </body>
+</html>

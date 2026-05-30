@@ -89,8 +89,12 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
 
       <div className="upload-disclaimer">
         <p>
-          <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">
+          <a href={`${import.meta.env.BASE_URL}docs/licencia.html`} target="_blank" rel="noopener noreferrer">
             GNU GPL v3.0
+          </a>
+          {' · '}
+          <a href={`${import.meta.env.BASE_URL}docs/arquitectura.html`} target="_blank" rel="noopener noreferrer">
+            Arquitectura
           </a>
           {' · '}
           <a href={`${import.meta.env.BASE_URL}docs/README.html`} target="_blank" rel="noopener noreferrer">

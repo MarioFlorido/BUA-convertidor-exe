@@ -325,11 +325,6 @@ export function App() {
           </a>
         </div>
         <span className="footer-copy">Biblioteca Universitaria · ConvertidoreXe v0.2.0</span>
-        <nav className="footer-docs" aria-label="Documentación">
-          <a href={`${import.meta.env.BASE_URL}docs/README.html`} target="_blank" rel="noopener noreferrer">Léeme</a>
-          <span aria-hidden="true">·</span>
-          <a href={`${import.meta.env.BASE_URL}docs/arquitectura.html`} target="_blank" rel="noopener noreferrer">Arquitectura</a>
-        </nav>
       </footer>
     </div>
   );
