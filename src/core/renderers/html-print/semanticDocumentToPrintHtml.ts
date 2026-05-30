@@ -146,7 +146,7 @@ function renderSection(page: SemanticPage, idx: number): string {
   const sectionClass = `section-level-${page.level}`;
 
   return `<section id="${id}" class="${sectionClass}">
-  <h${page.level} class="${titleClass}">${escHtml(page.title)}</h${page.level}>
+  <h${page.level} class="${titleClass}">${escHtml(page.title.toUpperCase())}</h${page.level}>
   ${blocksHtml}
 </section>`;
 }
@@ -162,17 +162,25 @@ function renderBlock(block: SemanticBlock): string {
 
   if (isDefaultTitle) {
     // Bloque sin título de iDevice: sólo contenido
+    const htmlUpperH2 = expandAccordions(block.html).replace(
+      /<h2([^>]*)>([^<]*)<\/h2>/gi,
+      (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
+    );
     return `<div class="content-block">
-  <div class="block-html">${expandAccordions(block.html)}</div>
+  <div class="block-html">${htmlUpperH2}</div>
 </div>`;
   }
 
   // iDevice con título: cabecera coloreada + borde perimetral (igual que en eXeLearning)
+  const blockHtmlUpperH2 = expandAccordions(block.html).replace(
+    /<h2([^>]*)>([^<]*)<\/h2>/gi,
+    (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
+  );
   return `<div class="content-block idevice-with-title">
   <header class="idevice-header">
-    <h4 class="idevice-title">${escHtml(block.title)}</h4>
+    <h4 class="idevice-title">${escHtml(block.title.toUpperCase())}</h4>
   </header>
-  <div class="block-html">${expandAccordions(block.html)}</div>
+  <div class="block-html">${blockHtmlUpperH2}</div>
 </div>`;
 }
 

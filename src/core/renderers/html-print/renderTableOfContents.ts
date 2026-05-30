@@ -73,7 +73,7 @@ function buildTocEntries(pages: SemanticPage[]): TocEntry[] {
 
 function renderTocItem(entry: TocEntry): string {
   return `<li class="toc-entry toc-level-${entry.level}">
-        <a href="#${entry.id}">${escHtml(entry.title)}</a>
+        <a href="#${entry.id}">${escHtml(entry.title.toUpperCase())}</a>
       </li>`;
 }
 
