@@ -109,7 +109,7 @@ ${navStructuresXml}</odeNavStructures>
   private generateOdeNavStructureXml(page: ImportedPage, order: number, pageIds: string[]): string {
     const pageId = pageIds[order];
     const parentPageId = page.parentIndex === null ? '' : pageIds[page.parentIndex] || '';
-    const title = page.title || `Página ${order + 1}`;
+    const title = (page.title || `Página ${order + 1}`).toUpperCase();
     const blocksXml = page.blocks
       .map((block, index) => this.generateOdePagStructureXml(block, pageId, index))
       .join('');
@@ -144,8 +144,12 @@ ${blocksXml}  </odePagStructures>
   private generateOdePagStructureXml(block: ImportedBlock, pageId: string, order: number): string {
     const blockId = createBlockId();
     const ideviceId = createIdeviceId();
-    const blockName = block.title;
-    const html = block.html || '<p></p>';
+    const blockName = block.title ? block.title.toUpperCase() : '';
+    const rawHtml = (block.html || '<p></p>').replace(
+      /<h2([^>]*)>([^<]*)<\/h2>/gi,
+      (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
+    );
+    const html = rawHtml;
     const wrappedHtml = `<div class="exe-text-template">\n${html}\n</div>`;
     const jsonProperties = JSON.stringify({
       ideviceId,

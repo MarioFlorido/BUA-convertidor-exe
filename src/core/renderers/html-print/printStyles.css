@@ -297,6 +297,7 @@
   border-bottom: 3px solid;
   bookmark-level: 1;
   bookmark-label: content();
+  text-transform: uppercase;
 }
 
 .section-title-2 {
@@ -307,6 +308,7 @@
   border-bottom: none;
   bookmark-level: 2;
   bookmark-label: content();
+  text-transform: uppercase;
 }
 
 .section-title-2::after,
@@ -329,6 +331,7 @@
   margin: 20px 0 4px 0;
   padding-bottom: 0;
   border-bottom: none;
+  text-transform: uppercase;
 }
 
 .section-title-3 {
@@ -381,6 +384,7 @@
   font-weight: 700;
   color: #fff;
   margin: 0;
+  text-transform: uppercase;
 }
 
 .idevice-with-title > .block-html {
