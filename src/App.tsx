@@ -108,7 +108,6 @@ export function App() {
 
   const handleStepClick = (step: 2 | 3) => {
     if (isProcessing) return;
-    setState({ status: 'idle' });
     if (step === 2 && structure) setScreen('structure');
     if (step === 3 && structure) setScreen('theme');
   };
