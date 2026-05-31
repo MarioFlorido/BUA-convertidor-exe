@@ -11,7 +11,12 @@ interface ThemeSelectorProps {
 export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
   // Leer del registry en cada montaje para recoger temas añadidos desde ThemeManager
   const availableThemes = ThemeOrderService.applyOrder(ThemeRegistry.getAll());
-  const [selectedThemeId, setSelectedThemeId] = useState<string>('base');
+  const [selectedThemeId, setSelectedThemeId] = useState<string>(() => {
+    const saved = localStorage.getItem('bua-last-theme');
+    // Verificar que el estilo guardado sigue existiendo en el registry
+    if (saved && ThemeRegistry.get(saved)) return saved;
+    return 'base';
+  });
 
   return (
     <div className="theme-selector">

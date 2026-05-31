@@ -97,12 +97,20 @@ export function App() {
 
   // NOTA: selectedThemeId se pasa directamente para evitar leer el estado stale.
   const handleThemeConfirm = (selectedThemeId: string) => {
+    localStorage.setItem('bua-last-theme', selectedThemeId);
     setOptions((prev) => ({ ...prev, themeId: selectedThemeId }));
     handleConvert(selectedThemeId);
   };
 
   const handleThemeCancel = () => {
     setScreen('structure');
+  };
+
+  const handleStepClick = (step: 2 | 3) => {
+    if (isProcessing) return;
+    setState({ status: 'idle' });
+    if (step === 2 && structure) setScreen('structure');
+    if (step === 3 && structure) setScreen('theme');
   };
 
   const handleConvert = async (themeIdOverride?: string) => {
@@ -161,7 +169,13 @@ export function App() {
       {/* Barra de pasos — solo en el flujo principal */}
       {screen !== 'theme-manager' && (
         <div className="step-bar">
-          <StepIndicator currentStep={isProcessing ? 3 : currentStep} />
+          <StepIndicator
+            currentStep={isProcessing ? 3 : currentStep}
+            onStepClick={!isProcessing ? handleStepClick : undefined}
+          />
+          {file && screen !== 'upload' && (
+            <p className="step-bar-file">{file.name}</p>
+          )}
         </div>
       )}
 

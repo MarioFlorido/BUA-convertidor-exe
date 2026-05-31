@@ -179,9 +179,21 @@ button {
 .step-bar {
   background: var(--surface);
   border-bottom: 1px solid var(--border-light);
-  padding: 0.625rem 2rem;
+  padding: 0.625rem 2rem 0.5rem;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.step-bar-file {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  margin: 0;
+  max-width: 480px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .step-indicator {
@@ -244,6 +256,24 @@ button {
 
 .step-label--done {
   color: var(--text-2);
+}
+
+.step-circle.step-clickable {
+  cursor: pointer;
+}
+
+.step-circle.step-clickable:hover {
+  background: var(--blue-hover, #0e4f76);
+  border-color: var(--blue-hover, #0e4f76);
+  transform: scale(1.1);
+}
+
+.step-label--clickable {
+  cursor: pointer;
+}
+
+.step-label--clickable:hover {
+  color: var(--blue);
 }
 
 .step-connector {
