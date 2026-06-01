@@ -1,6 +1,7 @@
 import type { ImportedProject } from './models/SemanticDocument';
 import { SemanticBuilder } from './builders/SemanticBuilder';
 import type { DocumentStructure } from '../types';
+import { normalizeText } from './utils/html';
 
 // Re-exportar funciones de transformación HTML
 export { applyDivClasses, applyTableClasses } from './transformers/HtmlTransformer';
@@ -56,7 +57,7 @@ export function buildProjectFromStructure(
 
       sections.push({
         level,
-        text: text.trim(),
+        text: normalizeText(text),
         html: '',
       });
 

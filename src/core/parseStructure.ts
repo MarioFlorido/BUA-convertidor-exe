@@ -1,4 +1,5 @@
 import type { DocumentStructure, H1Section, H2Item } from '../types';
+import { normalizeText } from './utils/html';
 
 export async function parseDocumentStructure(htmlContent: string): Promise<DocumentStructure> {
   const document = new DOMParser().parseFromString(
@@ -56,8 +57,4 @@ export async function parseDocumentStructure(htmlContent: string): Promise<Docum
   }
 
   return { h1Sections };
-}
-
-function normalizeText(text: string): string {
-  return text.replace(/\s+/g, ' ').trim();
 }
