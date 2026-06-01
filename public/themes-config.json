@@ -39,6 +39,38 @@
       "language": "en",
       "description": "",
       "screenshot": null
+    },
+    {
+      "id": "Doctorat_26-27",
+      "name": "Doctorat 26-27",
+      "activity": "",
+      "language": "ca",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "PhD_26-27",
+      "name": "PhD 26-27",
+      "activity": "",
+      "language": "en",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "Ciencia_abierta_26-27",
+      "name": "Ciencia abierta 26-27",
+      "activity": "",
+      "language": "es",
+      "description": "",
+      "screenshot": null
+    },
+    {
+      "id": "Ciencia_oberta_26-27",
+      "name": "Ciencia oberta 26-27",
+      "activity": "",
+      "language": "ca",
+      "description": "",
+      "screenshot": null
     }
   ]
 }
