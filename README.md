@@ -166,4 +166,5 @@ Lo que está hecho:
 ---
 
 **Documentación técnica:** [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)  
+**Comparación con eXeConvert:** [public/docs/comparacion.html](public/docs/comparacion.html)  
 **Repositorio:** https://github.com/MarioFlorido/BUA-convertidor-exe

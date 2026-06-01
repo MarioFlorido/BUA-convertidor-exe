@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comparación: eXeConvert vs ConvertidoreXe</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --mostaza-soft: #fff8e8;
+        --green: #1a7f4b;
+        --green-soft: #e6f4ec;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+        --white: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+
+      .doc-header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        color: var(--blue);
+        margin: 0 0 .4rem;
+      }
+      h1 { font-size: 2rem; margin: 0 0 .5rem; line-height: 1.2; }
+      .subtitle { color: var(--text-soft); margin: 0; font-size: .95rem; }
+
+      h2 {
+        font-size: 1.25rem;
+        margin: 2.75rem 0 .9rem;
+        padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 1.6rem 0 .5rem;
+        color: var(--text);
+      }
+      h3::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 14px;
+        background: var(--mostaza);
+        border-radius: 2px;
+        margin-right: .5rem;
+        vertical-align: -2px;
+      }
+      p { font-size: .95rem; margin: 0 0 .85rem; }
+      ul, ol { font-size: .95rem; padding-left: 1.5rem; margin: 0 0 1rem; }
+      li { margin-bottom: .35rem; }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: .75rem 0 1.25rem;
+        font-size: .9rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: .55rem .8rem;
+        text-align: left;
+      }
+      th { background: var(--blue-soft); font-weight: 600; }
+
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: var(--mostaza-soft);
+        padding: .8rem 1rem;
+        border-radius: 0 6px 6px 0;
+        font-size: .9rem;
+        margin: .75rem 0 1.25rem;
+      }
+      .callout--green {
+        border-left-color: var(--green);
+        background: var(--green-soft);
+      }
+
+      hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--border);
+        font-size: .82rem;
+        color: var(--text-soft);
+      }
+      footer a { color: var(--blue); text-decoration: none; }
+      footer a:hover { text-decoration: underline; }
+
+      a { color: var(--blue); }
+
+      strong { font-weight: 600; }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+
+      <header class="doc-header">
+        <p class="eyebrow">Contexto y referencias</p>
+        <h1>ConvertidoreXe vs eXeConvert</h1>
+        <p class="subtitle">
+          Cómo nace ConvertidoreXe a partir de eXeConvert y por qué tomó caminos distintos.
+        </p>
+      </header>
+
+      <h2>Agradecimientos a Juanjo de Haro</h2>
+
+      <p>
+        ConvertidoreXe no existiría sin <strong>Juanjo de Haro</strong> y su trabajo en <strong>eXeConvert</strong>.
+      </p>
+
+      <p>
+        eXeConvert hizo algo que parecía imposible: convertir documentos Word a formato eXeLearning sin instalar nada, sin servidores, sin complicaciones. Todo en el navegador, arquitectura limpia client-side. Esa idea fue el punto de partida de ConvertidoreXe.
+      </p>
+
+      <p>
+        El código de eXeConvert es abierto y está bien pensado. Estudiando cómo resolvía el problema DOCX → ELPX es lo que motivó este proyecto. La deuda con eXeConvert es real.
+      </p>
+
+      <p>
+        ConvertidoreXe es un desarrollo independiente para las necesidades específicas de la Biblioteca Universitaria de la Universidad de Alicante. Tiene una arquitectura interna diferente porque nace de problemas distintos, pero sigue la misma filosofía: convertir en el navegador, sin servidor.
+      </p>
+
+      <hr>
+
+      <h2>Las diferencias</h2>
+
+      <h3>Alcance y formatos</h3>
+      <p>
+        <strong>eXeConvert</strong> es agnóstica. Convierte en múltiples direcciones: DOCX → ELPX, ELPX → Word, ELP → ELPX, Markdown, PDF. Es herramienta para toda la comunidad eXeLearning, con CLI e instalables de escritorio.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> hace una sola cosa: Word → ELPX y Word → PDF. Nada de conversiones inversas. Los materiales de la Biblioteca salen siempre de Word y necesitan convertirse a recursos eXeLearning con identidad visual institucional.
+      </p>
+
+      <h3>Fórmulas matemáticas</h3>
+      <p>
+        <strong>eXeConvert</strong> las maneja completas. Convierte OMML (Office Math Markup Language) a LaTeX, renderiza a MathML y SVG.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> no toca matemáticas. Los materiales de la Biblioteca no las tienen, así que decidimos no complicarnos.
+      </p>
+
+      <h3>Control sobre la estructura</h3>
+      <p>
+        <strong>eXeConvert</strong> divide el documento automáticamente. Lee la jerarquía de encabezados y genera páginas sin intervención.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> ofrece un paso intermedio: configuración. Antes de convertir, defines qué hace cada nivel de encabezado. Uno puede ser página principal, otro subpágina, otro iDevice. Acordeones, pestañas, todo sin tocar el Word original. Además, puedes etiquetar elementos con corchetes para aplicar efectos semánticos: [Definición], [Importante], [Ejemplo].
+      </p>
+
+      <h3>Sistema de temas</h3>
+      <p>
+        <strong>eXeConvert</strong> genera ELPX con el tema por defecto de eXeLearning. La personalización visual corre por tu cuenta.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> viene con temas institucionales en ZIP. El ELPX que genera ya incluye el tema seleccionado (Doctorado, CID, Ciencia Abierta, etc.). CSS, tipografías, iconos, todo. El recurso está listo para publicar.
+      </p>
+
+      <h3>PDF</h3>
+      <p>
+        <strong>eXeConvert</strong> usa pdfmake (navegador) o puppeteer (servidor). Genera un PDF funcional del contenido.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> lo hace directo desde el SemanticDocument con Paged.js y CSS Paged Media. Control editorial mucho mejor. El resultado lleva portada con imagen institucional, logos BUA y UA, índice con numeración automática, cabeceras, pies de página, y parte de los estilos del tema. Es material que puedes entregar o imprimir.
+      </p>
+
+      <h3>Despliegue</h3>
+      <p>
+        <strong>eXeConvert</strong> tiene servidor (Puppeteer) para PDF en Node.js, además de instalables de escritorio.
+      </p>
+      <p>
+        <strong>ConvertidoreXe</strong> no requiere servidor. Se despliega en GitHub Pages. Funciona en cualquier navegador moderno. Nada de instalar.
+      </p>
+
+      <hr>
+
+      <h2>Tabla de comparación</h2>
+
+      <table>
+        <tr>
+          <th>Característica</th>
+          <th>eXeConvert</th>
+          <th>ConvertidoreXe</th>
+        </tr>
+        <tr>
+          <td>Formatos de entrada</td>
+          <td>DOCX, ELPX, ELP, MD</td>
+          <td>DOCX</td>
+        </tr>
+        <tr>
+          <td>Formatos de salida</td>
+          <td>ELPX, DOCX, HTML, PDF</td>
+          <td>ELPX, PDF</td>
+        </tr>
+        <tr>
+          <td>Fórmulas matemáticas</td>
+          <td>Sí</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Configuración de estructura</td>
+          <td>Automática</td>
+          <td>Por el usuario</td>
+        </tr>
+        <tr>
+          <td>Temas / estilos</td>
+          <td>No</td>
+          <td>Sí</td>
+        </tr>
+        <tr>
+          <td>PDF</td>
+          <td>Funcional</td>
+          <td>Con maquetación editorial</td>
+        </tr>
+        <tr>
+          <td>CLI / escritorio</td>
+          <td>Sí</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Despliegue</td>
+          <td>Node.js</td>
+          <td>100% estático (GitHub Pages)</td>
+        </tr>
+      </table>
+
+      <div class="callout callout--green">
+        <p>
+          Juanjo sigue siendo el auténtico gurú de eXeLearning. Gracias por tu código abierto. Gracias por hacerlo bien.
+        </p>
+      </div>
+
+      <hr>
+
+      <footer>
+        <a href="./README.html">← Volver al Léeme</a>
+      </footer>
+
+    </div>
+
+  </body>
+</html>
