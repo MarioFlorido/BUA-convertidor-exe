@@ -127,6 +127,27 @@ export function applyDivClasses(htmlValue: string): string {
  * <table class="bua_tabla_horizontal">...</table>
  */
 export function applyTableClasses(htmlValue: string): string {
+  // Pre-normalización: limpiar anclas vacías y <br/> dentro de [horizontal] y [vertical]
+  // Word puede insertar bookmarks vacíos o saltos de línea dentro de los delimitadores
+  let normalized = htmlValue.replace(
+    /\[([^\]]*?(?:horizontal|vertical)[^\]]*?)\]/gi,
+    (match) => {
+      // Remover anclas vacías
+      let cleaned = match.replace(/<a[^>]*><\/a>/g, '');
+      // Remover <br/> y saltos de línea
+      cleaned = cleaned.replace(/<br\s*\/?>/gi, '');
+      cleaned = cleaned.replace(/\n/g, ' ');
+      return cleaned;
+    },
+  );
+
+  // Pre-normalización 2: remover <br/> contiguo a los delimitadores (después del ])
+  // para que el párrafo quede completamente vacío
+  normalized = normalized.replace(
+    /(\[\s*(?:horizontal|vertical)\s*\])\s*<br\s*\/?>\s*</gi,
+    '$1<',
+  );
+
   const delimiters = [
     {
       // Busca <p>[horizontal]</p> seguido de tabla
@@ -142,7 +163,7 @@ export function applyTableClasses(htmlValue: string): string {
     },
   ];
 
-  let processedHtml = htmlValue;
+  let processedHtml = normalized;
 
   for (const { pattern, class: className, replacement } of delimiters) {
     processedHtml = processedHtml.replace(pattern, (_match, tableTag) => {
