@@ -31,7 +31,6 @@
         line-height: 1.65;
       }
 
-      /* ── Navegación superior ── */
       .top-nav {
         position: sticky;
         top: 0;
@@ -55,14 +54,12 @@
       }
       .top-nav a:hover { color: #fff; border-bottom-color: var(--mostaza); }
 
-      /* ── Contenedor ── */
       .container {
         max-width: 860px;
         margin: 0 auto;
         padding: 2.5rem 1.5rem 4rem;
       }
 
-      /* ── Cabecera ── */
       .doc-header {
         border-bottom: 1px solid var(--border);
         padding-bottom: 1.5rem;
@@ -79,7 +76,6 @@
       h1 { font-size: 2rem; margin: 0 0 .5rem; line-height: 1.2; }
       .subtitle { color: var(--text-soft); margin: 0; font-size: .95rem; }
 
-      /* ── Tipografía ── */
       h2 {
         font-size: 1.25rem;
         margin: 2.75rem 0 .9rem;
@@ -106,7 +102,6 @@
       ul, ol { font-size: .95rem; padding-left: 1.5rem; margin: 0 0 1rem; }
       li { margin-bottom: .35rem; }
 
-      /* ── Código ── */
       code {
         font-family: "SF Mono", Menlo, Consolas, monospace;
         font-size: .85em;
@@ -126,9 +121,8 @@
         line-height: 1.5;
         margin: .5rem 0 1.25rem;
       }
-      pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+      pre code { background: none; border: none; padding: 0; color: inherit; }
 
-      /* ── Tablas ── */
       table {
         width: 100%;
         border-collapse: collapse;
@@ -139,11 +133,9 @@
         border: 1px solid var(--border);
         padding: .55rem .8rem;
         text-align: left;
-        vertical-align: top;
       }
       th { background: var(--blue-soft); font-weight: 600; }
 
-      /* ── Callouts ── */
       .callout {
         border-left: 3px solid var(--mostaza);
         background: var(--mostaza-soft);
@@ -161,7 +153,6 @@
         background: var(--green-soft);
       }
 
-      /* ── Diagrama ── */
       .diagram-wrap {
         background: var(--white);
         border: 1px solid var(--border);
@@ -172,7 +163,6 @@
         text-align: center;
       }
 
-      /* ── Badge de estado ── */
       .badge {
         display: inline-block;
         font-size: .72rem;
@@ -181,24 +171,17 @@
         border-radius: 999px;
         background: var(--green);
         color: #fff;
-        vertical-align: 2px;
         margin-right: .15rem;
       }
 
-      /* ── Separador ── */
       hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
 
-      /* ── Footer ── */
       footer {
         margin-top: 3rem;
         padding-top: 1.25rem;
         border-top: 1px solid var(--border);
         font-size: .82rem;
         color: var(--text-soft);
-        display: flex;
-        flex-wrap: wrap;
-        gap: .4rem .75rem;
-        align-items: center;
       }
       footer a { color: var(--blue); text-decoration: none; }
       footer a:hover { text-decoration: underline; }
@@ -210,12 +193,11 @@
 
     <nav class="top-nav">
       <a href="#que-hace">¿Qué hace?</a>
+      <a href="#flujo">El flujo</a>
       <a href="#arquitectura">Arquitectura</a>
-      <a href="#estilos">Estilos</a>
       <a href="#etiquetas">Etiquetas BUA</a>
+      <a href="#estilos">Estilos</a>
       <a href="#pdf">PDF</a>
-      <a href="#instalacion">Instalación</a>
-      <a href="#comandos">Comandos</a>
       <a href="#problemas">Problemas</a>
     </nav>
 
@@ -223,390 +205,274 @@
 
       <header class="doc-header">
         <p class="eyebrow">Biblioteca Universitaria · Universidad de Alicante</p>
-        <h1>ConvertidoreXe — Léeme</h1>
+        <h1>ConvertidoreXe</h1>
         <p class="subtitle">
-          Convierte documentos Word a proyectos eXeLearning (.elpx) y a PDF con estilo visual personalizable.
-          Todo el procesamiento sucede en el navegador — ningún archivo sale de tu dispositivo.
+          Transforma documentos Word en cursos eXeLearning o PDF con estilos personalizados.
+          Todo sucede en tu navegador — tu contenido nunca abandona tu máquina.
         </p>
       </header>
 
-    <hr>    
       <p>
-        Este proyecto se inspira en el trabajo de
-        <a href="https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe" target="_blank" rel="noopener noreferrer">
-          Juanjo de Haro
-        </a>
-        sobre <strong>HACKeXe</strong>, una herramienta pionera para la edición avanzada
-        de proyectos eXeLearning. Su enfoque sobre la manipulación directa del formato ELPX
-        fue la semilla conceptual de este convertidor.
+        ConvertidoreXe nace de la necesidad real: crear cursos digitales sin tocar XML ni configurar nada en eXeLearning. Preparas tu Word con una estructura clara, subes el archivo, configuras cómo quieres que se estructure, eliges un tema visual, y listo. Tienes tu proyecto .elpx o tu PDF.
       </p>
 
       <p>
-        ConvertidoreXe extiende esa idea hacia un flujo editorial completo: parte de un
-        documento Word con estructura semántica y produce un recurso listo para
-        eXeLearning o un PDF académico, sin necesidad de intervención manual en el XML.
+        El proyecto se inspira en <a href="https://hackexe.tiddlyhost.com/#HACKeXe:HACKeXe" target="_blank">HACKeXe</a>, una herramienta que mostró que era posible trabajar con eXeLearning de forma diferente. ConvertidoreXe va más allá: completa el flujo desde Word hasta PDF, incluyendo un sistema de temas flexible que funciona 100% en tu navegador.
       </p>
 
       <div class="callout">
-        Consulta <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/docs/COMPARISON.md" target="_blank" rel="noopener noreferrer">docs/COMPARISON.md</a>
-        para una comparación detallada entre HACKeXe y ConvertidoreXe.
+        ¿Necesitas más detalles técnicos? Consulta <a href="./arquitectura.html">la documentación de arquitectura</a>.
       </div>
 
+      <hr>
 
       <!-- ── ¿Qué hace? ── -->
       <h2 id="que-hace">¿Qué hace?</h2>
 
       <p>
-        <strong>ConvertidoreXe v0.2.0</strong> es una aplicación web desarrollada por la
-        <a href="https://biblioteca.ua.es/es/" target="_blank" rel="noopener noreferrer">Biblioteca Universitaria de la Universidad de Alicante</a>
-        que transforma un documento Word en un recurso interactivo listo para eXeLearning,
-        o en un PDF estructurado con portada, índice automático, encabezados y pies.
+        En esencia: convierte tu Word en un proyecto interactivo para eXeLearning o en un PDF estructurado con portada, índice automático, encabezados y pies de página.
       </p>
 
+      <h3>El proceso de 5 pasos</h3>
       <ol>
-        <li>Subes un documento Word (.docx).</li>
-        <li>Configuras la jerarquía: qué nivel ocupa cada H1 y qué hace cada H2.</li>
-        <li>Eliges un estilo visual.</li>
-        <li>Descargas el <code>.elpx</code> para abrirlo en eXeLearning.</li>
-        <li>O exportas directamente a PDF con portada, índice, encabezados y pies.</li>
+        <li>Subes tu documento Word</li>
+        <li>Configuras la estructura (qué nivel tiene cada título)</li>
+        <li>Defines qué pasa con los H2 (iDevice, HTML, acordeón o pestañas)</li>
+        <li>Eliges un estilo visual</li>
+        <li>Descargas el .elpx o exportas a PDF</li>
       </ol>
+
+      <p>
+        Si te pierdes, hay un botón "?" en la cabecera con una guía completa integrada en la interfaz.
+      </p>
 
       <div class="diagram-wrap">
         <pre class="mermaid">
 flowchart LR
-    A([Subir DOCX]) --> B[Parsear con Mammoth]
-    B --> C[Configurar estructura]
-    C --> D[Seleccionar estilo]
+    A([Subir DOCX]) --> B[Parseador]
+    B --> C[Configurar]
+    C --> D[Elegir estilo]
     D --> E[Convertir]
-    E --> F([Descargar ELPX / PDF])
+    E --> F([ELPX o PDF])
         </pre>
       </div>
 
       <div class="callout callout--info">
-        <strong>Privacidad:</strong> no hay servidor backend. El documento que subes nunca sale de la pestaña del navegador.
+        <strong>Privacidad:</strong> Sin servidores, sin análisis, sin nubes. Tu documento nunca sale de tu navegador.
       </div>
 
       <hr>
 
+      <!-- ── El flujo ── -->
+      <h2 id="flujo">El flujo: Word → Documento semántico → Dos salidas</h2>
+
+      <p>
+        Internamente, ConvertidoreXe convierte tu Word en un "documento semántico" — una estructura que describe qué es cada parte del documento sin asumir un formato específico. Desde ahí, puede generar .elpx o PDF de forma independiente.
+      </p>
+
+      <p>
+        Esto significa que si mañana quieres SCORM o EPUB, se añade sin tocar el núcleo. La arquitectura está pensada para crecer.
+      </p>
+
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    DOCX([Word]) --> Parser["Parser<br/>(Mammoth)"]
+    Parser --> HTML["HTML<br/>intermedio"]
+    HTML --> Struct["Estructura<br/>H1/H2/H3/H4"]
+    HTML --> Builder["Constructores<br/>semánticos"]
+    Struct --> Builder
+    Builder --> SemDoc["Documento<br/>semántico"]
+    SemDoc --> ELPX[".elpx<br/>(eXeLearning)"]
+    SemDoc --> PDF["PDF<br/>(Paged.js)"]
+        </pre>
+      </div>
+
+      <p>
+        El documento semántico contiene las páginas y bloques de contenido. Los renderers (el que genera .elpx y el que genera PDF) son completamente independientes. Uno no sabe del otro.
+      </p>
+
+      <hr>
 
       <!-- ── Arquitectura ── -->
-      <h2 id="arquitectura">Arquitectura: pipeline de tres capas</h2>
+      <h2 id="arquitectura">Arquitectura</h2>
 
       <p>
-        El <strong>SemanticDocument</strong> es el núcleo del sistema: un modelo
-        agnóstico al formato de salida que describe el documento como páginas y
-        bloques semánticos. Los renderers ELPX y PDF son completamente independientes
-        entre sí — añadir un nuevo formato (SCORM, EPUB…) es escribir un renderer
-        adicional sin tocar lo demás.
+        Si quieres saber cómo funciona por dentro, ConvertidoreXe está organizado en capas:
       </p>
 
-      <div class="diagram-wrap">
-        <pre class="mermaid">
-flowchart TD
-    DOCX([DOCX]) --> Parser[DocxParser / Mammoth.js]
-    Parser --> HTML[HTML intermedio]
-    HTML --> Struct[parseDocumentStructure]
-    HTML --> Builder[SemanticBuilder]
-    Struct --> Builder
-    Builder --> SemDoc([SemanticDocument])
-    SemDoc --> ELPX[ElpxRenderer / .elpx]
-    SemDoc --> PDF[PrintHtmlRenderer / PDF]
-        </pre>
-      </div>
+      <h3>Capa 1: Parseo</h3>
+      <p>Tu Word entra, Mammoth.js lo convierte a HTML, y un parseador extrae la estructura de encabezados.</p>
 
-      <h3>Modelo SemanticDocument</h3>
-      <pre><code>SemanticDocument
-├── title: string
-├── subtitle: string
-└── pages: SemanticPage[]
-        ├── title: string
-        ├── level: 1 | 2 | 3 | 4
-        ├── parentIndex: number | null
-        └── blocks: SemanticBlock[]
-                ├── title: string   // '' = bloque sin título iDevice
-                └── html: string</code></pre>
+      <h3>Capa 2: Construcción semántica</h3>
+      <p>Los encabezados se convierten en un árbol jerárquico (páginas y niveles). El contenido HTML se enriquece con las etiquetas BUA que tengas marcadas ([importante], [ejemplo], [definición]).</p>
 
-      <h3>Estructura del proyecto</h3>
-      <pre><code>src/
-├── App.tsx                        # Orquestador del wizard
-├── core/
-│   ├── parsers/DocxParser.ts      # DOCX → HTML (Mammoth)
-│   ├── parseStructure.ts          # HTML → árbol H1/H2/H3/H4
-│   ├── builders/SemanticBuilder.ts
-│   ├── docxToSemanticDocument.ts  # Orquestador Capa 1
-│   ├── converters/
-│   │   └── semanticDocumentToElpx.ts
-│   ├── renderers/
-│   │   ├── ElpxRenderer.ts        # Genera content.xml del .elpx
-│   │   └── html-print/            # Renderer PDF (Paged.js)
-│   └── services/                  # Sistema de estilos client-side
-scripts/
-├── themes.ts                      # Gestión interactiva de estilos
-├── pack-themes.ts                 # Genera ZIPs en build time
-├── publish-theme.ts               # Publica un ZIP de estilo
-└── unpublish-theme.ts             # Retira un estilo oficial
-public/
-├── base.elpx                      # Plantilla base (no borrable)
-├── themes-config.json             # Catálogo de estilos oficiales
-└── themes/                        # Carpetas de estilos (fuente de verdad)</code></pre>
+      <h3>Capa 3: Renderizado</h3>
+      <p>El documento semántico se envía a dos renderers independientes: uno genera .elpx (ZIP con XML), otro genera HTML/PDF con Paged.js.</p>
 
-      <hr>
-
-
-      <!-- ── Sistema de estilos ── -->
-      <h2 id="estilos">Sistema de estilos</h2>
-
+      <h3>Sistema de estilos</h3>
       <p>
-        Los estilos son plugins ZIP cargados en runtime, sin backend.
-        Dos fuentes convergen en el <strong>ThemeRegistry</strong>, la fuente de
-        verdad única de la aplicación.
+        Los estilos viven en tu IndexedDB (el usuario puede subir los suyos) o en GitHub (los oficiales). Cada estilo es un ZIP con CSS, metadatos, logos y opcionalmente JavaScript. ConvertidoreXe los carga, valida y aplica sin servidor.
       </p>
 
-      <div class="diagram-wrap">
-        <pre class="mermaid">
-flowchart TD
-    subgraph Oficiales[Estilos oficiales - todos los usuarios]
-        Repo[public/themes/id/ - en git] -->|pack-themes| ZIP[id.zip - generado]
-        ZIP -->|fetch al arrancar| BIP[BuiltInThemeProvider]
-    end
-    subgraph Locales[Estilos locales - solo este navegador]
-        Upload[ZIP subido por el usuario] --> IDB[IndexedDB]
-        IDB --> UTP[UserThemeProvider]
-    end
-    BIP --> Reg[ThemeRegistry]
-    UTP --> Reg
-    Reg --> Sel[Selector de estilos]
-        </pre>
-      </div>
-
-      <h3>Secuencia de arranque</h3>
-      <div class="diagram-wrap">
-        <pre class="mermaid">
-sequenceDiagram
-    participant App
-    participant ThemeBoot
-    participant BuiltIn as BuiltInThemeProvider
-    participant User as UserThemeProvider
-    participant Registry as ThemeRegistry
-
-    App->>ThemeBoot: bootThemeSystem()
-    ThemeBoot->>User: init() IndexedDB
-    ThemeBoot->>BuiltIn: loadAll()
-    BuiltIn-->>Registry: register(estilos oficiales)
-    ThemeBoot->>User: loadAll()
-    User-->>Registry: register(estilos locales)
-    ThemeBoot-->>App: activeThemeId, themeCount
-        </pre>
-      </div>
-
-      <table>
-        <thead><tr><th>Tipo</th><th>Vive en</th><th>Visible para</th><th>Gestión</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>Base</strong> (fijo)</td>
-            <td><code>public/base.elpx</code></td>
-            <td>Todos los usuarios</td>
-            <td>Inmutable, no borrable</td>
-          </tr>
-          <tr>
-            <td><strong>Oficiales</strong></td>
-            <td><code>public/themes/&lt;id&gt;/</code> + <code>themes-config.json</code></td>
-            <td>Todos los usuarios</td>
-            <td><code>npm run themes</code></td>
-          </tr>
-          <tr>
-            <td><strong>Locales</strong></td>
-            <td>IndexedDB del navegador</td>
-            <td>Solo ese usuario</td>
-            <td>UI «Importar estilo local»</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Estructura de un ZIP de estilo</h3>
-      <pre><code>{EstiloId}.zip/
-├── style.css          # REQUERIDO — paleta, clases BUA
-├── config.xml         # REQUERIDO — metadatos (&lt;language&gt;es|ca|en&lt;/language&gt;)
-├── style.js           # Opcional
-├── screenshots.png    # Miniatura del selector (recomendado 1200×500 px)
-├── portada_pdf.png    # Imagen A4 para portada PDF (opcional)
-└── img/
-    ├── logo_BUA.png   # Encabezado PDF
-    ├── logo_UA.png    # Pie de página PDF
-    └── logo_CID.png   # Opcional</code></pre>
-
       <hr>
-
 
       <!-- ── Etiquetas BUA ── -->
       <h2 id="etiquetas">Etiquetas semánticas BUA</h2>
 
-      <p>Dentro del documento Word puedes marcar cajas semánticas con corchetes:</p>
+      <p>
+        Dentro de tu Word puedes marcar bloques especiales que ConvertidoreXe interpretará y estilizará según el tema elegido.
+      </p>
 
-      <pre><code>[importante]
-Contenido del bloque importante.
-[fin]
-
-[ejemplo]
-Texto del ejemplo.
-[fin]
-
-[definición]
-Texto de la definición.
-[fin]</code></pre>
-
-      <p>Y clases aplicadas a la tabla siguiente:</p>
-      <pre><code>[horizontal]   →  tabla horizontal estilizada
-[vertical]     →  tabla vertical estilizada</code></pre>
-
-      <p>La detección es robusta frente a las particularidades de Word:</p>
+      <h3>Cajas semánticas</h3>
+      <p>Rodea con [etiqueta] y [fin]:</p>
       <ul>
-        <li>Case-insensitive: <code>[IMPORTANTE]</code>, <code>[Importante]</code>, <code>[importante]</code></li>
-        <li>Tildes: <code>[definición]</code> ≡ <code>[definicion]</code></li>
-        <li>Bookmarks invisibles de Word (<code>&lt;a&gt;&lt;/a&gt;</code>) dentro de los corchetes — se limpian automáticamente</li>
-        <li><code>[horizontal]</code> y <code>[vertical]</code> entre dos cajas no rompen la detección de la siguiente</li>
-        <li>Saltos de línea (Shift+Enter) junto a marcadores se normalizan a saltos de párrafo</li>
+        <li><code>[importante]</code> — Para destacados, avisos, alertas</li>
+        <li><code>[ejemplo]</code> — Para casos prácticos, demostraciones</li>
+        <li><code>[definición]</code> — Para conceptos, términos clave</li>
+      </ul>
+
+      <p>No importan mayúsculas ni tildes. Word puede meter bookmarks invisibles dentro de los corchetes — ConvertidoreXe limpia eso automáticamente.</p>
+
+      <h3>Tablas</h3>
+      <p>Marca la línea anterior a la tabla:</p>
+      <ul>
+        <li><code>[horizontal]</code> → Tabla con encabezados en la primera fila</li>
+        <li><code>[vertical]</code> → Tabla con encabezados en la primera columna</li>
       </ul>
 
       <hr>
 
+      <!-- ── Estilos ── -->
+      <h2 id="estilos">Estilos (temas)</h2>
+
+      <h3>Dos tipos</h3>
+      <p><strong>Oficiales:</strong> Los que ves todos, están en el servidor, aparecen para cualquiera.</p>
+      <p><strong>Locales:</strong> Los que subes tú. Se guardan en tu navegador (IndexedDB), solo los ves tú.</p>
+
+      <h3>Cargar un estilo local</h3>
+      <p>Pulsa "Importar estilo local" en la cabecera. Arrastra el ZIP o abre el selector. Listo — está disponible en el selector de estilos del wizard.</p>
+
+      <h3>Estructura de un ZIP de estilo</h3>
+      <pre><code>tu-estilo.zip/
+├── style.css          (obligatorio)
+├── config.xml         (obligatorio — metadatos, idioma)
+├── screenshot.png     (recomendado — miniatura)
+├── portada_pdf.png    (opcional — para portadas PDF)
+├── style.js           (opcional — lógica interactiva)
+└── img/
+    ├── logo_BUA.png
+    ├── logo_UA.png
+    └── logo_CID.png</code></pre>
+
+      <p>
+        El <code>style.css</code> debe incluir clases para las cajas semánticas:
+        <code>.bua_importante</code>, <code>.bua_ejemplo</code>, <code>.bua_definicion</code>.
+      </p>
+
+      <hr>
 
       <!-- ── PDF ── -->
       <h2 id="pdf">El PDF generado</h2>
 
+      <p>Cuando exportas a PDF, ConvertidoreXe añade estructura automáticamente:</p>
+
       <table>
-        <thead><tr><th>Elemento</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><strong>Portada</strong></td><td>Imagen del estilo + logo BUA + título + año + licencia CC (switch en la UI, off por defecto)</td></tr>
-          <tr><td><strong>Índice</strong></td><td>TOC paginado automáticamente vía <code>target-counter()</code> de Paged.js</td></tr>
-          <tr><td><strong>Encabezado</strong></td><td>Logo BUA (izquierda) + título del documento (derecha) en cada página de contenido</td></tr>
-          <tr><td><strong>Pie de página</strong></td><td>Logo UA (izquierda) + número de página (centro)</td></tr>
-          <tr><td><strong>Cajas BUA</strong></td><td>Colores y etiquetas extraídos del CSS del estilo activo</td></tr>
-          <tr><td><strong>Acordeones/Pestañas</strong></td><td>Expandidos en impresión, sin solapamiento</td></tr>
-          <tr><td><strong>Títulos</strong></td><td>H1 y H2 en mayúsculas (índice, secciones e iDevices)</td></tr>
-        </tbody>
+        <tr>
+          <th>Elemento</th>
+          <th>Qué hace</th>
+        </tr>
+        <tr>
+          <td>Portada</td>
+          <td>Opcional (desactivada por defecto). Logo BUA, título, año, licencia</td>
+        </tr>
+        <tr>
+          <td>Índice</td>
+          <td>Automático, paginado con Paged.js</td>
+        </tr>
+        <tr>
+          <td>Encabezado</td>
+          <td>Logo BUA a la izquierda, título del documento a la derecha</td>
+        </tr>
+        <tr>
+          <td>Pie de página</td>
+          <td>Logo UA a la izquierda, número de página en el centro</td>
+        </tr>
+        <tr>
+          <td>Cajas semánticas</td>
+          <td>Con colores y etiquetas del estilo elegido</td>
+        </tr>
+        <tr>
+          <td>Tablas</td>
+          <td>Encabezado coloreado según el estilo</td>
+        </tr>
+        <tr>
+          <td>Imágenes</td>
+          <td>Centradas con sombra sutil</td>
+        </tr>
+        <tr>
+          <td>Acordeones/Pestañas</td>
+          <td>Expandidas (sin solapamientos en impresión)</td>
+        </tr>
       </table>
 
-      <h3>Detección de idioma del estilo (3 capas)</h3>
-      <ol>
-        <li>Etiquetas BUA en CSS: <code>"Exemple"</code> → CA · <code>"Example"</code> → EN · <code>"Ejemplo"</code> → ES</li>
-        <li>Palabras clave del ID: <code>PhD</code> → EN · <code>Doctorat</code> / <code>Grau</code> → CA</li>
-        <li>Fallback: <code>es</code></li>
-      </ol>
-
-      <hr>
-
-
-      <!-- ── Instalación ── -->
-      <h2 id="instalacion">Instalación y desarrollo</h2>
-
-      <h3>Requisitos</h3>
-      <ul>
-        <li><strong>Node.js</strong> ≥ 18</li>
-        <li><strong>npm</strong> ≥ 9</li>
-      </ul>
-
-      <h3>Clonar e instalar</h3>
-      <pre><code>git clone git@github.com:MarioFlorido/BUA-convertidor-exe.git
-cd BUA-convertidor-exe
-npm install</code></pre>
-
-      <h3>Servidor de desarrollo</h3>
-      <pre><code>npm run dev</code></pre>
-      <p>Accede a <code>http://localhost:5173/BUA-convertidor-exe/</code></p>
-
-      <h3>Build de producción</h3>
-      <pre><code>npm run build      # TypeScript + Vite → dist/
-npm run preview    # Previsualizar el build
-npm run deploy     # Build + publicación en gh-pages</code></pre>
-
-      <h3>Despliegue</h3>
       <p>
-        Cada push a <code>main</code> lanza una GitHub Action que construye el
-        proyecto y publica el resultado en GitHub Pages. La configuración está en:
+        El idioma del PDF se detecta automáticamente desde el estilo. Si hay confusión, asume español.
       </p>
-      <ul>
-        <li><code>vite.config.ts</code> → <code>base: '/BUA-convertidor-exe/'</code></li>
-        <li><code>.github/workflows/deploy.yml</code> → build + deploy automático</li>
-        <li>Branch <code>gh-pages</code> → contiene el build estático</li>
-      </ul>
 
       <hr>
 
-
-      <!-- ── Comandos ── -->
-      <h2 id="comandos">Comandos</h2>
-
-      <table>
-        <thead><tr><th>Comando</th><th>Descripción</th></tr></thead>
-        <tbody>
-          <tr><td><code>npm run dev</code></td><td>Servidor de desarrollo (Vite + HMR)</td></tr>
-          <tr><td><code>npm run build</code></td><td>Build de producción → <code>dist/</code></td></tr>
-          <tr><td><code>npm run preview</code></td><td>Previsualizar el build</td></tr>
-          <tr><td><code>npm run deploy</code></td><td>Build + publicación en GitHub Pages</td></tr>
-          <tr><td><code>npm run themes</code></td><td>Gestión interactiva de estilos oficiales (publicar / descargar / eliminar)</td></tr>
-          <tr><td><code>npm run pack-themes</code></td><td>Regenerar ZIPs de estilos desde <code>public/themes/</code></td></tr>
-          <tr><td><code>npm run lint</code></td><td>ESLint con reporte de directivas no usadas</td></tr>
-        </tbody>
-      </table>
-
-      <h3>Dependencias principales</h3>
-      <table>
-        <thead><tr><th>Paquete</th><th>Uso</th></tr></thead>
-        <tbody>
-          <tr><td><code>mammoth</code></td><td>DOCX → HTML</td></tr>
-          <tr><td><code>fflate</code></td><td>Compresión/descompresión ZIP (ELPX y estilos)</td></tr>
-          <tr><td><code>idb</code></td><td>Wrapper IndexedDB para persistir estilos locales</td></tr>
-          <tr><td><code>react</code> + <code>react-dom</code></td><td>UI</td></tr>
-          <tr><td><code>Paged.js</code> (CDN)</td><td>CSS Paged Media polyfill para PDF</td></tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-
-      <!-- ── Problemas ── -->
+      <!-- ── Problemas habituales ── -->
       <h2 id="problemas">Problemas habituales</h2>
 
-      <p><strong>«No se pudo cargar la plantilla base»</strong><br>
-      Falta <code>public/base.elpx</code>. Restaurar con <code>git checkout public/base.elpx</code>.</p>
+      <h3>El tema no aparece después de subirlo</h3>
+      <p>Probablemente le falta <code>style.css</code> o la estructura es inválida. Abre la consola del navegador (F12) para ver el error exacto.</p>
 
-      <p><strong>«El estilo no aparece en el selector tras subirlo»</strong><br>
-      La validación falló (ZIP sin <code>style.css</code> o estructura inválida). Revisar consola del navegador.</p>
+      <h3>Subo el ZIP pero no veo miniatura</h3>
+      <p>El ZIP no incluye <code>screenshot.png</code> en la raíz. El tema funciona igual, solo que sin imagen en el selector.</p>
 
-      <p><strong>«El estilo funciona pero sin miniatura»</strong><br>
-      El ZIP no incluye <code>screenshots.png</code> en la raíz. El estilo funciona igual, pero sin imagen en el selector.</p>
+      <h3>La interfaz dice [ES] pero el tema es en inglés</h3>
+      <p>El <code>config.xml</code> del tema necesita <code>&lt;language&gt;en&lt;/language&gt;</code> o <code>&lt;language&gt;ca&lt;/language&gt;</code>. Sin eso, asume español.</p>
 
-      <p><strong>«Las cajas BUA no tienen colores en el PDF»</strong><br>
-      El <code>style.css</code> del estilo debe declarar <code>.bua_ejemplo</code>, <code>.bua_definicion</code>, <code>.bua_importante</code> con <code>border-left</code> y <code>::before { content: "Etiqueta" }</code>.</p>
+      <h3>El PDF no tiene encabezados ni pies</h3>
+      <p>ConvertidoreXe usa Paged.js desde CDN. Sin internet, no funciona. En entornos offline, necesitarías descargar Paged.js localmente.</p>
 
-      <p><strong>«El PDF no muestra encabezados/pies»</strong><br>
-      Paged.js requiere conectividad para cargar desde CDN (<code>unpkg.com</code>). Para entornos offline, descargar Paged.js localmente y actualizar la URL en <code>semanticDocumentToPrintHtml.ts</code>.</p>
+      <h3>Las cajas no tienen colores en el PDF</h3>
+      <p>El <code>style.css</code> del tema no define <code>.bua_ejemplo</code>, <code>.bua_definicion</code> o <code>.bua_importante</code> con colores y <code>border-left</code>.</p>
 
-      <p><strong>«La interfaz dice [ES] pero el estilo es en inglés o catalán»</strong><br>
-      Falta la etiqueta <code>&lt;language&gt;</code> en el <code>config.xml</code> del estilo. Añadir <code>&lt;language&gt;en&lt;/language&gt;</code> o <code>&lt;language&gt;ca&lt;/language&gt;</code> y republicar.</p>
+      <h3>El PDF tiene páginas en blanco entre secciones</h3>
+      <p>Algo en el CSS del tema está forzando saltos de página. Revisa los estilos de sección.</p>
 
       <hr>
 
+      <!-- ── Metadatos ── -->
+      <h2>Metadatos del proyecto ELPX</h2>
 
+      <p>
+        Cuando generas un proyecto eXeLearning, ConvertidoreXe rellena automáticamente:
+      </p>
 
-      <p>Licencia: <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU GPL v3.0</a></p>
+      <ul>
+        <li><strong>Título:</strong> Del nombre de tu documento</li>
+        <li><strong>Subtítulo:</strong> "Biblioteca Universitaria" (por defecto)</li>
+        <li><strong>Autoría:</strong> Biblioteca de la Universidad de Alicante</li>
+        <li><strong>Idioma:</strong> Español</li>
+        <li><strong>Licencia:</strong> Creative Commons: Reconocimiento - No comercial - Compartir igual 4.0</li>
+      </ul>
+
+      <p>Puedes editar todo esto después en eXeLearning si lo necesitas.</p>
+
+      <hr>
 
       <footer>
-        <span>BUA ConvertidoreXe v0.2.0</span>
-        <span>·</span>
-        <a href="https://marioflorido.github.io/BUA-convertidor-exe/" target="_blank" rel="noopener noreferrer">Versión en vivo</a>
-        <span>·</span>
-        <a href="https://github.com/MarioFlorido/BUA-convertidor-exe" target="_blank" rel="noopener noreferrer">Repositorio</a>
-        <span>·</span>
-        <a href="arquitectura.html">Arquitectura</a>
-        <span>·</span>
-        <a href="guia-temas.html">Guía de estilos</a>
+        <a href="https://github.com/MarioFlorido/BUA-convertidor-exe">Repositorio en GitHub</a> •
+        <a href="./arquitectura.html">Documentación técnica</a>
       </footer>
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+
   </body>
 </html>
