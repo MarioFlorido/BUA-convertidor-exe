@@ -245,15 +245,96 @@ export function processIframes(htmlValue: string): string {
 }
 
 /**
- * Aplica todas las transformaciones HTML en orden
- * - Primero: procesar iframes (convertir a enlaces centrados)
- * - Segundo: clases semánticas [ejemplo], [definición], [importante]
- * - Tercero: clases de tabla [horizontal], [vertical]
+ * Convierte URLs en texto plano en enlaces clickeables.
+ *
+ * Word solo crea hipervínculos reales cuando el usuario los inserta como tal;
+ * una URL escrita o pegada como texto llega sin enlace. Esta función la detecta
+ * y la envuelve en <a href>, sin tocar:
+ *   - URLs ya dentro de un <a> (hipervínculos existentes)
+ *   - URLs en atributos como src o href (p. ej. el iframe de un vídeo)
+ *
+ * Trabaja sobre el DOM para procesar solo nodos de texto que estén fuera de <a>.
+ */
+export function autolinkUrls(htmlValue: string): string {
+  if (typeof DOMParser === 'undefined') return htmlValue;
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${htmlValue}</body></html>`,
+    'text/html',
+  );
+  const body = doc.body;
+  const urlPattern = /(https?:\/\/[^\s<>"'`)\]]+|www\.[^\s<>"'`)\]]+)/g;
+
+  const walker = doc.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+  const textNodes: Text[] = [];
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    textNodes.push(node as Text);
+  }
+
+  for (const textNode of textNodes) {
+    const text = textNode.textContent || '';
+    if (!/https?:\/\/|www\./i.test(text)) continue;
+
+    // Saltar URLs que ya están dentro de un enlace
+    let ancestor: HTMLElement | null = textNode.parentElement;
+    let insideAnchor = false;
+    while (ancestor && ancestor !== body) {
+      if (ancestor.tagName === 'A') {
+        insideAnchor = true;
+        break;
+      }
+      ancestor = ancestor.parentElement;
+    }
+    if (insideAnchor) continue;
+
+    const fragment = doc.createDocumentFragment();
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    urlPattern.lastIndex = 0;
+    while ((match = urlPattern.exec(text)) !== null) {
+      let url = match[0];
+      const start = match.index;
+
+      // No incluir signos de puntuación finales que no forman parte de la URL
+      const trailingMatch = url.match(/[.,;:!?]+$/);
+      const trailing = trailingMatch ? trailingMatch[0] : '';
+      if (trailing) url = url.slice(0, -trailing.length);
+
+      if (start > lastIndex) {
+        fragment.appendChild(doc.createTextNode(text.slice(lastIndex, start)));
+      }
+
+      const anchor = doc.createElement('a');
+      anchor.setAttribute('href', url.startsWith('www.') ? `https://${url}` : url);
+      anchor.textContent = url;
+      fragment.appendChild(anchor);
+
+      if (trailing) fragment.appendChild(doc.createTextNode(trailing));
+      lastIndex = start + url.length + trailing.length;
+    }
+
+    if (lastIndex < text.length) {
+      fragment.appendChild(doc.createTextNode(text.slice(lastIndex)));
+    }
+
+    textNode.parentNode?.replaceChild(fragment, textNode);
+  }
+
+  return body.innerHTML;
+}
+
+/**
+ * Aplica todas las transformaciones HTML en orden:
+ * 1. iframes embebidos (vídeos) → <iframe> real centrado
+ * 2. clases semánticas [ejemplo], [definición], [importante]
+ * 3. clases de tabla [horizontal], [vertical]
+ * 4. autolink de URLs en texto plano (al final: re-serializa el DOM)
  */
 export function applyAllTransforms(htmlValue: string): string {
   let transformed = htmlValue;
   transformed = processIframes(transformed);
   transformed = applyDivClasses(transformed);
   transformed = applyTableClasses(transformed);
+  transformed = autolinkUrls(transformed);
   return transformed;
 }
