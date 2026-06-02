@@ -508,6 +508,15 @@
   box-sizing: border-box;
 }
 
+/* Sombra que sobrevive al guardar el PDF, igual que en las imágenes.
+   drop-shadow en lugar de box-shadow para que Chrome no la degrade a un
+   marco sólido. Solo en las cajas (no en las tablas). */
+.block-html .bua_ejemplo,
+.block-html .bua_definicion,
+.block-html .bua_importante {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+
 /* Etiqueta de tipo — arriba a la izquierda, negrita, color del borde */
 .block-html .bua_ejemplo::before,
 .block-html .bua_definicion::before,
