@@ -348,7 +348,7 @@
 
     <h2>Introducción</h2>
 
-    <p><strong>ConvertidoreXe</strong> es una herramienta que convierte documentos Word (DOCX) a proyectos eXeLearning (ELPX) con estilos visuales profesionales y estructura semántica.</p>
+    <p><strong>ConvertidoreXe</strong> es una herramienta que convierte documentos Word (DOCX) a proyectos eXeLearning (ELPX) con estilos visuales de la UA y estructura semántica.</p>
 
     <p>Con ConvertidoreXe puedes crear cursos digitales de forma rápida: prepara tu contenido en Word, carga el archivo aquí, elige un tema visual, y descarga el proyecto listo para editar en eXeLearning o exportar como PDF.</p>
 
@@ -382,11 +382,11 @@
       <tbody>
         <tr>
           <td><strong>Título 1</strong></td>
-          <td>Página principal, página secundaria o página de 3er nivel</td>
+          <td>Página principal, página secundaria o página de 3er nivel. Da igual  que los pongas en mayúsculas o minúsculas, el renderizado final lo cambiará a lo que establezca el estilo</td>
         </tr>
         <tr>
           <td><strong>Título 2</strong></td>
-          <td>Un encabezado H2 para iniciar una sección dentro del iDevice // La cabecera de un acordeón o una pestaña // El nombre de un iDevice para remarcar un "para saber más", bibliografía, etc.</td>
+          <td>Un encabezado H2 para iniciar una sección dentro del iDevice // La cabecera de un acordeón o una pestaña // El nombre de un iDevice para remarcar un "para saber más", "bibliografía", etc. Igualmente da lo mismo en mayúsculas o minúsculas</td>
         </tr>
         <tr>
           <td><strong>Título 3 al 4</strong></td>
@@ -395,39 +395,22 @@
       </tbody>
     </table>
 
-    <h3>Ejemplo de Estructura</h3>
 
-    <pre>Encabezado 1: Unidad 1 - Introducción a JavaScript
-    Encabezado 2: Conceptos básicos
-        Encabezado 3: Variables y tipos de datos
-        Encabezado 3: Operadores
-    Encabezado 2: Ejemplos prácticos
-        Encabezado 3: Hola mundo</pre>
 
     <h3>Imágenes</h3>
 
     <p>Las imágenes deben estar insertadas directamente en el DOCX. ConvertidoreXe las exporta centradas en el ELPX. Para el PDF, se recomienda:</p>
     <ul>
-      <li>Máximo 800 px de ancho</li>
-      <li>Formato JPG o PNG</li>
+      <li>Máximo 900 px de ancho</li>
+      <li>Formato JPG o PNG. Aunque si son capturas de pantalla... no todo un pantallazo que pierde detalle y mejor en png</li>
       <li>Comprimidas (&lt; 500 KB por imagen)</li>
+      <li>La descripción de la imagen en Word es obligaoria debido a las normas de accesibilidad de la UA. De ahí se toma el atributo "alt" </li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2>Paso 2: Subir y Configurar</h2>
 
-    <h3>Subir el Archivo</h3>
-
-    <ol>
-      <li>Haz clic en el área <strong>"Arrastra tu archivo DOCX aquí"</strong> o selecciona el archivo desde tu computadora</li>
-      <li>ConvertidoreXe procesa el documento (puede tardar unos segundos si es grande)</li>
-      <li>Cuando esté listo, aparecerá un panel de configuración</li>
-    </ol>
-
-    <div class="divider"></div>
-
-    <h2 id="etiquetas">Paso 3: Etiquetas Semánticas</h2>
+    <h2 id="etiquetas">Paso 2: Etiquetas Semánticas</h2>
 
     <p>Las etiquetas semánticas se aplican escribiendo el nombre entre corchetes al inicio de un párrafo nuevo, y cerrando con <code>[fin]</code> al final.</p>
 
@@ -473,25 +456,11 @@ Contenido importante...
 
     <p>Usa cuando la primera fila contiene títulos de columna.</p>
 
-    <p><strong>En Word:</strong></p>
-    <pre>[horizontal]
-| Concepto | Definición | Ejemplo |
-|----------|-----------|---------|
-| Variable | Espacio de memoria | x = 5 |
-| Función | Bloque de código | def hola() |</pre>
-
     <p>No incluyas <code>[fin]</code> después de la tabla.</p>
 
     <h3>[vertical] — Encabezado Vertical</h3>
 
     <p>Usa cuando la primera columna contiene títulos de fila.</p>
-
-    <p><strong>En Word:</strong></p>
-    <pre>[vertical]
-| | JavaScript | Python | Java |
-|-----------|-----------|--------|
-| Tipado | Débil | Dinámico | Fuerte |
-| Compilado | No | No | Sí |</pre>
 
     <p>No incluyas <code>[fin]</code> después de la tabla.</p>
 
@@ -503,17 +472,30 @@ Contenido importante...
 
     <div class="divider"></div>
 
+ <h2>Paso 6: Subir y Configurar</h2>
+
+    <h3>Subir el Archivo</h3>
+
+    <ol>
+      <li>Haz clic en el área <strong>"Arrastra tu archivo DOCX aquí"</strong> o selecciona el archivo desde tu ordenador</li>
+      <li>ConvertidoreXe procesa el documento (puede tardar unos segundos si es grande)</li>
+      <li>Cuando esté listo, aparecerá un panel de configuración</li>
+    </ol>
+
+    <div class="divider"></div>
+    
+
     <h2>Paso 6: Configuración de Opciones</h2>
 
-    <h3>Elegir Tema Visual</h3>
+    <h3>Elegir estilo Visual</h3>
 
-    <p>Un <strong>tema</strong> es un conjunto de estilos (colores, fuentes, diseño) que se aplica a todo el documento.</p>
+    <p>Un <strong>estilo</strong> es un conjunto de normas (colores, fuentes, diseño) que se aplica a todo el documento.</p>
 
-    <h3>Dónde Aparecen los Temas</h3>
+    <h3>Dónde Aparecen los estilos</h3>
 
-    <p>Después de subir el archivo, en el panel de configuración verás un selector de <strong>temas disponibles</strong>. Incluye:</p>
+    <p>Después de subir el archivo, en el panel de configuración verás un selector de <strong>Estilos disponibles</strong>. Incluye:</p>
     <ul>
-      <li><strong>Temas oficiales</strong> — Diseñados profesionalmente, incluidos con ConvertidoreXe</li>
+      <li><strong>Temas oficiales</strong> — Diseñados para los cursos CID, Doctorado... incluidos en el programa.</li>
       <li><strong>Temas locales</strong> — Temas personalizados cargados en tu navegador</li>
     </ul>
 
@@ -521,14 +503,14 @@ Contenido importante...
 
     <h2 id="descargar">Descargar ELPX</h2>
 
-    <p>Un <strong>ELPX</strong> es el formato nativo de eXeLearning. Es un archivo comprimido con la estructura del curso.</p>
+    <p>Un <strong>ELPX</strong> es el formato nativo de eXeLearning 4.+. Es un archivo comprimido con la estructura del curso.</p>
 
     <h3>Pasos para Descargar</h3>
 
     <ol>
       <li>Haz clic en el botón <strong>"Descargar proyecto eXeLearning"</strong></li>
       <li>Se descarga un archivo <code>.elpx</code> a tu carpeta de descargas</li>
-      <li>Abre eXeLearning en tu computadora</li>
+      <li>Abre eXeLearning en tu ordenador</li>
     </ol>
 
     <h3>Abrir en eXeLearning</h3>
@@ -678,8 +660,8 @@ Contenido importante...
     <ul>
       <li>No abuses — 1-2 cajas por página es suficiente</li>
       <li>Usa <code>[ejemplo]</code> para código o demostraciones</li>
-      <li>Usa <code>[definición]</code> solo para términos nuevos</li>
-      <li>Usa <code>[importante]</code> para advertencias reales</li>
+      <li>Usa <code>[definición]</code> SOLO para términos nuevos y cuando no son obvios</li>
+      <li>Usa <code>[importante]</code> para advertencias reales. Una página llena de "importantes" resta valor al contenido</li>
     </ul>
 
     <h3>✓ Revisión Final</h3>
@@ -700,14 +682,14 @@ Contenido importante...
     <p><strong>P: ¿Se pierden mis cambios si genero el PDF después?</strong><br>
     R: No. El PDF es una "foto" del contenido en ese momento. El ELPX es editable.</p>
 
-    <p><strong>P: ¿Mi documento Word debe tener estilos especiales?</strong><br>
+    <p><strong>P: ¿Mi documento Word debe tener estilos personalizados como antes?</strong><br>
     R: No. ConvertidoreXe funciona con estilos estándar de Word (Encabezado 1, Encabezado 2, etc.).</p>
 
     <p><strong>P: ¿Puedo tener múltiples imágenes en una página?</strong><br>
     R: Sí, todas se centrarán automáticamente.</p>
 
     <p><strong>P: ¿Qué pasa si tengo tablas complejas (celdas combinadas)?</strong><br>
-    R: ConvertidoreXe intenta mantener la estructura, pero es mejor simplificar tablas muy complejas.</p>
+    R: ConvertidoreXe intentará mantener la estructura, pero es mejor simplificar tablas muy complejas.</p>
 
     <p><strong>P: ¿Puedo usar ConvertidoreXe sin crear un ELPX?</strong><br>
     R: Sí. Puedes generar solo el PDF si prefieres un documento de lectura.</p>
@@ -722,8 +704,8 @@ Contenido importante...
 
     <div class="footer">
       <p><strong>Guía de Uso: ConvertidoreXe</strong></p>
-      <p>Última actualización: Mayo 2026</p>
-      <p><em>Para preguntas o soporte, contacta al administrador de tu institución.</em></p>
+      <p>Última actualización: Junio 2026</p>
+      <p><em>Para preguntas o soporte, contacta con PuntBIU.</em></p>
     </div>
   </div>
 </body>
