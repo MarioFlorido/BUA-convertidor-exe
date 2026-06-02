@@ -220,7 +220,7 @@
       </p>
 
       <div class="callout">
-        ¿Necesitas más detalles técnicos? Consulta <a href="./arquitectura.html">la documentación de arquitectura</a>.
+        Si tienes curiosidad y quieres conocer detalles técnicos consulta <a href="./arquitectura.html">la documentación de arquitectura</a>.
       </div>
 
       <hr>
@@ -257,7 +257,7 @@ flowchart LR
       </div>
 
       <div class="callout callout--info">
-        <strong>Privacidad:</strong> Sin servidores, sin análisis, sin nubes. Tu documento nunca sale de tu navegador.
+        <strong>Privacidad:</strong> Sin servidores. Tu documento nunca sale de tu navegador.
       </div>
 
       <hr>
@@ -270,7 +270,7 @@ flowchart LR
       </p>
 
       <p>
-        Esto significa que si mañana quieres SCORM o EPUB, se añade sin tocar el núcleo. La arquitectura está pensada para crecer.
+        Esto significa que si mañana quieres SCORM o EPUB, cambiamos de versión en eXelearning o migramos a otra platarforma podemos seguir aprovechando el trabajo. La arquitectura está pensada para crecer.
       </p>
 
       <div class="diagram-wrap">
@@ -288,7 +288,7 @@ flowchart TD
       </div>
 
       <p>
-        El documento semántico contiene las páginas y bloques de contenido. Los renderers (el que genera .elpx y el que genera PDF) son completamente independientes. Uno no sabe del otro.
+        El documento semántico contiene las páginas y bloques de contenido. Los renderers (el que genera .elpx y el que genera PDF) son completamente independientes. Uno no sabe del otro, pero los estilos garantizan la consistencia visual entre los dos.
       </p>
 
       <hr>
@@ -320,7 +320,7 @@ flowchart TD
       <h2 id="etiquetas">Etiquetas semánticas BUA</h2>
 
       <p>
-        Dentro de tu Word puedes marcar bloques especiales que ConvertidoreXe interpretará y estilizará según el tema elegido.
+        Dentro de tu Word puedes marcar bloques especiales que ConvertidoreXe interpretará y estilizará según el tema elegido: los antigüos: bua_imprtante, bua_ejemplo...
       </p>
 
       <h3>Cajas semánticas</h3>
@@ -331,7 +331,7 @@ flowchart TD
         <li><code>[definición]</code> — Para conceptos, términos clave</li>
       </ul>
 
-      <p>No importan mayúsculas ni tildes. Word puede meter bookmarks invisibles dentro de los corchetes — ConvertidoreXe limpia eso automáticamente.</p>
+      <p>No importan mayúsculas ni tildes. Word puede meter caracters invisible invisibles dentro de los corchetes — ConvertidoreXe limpia eso automáticamente. Además no tienes la limitación de aplicar el atributo a un solo párrafo que teníamos antes </p>
 
       <h3>Tablas</h3>
       <p>Marca la línea anterior a la tabla:</p>
@@ -419,6 +419,10 @@ flowchart TD
         El idioma del PDF se detecta automáticamente desde el estilo. Si hay confusión, asume español.
       </p>
 
+        <p>
+        Para un mejor renderizado, más automatico y conservando los márgenes, recomiendo Chrome (o Edge que es el mismo motor)
+      </p>
+
       <hr>
 
       <!-- ── Problemas habituales ── -->
@@ -448,7 +452,7 @@ flowchart TD
       <h2>Metadatos del proyecto ELPX</h2>
 
       <p>
-        Cuando generas un proyecto eXeLearning, ConvertidoreXe rellena automáticamente:
+        Cuando generas un proyecto eXeLearning, ConvertidoreXe rellena automáticamente, ya no hay que hacerlo a mano:
       </p>
 
       <ul>
@@ -459,7 +463,7 @@ flowchart TD
         <li><strong>Licencia:</strong> Creative Commons: Reconocimiento - No comercial - Compartir igual 4.0</li>
       </ul>
 
-      <p>Puedes editar todo esto después en eXeLearning si lo necesitas.</p>
+      <p>Aunque siempre puedes editar todo esto después en eXeLearning si lo necesitas.</p>
 
       <hr>
 
