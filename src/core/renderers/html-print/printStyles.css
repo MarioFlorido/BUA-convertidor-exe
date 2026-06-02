@@ -413,7 +413,10 @@
   display: block;
   margin: 12px auto;
   break-inside: avoid;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  /* filter: drop-shadow en lugar de box-shadow: Chrome degrada box-shadow a un
+     marco sólido al guardar/imprimir a PDF. drop-shadow se rasteriza con la
+     imagen y se mantiene en el PDF final. */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
   border-radius: 2px;
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
