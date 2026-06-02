@@ -18,7 +18,8 @@ import { escapeHtml } from './utils/html';
  */
 
 import { DocxParser } from './parsers/DocxParser';
-import { buildProjectFromStructure, applyTableClasses, applyDivClasses } from './buildFromStructure';
+import { buildProjectFromStructure } from './buildFromStructure';
+import { applyAllTransforms } from './transformers/HtmlTransformer';
 import type {
   DocxImportProgress,
   DocxImportOptions,
@@ -128,9 +129,8 @@ export async function convertHtmlToSemanticDocument(
     messageKey: parseMessageKey,
   });
 
-  // Procesar delimitadores y tablas, aplicar clases CSS
-  let processedHtml = applyDivClasses(htmlValue);
-  processedHtml = applyTableClasses(processedHtml);
+  // Procesar iframes, delimitadores y tablas, aplicar clases CSS
+  const processedHtml = applyAllTransforms(htmlValue);
 
   const project = buildProjectFromHtml(processedHtml, filename, options, structure);
 
