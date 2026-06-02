@@ -193,33 +193,55 @@ export function applyTableClasses(htmlValue: string): string {
 }
 
 /**
- * Procesa iframes (generalmente embeds de YouTube de Word)
- * Los iframes no se pueden renderizar en ELPX/PDF, así que:
- * 1. Extrae la URL del iframe
- * 2. Si es YouTube, crea un enlace clickeable a youtube.com/watch?v=...
- * 3. Centra el enlace
- * 4. Mantiene el iframe como comentario para referencia (oculto)
+ * Des-escapa las entidades HTML básicas que Mammoth genera al volcar texto.
+ */
+function unescapeBasicHtml(value: string): string {
+  return value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+/**
+ * Procesa iframes embebidos (vídeos de YouTube pegados en Word).
+ *
+ * Word/Mammoth NO entregan el iframe como elemento real: lo vuelcan como
+ * TEXTO ESCAPADO (&lt;iframe...&gt;...&lt;/iframe&gt;). Sin procesar, el
+ * navegador lo muestra como código visible en vez de como vídeo.
+ *
+ * Esta función lo convierte en un <iframe> real dentro de un contenedor
+ * centrado:
+ *   - En ELPX  → eXeLearning muestra el vídeo embebido y centrado
+ *   - En PDF   → convertIframesToLinks() lo transforma en enlace clickeable
+ *   - En preview → PreviewService lo sustituye por un placeholder
  */
 export function processIframes(htmlValue: string): string {
-  return htmlValue.replace(
-    /<iframe[^>]*\bsrc="([^"]*)"[^>]*>[\s\S]*?<\/iframe>/gi,
-    (_, src: string) => {
-      // Extraer video ID de YouTube
-      const ytMatch = src.match(/youtube(?:-nocookie)?\.com\/embed\/([^?&"]+)/i);
-      const url = ytMatch
-        ? `https://www.youtube.com/watch?v=${ytMatch[1]}`
-        : src;
+  const transform = (escaped: string): string => {
+    // Des-escapar y centrar el iframe directamente (display:block + margin auto),
+    // así el centrado no depende del contenedor. Además se envuelve en
+    // .bua_video por si el tema quiere estilizarlo.
+    const iframe = unescapeBasicHtml(escaped).replace(
+      /<iframe\b/i,
+      '<iframe style="display: block; margin: 1em auto; max-width: 100%;"',
+    );
+    return `<div class="bua_video">${iframe}</div>`;
+  };
 
-      if (!url) return '';
-
-      // Crear enlace centrado
-      return `<div style="text-align: center; margin: 1em 0;">
-  <a href="${escapeHtml(url)}" target="_blank" style="display: inline-block; padding: 0.5em 1em; background: #f0f0f0; border-radius: 4px; text-decoration: none; color: #135d87; border: 1px solid #ddd;">
-    ▶ Ver vídeo: ${escapeHtml(url)}
-  </a>
-</div>`;
-    },
+  // Caso A: el iframe escapado es el único contenido de un <p>.
+  // Se reemplaza el <p> completo para no dejar un <div> dentro de un <p>
+  // (HTML inválido que el navegador rompe).
+  let result = htmlValue.replace(
+    /<p>\s*(&lt;iframe\b[\s\S]*?&lt;\/iframe&gt;)\s*<\/p>/gi,
+    (_m, escaped: string) => transform(escaped),
   );
+
+  // Caso B: iframe escapado en cualquier otro contexto (suelto o junto a texto).
+  result = result.replace(
+    /&lt;iframe\b[\s\S]*?&lt;\/iframe&gt;/gi,
+    (escaped: string) => transform(escaped),
+  );
+
+  return result;
 }
 
 /**

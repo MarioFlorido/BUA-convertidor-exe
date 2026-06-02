@@ -423,6 +423,19 @@ function normalizeImportedNode(node: Node): string {
       const altAttribute = alt ? ` alt="${escapeHtml(alt)}"` : '';
       return `<img src="${escapeHtml(src)}"${altAttribute} />`;
     }
+    case 'iframe': {
+      // Vídeos embebidos (YouTube). Se centra con display:block + margin auto
+      // para no depender del contenedor (eXeLearning puede descartar el wrapper).
+      const src = (node.getAttribute('src') || '').trim();
+      if (!src) {
+        return '';
+      }
+      const width = (node.getAttribute('width') || '560').trim();
+      const height = (node.getAttribute('height') || '315').trim();
+      const title = (node.getAttribute('title') || '').trim();
+      const titleAttribute = title ? ` title="${escapeHtml(title)}"` : '';
+      return `<iframe src="${escapeHtml(src)}" width="${escapeHtml(width)}" height="${escapeHtml(height)}"${titleAttribute} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="display: block; margin: 1em auto; max-width: 100%;"></iframe>`;
+    }
     default:
       return normalizedChildren;
   }

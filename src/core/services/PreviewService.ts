@@ -264,7 +264,15 @@ function sanitizePreviewBlockHtml(html: string): string {
   for (const element of Array.from(body.querySelectorAll('script, iframe, object, embed'))) {
     const replacement = document.createElement('div');
     replacement.className = 'preview-embed-placeholder';
-    replacement.textContent = 'Contenido incrustado omitido en la vista previa.';
+    // Para iframes de vídeo mostramos la URL: más útil que un texto genérico
+    const src = (element.getAttribute('src') || '').trim();
+    if (element.tagName.toLowerCase() === 'iframe' && src) {
+      const ytMatch = src.match(/youtube(?:-nocookie)?\.com\/embed\/([^?&"]+)/i);
+      const url = ytMatch ? `https://www.youtube.com/watch?v=${ytMatch[1]}` : src;
+      replacement.textContent = `▶ Vídeo: ${url}`;
+    } else {
+      replacement.textContent = 'Contenido incrustado omitido en la vista previa.';
+    }
     element.replaceWith(replacement);
   }
 
