@@ -1,6 +1,6 @@
 # ConvertidoreXe
 
-Transforma documentos Word en cursos eXeLearning listos para usar. Todo sucede en tu navegador, sin servidores ni subidas a la nube.
+Transforma documentos Word en cursos eXeLearning listos para usar. Sin servidores ni subidas a la nube.
 
 **Versión:** 0.2.0  
 **Licencia:** GNU GPL v3.0  
@@ -169,7 +169,7 @@ Lo que me falta:
 
 Para la versión 2:
 
-- Vista previa en tiempo real con editor de estructura tipo arbol. Despues de parsear y con drag & drop, mover secciones y cambiar niveles
+- Vista previa en tiempo real con editor de estructura tipo arbol. Despues de parsear con las utilidades de: drag & drop, mover secciones y cambiar niveles
 
 ---
 
