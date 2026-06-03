@@ -18,8 +18,6 @@ Transforma documentos Word en cursos eXeLearning listos para usar. Todo sucede e
 
 El documento nunca sale de tu navegador. ConvertidoreXe procesa todo localmente.
 
-**¿Perdido?** Hay un botón "?" en la cabecera con una guía completa de uso.
-
 ---
 
 ## Etiquetas semánticas
@@ -151,17 +149,27 @@ Puedes editar todo esto después en eXeLearning si lo necesitas.
 
 Lo que está hecho:
 
-- ✅ Convertir Word a eXeLearning
-- ✅ Sistema de temas (oficiales y locales)
-- ✅ Configurador de estructura
-- ✅ Opciones para H2 (iDevice, HTML, acordeón, pestañas)
-- ✅ Cajas semánticas ([importante], [ejemplo], [definición])
-- ✅ Tablas horizontal y vertical
-- ✅ PDF con portada, índice, encabezados y pies
-- ✅ Detección de idioma del tema
-- ✅ Reordenación de temas (drag-and-drop)
-- ✅ Guía de usuario integrada
-- ✅ Despliegue automático en GitHub Pages
+-  Convertir Word a eXeLearning
+-  Sistema de temas (oficiales y locales)
+-  Configurador de estructura
+-  Opciones para H2 (iDevice, HTML, acordeón, pestañas)
+-  Cajas semánticas ([importante], [ejemplo], [definición])
+-  Tablas horizontal y vertical
+-  Manejo de Iframes de medios embebidos.
+-  PDF con portada, índice, encabezados y pies
+-  Detección de idioma del tema
+-  Reordenación de temas (drag-and-drop)
+-  Guía de usuario integrada
+-  Despliegue automático en GitHub Pages
+
+Lo que me falta:
+
+-  Dashboard para cargar temas oficales en remoto
+-  Fase 3 de depuración --- > eliminar dos duplicaciones de código (escHtml y DocumentStructure)
+
+Para la versión 2:
+
+- Vista previa en tiempo real con editor de estructura tipo arbol. Despues de parsear y con drag & drop, mover secciones y cambiar niveles
 
 ---
 
