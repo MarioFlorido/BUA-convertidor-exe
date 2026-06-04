@@ -1,10 +1,64 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { DocumentStructure, H2StructureOption } from '../types';
 
 interface StructureConfiguratorProps {
   structure: DocumentStructure;
   onConfirm: (structure: DocumentStructure) => void;
   onCancel: () => void;
+}
+
+export interface StructureValidation {
+  /** h1Id -> mensaje de error de jerarquía de nivel */
+  h1Errors: Record<string, string>;
+  /** h2Id -> mensaje de error de clasificación */
+  h2Errors: Record<string, string>;
+  hasErrors: boolean;
+}
+
+/**
+ * Valida las dos reglas de maquetación del ELPX:
+ *
+ * 1. Jerarquía de páginas: una página de 3er nivel debe ir precedida por una
+ *    subpágina (2º nivel) o por otra de 3er nivel (hermana). No se puede saltar
+ *    de 1er a 3er nivel.
+ *
+ * 2. Título de iDevice: un H2 marcado como "Nombre de iDevice" genera un bloque
+ *    hoja que no puede contener dentro otro H2, acordeón ni pestañas. Por eso
+ *    solo es válido si es el último H2 de su sección o si el H2 siguiente también
+ *    es "Nombre de iDevice". Si le sigue un H2 en texto / acordeón / pestañas,
+ *    ese contenido quedaría anidado dentro del iDevice (estructura inválida).
+ */
+export function validateStructure(structure: DocumentStructure): StructureValidation {
+  const h1Errors: Record<string, string> = {};
+  const h2Errors: Record<string, string> = {};
+  const sections = structure.h1Sections;
+
+  sections.forEach((section, index) => {
+    // Regla 1
+    if (section.level === 3) {
+      const prev = index > 0 ? sections[index - 1] : null;
+      if (!prev || (prev.level !== 2 && prev.level !== 3)) {
+        h1Errors[section.id] =
+          'Una página de 3er nivel debe ir precedida por una subpágina (2º nivel). No se puede saltar de 1er a 3er nivel.';
+      }
+    }
+
+    // Regla 2
+    section.h2Items.forEach((h2, i) => {
+      if (h2.option !== 'idevice-title') return;
+      const next = section.h2Items[i + 1];
+      if (next && next.option !== 'idevice-title') {
+        h2Errors[h2.id] =
+          'Un “Nombre de iDevice” no puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”.';
+      }
+    });
+  });
+
+  return {
+    h1Errors,
+    h2Errors,
+    hasErrors: Object.keys(h1Errors).length > 0 || Object.keys(h2Errors).length > 0,
+  };
 }
 
 const LEVEL_LABELS: Record<1 | 2 | 3, string> = {
@@ -26,6 +80,20 @@ const BLOCK2: { option: H2StructureOption; label: string }[] = [
 export function StructureConfigurator({ structure, onConfirm, onCancel }: StructureConfiguratorProps) {
   const [localStructure, setLocalStructure] = useState(structure);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
+
+  const validation = useMemo(() => validateStructure(localStructure), [localStructure]);
+
+  /** Nº de H2 con error dentro de una sección (para avisar aunque esté plegada) */
+  const countH2Errors = (h1Id: string) => {
+    const section = localStructure.h1Sections.find((h1) => h1.id === h1Id);
+    if (!section) return 0;
+    return section.h2Items.filter((h2) => validation.h2Errors[h2.id]).length;
+  };
+
+  const handleConfirm = () => {
+    if (validation.hasErrors) return;
+    onConfirm(localStructure);
+  };
 
   const toggleSection = (h1Id: string) => {
     setOpenSections((prev) => {
@@ -68,9 +136,15 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
         {localStructure.h1Sections.map((h1, index) => {
           const isFirst = index === 0;
           const isOpen = openSections.has(h1.id);
+          const levelError = validation.h1Errors[h1.id];
+          const h2ErrorCount = countH2Errors(h1.id);
+          const hasError = Boolean(levelError) || h2ErrorCount > 0;
 
           return (
-            <div key={h1.id} className={`h1-card${isOpen ? ' h1-card--open' : ''}`}>
+            <div
+              key={h1.id}
+              className={`h1-card${isOpen ? ' h1-card--open' : ''}${hasError ? ' h1-card--error' : ''}`}
+            >
 
               {/* CABECERA — siempre visible */}
               <div className="h1-card-header">
@@ -117,6 +191,14 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
                     aria-expanded={isOpen}
                     title={isOpen ? 'Cerrar sección' : 'Abrir sección'}
                   >
+                    {h2ErrorCount > 0 && (
+                      <span
+                        className="h1-error-badge"
+                        title={`${h2ErrorCount} H2 con errores`}
+                      >
+                        ⚠ {h2ErrorCount}
+                      </span>
+                    )}
                     <span className="h1-toggle-count">
                       {h1.h2Items.length} H2
                     </span>
@@ -125,14 +207,19 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
                 </div>
               </div>
 
+              {/* Error de jerarquía de nivel — siempre visible */}
+              {levelError && <p className="config-error config-error--level">{levelError}</p>}
+
               {/* LISTA DE H2 — expandible */}
               {isOpen && (
                 <div className="h2-list">
                   {h1.h2Items.length === 0 ? (
                     <p className="no-h2">No contiene encabezamientos H2</p>
                   ) : (
-                    h1.h2Items.map((h2) => (
-                      <div key={h2.id} className="h2-item">
+                    h1.h2Items.map((h2) => {
+                      const h2Error = validation.h2Errors[h2.id];
+                      return (
+                      <div key={h2.id} className={`h2-item${h2Error ? ' h2-item--error' : ''}`}>
                         <div className="h2-item-name">{h2.text}</div>
                         <div className="h2-item-blocks">
 
@@ -176,8 +263,11 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
                           </div>
 
                         </div>
+
+                        {h2Error && <p className="config-error">{h2Error}</p>}
                       </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               )}
@@ -186,8 +276,19 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
         })}
       </div>
 
+      {validation.hasErrors && (
+        <p className="structure-error-summary" role="alert">
+          Hay errores de estructura que debes corregir antes de continuar.
+        </p>
+      )}
+
       <div className="structure-actions">
-        <button onClick={() => onConfirm(localStructure)} className="btn-confirm">
+        <button
+          onClick={handleConfirm}
+          className="btn-confirm"
+          disabled={validation.hasErrors}
+          title={validation.hasErrors ? 'Corrige los errores de estructura para continuar' : undefined}
+        >
           Continuar con esta estructura
         </button>
         <button onClick={onCancel} className="btn-cancel">
