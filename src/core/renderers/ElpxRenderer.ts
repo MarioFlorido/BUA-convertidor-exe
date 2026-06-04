@@ -1,7 +1,7 @@
 import { zipSync } from 'fflate';
 import type { ImportedProject, ImportedPage, ImportedBlock } from '../models/SemanticDocument';
 import { PreviewService } from '../services/PreviewService';
-import { extractImages } from '../transformers/ImageExtractor';
+import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml } from '../utils/html';
 
 export interface ElpxRenderOptions {
@@ -178,7 +178,11 @@ ${blocksXml}  </odePagStructures>
       /<h2([^>]*)>([^<]*)<\/h2>/gi,
       (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
     );
-    const html = rawHtml;
+    // eXeLearning resuelve las imágenes de recursos con el placeholder
+    // {{context_path}}/ por delante (lo sustituye en runtime). El ImageExtractor
+    // deja la ruta "neutra" content/resources/, válida para las preview pages;
+    // aquí, solo para el content.xml, le anteponemos el placeholder.
+    const html = rawHtml.split(`"${RESOURCE_DIR}/`).join(`"{{context_path}}/${RESOURCE_DIR}/`);
     const wrappedHtml = `<div class="exe-text-template">\n${html}\n</div>`;
     const jsonProperties = JSON.stringify({
       ideviceId,
