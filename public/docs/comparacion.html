@@ -188,7 +188,7 @@
 
       <h3>PDF</h3>
       <p>
-        <strong>eXeConvert</strong> usa pdfmake (navegador) o puppeteer (servidor). Genera un PDF funcional del contenido.
+        <strong>eXeConvert</strong> eXeConvert usa pdfmake en la web y Puppeteer en la CLI para generar PDF. Genera un PDF funcional del contenido en local, sin necesidad de servidor.
       </p>
       <p>
         <strong>ConvertidoreXe</strong> lo hace directo desde el SemanticDocument con Paged.js y CSS Paged Media. Control editorial mucho mejor. El resultado lleva portada con imagen institucional, logos BUA y UA, índice con numeración automática, cabeceras, pies de página, y parte de los estilos del tema. Es material que puedes entregar o imprimir.
@@ -196,10 +196,10 @@
 
       <h3>Despliegue</h3>
       <p>
-        <strong>eXeConvert</strong> tiene servidor (Puppeteer) para PDF en Node.js, además de instalables de escritorio.
+        <strong>eXeConvert</strong> eXeConvert se despliega como web estática y como CLI en Node.js. Para PDF, la CLI usa Puppeteer; además, hay instalables nativos de escritorio.
       </p>
       <p>
-        <strong>ConvertidoreXe</strong> no requiere servidor. Se despliega en GitHub Pages. Funciona en cualquier navegador moderno. Nada de instalar.
+        <strong>ConvertidoreXe</strong> tampoco requiere servidor. Se despliega en GitHub Pages. Funciona en cualquier navegador moderno. Nada de instalar.
       </p>
 
       <hr>
@@ -249,7 +249,7 @@
         </tr>
         <tr>
           <td>Despliegue</td>
-          <td>Node.js</td>
+          <td>Página estática para la versión web. Node.js para la versión CLI.</td>
           <td>100% estático (GitHub Pages)</td>
         </tr>
       </table>
