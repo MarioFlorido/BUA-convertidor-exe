@@ -1,6 +1,7 @@
 import { zipSync } from 'fflate';
 import type { ImportedProject, ImportedPage, ImportedBlock } from '../models/SemanticDocument';
 import { PreviewService } from '../services/PreviewService';
+import { extractImages } from '../transformers/ImageExtractor';
 import { escapeHtml } from '../utils/html';
 
 export interface ElpxRenderOptions {
@@ -31,9 +32,13 @@ export class ElpxRenderer {
   /**
    * Renderizar proyecto completo como ELPX
    */
-  render(options: ElpxRenderOptions): RenderedElpx {
+  async render(options: ElpxRenderOptions): Promise<RenderedElpx> {
     const { entries } = this.template;
     const effectiveThemeId = options.themeId && options.themeId !== 'base' ? options.themeId : 'base';
+
+    // Extraer las imágenes embebidas (base64) a archivos dentro del ZIP.
+    // Trabaja sobre una copia: el project original (compartido con el PDF) no se toca.
+    await this.extractImagesToFiles(entries);
 
     // Generar content.xml
     entries['content.xml'] = new TextEncoder().encode(this.generateContentXml(effectiveThemeId));
@@ -52,6 +57,30 @@ export class ElpxRenderer {
       pageCount: this.project.pages.length,
       blockCount: this.project.pages.reduce((count, page) => count + page.blocks.length, 0),
     };
+  }
+
+  /**
+   * Extrae las imágenes embebidas (data URL base64) de los bloques a archivos
+   * dentro del ZIP, y reescribe los bloques para que apunten a esos archivos.
+   *
+   * Crea una copia del project y reasigna la referencia local: el project
+   * original (compartido con el renderer de PDF) queda intacto con sus imágenes
+   * en base64, que es lo que el PDF necesita.
+   */
+  private async extractImagesToFiles(entries: Record<string, Uint8Array>): Promise<void> {
+    const pages: ImportedPage[] = [];
+    for (const page of this.project.pages) {
+      const blocks: ImportedBlock[] = [];
+      for (const block of page.blocks) {
+        const { html, files } = await extractImages(block.html || '');
+        for (const [path, bytes] of files) {
+          entries[path] = bytes;
+        }
+        blocks.push({ ...block, html });
+      }
+      pages.push({ ...page, blocks });
+    }
+    this.project = { ...this.project, pages };
   }
 
   /**

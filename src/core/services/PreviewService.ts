@@ -1,5 +1,6 @@
 import type { ImportedProject, ImportedBlock } from '../models/SemanticDocument';
 import { escapeHtml } from '../utils/html';
+import { RESOURCE_DIR } from '../transformers/ImageExtractor';
 
 export interface PreviewPageInfo {
   title: string;
@@ -115,7 +116,7 @@ export class PreviewService {
     const nextPage = activeIndex < pages.length - 1 ? pages[activeIndex + 1] : null;
     const navItems = this.generateNavHtml(pages, activePageInfo.pageNumber, activeIndex);
     const blocks = activePage.blocks
-      .map((block, blockIndex) => this.generateBlockHtml(block, activePageInfo.pageNumber, blockIndex))
+      .map((block, blockIndex) => this.generateBlockHtml(block, activePageInfo.pageNumber, blockIndex, assetPrefix))
       .join('\n');
     const prevHref = prevPage
       ? activeIndex === 1
@@ -215,10 +216,15 @@ ${nextPage ? `<a href="${escapeHtml(nextHref)}" title="Next" class="nav-button n
   /**
    * Generar HTML de un bloque/iDevice
    */
-  private generateBlockHtml(block: ImportedBlock, pageNumber: number, blockIndex: number): string {
+  private generateBlockHtml(block: ImportedBlock, pageNumber: number, blockIndex: number, assetPrefix = ''): string {
     const blockId = `block-preview-${pageNumber}-${blockIndex + 1}`;
     const ideviceId = `idevice-preview-${pageNumber}-${blockIndex + 1}`;
-    const sanitizedHtml = sanitizePreviewBlockHtml(block.html || '<p></p>');
+    let sanitizedHtml = sanitizePreviewBlockHtml(block.html || '<p></p>');
+    // Las imágenes extraídas viven en content/resources/. En páginas anidadas
+    // (html/*.html) hay que prefijar con ../ para que la ruta resuelva.
+    if (assetPrefix) {
+      sanitizedHtml = sanitizedHtml.split(`"${RESOURCE_DIR}/`).join(`"${assetPrefix}${RESOURCE_DIR}/`);
+    }
 
     return `<article id="${escapeHtml(blockId)}" class="box">
 <header class="box-head no-icon">
