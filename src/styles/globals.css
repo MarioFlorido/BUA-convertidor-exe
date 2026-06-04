@@ -181,16 +181,59 @@ button {
   border-bottom: 1px solid var(--border-light);
   padding: 0.625rem 2rem 0.5rem;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 0.25rem;
 }
 
-.step-bar-file {
+/* ── Banner del documento (sobre el configurador) ────────────────────────── */
+.doc-title-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.doc-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  color: var(--blue);
+  background: var(--blue-light, rgba(0, 90, 158, 0.08));
+  border-radius: var(--radius-sm);
+}
+
+.doc-title-icon svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.doc-title-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doc-title-label {
   font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-3);
-  margin: 0;
-  max-width: 480px;
+}
+
+.doc-title-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -64,7 +64,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
 const LEVEL_LABELS: Record<1 | 2 | 3, string> = {
   1: 'Página principal',
   2: 'Subpágina',
-  3: 'Sub-subpágina',
+  3: '3er nivel',
 };
 
 const BLOCK1: { option: H2StructureOption; label: string }[] = [
