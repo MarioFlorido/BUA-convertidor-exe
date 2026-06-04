@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 
 # ZIPs de temas oficiales — artefactos generados por pack-themes, no van a git
 public/*.zip
+
+# Basura del sistema operativo (macOS)
+.DS_Store
+**/.DS_Store
