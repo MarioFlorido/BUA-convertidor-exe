@@ -192,7 +192,6 @@ button {
   gap: 0.75rem;
   background: var(--surface);
   border: 1px solid var(--border-light);
-  border-left: 3px solid var(--blue);
   border-radius: var(--radius);
   padding: 0.7rem 1rem;
   margin-bottom: 1.25rem;
@@ -200,20 +199,9 @@ button {
 }
 
 .doc-title-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: auto;
   flex-shrink: 0;
-  color: var(--blue);
-  background: var(--blue-light, rgba(0, 90, 158, 0.08));
-  border-radius: var(--radius-sm);
-}
-
-.doc-title-icon svg {
-  width: 1.1rem;
-  height: 1.1rem;
 }
 
 .doc-title-text {

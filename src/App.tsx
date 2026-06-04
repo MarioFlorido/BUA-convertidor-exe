@@ -225,12 +225,12 @@ export function App() {
           <>
             {file && (screen === 'structure' || screen === 'theme') && (
               <div className="doc-title-banner">
-                <span className="doc-title-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-                    <path d="M14 3v5h5" />
-                  </svg>
-                </span>
+                <img
+                  src={`${import.meta.env.BASE_URL}docx.png`}
+                  alt=""
+                  className="doc-title-icon"
+                  aria-hidden="true"
+                />
                 <div className="doc-title-text">
                   <span className="doc-title-label">Documento</span>
                   <span className="doc-title-name">{file.name}</span>
