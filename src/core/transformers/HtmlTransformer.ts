@@ -324,11 +324,44 @@ export function autolinkUrls(htmlValue: string): string {
 }
 
 /**
+ * Hace que los enlaces externos se abran en una pestaña nueva.
+ *
+ * Añade target="_blank" y rel="noopener noreferrer" a los <a> cuyo href
+ * apunta a una URL externa (http/https). No toca enlaces internos como
+ * anclas (#...), mailto:, tel: ni rutas relativas.
+ *
+ * Cubre tanto los enlaces creados por autolinkUrls como los hipervínculos
+ * que ya traía el documento de Word.
+ */
+export function openExternalLinksInNewTab(htmlValue: string): string {
+  if (typeof DOMParser === 'undefined') return htmlValue;
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${htmlValue}</body></html>`,
+    'text/html',
+  );
+  const body = doc.body;
+  let changed = false;
+
+  for (const anchor of Array.from(body.querySelectorAll('a[href]'))) {
+    const href = (anchor.getAttribute('href') || '').trim();
+    if (!/^https?:\/\//i.test(href)) continue; // solo enlaces externos
+    anchor.setAttribute('target', '_blank');
+    anchor.setAttribute('rel', 'noopener noreferrer');
+    changed = true;
+  }
+
+  // Si no hubo cambios, devolver el HTML original sin re-serializar
+  return changed ? body.innerHTML : htmlValue;
+}
+
+/**
  * Aplica todas las transformaciones HTML en orden:
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
  * 2. clases semánticas [ejemplo], [definición], [importante]
  * 3. clases de tabla [horizontal], [vertical]
  * 4. autolink de URLs en texto plano (al final: re-serializa el DOM)
+ * 5. enlaces externos → abrir en pestaña nueva
  */
 export function applyAllTransforms(htmlValue: string): string {
   let transformed = htmlValue;
@@ -336,5 +369,6 @@ export function applyAllTransforms(htmlValue: string): string {
   transformed = applyDivClasses(transformed);
   transformed = applyTableClasses(transformed);
   transformed = autolinkUrls(transformed);
+  transformed = openExternalLinksInNewTab(transformed);
   return transformed;
 }

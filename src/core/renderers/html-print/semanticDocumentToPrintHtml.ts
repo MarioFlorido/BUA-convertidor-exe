@@ -197,7 +197,7 @@ function convertIframesToLinks(html: string): string {
       const url = ytMatch
         ? `https://www.youtube.com/watch?v=${ytMatch[1]}`
         : src;
-      return url ? `<div style="text-align: center; margin: 1em 0;"><a href="${url}">${url}</a></div>` : '';
+      return url ? `<div style="text-align: center; margin: 1em 0;"><a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a></div>` : '';
     },
   );
 }

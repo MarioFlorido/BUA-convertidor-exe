@@ -412,7 +412,11 @@ function normalizeImportedNode(node: Node): string {
       if (!href) {
         return normalizedChildren;
       }
-      return `<a href="${escapeHtml(href)}">${normalizedChildren}</a>`;
+      // Los enlaces externos se abren en pestaña nueva
+      const externalAttrs = /^https?:\/\//i.test(href)
+        ? ' target="_blank" rel="noopener noreferrer"'
+        : '';
+      return `<a href="${escapeHtml(href)}"${externalAttrs}>${normalizedChildren}</a>`;
     }
     case 'img': {
       const src = (node.getAttribute('src') || '').trim();
