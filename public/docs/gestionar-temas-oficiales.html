@@ -190,17 +190,18 @@
         <p class="eyebrow">Administración · Solo para mí</p>
         <h1>Gestionar estilos oficiales</h1>
         <p style="color: var(--text-soft); margin: 0">
-          Cómo publicar y eliminar los estilos que aparecen para todos los usuarios.
+          Publica, actualiza y elimina los estilos que ven todos los usuarios,
+          <strong>desde el propio Convertidor</strong> — sin Terminal ni scripts.
         </p>
       </header>
 
       <!-- Requisitos previos -->
       <div class="prereq">
         <p>
-          <strong>Antes de empezar:</strong> necesitas tener el proyecto descargado
-          en la carpeta <code>/Users/ruta/a/mi/copia/local</code>. Si no lo tienes,
-          clónalo con <code>git clone git@github.com:MarioFlorido/BUA-convertidor-exe.git</code>
-          y luego ejecuta <code>npm install</code> dentro de esa carpeta.
+          <strong>Antes de empezar:</strong> necesitas un <strong>token de acceso de GitHub</strong>
+          (fine-grained PAT) limitado a este repositorio, con permiso
+          <code>Contents: Read and write</code>. Se crea <strong>una sola vez</strong> y se reutiliza.
+          Usa <strong>Chrome o Edge</strong> (la selección de carpeta no funciona en Firefox/Safari).
         </p>
       </div>
 
@@ -208,44 +209,49 @@
       <div class="diagram-wrap">
         <pre class="mermaid">
 flowchart TD
-    Start([npm run publish-theme]) --> Pub[Proporcionar ruta al ZIP]
-    Pub --> Extract[Extraer a public/themes/id/]
-    Extract --> Config[Actualizar themes-config.json]
-    Config --> Push[git commit + push]
-    Push --> GH([GitHub Pages en 1-2 min])
-
-    Start2([npm run unpublish-theme]) --> Del[Eliminar estilo oficial]
-    Del --> Config2[Actualizar themes-config.json]
-    Config2 --> Push2[git commit + push]
-    Push2 --> GH
+    Start([Panel de administración]) --> Auth[Introducir token de GitHub]
+    Auth --> Pick[Seleccionar carpeta del tema]
+    Pick --> Val[Validar + previsualizar]
+    Val --> Pub[Publicar / Actualizar / Eliminar]
+    Pub --> Commit[Commit a main vía API de GitHub]
+    Commit --> CI([CI deploy.yml reconstruye y despliega])
+    CI --> GH([Visible para todos en 1-2 min])
         </pre>
       </div>
 
-      <h2>Publicar un estilo (oficial)</h2>
-
+      <h2>Dónde está el panel</h2>
       <ol class="steps">
-        <li>
-          <span>
-            Abre el <strong>Terminal</strong>
-            (búscalo con <kbd>⌘ Espacio</kbd> y escribe "Terminal").
-          </span>
-        </li>
-        <li>
-          <span>
-            Navega a la carpeta del proyecto:<br>
-            <samp class="cmd">cd /Users/mariofloridoperez/BUA-convertidor-exe</samp>
-          </span>
-        </li>
-        <li>
-          <span>
-            Ejecuta el comando para publicar:<br>
-            <samp class="cmd">npm run publish-theme -- /ruta/al/archivo/tema.zip</samp>
-            <span class="note">Sustituye <code>/ruta/al/archivo/tema.zip</code> por la ruta real de tu archivo ZIP.</span>
-          </span>
-        </li>
+        <li><span>Abre el Convertidor y pulsa <strong>«Estilos eXeLearning»</strong> (arriba a la derecha).</span></li>
+        <li><span>Baja hasta la sección <strong>«Administración de temas oficiales»</strong>.</span></li>
+        <li><span>Pega tu token y pulsa <strong>Entrar</strong>. Si quieres no repetirlo, elige <em>«Recordar… en este dispositivo»</em>.</span></li>
       </ol>
 
-      <!-- Publicar -->
+      <!-- Crear el token -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Crear el token de GitHub (una sola vez)</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En GitHub: <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</strong>.</span></li>
+            <li><span><strong>Resource owner:</strong> MarioFlorido. <strong>Expiration:</strong> larga (p. ej. 1 año).</span></li>
+            <li><span><strong>Repository access:</strong> <em>Only select repositories</em> → <code>BUA-convertidor-exe</code>.</span></li>
+            <li><span><strong>Repository permissions → Contents:</strong> <code>Read and write</code>. (GitHub añade <em>Metadata: Read-only</em> solo, es normal.)</span></li>
+            <li><span><strong>Generate token</strong> y copia el valor (<code>github_pat_…</code>). Se muestra una sola vez.</span></li>
+          </ol>
+          <div class="callout">
+            El mismo token vale en los tres entornos (localhost de casa, producción en github.io, localhost del trabajo):
+            es una credencial de GitHub, no del sitio. Cada navegador/equipo lo recuerda por separado.
+          </div>
+        </div>
+      </div>
+
+      <!-- Publicar / actualizar -->
       <div class="action-card">
         <div class="action-card-header">
           <div class="action-card-icon icon--publish">
@@ -253,88 +259,20 @@ flowchart TD
               <path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 20h16"/>
             </svg>
           </div>
-          <span class="action-card-title">Publicar un estilo oficial</span>
+          <span class="action-card-title">Publicar o actualizar un estilo oficial</span>
         </div>
         <div class="action-card-body">
           <ol class="steps">
-            <li>
-              <span>
-                En Terminal, desde la carpeta del proyecto, ejecuta:
-                <br><samp class="cmd">npm run publish-theme -- ~/Desktop/Doctorado_26-27.zip</samp>
-                <span class="note">Sustituye la ruta con la ubicación real de tu ZIP.</span>
-              </span>
-            </li>
-            <li>
-              <span>
-                Opcionalmente, añade metadatos:
-                <br><samp class="cmd">npm run publish-theme -- ~/Desktop/Doctorado_26-27.zip --activity "Doctorado" --description "Estilo para Doctorado 26-27"</samp>
-                <span class="note">Las opciones <code>--activity</code> y <code>--description</code> son opcionales.</span>
-              </span>
-            </li>
-            <li>
-              <span>
-                El script extrae el ZIP, lo valida y actualiza <code>themes-config.json</code>.
-                Verás un mensaje indicando qué comandos ejecutar:
-                <br><samp class="cmd">git add public/themes/Doctorado_26-27/ public/themes-config.json</samp>
-                <br><samp class="cmd">git commit -m "feat(themes): publicar Doctorado_26-27"</samp>
-                <br><samp class="cmd">git push</samp>
-              </span>
-            </li>
-            <li>
-              <span>
-                Ejecuta esos comandos. En 1-2 minutos el estilo estará visible en GitHub Pages
-                para todos los usuarios.
-              </span>
-            </li>
+            <li><span>En el panel, pulsa <strong>«Seleccionar carpeta…»</strong> y elige la carpeta del tema (p. ej. <code>Doctorado_26-27</code>).</span></li>
+            <li><span>Revisa la <strong>validación</strong> (errores en rojo bloquean; avisos en amarillo no) y la <strong>previsualización</strong> (nombre, actividad y descripción son editables).</span></li>
+            <li><span>Pulsa <strong>«Publicar tema oficial»</strong>. Si el id ya existe, el botón pasa a <strong>«Actualizar»</strong>: se reemplazan los archivos y se borran los que ya no estén en la carpeta.</span></li>
+            <li><span>Listo: se hace un único commit en <code>main</code> y el CI reconstruye y despliega en 1-2 minutos.</span></li>
           </ol>
           <div class="callout">
-            <strong>Importante:</strong> El archivo debe ser un ZIP válido con dentro: <code>config.xml</code> y <code>style.css</code>
-            (sin archivos de sistema como <code>__MACOSX</code> o <code>.DS_Store</code>).
-            El nombre del ZIP (sin extensión) se convierte en el ID: <code>Doctorado_26-27.zip</code> → ID <code>Doctorado_26-27</code>.
+            <strong>Importante:</strong> la carpeta debe contener al menos <code>config.xml</code> y <code>style.css</code>.
+            El <strong>nombre de la carpeta es el ID</strong> del estilo (<code>Doctorado_26-27</code> → ID <code>Doctorado_26-27</code>).
+            La basura de macOS (<code>__MACOSX</code>, <code>.DS_Store</code>) se descarta automáticamente.
           </div>
-        </div>
-      </div>
-
-      <!-- Descargar -->
-      <div class="action-card">
-        <div class="action-card-header">
-          <div class="action-card-icon icon--download">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 4v12M8 12l4 4 4-4"/><path d="M4 20h16"/>
-            </svg>
-          </div>
-          <span class="action-card-title">Descargar un estilo oficial (para editar)</span>
-        </div>
-        <div class="action-card-body">
-          <p>
-            Los estilos oficiales se encuentran en <code>public/themes/</code>.
-            Puedes descargarlos como ZIP desde GitHub directamente:
-          </p>
-          <ol class="steps">
-            <li>
-              <span>
-                Abre <a href="https://github.com/MarioFlorido/BUA-convertidor-exe/tree/main/public/themes" target="_blank">
-                  el repositorio en GitHub
-                </a>
-              </span>
-            </li>
-            <li>
-              <span>
-                Selecciona la carpeta del estilo que quieres (ej: <code>Doctorado_26-27</code>)
-              </span>
-            </li>
-            <li>
-              <span>
-                Haz clic en el botón <strong>⬇ Code</strong> y luego <strong>Download ZIP</strong>
-              </span>
-            </li>
-          </ol>
-          <p>
-            <strong>Alternativa desde Terminal:</strong>
-            Los estilos ya están en tu copia local en <code>public/themes/&lt;id&gt;/</code>.
-            Puedes comprimirlos con:
-          </p>
-          <samp class="cmd">zip -r Doctorado_26-27.zip public/themes/Doctorado_26-27/</samp>
         </div>
       </div>
 
@@ -350,47 +288,41 @@ flowchart TD
         </div>
         <div class="action-card-body">
           <ol class="steps">
-            <li>
-              <span>
-                En Terminal, ejecuta:
-                <br><samp class="cmd">npm run unpublish-theme</samp>
-              </span>
-            </li>
-            <li>
-              <span>
-                Te mostrará una lista de estilos oficiales. Introduce el nombre del que quieres eliminar
-                (debe coincidir exactamente, ej: <code>Doctorado_26-27</code>)
-              </span>
-            </li>
-            <li>
-              <span>
-                El script pide confirmación. Escribe <code>s</code> y pulsa <kbd>Enter</kbd>.
-                <strong>Esta acción no se puede deshacer.</strong>
-              </span>
-            </li>
-            <li>
-              <span>
-                El script te mostrará los comandos git para hacer commit y push:
-                <br><samp class="cmd">git add public/themes-config.json</samp>
-                <br><samp class="cmd">git commit -m "feat(themes): eliminar Doctorado_26-27"</samp>
-                <br><samp class="cmd">git push</samp>
-              </span>
-            </li>
-            <li>
-              <span>
-                Ejecuta esos comandos. En 1-2 minutos el estilo desaparecerá para todos los usuarios.
-              </span>
-            </li>
+            <li><span>En la lista <strong>«Temas oficiales existentes»</strong>, pulsa <strong>Eliminar</strong> en el que quieras.</span></li>
+            <li><span>Para confirmar, <strong>escribe el id exacto</strong> del tema (doble confirmación de seguridad).</span></li>
+            <li><span>Pulsa <strong>«Eliminar def.»</strong>: se borra la carpeta y se actualiza el catálogo en un commit. <strong>Recuperable desde el historial de git</strong> si hiciera falta.</span></li>
           </ol>
+        </div>
+      </div>
+
+      <!-- Opciones avanzadas -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Opciones avanzadas (probar sin riesgo)</span>
+        </div>
+        <div class="action-card-body">
+          <p>Dentro del panel, en <strong>«Opciones avanzadas»</strong>:</p>
+          <ul>
+            <li><strong>Rama destino:</strong> cámbiala a <code>admin-themes-test</code> para ensayar sin tocar producción.</li>
+            <li><strong>Simular (dry-run):</strong> calcula qué se subiría/borraría <strong>sin modificar nada</strong>.</li>
+          </ul>
           <div class="callout">
-            <strong>Nota:</strong> El directorio <code>public/themes/&lt;id&gt;/</code> se elimina del repositorio,
-            pero puedes recuperarlo desde el historial de git si es necesario.
+            Para publicar de verdad, deja la rama en <code>main</code> y el dry-run desactivado.
           </div>
         </div>
       </div>
 
       <footer>
-        <p>BUA Convertidor · <a href="../docs/guia-temas.html">Guía de estilos para usuarios</a></p>
+        <p>
+          BUA Convertidor · <a href="../docs/guia-temas.html">Guía de estilos para usuarios</a><br>
+          <span class="note">El antiguo flujo por Terminal (<code>publicar-tema-completo.sh</code> /
+          <code>npm run publish-theme</code>) queda obsoleto: todo se hace desde este panel.</span>
+        </p>
       </footer>
 
     </div>
