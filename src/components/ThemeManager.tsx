@@ -3,6 +3,7 @@ import { themeClientService } from '../core/services/ThemeClientService';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
 import { ThemeOrderService } from '../core/services/ThemeOrderService';
 import type { ThemeBundle } from '../core/services/ThemeBundle';
+import { OfficialThemeAdmin } from './OfficialThemeAdmin';
 
 export function ThemeManager() {
   const [themes, setThemes] = useState<ThemeBundle[]>(() =>
@@ -260,6 +261,10 @@ export function ThemeManager() {
           </div>
         )}
       </div>
+
+      {/* Administración de temas oficiales (requiere token de GitHub) */}
+      <hr className="admin-divider" />
+      <OfficialThemeAdmin />
 
     </div>
   );
