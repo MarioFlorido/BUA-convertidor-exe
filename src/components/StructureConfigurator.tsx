@@ -49,7 +49,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const next = section.h2Items[i + 1];
       if (next && next.option !== 'idevice-title') {
         h2Errors[h2.id] =
-          'Un “Nombre de iDevice” crea un iDevice con cabecera y con un marco y no puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”. Es el que se utiliza en "Para saber más, bibliografía o material complementario..."';
+          'Un “Nombre de iDevice” crea un iDevice con cabecera y marco. No puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”. Son los que se utilizan en "Para saber más", "Bibliografía"..."';
       }
     });
   });
