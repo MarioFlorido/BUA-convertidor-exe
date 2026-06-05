@@ -569,8 +569,7 @@ button {
 
 .result-success-card {
   background: var(--surface);
-  border: 1px solid rgba(52,199,89,.25);
-  border-top: 3px solid var(--green);   /* acento verde — señal clara de éxito */
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   padding: 2.5rem 2.25rem;
   box-shadow: var(--shadow-sm);
