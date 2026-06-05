@@ -5,6 +5,7 @@ import { readThemeDirectory, isDirectoryPickerSupported } from '../core/services
 import { validateThemeForPublish, type ThemeValidationReport } from '../core/services/admin/themeValidation';
 import { screenshotToObjectUrl } from '../core/services/themeConfigParser';
 import { DEFAULT_PUBLISH_BRANCH } from '../core/services/admin/githubRepo';
+import { ThemeRegistry } from '../core/services/ThemeRegistry';
 
 interface LoadedTheme {
   id: string;
@@ -46,6 +47,15 @@ export function OfficialThemeAdmin() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [branch, setBranch] = useState(DEFAULT_PUBLISH_BRANCH);
   const [dryRun, setDryRun] = useState(false);
+
+  // ── Eliminar tema ──
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmText, setConfirmText] = useState('');
+
+  // Temas oficiales cargados en la app (excluye "base", que no se borra).
+  const officialThemes = ThemeRegistry.getAll().filter(
+    (t) => t.source === 'builtin' && t.id !== 'base',
+  );
 
   const handleLogin = async () => {
     setAuthBusy(true);
@@ -119,6 +129,27 @@ export function OfficialThemeAdmin() {
     }
   };
 
+  const cancelDelete = () => {
+    setDeletingId(null);
+    setConfirmText('');
+  };
+
+  const handleDelete = async () => {
+    if (!deletingId || confirmText !== deletingId) return;
+    setBusy(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await GitHubThemePublisher.deleteTheme(deletingId, { branch, dryRun });
+      setResult(res);
+      cancelDelete();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error eliminando el tema.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   // ── Render: no autenticado ──
   if (!authed) {
     return (
@@ -164,6 +195,7 @@ export function OfficialThemeAdmin() {
   // ── Render: autenticado ──
   const report = loaded?.report;
   const hasErrors = (report?.errors.length ?? 0) > 0;
+  const hasExisting = loaded ? officialThemes.some((t) => t.id === loaded.id) : false;
 
   return (
     <div className="admin-panel">
@@ -177,7 +209,7 @@ export function OfficialThemeAdmin() {
 
       {error && <div className="alert alert-error">{error}</div>}
 
-      {/* Resultado de publicación */}
+      {/* Resultado de la operación (publicar / actualizar / eliminar) */}
       {result && (
         <div className={`alert ${result.dryRun ? 'alert-info' : 'alert-success'}`}>
           {result.dryRun ? (
@@ -187,20 +219,99 @@ export function OfficialThemeAdmin() {
             </>
           ) : (
             <>
-              <strong>✓ Publicado</strong> en <code>{result.branch}</code> ({result.upserted} archivo(s),
-              {' '}{result.deleted} eliminado(s)). Commit <code>{result.commitSha?.slice(0, 7)}</code>.
+              <strong>✓ Hecho</strong> en <code>{result.branch}</code>: {result.upserted} archivo(s)
+              {' '}subido(s), {result.deleted} eliminado(s). Commit <code>{result.commitSha?.slice(0, 7)}</code>.
               {result.branch === DEFAULT_PUBLISH_BRANCH && ' El despliegue se actualiza en 1-2 minutos.'}
             </>
           )}
           <div style={{ marginTop: '0.6rem' }}>
-            <button className="btn-cancel" onClick={resetWizard}>Publicar otro tema</button>
+            <button className="btn-cancel" onClick={resetWizard}>Hacer otra operación</button>
           </div>
         </div>
       )}
 
-      {/* Asistente */}
+      {/* Opciones avanzadas (rama destino + dry-run) — aplican a todas las operaciones */}
+      {!result && (
+        <div className="admin-wizard-step" style={{ borderTop: 'none', paddingTop: 0 }}>
+          <button type="button" className="link-button" onClick={() => setShowAdvanced((v) => !v)}>
+            {showAdvanced ? '▲ Ocultar opciones avanzadas' : '▼ Opciones avanzadas'}
+          </button>
+          {showAdvanced && (
+            <div className="admin-advanced">
+              <label>
+                Rama destino
+                <input type="text" value={branch} onChange={(e) => setBranch(e.target.value)} />
+              </label>
+              <label className="admin-checkbox">
+                <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} />
+                Simular (dry-run): no modifica nada
+              </label>
+            </div>
+          )}
+          {branch !== DEFAULT_PUBLISH_BRANCH && (
+            <p className="help-text">Operando sobre la rama <code>{branch}</code> (no en producción).</p>
+          )}
+        </div>
+      )}
+
+      {/* Temas oficiales existentes */}
+      {!result && (
+        <div className="admin-wizard-step">
+          <h4>Temas oficiales existentes ({officialThemes.length})</h4>
+          {officialThemes.length === 0 ? (
+            <p className="help-text">No hay temas oficiales cargados.</p>
+          ) : (
+            <div className="admin-theme-list">
+              {officialThemes.map((t) => (
+                <div key={t.id} className="admin-theme-row">
+                  <span className="admin-theme-name">
+                    <strong>{t.metadata?.name ?? t.name}</strong>
+                    <span className="theme-id">({t.id})</span>
+                  </span>
+                  {deletingId === t.id ? (
+                    <span className="admin-delete-confirm">
+                      <input
+                        type="text"
+                        placeholder={`Escribe "${t.id}"`}
+                        value={confirmText}
+                        onChange={(e) => setConfirmText(e.target.value)}
+                        className="admin-confirm-input"
+                      />
+                      <button
+                        className="btn-delete"
+                        onClick={handleDelete}
+                        disabled={busy || confirmText !== t.id}
+                      >
+                        {busy ? '…' : dryRun ? 'Simular' : 'Eliminar def.'}
+                      </button>
+                      <button className="link-button" onClick={cancelDelete} disabled={busy}>Cancelar</button>
+                    </span>
+                  ) : (
+                    <button
+                      className="btn-delete"
+                      onClick={() => { setDeletingId(t.id); setConfirmText(''); setError(null); }}
+                      disabled={busy}
+                    >
+                      Eliminar
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="help-text">
+            Para <strong>actualizar</strong> un tema, vuelve a publicar su carpeta con el mismo nombre
+            (mismo id) en el asistente de abajo: se reemplazan los archivos y se conservan sus metadatos.
+          </p>
+        </div>
+      )}
+
+      {/* Asistente: crear / actualizar */}
       {!result && (
         <>
+          <div className="admin-wizard-step">
+            <h4>Nuevo tema oficial (o actualizar uno existente)</h4>
+          </div>
           <div className="admin-wizard-step">
             <h4>1. Selecciona la carpeta del tema</h4>
             {!isDirectoryPickerSupported() ? (
@@ -270,38 +381,19 @@ export function OfficialThemeAdmin() {
 
               <div className="admin-wizard-step">
                 <h4>4. Publicar</h4>
-
-                <button
-                  type="button"
-                  className="link-button"
-                  onClick={() => setShowAdvanced((v) => !v)}
-                >
-                  {showAdvanced ? '▲ Ocultar opciones avanzadas' : '▼ Opciones avanzadas'}
-                </button>
-                {showAdvanced && (
-                  <div className="admin-advanced">
-                    <label>
-                      Rama destino
-                      <input type="text" value={branch} onChange={(e) => setBranch(e.target.value)} />
-                    </label>
-                    <label className="admin-checkbox">
-                      <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} />
-                      Simular (dry-run): no modifica nada
-                    </label>
+                {hasExisting && (
+                  <div className="alert alert-warning">
+                    Ya existe un tema oficial con id <code>{loaded.id}</code>: se <strong>actualizará</strong>
+                    {' '}(se reemplazan sus archivos y se eliminan los que ya no estén en la carpeta).
                   </div>
                 )}
-
-                {branch !== DEFAULT_PUBLISH_BRANCH && (
-                  <p className="help-text">Publicando en la rama <code>{branch}</code> (no en producción).</p>
-                )}
-
                 <button
                   className="btn-confirm"
                   onClick={handlePublish}
                   disabled={busy || hasErrors}
                   title={hasErrors ? 'Corrige los errores antes de publicar' : undefined}
                 >
-                  {busy ? 'Publicando…' : dryRun ? 'Simular publicación' : 'Publicar tema oficial'}
+                  {busy ? 'Publicando…' : dryRun ? 'Simular publicación' : hasExisting ? 'Actualizar tema oficial' : 'Publicar tema oficial'}
                 </button>
                 {hasErrors && <p className="help-text">Hay errores que impiden publicar.</p>}
               </div>
