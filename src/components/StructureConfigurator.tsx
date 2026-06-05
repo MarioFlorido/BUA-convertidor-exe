@@ -39,7 +39,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const prev = index > 0 ? sections[index - 1] : null;
       if (!prev || (prev.level !== 2 && prev.level !== 3)) {
         h1Errors[section.id] =
-          'Una página de 3er nivel debe ir precedida por una subpágina (2º nivel). No se puede saltar de 1er a 3er nivel.';
+          'Una página de 3er nivel debe ir precedida por una subpágina (2º nivel). No se puede saltar de Página principal a 3er nivel.';
       }
     }
 
@@ -49,7 +49,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const next = section.h2Items[i + 1];
       if (next && next.option !== 'idevice-title') {
         h2Errors[h2.id] =
-          'Un “Nombre de iDevice” no puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”.';
+          'Un “Nombre de iDevice” crea un iDevice con cabecera y con un marco y no puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”. Es el que se utiliza en "Para saber más, bibliografía o material complementario..."';
       }
     });
   });
