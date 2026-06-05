@@ -1233,9 +1233,9 @@ button {
 /* ── Validación de estructura ────────────────────────────────────────────── */
 .config-error {
   color: var(--red);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   line-height: 1.35;
-  background: var(--red-light);
+ /* background: var(--red-light);*/
   border-radius: var(--radius-sm);
   padding: 0.5rem 0.7rem;
   margin-top: 0.5rem;
