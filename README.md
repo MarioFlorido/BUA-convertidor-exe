@@ -59,6 +59,12 @@ El tema que elijas aporta los colores y las etiquetas. ConvertidoreXe es bastant
 
 Para cargar un tema local, pulsa "Importar estilo local" en la cabecera. Arrastra el ZIP o abre el selector de archivos. Listo.
 
+### Publicar temas oficiales (administración)
+
+Los temas oficiales se gestionan desde el propio Convertidor, en **«Estilos eXeLearning» → «Administración de temas oficiales»** — sin Terminal. Requiere un *token de acceso de GitHub* (fine-grained PAT limitado a este repo, con permiso `Contents: Read and write`). El panel lee la carpeta del tema, la valida, la previsualiza y publica/actualiza/elimina commiteando a `main` vía la API de GitHub; el CI reconstruye y despliega solo en 1-2 minutos.
+
+Guía detallada: [Gestionar estilos oficiales](public/docs/gestionar-temas-oficiales.html). El antiguo flujo por Terminal (`npm run publish-theme` / `unpublish-theme`) queda como _fallback_.
+
 ### Reordenar temas
 
 En el selector de temas hay un icono (≡) a la izquierda de cada uno. Arrastra para cambiar el orden. Se guarda automáticamente.
@@ -161,10 +167,10 @@ Lo que está hecho:
 -  Reordenación de temas (drag-and-drop)
 -  Guía de usuario integrada
 -  Despliegue automático en GitHub Pages
+-  Panel de administración de temas oficiales (publicar/actualizar/eliminar desde el navegador, sin Terminal)
 
 Lo que me falta:
 
--  Dashboard para cargar temas oficales en remoto
 -  Fase 3 de depuración --- > eliminar dos duplicaciones de código (escHtml y DocumentStructure)
 
 Para la versión 2:
