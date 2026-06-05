@@ -22,10 +22,10 @@ export interface StructureValidation {
  *    subpágina (2º nivel) o por otra de 3er nivel (hermana). No se puede saltar
  *    de 1er a 3er nivel.
  *
- * 2. Título de iDevice: un H2 marcado como "Nombre de iDevice" genera un bloque
+ * 2. Título de iDevice: un H2 marcado como "Título de iDevice" genera un bloque
  *    hoja que no puede contener dentro otro H2, acordeón ni pestañas. Por eso
  *    solo es válido si es el último H2 de su sección o si el H2 siguiente también
- *    es "Nombre de iDevice". Si le sigue un H2 en texto / acordeón / pestañas,
+ *    es "Título de iDevice". Si le sigue un H2 en texto / acordeón / pestañas,
  *    ese contenido quedaría anidado dentro del iDevice (estructura inválida).
  */
 export function validateStructure(structure: DocumentStructure): StructureValidation {
@@ -39,7 +39,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const prev = index > 0 ? sections[index - 1] : null;
       if (!prev || (prev.level !== 2 && prev.level !== 3)) {
         h1Errors[section.id] =
-          'Una página de 3er nivel debe ir precedida por una subpágina (2º nivel). No se puede saltar de Página principal a 3er nivel.';
+          'No se puede saltar de Página principal a un 3er nivel.';
       }
     }
 
@@ -49,7 +49,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const next = section.h2Items[i + 1];
       if (next && next.option !== 'idevice-title') {
         h2Errors[h2.id] =
-          'Un “Nombre de iDevice” crea un iDevice con cabecera y marco. No puede llevar dentro otro H2, acordeón o pestañas. Debe ser el último H2 de la sección o ir seguido de otro “Nombre de iDevice”. Son los que se utilizan en "Para saber más", "Bibliografía"..."';
+          'Un «Título de iDevice» crea un iDevice con ese título en la cabecera y un marco contenedor. Debe ser el último H2 de la sección o ir seguido de otro iDevice con título';
       }
     });
   });
@@ -68,7 +68,7 @@ const LEVEL_LABELS: Record<1 | 2 | 3, string> = {
 };
 
 const BLOCK1: { option: H2StructureOption; label: string }[] = [
-  { option: 'idevice-title', label: 'Nombre de iDevice' },
+  { option: 'idevice-title', label: 'Título de iDevice' },
   { option: 'html',          label: 'Cabecera 2 en texto' },
 ];
 
