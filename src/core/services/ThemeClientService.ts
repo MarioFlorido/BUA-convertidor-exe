@@ -60,8 +60,9 @@ export class ThemeClientService {
   /**
    * Elimina un tema del registry y de IndexedDB.
    * - 'base' (oficial): no se puede eliminar.
-   * - Cualquier tema oficial (source 'builtin'): tampoco se puede eliminar desde
-   *   la UI; los temas oficiales se gestionan vía repo Git (`npm run unpublish-theme`).
+   * - Cualquier tema oficial (source 'builtin'): no se elimina desde esta UI de
+   *   usuario; se gestiona en el panel «Administración de temas oficiales»
+   *   (o, como fallback, vía CLI `npm run unpublish-theme`).
    * - Temas locales (source 'user'): se borran de IndexedDB.
    */
   async removeTheme(id: string): Promise<void> {
