@@ -383,18 +383,19 @@
    Reproducen el aspecto del tema eXeLearning:
      - Cabecera coloreada con el título en blanco (color primario del tema)
      - Borde perimetral del mismo color
-   break-inside:avoid mantiene cabecera y primer párrafo juntos en la misma página.
+   Puede partirse entre páginas si es largo (evita huecos en blanco); solo se
+   protege que la cabecera no quede huérfana al final de página (break-after).
    ──────────────────────────────────────────────────────────────────────────── */
 .idevice-with-title {
   border: 1px solid var(--color-primary, #135d87);
   margin: 14px 0;
-  break-inside: avoid;
   box-sizing: border-box;
 }
 
 .idevice-header {
   background-color: var(--color-primary, #135d87);
   padding: 6px 14px;
+  break-after: avoid;
 }
 
 .idevice-title {
@@ -459,9 +460,14 @@
   border-collapse: collapse;
   margin: 10px 2px;
   font-size: 9.5pt;
-  break-inside: avoid;
   box-sizing: border-box;
   table-layout: fixed;
+}
+
+/* Una tabla larga puede partirse entre páginas (evita huecos), pero una fila
+   nunca se corta por la mitad. */
+.block-html tr {
+  break-inside: avoid;
 }
 
 .block-html th {
@@ -502,9 +508,7 @@
 .block-html .bua_tabla_horizontal,
 .block-html .bua_tabla_vertical {
   margin: 10px 0;
-  break-inside: avoid;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 
@@ -522,7 +526,9 @@
 .block-html .bua_tabla_vertical {
   margin: 10px 25px;
   padding: 10px 14px;
-  break-inside: avoid;
+  /* Sin break-inside: avoid — una caja extensa (típico en Ejemplo/Importante)
+     puede partirse entre páginas para no dejar huecos. La etiqueta ::before solo
+     aparece al inicio; el fondo y el borde izquierdo continúan en la 2ª parte. */
   border-radius: 0 3px 3px 0;
   box-sizing: border-box;
 }
@@ -577,13 +583,13 @@
 
 .block-html details {
   margin: 8px 0;
-  break-inside: avoid;
 }
 
 .block-html details summary {
   font-weight: 700;
   margin-bottom: 5px;
   list-style: none;
+  break-after: avoid;
 }
 
 .block-html details summary::marker,
