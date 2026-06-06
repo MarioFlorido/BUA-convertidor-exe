@@ -402,13 +402,21 @@
    protege que la cabecera no quede huérfana al final de página (break-after).
    ──────────────────────────────────────────────────────────────────────────── */
 .idevice-with-title {
-  border: 1px solid var(--color-primary, #135d87);
+  /* Solo bordes laterales: al fragmentar con Paged.js, left/right se cortan
+     limpio en cada página. El borde superior lo cierra .idevice-header (que
+     solo aparece en el primer fragmento) y no hay border-bottom explícito,
+     por lo que ningún fragmento muestra borde en el punto de ruptura.
+     box-decoration-break:slice (defecto CSS) no funciona de forma fiable en
+     Paged.js 0.4.3, de ahí esta estrategia explícita. */
+  border-left: 1px solid var(--color-primary, #135d87);
+  border-right: 1px solid var(--color-primary, #135d87);
   margin: 14px 0;
   box-sizing: border-box;
 }
 
 .idevice-header {
   background-color: var(--color-primary, #135d87);
+  border-top: 1px solid var(--color-primary, #135d87);
   padding: 6px 14px;
   break-after: avoid;
 }
@@ -489,7 +497,7 @@
 }
 
 .block-html th {
-  background-color: #f5f6f7;
+  background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;
   padding: 6px 10px;
@@ -516,7 +524,7 @@
 
 /* Tabla vertical: primera columna actúa como cabecera */
 .block-html .bua_tabla_vertical td:first-child {
-  background-color: #f5f6f7;
+  background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-right: 3px solid var(--color-accent, #deb13c);
@@ -525,7 +533,7 @@
 /* Tabla horizontal: primera fila actúa como cabecera. Las celdas llegan como
    <td> desde Word (Mammoth no genera <th>), por eso se estiliza la fila aquí. */
 .block-html .bua_tabla_horizontal tr:first-child td {
-  background-color: #f5f6f7;
+  background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-bottom: 3px solid var(--color-accent, #deb13c);
