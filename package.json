@@ -11,6 +11,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "deploy": "npm run build && gh-pages -d dist",
     "themes": "tsx scripts/themes.ts",
     "publish-theme": "tsx scripts/publish-theme.ts",
