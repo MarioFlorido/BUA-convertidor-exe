@@ -292,15 +292,15 @@
    4. CONTENIDO — SECCIONES Y TÍTULOS
    ============================================================ */
 
-/* H1 siempre abre nueva página */
-.section-level-1 {
-  break-before: page;
-}
-
+/* Todo título de página abre página nueva. Todos provienen de un encabezado 1,
+   sea página, subpágina o 3er nivel de la estructura de navegación: en el PDF
+   cada uno es una página. La jerarquía se conserva en el índice y en los
+   marcadores del PDF (bookmark-level por nivel). */
+.section-level-1,
 .section-level-2,
 .section-level-3,
 .section-level-4 {
-  break-before: auto;
+  break-before: page;
 }
 
 /* FIX: sin break-after: avoid en los títulos.
@@ -320,17 +320,16 @@
 }
 
 .section-title-2 {
-  font-size: 15pt;
+  font-size: 20pt;
   font-weight: 700;
-  margin: 28px 0 6px 0;
-  padding-bottom: 0;
-  border-bottom: none;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 3px solid;
   bookmark-level: 2;
   bookmark-label: content();
   text-transform: uppercase;
 }
 
-.section-title-2::after,
 .block-html h2::after {
   content: '';
   display: block;
@@ -353,20 +352,36 @@
   text-transform: uppercase;
 }
 
-.section-title-3 {
-  font-size: 12pt;
+/* H3 dentro de bloques de contenido */
+.block-html h3 {
+  font-size: 11pt;
   font-weight: 700;
-  margin: 22px 0 5px 0;
-  padding-bottom: 3px;
-  border-bottom: 1px solid;
+  color: var(--color-primary, #135d87);
+  margin: 18px 0 3px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--color-accent, #deb13c);
+}
+
+.section-title-3 {
+  font-size: 20pt;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 3px solid;
   bookmark-level: 3;
   bookmark-label: content();
+  text-transform: uppercase;
 }
 
 .section-title-4 {
-  font-size: 11pt;
+  font-size: 20pt;
   font-weight: 700;
-  margin: 18px 0 4px 0;
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 3px solid;
+  bookmark-level: 4;
+  bookmark-label: content();
+  text-transform: uppercase;
 }
 
 
@@ -409,7 +424,10 @@
 
 .idevice-with-title > .block-html {
   padding: 10px 14px;
-  overflow: hidden;
+  /* Sin overflow:hidden — con él, Paged.js DUPLICABA contenido al fragmentar un
+     iDevice largo. Al quitarlo se parte limpio; el borde superior no se cierra
+     en la página siguiente (box-decoration-break: slice por defecto), de modo
+     que la 2ª parte se ve como continuación de la caja. */
 }
 
 .block-html {
@@ -502,6 +520,15 @@
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-right: 3px solid var(--color-accent, #deb13c);
+}
+
+/* Tabla horizontal: primera fila actúa como cabecera. Las celdas llegan como
+   <td> desde Word (Mammoth no genera <th>), por eso se estiliza la fila aquí. */
+.block-html .bua_tabla_horizontal tr:first-child td {
+  background-color: #f5f6f7;
+  color: var(--color-primary, #135d87);
+  font-weight: 700;
+  border-bottom: 3px solid var(--color-accent, #deb13c);
 }
 
 
