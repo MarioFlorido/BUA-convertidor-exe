@@ -504,12 +504,6 @@
   border-right: 3px solid var(--color-accent, #deb13c);
 }
 
-/* Contenedor de tabla con clase BUA */
-.block-html .bua_tabla_horizontal,
-.block-html .bua_tabla_vertical {
-  margin: 10px 0;
-  box-sizing: border-box;
-}
 
 
 /* ============================================================
@@ -521,9 +515,7 @@
 
 .block-html .bua_ejemplo,
 .block-html .bua_definicion,
-.block-html .bua_importante,
-.block-html .bua_tabla_horizontal,
-.block-html .bua_tabla_vertical {
+.block-html .bua_importante {
   margin: 10px 25px;
   padding: 10px 14px;
   /* Sin break-inside: avoid — una caja extensa (típico en Ejemplo/Importante)
