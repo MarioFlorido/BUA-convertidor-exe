@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ImportToElpxResult, SemanticDocument } from '../types';
-import { semanticDocumentToPrintHtml } from '../core/renderers/html-print/semanticDocumentToPrintHtml';
+// El módulo de impresión embebe Paged.js (~491 KB); se carga de forma diferida
+// (import dinámico en handleExportPrint) para no inflar el bundle inicial.
 
 interface DownloadButtonProps {
   result: ImportToElpxResult;
@@ -52,6 +53,9 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
     setPrintError(null);
 
     try {
+      const { semanticDocumentToPrintHtml } = await import(
+        '../core/renderers/html-print/semanticDocumentToPrintHtml'
+      );
       const { html } = await semanticDocumentToPrintHtml(semanticDoc, {
         themeId,
         cover: { date: String(new Date().getFullYear()) },

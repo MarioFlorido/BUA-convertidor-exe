@@ -7,6 +7,13 @@ import { renderTableOfContents, sectionId } from './renderTableOfContents';
 // Necesario porque el HTML se abre como blob: URL — rutas relativas no resuelven.
 import printStylesCss from './printStyles.css?raw';
 
+// Paged.js (polyfill minificado) embebido como string. Inline en el HTML generado
+// → PDF 100 % offline, sin CDN ni JS de terceros en runtime. Este import arrastra
+// ~491 KB a este módulo; DownloadButton lo carga de forma diferida (import dinámico).
+// Ruta relativa a node_modules: el `exports` de pagedjs no expone dist/ como bare
+// specifier, pero un import de fichero relativo sí resuelve (y lo embebe vía ?raw).
+import pagedPolyfillMin from '../../../../node_modules/pagedjs/dist/paged.polyfill.min.js?raw';
+
 /**
  * Opciones del renderer HTML Print.
  *
@@ -103,12 +110,13 @@ export async function semanticDocumentToPrintHtml(
 
   const { html: contentHtml, pageCount } = renderContentPages(doc);
 
-  // 3. Ensamblar documento HTML completo
+  // 3. Ensamblar documento HTML completo (Paged.js embebido inline, sin CDN)
   const html = assembleHtmlDocument({
     title: doc.title,
     coverHtml,
     tocHtml,
     contentHtml,
+    pagedPolyfillJs: pagedPolyfillMin,
     primaryColor: assets.primaryColor,
     accentColor: assets.accentColor,
     fontFamilyTitle: assets.fontFamilyTitle,
@@ -218,6 +226,8 @@ interface AssemblyOptions {
   coverHtml: string;
   tocHtml: string;
   contentHtml: string;
+  /** Código de Paged.js (paged.polyfill.min.js) inyectado inline, sin CDN. */
+  pagedPolyfillJs: string;
   primaryColor: string;
   accentColor: string;
   fontFamilyTitle: string;
@@ -331,9 +341,9 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
   <!-- Estilos Paged Media del renderer print (inline — funciona desde blob: URL) -->
   <style>${printStylesCss}</style>
 
-  <!-- Paged.js — polyfill CSS Paged Media en el navegador -->
+  <!-- Paged.js — polyfill CSS Paged Media, INLINE (sin CDN: offline + sin terceros) -->
   <!-- Registrar hook ANTES de que Paged.js empiece a paginar (DOMContentLoaded) -->
-  <script src="https://unpkg.com/pagedjs@0.4.3/dist/paged.polyfill.js"></script>
+  <script>${opts.pagedPolyfillJs.replace(/<\/script/gi, '<\\/script')}</script>
   <script>
     // Abrir el diálogo de impresión automáticamente cuando Paged.js termine de paginar.
     // afterRendered() se llama una sola vez, justo cuando la paginación está completa.
