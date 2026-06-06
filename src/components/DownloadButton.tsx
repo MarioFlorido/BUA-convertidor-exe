@@ -30,6 +30,7 @@ function DownloadArrow() {
 export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonProps) {
   const [printLoading, setPrintLoading] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
+  const [printNotice, setPrintNotice] = useState<string | null>(null);
   const [useCoverImage, setUseCoverImage] = useState(false);
 
   const base = import.meta.env.BASE_URL;
@@ -51,6 +52,7 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
     if (!semanticDoc) return;
     setPrintLoading(true);
     setPrintError(null);
+    setPrintNotice(null);
 
     try {
       const { semanticDocumentToPrintHtml } = await import(
@@ -71,6 +73,7 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
       if (win) {
         win.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
       } else {
+        // Popup bloqueado: descargar el HTML e informar de cómo abrirlo.
         const a = document.createElement('a');
         a.href = url;
         a.download = result.filename.replace('.elpx', '_print.html');
@@ -78,6 +81,11 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
         a.click();
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setPrintNotice(
+          'Tu navegador bloqueó la ventana emergente, así que se ha descargado el ' +
+            'documento de impresión. Ábrelo y usa «Imprimir → Guardar como PDF». ' +
+            'Permite las ventanas emergentes de este sitio para abrirlo directamente.',
+        );
       }
     } catch (err) {
       setPrintError(err instanceof Error ? err.message : 'Error al generar el documento de impresión');
@@ -148,6 +156,10 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
         <div className="download-error">
           Error al generar la vista de impresión: {printError}
         </div>
+      )}
+
+      {printNotice && (
+        <div className="download-notice">{printNotice}</div>
       )}
     </div>
   );

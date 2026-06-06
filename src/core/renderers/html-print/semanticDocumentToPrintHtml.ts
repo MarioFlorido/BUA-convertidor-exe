@@ -355,14 +355,55 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
   <!-- Estilos Paged Media del renderer print (inline — funciona desde blob: URL) -->
   <style>${printStylesCss}</style>
 
+  <!-- UI de la pestaña (overlay de progreso + barra). Nunca aparece en el PDF. -->
+  <style>
+    #bua-print-overlay{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;gap:14px;background:#eef1f5;color:#1d2733;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+    #bua-print-overlay p{margin:0;font-size:16px;font-weight:600;}
+    #bua-print-overlay small{color:#5b6776;font-size:12.5px;}
+    #bua-print-overlay .bua-spin{width:34px;height:34px;border:3px solid #cfd6df;
+      border-top-color:#1B6EC2;border-radius:50%;animation:bua-spin .7s linear infinite;}
+    @keyframes bua-spin{to{transform:rotate(360deg)}}
+    #bua-print-bar{position:fixed;top:0;left:0;right:0;z-index:99999;display:flex;align-items:center;
+      justify-content:center;gap:14px;padding:8px 14px;background:#16365c;color:#fff;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;
+      box-shadow:0 2px 10px rgba(0,0,0,.2);}
+    #bua-print-bar button{background:#1B6EC2;color:#fff;border:none;border-radius:6px;padding:7px 16px;
+      font-size:13px;font-weight:600;cursor:pointer;}
+    #bua-print-bar button:hover{background:#155FAF;}
+    @media print{#bua-print-overlay,#bua-print-bar{display:none !important;}}
+  </style>
+
   <!-- Paged.js — polyfill CSS Paged Media, INLINE (sin CDN: offline + sin terceros) -->
   <!-- Registrar hook ANTES de que Paged.js empiece a paginar (DOMContentLoaded) -->
   <script>${opts.pagedPolyfillJs.replace(/<\/script/gi, '<\\/script')}</script>
   <script>
-    // Abrir el diálogo de impresión automáticamente cuando Paged.js termine de paginar.
-    // afterRendered() se llama una sola vez, justo cuando la paginación está completa.
+    // Overlay de progreso mientras Paged.js paginá. Se monta en <html> (no en
+    // <body>) para que Paged.js, que paginá el body, no lo incluya en las páginas.
+    (function () {
+      var ov = document.createElement('div');
+      ov.id = 'bua-print-overlay';
+      ov.innerHTML = '<div class="bua-spin"></div><p>Preparando el documento…</p>' +
+        '<small>Se abrirá el diálogo de impresión automáticamente.</small>';
+      var mount = function () { document.documentElement.appendChild(ov); };
+      if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
+    })();
+
+    // Cuando Paged.js termina de paginar: ocultar overlay, mostrar barra con botón
+    // de reintento y abrir el diálogo de impresión automáticamente.
     class PrintAfterRender extends Paged.Handler {
       afterRendered() {
+        var ov = document.getElementById('bua-print-overlay');
+        if (ov) ov.remove();
+        var bar = document.createElement('div');
+        bar.id = 'bua-print-bar';
+        bar.innerHTML = '<span>Documento listo.</span>' +
+          '<button type="button" id="bua-print-btn">Imprimir / Guardar como PDF</button>';
+        document.documentElement.appendChild(bar);
+        document.getElementById('bua-print-btn').addEventListener('click', function () {
+          window.print();
+        });
         window.print();
       }
     }

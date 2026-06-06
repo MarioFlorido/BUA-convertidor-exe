@@ -823,6 +823,17 @@ button {
   font-size: 0.825rem;
 }
 
+.download-notice {
+  color: var(--blue-active);
+  background: var(--blue-light);
+  border: 1px solid var(--blue-border);
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.825rem;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+
 /* ── Shared Buttons ──────────────────────────────────────────────────────── */
 .btn-confirm {
   background: var(--blue);
