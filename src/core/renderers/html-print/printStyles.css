@@ -311,7 +311,7 @@
 .section-title-1 {
   font-size: 20pt;
   font-weight: 700;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
   padding-bottom: 8px;
   border-bottom: 3px solid;
   bookmark-level: 1;
@@ -322,7 +322,7 @@
 .section-title-2 {
   font-size: 15pt;
   font-weight: 700;
-  margin: 24px 0 12px 0;
+  margin: 28px 0 6px 0;
   padding-bottom: 0;
   border-bottom: none;
   bookmark-level: 2;
@@ -347,7 +347,7 @@
   font-size: 13pt;
   font-weight: 700;
   color: var(--color-primary, #135d87);
-  margin: 20px 0 4px 0;
+  margin: 24px 0 3px 0;
   padding-bottom: 0;
   border-bottom: none;
   text-transform: uppercase;
@@ -356,7 +356,7 @@
 .section-title-3 {
   font-size: 12pt;
   font-weight: 700;
-  margin: 16px 0 8px 0;
+  margin: 22px 0 5px 0;
   padding-bottom: 3px;
   border-bottom: 1px solid;
   bookmark-level: 3;
@@ -366,7 +366,7 @@
 .section-title-4 {
   font-size: 11pt;
   font-weight: 700;
-  margin: 12px 0 6px 0;
+  margin: 18px 0 4px 0;
 }
 
 
