@@ -108,10 +108,13 @@
 
 .cover-page {
   page: cover;
-  break-after: page;
+  /* Alto A4 EXACTO (no 100vh: dependía del viewport y desbordaba a una 2ª
+     página con franja en blanco). Sin break-after: el cambio a @page toc del
+     índice ya fuerza el salto; añadirlo generaba una página vacía extra. */
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 297mm;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,11 +255,27 @@
   border-bottom: 1px solid #eee;
 }
 
-/* leader() + target-counter() — Paged.js los resuelve al paginar */
+/* Puntos líderes + número de página.
+   NOTA: Paged.js 0.4.3 NO soporta la función leader() (descarta toda la regla
+   y el índice queda sin números). Se hace con flexbox: el texto del enlace
+   (flex item anónimo, order 0), el ::before como línea de puntos elástica
+   (order 1, flex:1) y el ::after con el número resuelto por target-counter
+   (order 2). El <a> ya es display:flex con align-items:baseline. */
+.toc-entry a::before {
+  content: "";
+  order: 1;
+  flex: 1 1 auto;
+  border-bottom: 1px dotted #9aa0a6;
+  margin: 0 8px;
+  position: relative;
+  top: -0.28em;
+}
+
 .toc-entry a::after {
-  content: leader(dotted) target-counter(attr(href url), page);
+  content: target-counter(attr(href), page);
+  order: 2;
+  flex: 0 0 auto;
   white-space: nowrap;
-  margin-left: 4px;
 }
 
 .toc-level-1          { margin-top: 10px; }
