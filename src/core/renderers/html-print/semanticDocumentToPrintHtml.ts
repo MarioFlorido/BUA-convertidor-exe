@@ -2,6 +2,7 @@ import type { SemanticDocument, SemanticPage, SemanticBlock } from '../../models
 import { loadPrintThemeAssets, type BuaBoxStyles } from './PrintThemeLoader';
 import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
 import { renderTableOfContents, sectionId } from './renderTableOfContents';
+import { optimizeImagesForPrint } from './optimizeImagesForPrint';
 
 // CSS importado como string raw para inyectarlo inline en el HTML generado.
 // Necesario porque el HTML se abre como blob: URL — rutas relativas no resuelven.
@@ -42,6 +43,12 @@ export interface PrintRenderOptions {
    * Si es false, la portada se muestra sin imagen de fondo aunque el tema la tenga.
    */
   useCoverImage?: boolean;
+
+  /**
+   * Optimizar (redimensionar/recomprimir) las imágenes embebidas del contenido
+   * para reducir peso y acelerar la paginación. Default: true.
+   */
+  optimizeImages?: boolean;
 }
 
 /**
@@ -91,6 +98,7 @@ export async function semanticDocumentToPrintHtml(
     includeCover = true,
     includeToc = true,
     useCoverImage = true,
+    optimizeImages = true,
   } = options;
 
   // 1. Cargar assets del tema (portada_pdf.*, logos, colores)
@@ -108,7 +116,13 @@ export async function semanticDocumentToPrintHtml(
     ? renderTableOfContents(doc)
     : '';
 
-  const { html: contentHtml, pageCount } = renderContentPages(doc);
+  const { html: rawContentHtml, pageCount } = renderContentPages(doc);
+
+  // 2b. Optimizar imágenes embebidas (redimensionar/recomprimir) para reducir
+  //     peso del HTML/PDF y acelerar la paginación. No-op si no hay DOM.
+  const contentHtml = optimizeImages
+    ? await optimizeImagesForPrint(rawContentHtml)
+    : rawContentHtml;
 
   // 3. Ensamblar documento HTML completo (Paged.js embebido inline, sin CDN)
   const html = assembleHtmlDocument({
