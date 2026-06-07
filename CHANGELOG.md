@@ -1,6 +1,6 @@
 # Changelog
 
-## Junio 2026
+## v0.3.0 — Junio 2026
 
 ### PDF — motor y rendimiento
 - **Paged.js embebido** (dep `pagedjs@0.4.3`, importado como `?raw`): el motor de paginación ya **no** se descarga de un CDN. El PDF se genera 100% offline. El polyfill va en su propio chunk lazy (carga diferida desde `DownloadButton`).

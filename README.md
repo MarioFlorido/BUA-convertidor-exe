@@ -2,7 +2,7 @@
 
 Transforma documentos Word en cursos eXeLearning listos para usar. Sin servidores ni subidas a la nube.
 
-**Versión:** 0.2.0  
+**Versión:** 0.3.0  
 **Licencia:** GNU GPL v3.0  
 **Desarrollado por:** Biblioteca Universitaria de la Universidad de Alicante  
 **Acceso:** https://marioflorido.github.io/BUA-convertidor-exe/

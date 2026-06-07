@@ -148,3 +148,6 @@ public/*.zip
 # Basura del sistema operativo (macOS)
 .DS_Store
 **/.DS_Store
+
+# Entregables locales que NO van al repo (informes descargables, etc.)
+INFORME-ESTILO-INTERFAZ.html

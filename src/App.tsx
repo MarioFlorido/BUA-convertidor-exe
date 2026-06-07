@@ -349,7 +349,7 @@ export function App() {
             />
           </a>
         </div>
-        <span className="footer-copy">Biblioteca Universitaria · ConvertidoreXe v0.2.0</span>
+        <span className="footer-copy">Biblioteca Universitaria · ConvertidoreXe v0.3.0</span>
       </footer>
     </div>
   );
