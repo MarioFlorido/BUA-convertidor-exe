@@ -1,5 +1,31 @@
 # Changelog
 
+## Junio 2026
+
+### PDF — motor y rendimiento
+- **Paged.js embebido** (dep `pagedjs@0.4.3`, importado como `?raw`): el motor de paginación ya **no** se descarga de un CDN. El PDF se genera 100% offline. El polyfill va en su propio chunk lazy (carga diferida desde `DownloadButton`).
+- **Optimización automática de imágenes** antes de generar el PDF (`optimizeImagesForPrint.ts`): redimensionado (máx. 1600×2200) y recompresión (JPEG 0.82; PNG si hay transparencia). Nunca empeora el original. Reduce el peso del PDF y acelera la paginación.
+
+### PDF — maquetación
+- Portada a una página exacta (`297mm`) sin página en blanco.
+- Índice con puntos líderes + número de página (técnica flex, porque Paged.js 0.4.3 no soporta `leader()`).
+- `break-inside` ajustado: iDevices, tablas, cajas y acordeones pueden partir entre páginas (sin huecos); imágenes y figuras se mantienen unidas. Protecciones para cabeceras y filas.
+- Títulos de página uniformes: todos los niveles (página / subpágina / 3er nivel) se renderizan igual (20 pt, página nueva), ya que todos provienen de un H1 en Word. La jerarquía se conserva en el índice.
+- Tablas horizontal/vertical: cabecera con fondo gris y borde mostaza, distinguible del cuerpo.
+- iDevice con título: al partir entre páginas no se dibujan bordes en el punto de corte.
+
+### Administración de temas oficiales
+- **Panel de administración integrado en la app** (`OfficialThemeAdmin.tsx`, en «Estilos eXeLearning»): crear, actualizar y eliminar temas oficiales sin Terminal, autenticando con un token fine-grained de GitHub. Núcleo en `src/core/services/admin/`. El flujo por CLI queda como _fallback_.
+
+### Calidad
+- Tests automatizados de `HtmlTransformer` (27 tests) con `node:test` vía `tsx` (`npm test`), sin dependencias nuevas.
+- Consolidada `escapeHtml` en una única definición canónica (`src/core/utils/html.ts`).
+
+### UX impresión
+- Overlay «Preparando…» + barra con botón de impresión/guardado, fuera del DOM al imprimir para que no salgan en el PDF.
+
+---
+
 ## v0.2.0 — Mayo 2026
 
 ### Arquitectura

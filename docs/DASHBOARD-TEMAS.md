@@ -1,9 +1,17 @@
 # Dashboard Web — Gestión de Temas Oficiales
 
+> ⚠️ **Documento histórico de planificación.** La función **ya está implementada**,
+> pero la implementación final **difiere de este plan**: en lugar de un dashboard
+> standalone en `public/admin/index.html`, el panel vive integrado en la app como
+> `OfficialThemeAdmin.tsx` (dentro de «Estilos eXeLearning» → «Administración de
+> temas oficiales»), con el núcleo en `src/core/services/admin/`. La guía de uso
+> real para el administrador es **`public/docs/gestionar-temas-oficiales.html`**.
+> Este archivo se conserva solo como registro del diseño original.
+
 **Proyecto:** BUA ConvertidoreXe  
 **Versión:** 1.0 (Planificación)  
 **Fecha de creación:** 1 de junio de 2026  
-**Estado:** Documentado, no implementado aún  
+**Estado:** ✅ Implementado (jun 2026) — la implementación difiere de este plan  
 **Prioridad:** Media (mejora QoL para administrador)
 
 ---
@@ -352,8 +360,11 @@ Una vez implementado, probar:
 
 Una vez implementado, crear:
 1. `public/admin/HELP.md` — Cómo usar el dashboard
-2. Actualizar `/docs/gestion-temas-oficiales.md` — Referenciar el dashboard
+2. Actualizar la guía del administrador — Referenciar el dashboard
 3. Agregar enlace en la app principal: "Admin → Gestionar temas"
+
+> Resuelto: la guía real del administrador es `public/docs/gestionar-temas-oficiales.html`
+> y el acceso está integrado en «Estilos eXeLearning».
 
 ---
 

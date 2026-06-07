@@ -407,13 +407,17 @@ flowchart TD
         </tr>
         <tr>
           <td>Imágenes</td>
-          <td>Centradas con sombra sutil</td>
+          <td>Centradas con sombra sutil. Se optimizan automáticamente (redimensionado + recompresión) para aligerar el PDF sin empeorar el original</td>
         </tr>
         <tr>
           <td>Acordeones/Pestañas</td>
           <td>Expandidas (sin solapamientos en impresión)</td>
         </tr>
       </table>
+
+      <p>
+        Todo el proceso es <strong>offline</strong>: el motor de paginación (Paged.js) va embebido en la app, no se descarga de ningún CDN. El PDF se genera aunque no tengas conexión.
+      </p>
 
       <p>
         El idioma del PDF se detecta automáticamente desde el estilo. Si hay confusión, asume español.
@@ -438,7 +442,7 @@ flowchart TD
       <p>El <code>config.xml</code> del tema necesita <code>&lt;language&gt;en&lt;/language&gt;</code> o <code>&lt;language&gt;ca&lt;/language&gt;</code>. Sin eso, asume español.</p>
 
       <h3>El PDF no tiene encabezados ni pies</h3>
-      <p>ConvertidoreXe usa Paged.js desde CDN. Sin internet, no funciona. En entornos offline, necesitarías descargar Paged.js localmente.</p>
+      <p>Revisa que el tema defina sus <em>running elements</em>. El PDF funciona sin conexión: el motor de paginación (Paged.js) va embebido en la propia app, no se descarga de ningún CDN.</p>
 
       <h3>Las cajas no tienen colores en el PDF</h3>
       <p>El <code>style.css</code> del tema no define <code>.bua_ejemplo</code>, <code>.bua_definicion</code> o <code>.bua_importante</code> con colores y <code>border-left</code>.</p>

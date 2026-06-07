@@ -12,7 +12,7 @@ Transforma documentos Word en cursos eXeLearning listos para usar. Sin servidore
 ## Qué hace
 
 1. Subes un Word (DOCX)
-2. Configurasla estructura: qué hace cada encabezado
+2. Configuras la estructura: qué hace cada encabezado
 3. Eliges un tema visual
 4. Descargas el proyecto (.elpx) para eXeLearning o un PDF
 
@@ -108,6 +108,10 @@ Cuando exportas a PDF, ConvertidoreXe añade:
 - **Imágenes** — Centradas con sombra sutil
 - **Acordeones y pestañas** — Expandidos en impresión (sin solapamientos)
 
+Las imágenes se optimizan automáticamente antes de generar el PDF (redimensionado y recompresión) para reducir el peso del archivo y acelerar la paginación, sin empeorar nunca el original.
+
+Todo el proceso es **offline**: el motor de paginación (Paged.js) va embebido en la app, no se descarga de ningún CDN. El PDF se genera aunque no tengas conexión.
+
 Los idiomas se detectan automáticamente desde el tema. Si algo falla, usa español como fallback.
 
 ---
@@ -127,7 +131,7 @@ El ZIP no incluye `screenshot.png` en la raíz. El tema funciona igual, solo que
 El `config.xml` del tema necesita `<language>en</language>` o `<language>ca</language>`. Sin eso, asume español.
 
 **"El PDF no tiene encabezados ni pies"**  
-ConvertidoreXe usa Paged.js desde CDN. Si no tienes internet, nada funciona. En entornos offline, necesitarías descargar Paged.js localmente (trabajo más avanzado).
+Revisa que el tema defina sus *running elements*. El PDF funciona sin conexión: Paged.js va embebido en la propia app (no se descarga de ningún CDN), así que la exportación funciona aunque no tengas internet.
 
 **"Las cajas no tienen colores en el PDF"**  
 El `style.css` del tema no define `.bua_ejemplo`, `.bua_definicion` o `.bua_importante`. Añade esas clases con colores y `border-left`.
@@ -168,10 +172,12 @@ Lo que está hecho:
 -  Guía de usuario integrada
 -  Despliegue automático en GitHub Pages
 -  Panel de administración de temas oficiales (publicar/actualizar/eliminar desde el navegador, sin Terminal)
+-  PDF 100% offline (Paged.js embebido) + optimización automática de imágenes
+-  Tests automatizados de la capa de transformación HTML (`npm test`)
 
 Lo que me falta:
 
--  Fase 3 de depuración --- > eliminar dos duplicaciones de código (escHtml y DocumentStructure)
+-  Unificar la interfaz `DocumentStructure`, hoy definida dos veces (`src/types/index.ts` y `src/core/models/SemanticDocument.ts`) con una pequeña divergencia (la primera lleva `id` en los items). Deuda técnica menor, sin impacto funcional.
 
 Para la versión 2:
 
@@ -179,6 +185,6 @@ Para la versión 2:
 
 ---
 
-**Documentación técnica:** [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)  
-**Comparación con eXeConvert:** [public/docs/comparacion.html](public/docs/comparacion.html)  
+**Documentación (web):** https://marioflorido.github.io/BUA-convertidor-exe/docs/arquitectura.html  
+**Comparación con eXeConvert:** https://marioflorido.github.io/BUA-convertidor-exe/docs/comparacion.html  
 **Repositorio:** https://github.com/MarioFlorido/BUA-convertidor-exe

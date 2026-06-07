@@ -1,5 +1,14 @@
 # FASE 3 — Infraestructura de calidad: tests y consolidaciones
 
+> 📌 **Estado a junio 2026 (parcialmente hecho):**
+> - ✅ **Tests** — implementados, pero con `node:test` vía `tsx` (script `npm test`),
+>   **no** con Vitest como proponía el Paso 1. Cubren `HtmlTransformer` (27 tests).
+> - ✅ **`escHtml` consolidada** (Paso 3) — una sola definición canónica en
+>   `src/core/utils/html.ts`.
+> - ⏳ **Unificar `DocumentStructure` (Paso 4) — PENDIENTE.** Sigue definida en
+>   `src/types/index.ts` y en `src/core/models/SemanticDocument.ts` con una
+>   divergencia (la primera lleva `id` en los items). Es lo único que queda.
+
 **Proyecto:** BUA ConvertidoreXe (`/Users/mario/BUA-convertidor-exe`)  
 **Prerequisito:** Las Fases 1 y 2 están aplicadas. El programa funciona al 100%.  
 **Estimación:** 3-4 horas de trabajo concentrado.  
