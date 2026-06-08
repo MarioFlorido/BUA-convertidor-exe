@@ -1,5 +1,5 @@
 import { zipSync } from 'fflate';
-import type { ImportedProject, ImportedPage, ImportedBlock } from '../models/SemanticDocument';
+import type { SemanticDocument, SemanticPage, SemanticBlock } from '../models/SemanticDocument';
 import { PreviewService } from '../services/PreviewService';
 import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml } from '../utils/html';
@@ -16,7 +16,7 @@ export interface RenderedElpx {
 }
 
 /**
- * Renderizador ELPX - Genera XML/ZIP de eXeLearning a partir de ImportedProject
+ * Renderizador ELPX - Genera XML/ZIP de eXeLearning a partir de SemanticDocument
  *
  * Responsabilidades:
  * - Generar content.xml (estructura de navegación y bloques)
@@ -26,7 +26,7 @@ export interface RenderedElpx {
 export class ElpxRenderer {
   constructor(
     private template: { entries: Record<string, Uint8Array> },
-    private project: ImportedProject,
+    private project: SemanticDocument,
   ) {}
 
   /**
@@ -68,9 +68,9 @@ export class ElpxRenderer {
    * en base64, que es lo que el PDF necesita.
    */
   private async extractImagesToFiles(entries: Record<string, Uint8Array>): Promise<void> {
-    const pages: ImportedPage[] = [];
+    const pages: SemanticPage[] = [];
     for (const page of this.project.pages) {
-      const blocks: ImportedBlock[] = [];
+      const blocks: SemanticBlock[] = [];
       for (const block of page.blocks) {
         const { html, files } = await extractImages(block.html || '');
         for (const [path, bytes] of files) {
@@ -135,7 +135,7 @@ ${navStructuresXml}</odeNavStructures>
   /**
    * Generar estructura de navegación (página) en XML
    */
-  private generateOdeNavStructureXml(page: ImportedPage, order: number, pageIds: string[]): string {
+  private generateOdeNavStructureXml(page: SemanticPage, order: number, pageIds: string[]): string {
     const pageId = pageIds[order];
     const parentPageId = page.parentIndex === null ? '' : pageIds[page.parentIndex] || '';
     const title = (page.title || `Página ${order + 1}`).toUpperCase();
@@ -170,7 +170,7 @@ ${blocksXml}  </odePagStructures>
   /**
    * Generar estructura de bloque (iDevice) en XML
    */
-  private generateOdePagStructureXml(block: ImportedBlock, pageId: string, order: number): string {
+  private generateOdePagStructureXml(block: SemanticBlock, pageId: string, order: number): string {
     const blockId = createBlockId();
     const ideviceId = createIdeviceId();
     const blockName = block.title ? block.title.toUpperCase() : '';

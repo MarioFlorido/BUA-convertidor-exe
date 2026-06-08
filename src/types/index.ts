@@ -29,12 +29,7 @@ export type {
   SemanticDocument,
   SemanticPage,
   SemanticBlock,
-  DocumentStructure as SemanticDocumentStructure,
   BUA_CLASSES,
-  // Alias hacia atrás para compatibilidad
-  ImportedProject,
-  ImportedPage,
-  ImportedBlock,
 } from '../core/models/SemanticDocument';
 
 export interface Theme {

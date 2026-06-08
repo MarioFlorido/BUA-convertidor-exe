@@ -1,4 +1,4 @@
-import type { ImportedPage, ImportedBlock } from '../models/SemanticDocument';
+import type { SemanticPage, SemanticBlock } from '../models/SemanticDocument';
 import type { DocumentStructure, H1Section } from '../../types';
 import { escapeHtml } from '../utils/html';
 
@@ -34,8 +34,8 @@ export class SemanticBuilder {
   /**
    * Construir todas las páginas del proyecto
    */
-  buildPages(filename: string): ImportedPage[] {
-    const pages: ImportedPage[] = [];
+  buildPages(filename: string): SemanticPage[] {
+    const pages: SemanticPage[] = [];
     const stemmed = filename.replace(/\.[^.]+$/, '').trim() || 'Documento importado';
 
     for (const h1Section of this.structure.h1Sections) {
@@ -73,7 +73,7 @@ export class SemanticBuilder {
   /**
    * Construir una página individual a partir de un H1
    */
-  private buildPageFromH1(h1Section: H1Section, h1Index: number, pages: ImportedPage[]): ImportedPage {
+  private buildPageFromH1(h1Section: H1Section, h1Index: number, pages: SemanticPage[]): SemanticPage {
     // Calcular parentIndex basándose en el nivel
     let parentIndex: number | null = null;
     if (h1Section.level === 2) {
@@ -94,7 +94,7 @@ export class SemanticBuilder {
       }
     }
 
-    const page: ImportedPage = {
+    const page: SemanticPage = {
       title: h1Section.title,
       level: h1Section.level,
       parentIndex,
@@ -105,7 +105,7 @@ export class SemanticBuilder {
     const contentBeforeFirstH2 = this.extractContentBeforeFirstH2(h1Index);
 
     // Crear un iDevice sin título por defecto (para contenido antes del primer H2 y H2s en HTML)
-    let currentBlock: ImportedBlock | null = null;
+    let currentBlock: SemanticBlock | null = null;
 
     if (contentBeforeFirstH2) {
       currentBlock = { title: '', html: contentBeforeFirstH2 };

@@ -1,4 +1,4 @@
-import type { ImportedProject } from './models/SemanticDocument';
+import type { SemanticDocument } from './models/SemanticDocument';
 import { SemanticBuilder } from './builders/SemanticBuilder';
 import type { DocumentStructure } from '../types';
 import { normalizeText } from './utils/html';
@@ -13,18 +13,18 @@ interface DocumentSection {
 }
 
 /**
- * Construir proyecto ImportedProject a partir de HTML de DOCX
+ * Construir proyecto SemanticDocument a partir de HTML de DOCX
  *
  * Responsabilidades:
  * 1. Parsear HTML en secciones (H1, H2, H3, contenido)
  * 2. Delegar construcción de páginas/bloques a SemanticBuilder
- * 3. Retornar ImportedProject completo
+ * 3. Retornar SemanticDocument completo
  */
 export function buildProjectFromStructure(
   htmlValue: string,
   filename: string,
   structure: DocumentStructure,
-): ImportedProject {
+): SemanticDocument {
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body>${htmlValue}</body></html>`,
     'text/html',

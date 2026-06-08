@@ -2,7 +2,7 @@
  * Renderizador ELPX - Convierte SemanticDocument a formato eXeLearning
  *
  * RESPONSABILIDAD ÚNICA:
- * Renderizar un SemanticDocument (ImportedProject) a ELPX puro.
+ * Renderizar un SemanticDocument a ELPX puro.
  *
  * Este módulo recibe un documento ya parseado semánticamente
  * y lo convierte al formato específico de eXeLearning.
@@ -10,7 +10,7 @@
  * Nunca manipula parsing o semántica - eso ya está hecho.
  */
 
-import { ElpxRenderer } from '../renderers/ElpxRenderer';
+import { ElpxRenderer, type ElpxRenderOptions } from '../renderers/ElpxRenderer';
 import { ThemeService } from '../services/ThemeService';
 import { ThemeRegistry } from '../services/ThemeRegistry';
 import type {
@@ -22,7 +22,7 @@ import type {
 /**
  * Convertir SemanticDocument a ELPX (eXeLearning)
  *
- * Toma un ImportedProject (ya parseado semánticamente)
+ * Toma un SemanticDocument (ya parseado semánticamente)
  * y lo renderiza a formato ELPX.
  *
  * Flujo:
@@ -32,7 +32,7 @@ import type {
  * 4. Genera preview HTML con PreviewService
  *
  * Usar cuando:
- * - Tienes un ImportedProject preconstruido
+ * - Tienes un SemanticDocument preconstruido
  * - Necesitas máximo control sobre la renderización
  * - Quieres reutilizar un proyecto múltiples veces con diferentes temas
  *
@@ -55,10 +55,6 @@ import type {
  * downloadFile(result.blob, result.filename);
  * ```
  */
-export interface ElpxRenderOptions {
-  themeId?: string;
-}
-
 export async function semanticDocumentToElpx(
   project: SemanticDocument,
   filename: string,
