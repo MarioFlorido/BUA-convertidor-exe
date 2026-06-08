@@ -71,11 +71,6 @@ export function removeThemeEntry(config: ThemesConfig, id: string): ThemesConfig
   return { themes: config.themes.filter((t) => t.id !== id) };
 }
 
-/** ¿Existe ya un tema con ese id en el catálogo? */
-export function hasThemeEntry(config: ThemesConfig, id: string): boolean {
-  return config.themes.some((t) => t.id === id);
-}
-
 /**
  * Serializa el catálogo con el mismo formato que el script (2 espacios + salto
  * final), para evitar diffs espurios en git.
