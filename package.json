@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "tsx --test \"src/**/*.test.ts\"",
+    "test": "tsx --test $(find src -name '*.test.ts')",
     "deploy": "npm run build && gh-pages -d dist",
     "themes": "tsx scripts/themes.ts",
     "publish-theme": "tsx scripts/publish-theme.ts",
