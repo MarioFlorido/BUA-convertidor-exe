@@ -1,8 +1,14 @@
 import { useMemo, useState } from 'react';
 import type { DocumentStructure, H2StructureOption } from '../types';
+import {
+  describeSemanticTagIssue,
+  type SemanticTagIssue,
+} from '../core/validation/semanticTagBalance';
 
 interface StructureConfiguratorProps {
   structure: DocumentStructure;
+  /** Avisos (no bloqueantes) de cajas semánticas [ejemplo]/[fin] mal cerradas. */
+  tagIssues?: SemanticTagIssue[];
   onConfirm: (structure: DocumentStructure) => void;
   onCancel: () => void;
 }
@@ -77,7 +83,7 @@ const BLOCK2: { option: H2StructureOption; label: string }[] = [
   { option: 'tabs',      label: 'Pestañas' },
 ];
 
-export function StructureConfigurator({ structure, onConfirm, onCancel }: StructureConfiguratorProps) {
+export function StructureConfigurator({ structure, tagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
   const [localStructure, setLocalStructure] = useState(structure);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
@@ -128,6 +134,21 @@ export function StructureConfigurator({ structure, onConfirm, onCancel }: Struct
 
   return (
     <div className="structure-configurator">
+      {tagIssues.length > 0 && (
+        <div className="alert alert-warning" role="alert">
+          <strong>Revisa las cajas semánticas antes de continuar.</strong> Parece que
+          {tagIssues.length === 1 ? ' una caja no está' : ` ${tagIssues.length} cajas no están`}{' '}
+          bien cerrada{tagIssues.length === 1 ? '' : 's'} con <code>[fin]</code>. Si conviertes
+          así, el contenido puede mezclarse o aparecer la etiqueta como texto. Corrige el documento
+          de Word y vuelve a subirlo:
+          <ul className="tag-issue-list">
+            {tagIssues.map((issue, i) => (
+              <li key={i}>{describeSemanticTagIssue(issue)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <p className="help-text">
         Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
       </p>

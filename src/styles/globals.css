@@ -1786,6 +1786,23 @@ button {
   color: var(--blue-active);
 }
 
+/* Lista de avisos de cajas semánticas mal cerradas dentro de un .alert-warning */
+.tag-issue-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-weight: 400;
+}
+.tag-issue-list li {
+  margin: 0.15rem 0;
+}
+.tag-issue-list code,
+.alert-warning code {
+  background: rgba(138,90,0,.1);
+  padding: 0 0.25rem;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
 /* ── Panel de administración de temas oficiales ──────────────────────────── */
 .admin-divider {
   border: none;

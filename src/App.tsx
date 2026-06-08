@@ -9,6 +9,7 @@ import { StepIndicator } from './components/StepIndicator';
 import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/parseStructure';
+import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
 import type {
   DocxImportOptions,
@@ -41,6 +42,7 @@ export function App() {
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
   const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
   const [parsedDocxHtml, setParsedDocxHtml] = useState<string | null>(null);
+  const [tagIssues, setTagIssues] = useState<SemanticTagIssue[]>([]);
   const [options, setOptions] = useState<DocxImportOptions>({
     heading1Mode: 'page',
     heading2Mode: 'page',
@@ -70,6 +72,7 @@ export function App() {
       const parseResult = await parser.parse(selectedFile);
 
       setParsedDocxHtml(parseResult.html);
+      setTagIssues(detectSemanticTagIssues(parseResult.html));
       const parsedStructure = await parseDocumentStructure(parseResult.html);
       setStructure(parsedStructure);
       setScreen('structure');
@@ -91,6 +94,7 @@ export function App() {
     setFile(null);
     setStructure(null);
     setParsedDocxHtml(null);
+    setTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -153,6 +157,7 @@ export function App() {
     setStructure(null);
     setSemanticDoc(null);
     setParsedDocxHtml(null);
+    setTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -245,6 +250,7 @@ export function App() {
             {screen === 'structure' && structure && (
               <StructureConfigurator
                 structure={structure}
+                tagIssues={tagIssues}
                 onConfirm={handleStructureConfirm}
                 onCancel={handleStructureCancel}
               />
