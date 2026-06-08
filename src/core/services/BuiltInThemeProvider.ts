@@ -26,11 +26,18 @@ interface ThemesConfigEntry {
 }
 
 class BuiltInThemeProviderClass {
+  private generatedObjectUrls: string[] = [];
+
   /**
    * Carga todos los temas predefinidos declarados en themes-config.json.
    * Los fallos individuales no bloquean el boot.
+   *
+   * NOTA: Revoca Object URLs anteriores antes de crear nuevos para evitar memory leaks.
    */
   async loadAll(): Promise<void> {
+    // Revocar Object URLs anteriores para liberar memoria
+    this.revokeGeneratedUrls();
+
     const configEntries = await this.fetchThemesConfig();
     await Promise.allSettled(configEntries.map((entry) => this.loadOne(entry)));
   }
@@ -49,6 +56,40 @@ class BuiltInThemeProviderClass {
       console.warn('[BuiltInThemeProvider] Error cargando themes-config.json:', err);
       return [];
     }
+  }
+
+  /**
+   * Genera un Object URL para la screenshot si existe en los archivos del tema.
+   */
+  private generateScreenshotUrl(files: Record<string, Uint8Array>): string | undefined {
+    const screenshotBuffer = files['screenshot.png'] || files['screenshot.jpg'];
+    if (!screenshotBuffer) return undefined;
+
+    try {
+      // Convertir Uint8Array a un Blob directamente
+      const type = files['screenshot.png'] ? 'image/png' : 'image/jpeg';
+      const blob = new Blob([new Uint8Array(screenshotBuffer)], { type });
+      return URL.createObjectURL(blob);
+    } catch (err) {
+      console.warn('[BuiltInThemeProvider] Error generando Object URL para screenshot:', err);
+      return undefined;
+    }
+  }
+
+  /**
+   * Revoca todos los Object URLs generados para liberar memoria.
+   * Se llama automáticamente en loadAll() antes de crear nuevas URLs.
+   */
+  private revokeGeneratedUrls(): void {
+    for (const url of this.generatedObjectUrls) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        // Algunos navegadores pueden lanzar error si la URL ya no es válida
+        console.debug('[BuiltInThemeProvider] No se pudo revocar URL:', url, err);
+      }
+    }
+    this.generatedObjectUrls = [];
   }
 
   private async loadOne(entry: ThemesConfigEntry): Promise<void> {
@@ -100,10 +141,17 @@ class BuiltInThemeProviderClass {
         metadata.language = langFromConfig;
       }
 
-      // Screenshot servido directamente desde public/ — no necesita conversión
+      // Screenshot: preferir URL estática desde public/
       if (files['screenshot.png'] || files['screenshot.jpg']) {
         const ext = files['screenshot.png'] ? 'png' : 'jpg';
         metadata.screenshot = `${BASE_URL}themes/${entry.id}/screenshot.${ext}`;
+      } else {
+        // Fallback: generar Object URL si no existe screenshot estático
+        const screenshotUrl = this.generateScreenshotUrl(files);
+        if (screenshotUrl) {
+          metadata.screenshot = screenshotUrl;
+          this.generatedObjectUrls.push(screenshotUrl);
+        }
       }
 
       const bundle: ThemeBundle = {

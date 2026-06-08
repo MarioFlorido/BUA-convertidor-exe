@@ -12,6 +12,7 @@
 
 import { ElpxRenderer } from '../renderers/ElpxRenderer';
 import { ThemeService } from '../services/ThemeService';
+import { ThemeRegistry } from '../services/ThemeRegistry';
 import type {
   DocxImportProgress,
   ImportToElpxResult,
@@ -74,6 +75,15 @@ export async function semanticDocumentToElpx(
 
   // Cargar tema personalizado si es necesario
   if (options.themeId && options.themeId !== 'base') {
+    // Verificar que el tema existe en el registry
+    const themeBundle = ThemeRegistry.get(options.themeId);
+    if (!themeBundle || Object.keys(themeBundle.files).length === 0) {
+      throw new Error(
+        `Tema "${options.themeId}" no está disponible. ` +
+        `Verifica que el tema se haya cargado correctamente.`
+      );
+    }
+
     const themeEntries = await ThemeService.loadTheme(options.themeId);
     for (const [entryPath, entryData] of Object.entries(themeEntries)) {
       template.entries[entryPath] = entryData;

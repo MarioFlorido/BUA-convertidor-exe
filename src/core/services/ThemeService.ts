@@ -96,10 +96,17 @@ export class ThemeService {
 
   /**
    * Limpiar caché (útil para testing o cambio de tema)
+   *
+   * @param themeId - Si se proporciona, solo limpia el tema específico.
+   *                  Si no, limpia todo (incluyendo template).
    */
-  static clearCache(): void {
-    this.cache.clear();
-    this.templateCache = null;
+  static clearCache(themeId?: string): void {
+    if (themeId) {
+      this.cache.delete(themeId);
+    } else {
+      this.cache.clear();
+      this.templateCache = null;
+    }
   }
 
   /**

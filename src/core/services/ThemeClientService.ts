@@ -10,6 +10,7 @@ import { unzipSync } from 'fflate';
 import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { UserThemeProvider } from './UserThemeProvider';
+import { ThemeService } from './ThemeService';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
 import { extractLanguageFromConfigXml, screenshotToObjectUrl } from './themeConfigParser';
 
@@ -54,6 +55,9 @@ export class ThemeClientService {
     ThemeRegistry.register(bundle);
     await UserThemeProvider.save(bundle, zipBuffer);
 
+    // Invalidar caché del tema para que la próxima carga obtenga la versión nueva
+    ThemeService.clearCache(bundle.id);
+
     return bundle;
   }
 
@@ -79,6 +83,9 @@ export class ThemeClientService {
 
     ThemeRegistry.remove(id);
     await UserThemeProvider.remove(id);
+
+    // Invalidar caché del tema eliminado
+    ThemeService.clearCache(id);
   }
 
   /** Todos los temas disponibles (built-in + usuario) */

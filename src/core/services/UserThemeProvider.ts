@@ -33,6 +33,7 @@ interface StoredTheme {
 
 class UserThemeProviderClass {
   private db: IDBPDatabase | null = null;
+  private generatedObjectUrls: string[] = [];
 
   /** Inicializa IndexedDB. Debe llamarse durante el boot. */
   async init(): Promise<void> {
@@ -74,10 +75,15 @@ class UserThemeProviderClass {
   /**
    * Carga todos los temas de usuario desde IndexedDB y los registra en ThemeRegistry.
    * Los temas corruptos se ignoran silenciosamente.
+   *
+   * NOTA: Revoca Object URLs anteriores antes de crear nuevos para evitar memory leaks.
    */
   async loadAll(): Promise<ThemeBundle[]> {
     if (!this.db) return [];
     if (!this.hasStore(STORE_NAME)) return [];
+
+    // Revocar Object URLs anteriores para liberar memoria
+    this.revokeGeneratedUrls();
 
     const stored: StoredTheme[] = await this.db.getAll(STORE_NAME);
     const bundles: ThemeBundle[] = [];
@@ -96,13 +102,18 @@ class UserThemeProviderClass {
           continue;
         }
 
+        const screenshotUrl = screenshotToObjectUrl(files);
+        if (screenshotUrl) {
+          this.generatedObjectUrls.push(screenshotUrl);
+        }
+
         const bundle: ThemeBundle = {
           id: record.id,
           name: record.name,
           source: 'user',
           files,
           // El Object URL de la sesión anterior ya no es válido — regenerar
-          metadata: { ...record.metadata, screenshot: screenshotToObjectUrl(files) },
+          metadata: { ...record.metadata, screenshot: screenshotUrl },
         };
 
         ThemeRegistry.register(bundle);
@@ -136,6 +147,22 @@ class UserThemeProviderClass {
   async remove(id: string): Promise<void> {
     if (!this.db || !this.hasStore(STORE_NAME)) throw new Error('UserThemeProvider no inicializado');
     await this.db.delete(STORE_NAME, id);
+  }
+
+  /**
+   * Revoca todos los Object URLs generados para liberar memoria.
+   * Se llama automáticamente en loadAll() antes de crear nuevas URLs.
+   */
+  private revokeGeneratedUrls(): void {
+    for (const url of this.generatedObjectUrls) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        // Algunos navegadores pueden lanzar error si la URL ya no es válida
+        console.debug('[UserThemeProvider] No se pudo revocar URL:', url, err);
+      }
+    }
+    this.generatedObjectUrls = [];
   }
 
 }
