@@ -151,3 +151,5 @@ public/*.zip
 
 # Entregables locales que NO van al repo (informes descargables, etc.)
 INFORME-ESTILO-INTERFAZ.html
+INVENTARIO-REPOSITORIO.md
+AUDITORIA-REPOSITORIO.md
