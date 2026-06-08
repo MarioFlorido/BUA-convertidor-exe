@@ -160,19 +160,21 @@ function buildProjectFromHtml(
   options: DocxImportOptions,
   structure?: DocumentStructure,
 ): SemanticDocument {
+  // Si hay estructura configurada, usarla. No parseamos el HTML aquí:
+  // buildProjectFromStructure hace su propio parseo del string, así que
+  // crear un DOMParser antes de este early-return sería trabajo desperdiciado
+  // (este es el caso normal del wizard).
+  if (structure && structure.h1Sections && structure.h1Sections.length > 0) {
+    return buildProjectFromStructure(htmlValue, filename, structure) as SemanticDocument;
+  }
+
+  // Si no hay estructura, usar la lógica antigua
   const document = new DOMParser().parseFromString(
     `<!doctype html><html><body>${htmlValue}</body></html>`,
     'text/html',
   );
   const body = document.body;
   const pages: SemanticPage[] = [];
-
-  // Si hay estructura configurada, usarla
-  if (structure && structure.h1Sections && structure.h1Sections.length > 0) {
-    return buildProjectFromStructure(htmlValue, filename, structure) as SemanticDocument;
-  }
-
-  // Si no hay estructura, usar la lógica antigua
   let resourceTitleAssigned = false;
   let currentPage: SemanticPage | null = null;
   let currentBlock: SemanticBlock | null = null;
