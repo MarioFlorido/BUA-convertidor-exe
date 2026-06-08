@@ -64,21 +64,6 @@ export interface SemanticDocument {
 }
 
 /**
- * Resultado del análisis de estructura de documento
- * Detecta jerarquía H1/H2/H3 y su configuración
- */
-export interface DocumentStructure {
-  h1Sections: Array<{
-    title: string;
-    level: 1 | 2 | 3;
-    h2Items: Array<{
-      text: string;
-      option: 'html' | 'idevice-title' | 'accordion' | 'tabs';
-    }>;
-  }>;
-}
-
-/**
  * Constantes para clasificación de contenido semántico
  */
 export const BUA_CLASSES = {

@@ -29,7 +29,6 @@ export type {
   SemanticDocument,
   SemanticPage,
   SemanticBlock,
-  DocumentStructure as SemanticDocumentStructure,
   BUA_CLASSES,
 } from '../core/models/SemanticDocument';
 
