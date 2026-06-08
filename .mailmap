@@ -1,0 +1,16 @@
+# .mailmap — unifica las distintas identidades git del mismo autor
+#
+# El desarrollo se hace desde varios equipos y algunos commits quedaron
+# firmados con el correo local de la máquina (…@iMac-…, …@MacBook-…) en vez
+# de con la identidad de GitHub. Este archivo hace que `git shortlog`, `git log`
+# y GitHub muestren una sola identidad canónica, sin reescribir el historial.
+#
+# Forma:  Nombre Canónico <email-canónico>  <email-alias-a-mapear>
+#
+# Para que los commits FUTUROS ya salgan unificados, configurar en cada equipo:
+#   git config --global user.name  "MarioFlorido"
+#   git config --global user.email "68684595+MarioFlorido@users.noreply.github.com"
+
+MarioFlorido <68684595+MarioFlorido@users.noreply.github.com> <MarioFlorido@users.noreply.github.com>
+MarioFlorido <68684595+MarioFlorido@users.noreply.github.com> Mario Florido Pérez <mariofloridoperez@iMac-de-PuntBIU.local>
+MarioFlorido <68684595+MarioFlorido@users.noreply.github.com> Mario <mario@MacBook-Air-de-Tere.local>
