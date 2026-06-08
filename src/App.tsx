@@ -9,6 +9,7 @@ import { StepIndicator } from './components/StepIndicator';
 import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/parseStructure';
+import { DocxParser } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
 import type {
@@ -67,7 +68,6 @@ export function App() {
 
     try {
       setState({ status: 'processing', progress: { phase: 'read', message: 'Leyendo archivo…' } });
-      const { DocxParser } = await import('./core/parsers/DocxParser');
       const parser = new DocxParser();
       const parseResult = await parser.parse(selectedFile);
 
