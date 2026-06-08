@@ -1,4 +1,4 @@
-import type { ImportedProject, ImportedBlock } from '../models/SemanticDocument';
+import type { SemanticDocument, SemanticBlock } from '../models/SemanticDocument';
 import { escapeHtml } from '../utils/html';
 import { RESOURCE_DIR } from '../transformers/ImageExtractor';
 
@@ -24,7 +24,7 @@ export interface PreviewPageInfo {
  * No es la representación interna de eXeLearning (que usa XML).
  */
 export class PreviewService {
-  constructor(private project: ImportedProject) {}
+  constructor(private project: SemanticDocument) {}
 
   /**
    * Construir todas las páginas de preview HTML
@@ -216,7 +216,7 @@ ${nextPage ? `<a href="${escapeHtml(nextHref)}" title="Next" class="nav-button n
   /**
    * Generar HTML de un bloque/iDevice
    */
-  private generateBlockHtml(block: ImportedBlock, pageNumber: number, blockIndex: number, assetPrefix = ''): string {
+  private generateBlockHtml(block: SemanticBlock, pageNumber: number, blockIndex: number, assetPrefix = ''): string {
     const blockId = `block-preview-${pageNumber}-${blockIndex + 1}`;
     const ideviceId = `idevice-preview-${pageNumber}-${blockIndex + 1}`;
     let sanitizedHtml = sanitizePreviewBlockHtml(block.html || '<p></p>');

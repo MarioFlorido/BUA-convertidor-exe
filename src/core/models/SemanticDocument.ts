@@ -64,15 +64,6 @@ export interface SemanticDocument {
 }
 
 /**
- * Alias hacia atrás - Para compatibilidad con código legacy
- * DEPRECADO: Usar SemanticDocument en lugar de ImportedProject
- * @deprecated Use SemanticDocument instead
- */
-export type ImportedProject = SemanticDocument;
-export type ImportedPage = SemanticPage;
-export type ImportedBlock = SemanticBlock;
-
-/**
  * Resultado del análisis de estructura de documento
  * Detecta jerarquía H1/H2/H3 y su configuración
  */
