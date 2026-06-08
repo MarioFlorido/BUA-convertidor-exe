@@ -10,7 +10,7 @@
  * Nunca manipula parsing o semántica - eso ya está hecho.
  */
 
-import { ElpxRenderer } from '../renderers/ElpxRenderer';
+import { ElpxRenderer, type ElpxRenderOptions } from '../renderers/ElpxRenderer';
 import { ThemeService } from '../services/ThemeService';
 import { ThemeRegistry } from '../services/ThemeRegistry';
 import type {
@@ -55,10 +55,6 @@ import type {
  * downloadFile(result.blob, result.filename);
  * ```
  */
-export interface ElpxRenderOptions {
-  themeId?: string;
-}
-
 export async function semanticDocumentToElpx(
   project: SemanticDocument,
   filename: string,
