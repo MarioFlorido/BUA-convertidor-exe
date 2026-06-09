@@ -63,6 +63,14 @@
       "language": "en",
       "description": "",
       "screenshot": null
+    },
+    {
+      "id": "CID_es_26-27",
+      "name": "CID es 26-27",
+      "activity": "Cursos CID",
+      "language": "es",
+      "description": "Plantilla en castellano para material de los cursos CID",
+      "screenshot": null
     }
   ]
 }
