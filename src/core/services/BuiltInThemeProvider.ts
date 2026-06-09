@@ -9,6 +9,7 @@
  */
 
 import { unzipSync } from 'fflate';
+import { themeZipUrl } from './themeUrl';
 import type { ThemeBundle, ThemeMetadata } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
@@ -23,6 +24,7 @@ interface ThemesConfigEntry {
   language?: string;
   description?: string;
   screenshot?: string | null;
+  updatedAt?: string;
 }
 
 class BuiltInThemeProviderClass {
@@ -45,7 +47,9 @@ class BuiltInThemeProviderClass {
   private async fetchThemesConfig(): Promise<ThemesConfigEntry[]> {
     try {
       const url = `${BASE_URL}themes-config.json`;
-      const response = await fetch(url);
+      // Revalidar siempre el catálogo: es pequeño y debe reflejar la última
+      // publicación (incluido el `updatedAt` que versiona los .zip de los temas).
+      const response = await fetch(url, { cache: 'no-cache' });
       if (!response.ok) {
         console.warn(`[BuiltInThemeProvider] No se pudo cargar ${url}`);
         return [];
@@ -115,7 +119,8 @@ class BuiltInThemeProviderClass {
     }
 
     try {
-      const url = `${BASE_URL}${entry.id}.zip`;
+      // `?v=updatedAt` rompe la caché cuando el tema se ha republicado.
+      const url = themeZipUrl(BASE_URL, entry.id, entry.updatedAt);
       const response = await fetch(url);
       if (!response.ok) {
         console.warn(`[BuiltInThemeProvider] No se pudo cargar ${url}`);

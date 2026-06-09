@@ -16,6 +16,8 @@ export interface ThemeEntry {
   language?: string;
   description?: string;
   screenshot?: string | null;
+  /** Marca de versión (ISO) de la última publicación. Versiona la URL del .zip. */
+  updatedAt?: string;
 }
 
 export interface ThemesConfig {
@@ -29,6 +31,8 @@ export interface ThemeEntryInput {
   activity?: string;
   language?: string;
   description?: string;
+  /** Marca de versión (ISO). Si se aporta, se guarda; si no, conserva la previa. */
+  updatedAt?: string;
 }
 
 /**
@@ -55,6 +59,7 @@ export function upsertThemeEntry(
     language: input.language ?? existing?.language ?? 'es',
     description: input.description ?? existing?.description ?? '',
     screenshot: null,
+    updatedAt: input.updatedAt ?? existing?.updatedAt,
   };
 
   if (existing) {
