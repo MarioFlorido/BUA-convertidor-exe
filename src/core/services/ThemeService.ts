@@ -1,4 +1,5 @@
 import { unzipSync } from 'fflate';
+import { themeZipUrl } from './themeUrl';
 import { ThemeRegistry } from './ThemeRegistry';
 
 export interface TemplateData {
@@ -70,7 +71,7 @@ export class ThemeService {
 
     // Fallback: fetch desde URL (compatibilidad dev sin registry completo)
     const baseUrl = import.meta.env.BASE_URL ?? '/';
-    const url = `${baseUrl}${themeId}.zip`;
+    const url = themeZipUrl(baseUrl, themeId);
 
     const rawEntries = await this.fetchAndUnzip(url);
     const prefixedEntries = this.filterAndPrefixThemeEntries(rawEntries);

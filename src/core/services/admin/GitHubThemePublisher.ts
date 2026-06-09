@@ -22,6 +22,7 @@ import {
   type ThemeEntryInput,
 } from './themesConfig';
 import { buildThemeTreeEntries, buildDeleteThemeTreeEntries, type GitTreeEntry } from './gitTree';
+import { readThemeVersion, setThemeVersion, nextThemeVersion } from './themeVersion';
 
 export interface PublishOptions {
   branch?: string;
@@ -110,6 +111,47 @@ class GitHubThemePublisherClass {
     return JSON.parse(base64ToString(data.content)) as ThemesConfig;
   }
 
+  /**
+   * Lee el `<version>` del config.xml publicado de un tema en la rama.
+   * Devuelve null si el tema (o su config.xml) aún no existe en el repo.
+   */
+  private async fetchPublishedThemeVersion(themeId: string, branch: string): Promise<number | null> {
+    try {
+      const data = await this.api<{ content: string }>(
+        `/contents/${THEMES_DIR}/${themeId}/config.xml?ref=${branch}`,
+      );
+      return readThemeVersion(base64ToString(data.content));
+    } catch {
+      return null; // tema nuevo: aún no hay config.xml publicado
+    }
+  }
+
+  /**
+   * Devuelve una copia de `files` con el `<version>` del config.xml incrementado.
+   *
+   * eXeLearning identifica un estilo por su `<name>` y usa `<version>` para
+   * detectar revisiones: si el número no sube, quien ya tenga el tema instalado
+   * seguiría viendo el CSS antiguo. El incremento es monótono respecto a lo ya
+   * publicado, así que no depende de la versión que traiga la carpeta local.
+   */
+  private async withBumpedThemeVersion(
+    themeId: string,
+    branch: string,
+    files: Record<string, Uint8Array>,
+  ): Promise<Record<string, Uint8Array>> {
+    const configKey = Object.keys(files).find(
+      (p) => p === 'config.xml' || p.endsWith('/config.xml'),
+    );
+    if (!configKey) return files; // el validador ya exige config.xml; defensivo
+
+    const localXml = new TextDecoder().decode(files[configKey]);
+    const published = await this.fetchPublishedThemeVersion(themeId, branch);
+    const next = nextThemeVersion(published, readThemeVersion(localXml));
+    const bumpedXml = setThemeVersion(localXml, next);
+
+    return { ...files, [configKey]: new TextEncoder().encode(bumpedXml) };
+  }
+
   private async createBlob(bytes: Uint8Array): Promise<string> {
     const data = await this.api<{ sha: string }>(`/git/blobs`, {
       method: 'POST',
@@ -157,7 +199,9 @@ class GitHubThemePublisherClass {
     const baseTreeSha = await this.getBaseTreeSha(headSha);
 
     const config = await this.fetchThemesConfig(branch);
-    const newConfig = upsertThemeEntry(config, input);
+    // Marca de versión por publicación: cambia la URL del .zip del tema (`?v=`)
+    // para que los navegadores bajen la versión nueva en vez de reusar la cacheada.
+    const newConfig = upsertThemeEntry(config, { ...input, updatedAt: new Date().toISOString() });
     const configBytes = new TextEncoder().encode(serializeThemesConfig(newConfig));
 
     const oldRelPaths = await this.listExistingThemeFiles(input.id, baseTreeSha);
@@ -178,9 +222,13 @@ class GitHubThemePublisherClass {
       return { dryRun: true, branch, upserted: upsertRelPaths.length, deleted, treeEntries };
     }
 
+    // Auto-incrementar el <version> del config.xml para que eXeLearning reconozca
+    // la actualización (identifica los estilos por <name> y usa <version>).
+    const filesToPublish = await this.withBumpedThemeVersion(input.id, branch, files);
+
     // Crear blobs de cada archivo del tema
     const upsertBlobs: Record<string, string> = {};
-    for (const [relPath, bytes] of Object.entries(files)) {
+    for (const [relPath, bytes] of Object.entries(filesToPublish)) {
       upsertBlobs[relPath] = await this.createBlob(bytes);
     }
     const configBlobSha = await this.createBlob(configBytes);
