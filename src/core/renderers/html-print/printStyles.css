@@ -322,7 +322,7 @@
 .section-title-2 {
   font-size: 20pt;
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 12px 0 12px 0; /* aire superior (punto 2) */
   padding-bottom: 8px;
   border-bottom: 3px solid;
   bookmark-level: 2;
@@ -354,7 +354,7 @@
 
 /* H3 dentro de bloques de contenido */
 .block-html h3 {
-  font-size: 11pt;
+  font-size: 12pt; /* un poco mayor, para diferenciarlo del H4 (punto 1) */
   font-weight: 700;
   color: var(--color-primary, #135d87);
   margin: 18px 0 3px 0;
@@ -362,10 +362,25 @@
   border-bottom: 1px solid var(--color-accent, #deb13c);
 }
 
+/* H4 dentro de bloques de contenido — menor que el H3, con símbolo de acento.
+   (Antes se perdía en la conversión: SemanticBuilder no contemplaba el nivel 4.) */
+.block-html h4 {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--color-primary, #135d87);
+  margin: 14px 0 3px 0;
+}
+
+.block-html h4::before {
+  content: "▸ ";
+  color: var(--color-accent, #deb13c);
+  margin-right: 4px;
+}
+
 .section-title-3 {
   font-size: 20pt;
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 12px 0 12px 0; /* aire superior (punto 2) */
   padding-bottom: 8px;
   border-bottom: 3px solid;
   bookmark-level: 3;
@@ -374,9 +389,9 @@
 }
 
 .section-title-4 {
-  font-size: 20pt;
+  font-size: 16pt; /* menor que el nivel 3, para diferenciarlos (punto 1) */
   font-weight: 700;
-  margin: 0 0 12px 0;
+  margin: 12px 0 12px 0; /* aire superior (punto 2) */
   padding-bottom: 8px;
   border-bottom: 3px solid;
   bookmark-level: 4;
@@ -440,13 +455,13 @@
 
 .block-html {
   font-size: 10.5pt;
-  line-height: 1.65;
+  line-height: 1.5; /* interlineado más ajustado (punto 3) */
   box-sizing: border-box;
 }
 
-.block-html p          { margin: 0 0 7px 0; }
+.block-html p          { margin: 0 0 12px 0; } /* más separación entre párrafos (punto 3) */
 .block-html ul,
-.block-html ol         { margin: 7px 0; padding-left: 20px; }
+.block-html ol         { margin: 7px 0; padding-left: 34px; } /* más sangría para resaltar listas (punto 6) */
 .block-html li         { margin-bottom: 3px; }
 .block-html strong     { font-weight: 700; }
 .block-html em         { font-style: italic; }
@@ -531,13 +546,21 @@
 }
 
 /* Tabla horizontal: primera fila actúa como cabecera. Las celdas llegan como
-   <td> desde Word (Mammoth no genera <th>), por eso se estiliza la fila aquí. */
-.block-html .bua_tabla_horizontal tr:first-child td {
+   <td> desde Word (Mammoth no genera <th>). Se marca con la clase .bua-hrow en
+   el render (NO con tr:first-child): así, cuando Paged.js parte la tabla y clona
+   la continuación, la 1ª fila de DATOS de la página siguiente ya NO se tiñe como
+   cabecera (punto 8). */
+.block-html .bua_tabla_horizontal tr.bua-hrow td {
   background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-bottom: 3px solid var(--color-accent, #deb13c);
 }
+
+/* Cebreado de las filas de DATOS de la tabla horizontal: empieza en BLANCO tras
+   la cabecera, para que la fila siguiente no parezca otra cabecera (punto 7). */
+.block-html .bua_tabla_horizontal tr:not(.bua-hrow):nth-child(even) td { background-color: #ffffff; }
+.block-html .bua_tabla_horizontal tr:not(.bua-hrow):nth-child(odd)  td { background-color: #f7f7f7; }
 
 
 
@@ -551,8 +574,8 @@
 .block-html .bua_ejemplo,
 .block-html .bua_definicion,
 .block-html .bua_importante {
-  margin: 10px 25px;
-  padding: 10px 14px;
+  margin: 16px 25px; /* más aire superior/inferior (punto 5) */
+  padding: 12px 14px; /* algo más de aire interno (punto 5) */
   /* Sin break-inside: avoid — una caja extensa (típico en Ejemplo/Importante)
      puede partirse entre páginas para no dejar huecos. La etiqueta ::before solo
      aparece al inicio; el fondo y el borde izquierdo continúan en la 2ª parte. */
@@ -565,12 +588,12 @@
 .block-html .bua_definicion::before,
 .block-html .bua_importante::before {
   display: block;
-  font-size: 8pt;
+  font-size: 9pt; /* etiqueta algo mayor para que resalte (punto 4) */
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 5px;
-  opacity: 0.75;
+  margin-bottom: 6px;
+  opacity: 0.9; /* menos transparente, resalta más (punto 4) */
 }
 
 /* Ejemplo — colores y etiqueta inyectados por el renderer desde el CSS del tema */

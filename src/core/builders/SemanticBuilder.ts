@@ -224,6 +224,10 @@ export class SemanticBuilder {
       if (section.level === 999) {
         // Contenido entre H1 y primer H2
         content += section.html;
+      } else if (section.level === 3) {
+        content += `<h3>${escapeHtml(section.text)}</h3>`;
+      } else if (section.level === 4) {
+        content += `<h4>${escapeHtml(section.text)}</h4>`;
       }
     }
 
@@ -270,6 +274,9 @@ export class SemanticBuilder {
         } else if (section.level === 3) {
           // H3 como encabezado
           content += `<h3>${escapeHtml(section.text)}</h3>`;
+        } else if (section.level === 4) {
+          // H4 como encabezado (antes se descartaba → el título desaparecía)
+          content += `<h4>${escapeHtml(section.text)}</h4>`;
         }
       }
     }
