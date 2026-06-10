@@ -9,67 +9,67 @@
       "screenshot": null
     },
     {
-      "id": "Doctorado_26-27",
-      "name": "Doctorado 26-27",
+      "id": "CID_es",
+      "name": "CID es",
       "activity": "",
       "language": "es",
-      "description": "",
+      "description": "Estilo para los temas CID en castellano",
       "screenshot": null
     },
     {
-      "id": "Ciencia_abierta_26-27",
-      "name": "Ciencia abierta 26-27",
+      "id": "CID_va",
+      "name": "CID va",
+      "activity": "",
+      "language": "ca",
+      "description": "Estilo para los temas CID en valenciano",
+      "screenshot": null
+    },
+    {
+      "id": "Ciencia_abierta",
+      "name": "Ciencia abierta",
       "activity": "",
       "language": "es",
-      "description": "",
+      "description": "Estilo minimalista en castellano para los temas de Ciencia Abierta",
       "screenshot": null
     },
     {
-      "id": "CID_va_26-27",
-      "name": "CID va 26-27",
+      "id": "Ciencia_oberta",
+      "name": "Ciencia oberta",
       "activity": "",
       "language": "ca",
-      "description": "",
+      "description": "Estilo minimalista en valenciano para los temas de Ciencia Abierta",
       "screenshot": null
     },
     {
-      "id": "Doctorat_26-27",
-      "name": "Doctorat 26-27",
+      "id": "Doctorado",
+      "name": "Doctorado",
+      "activity": "",
+      "language": "es",
+      "description": "Estilo minimalista en castellano para los temas de Doctorado",
+      "screenshot": null
+    },
+    {
+      "id": "Doctorat",
+      "name": "Doctorat",
       "activity": "",
       "language": "ca",
-      "description": "",
+      "description": "Estilo minimalista en valenciano para los temas de Doctorado",
       "screenshot": null
     },
     {
-      "id": "Ciencia_oberta_26-27",
-      "name": "Ciencia oberta 26-27",
-      "activity": "",
-      "language": "ca",
-      "description": "",
-      "screenshot": null
-    },
-    {
-      "id": "PhD_26-27",
-      "name": "PhD 26-27",
+      "id": "Open_Science",
+      "name": "Open Science",
       "activity": "",
       "language": "en",
-      "description": "",
+      "description": "Estilo minimalista en inglés para los temas de Ciencia Abierta",
       "screenshot": null
     },
     {
-      "id": "Open_Science_26-27",
-      "name": "Open Science 26-27",
+      "id": "PhD",
+      "name": "PhD",
       "activity": "",
       "language": "en",
-      "description": "",
-      "screenshot": null
-    },
-    {
-      "id": "CID_es_26-27",
-      "name": "CID es 26-27",
-      "activity": "Cursos CID básico e intermedio en castellano",
-      "language": "es",
-      "description": "Estilo minimalista con muy pocos elementos",
+      "description": "Estilo minimalista en inglés para los temas de Doctorado",
       "screenshot": null
     }
   ]

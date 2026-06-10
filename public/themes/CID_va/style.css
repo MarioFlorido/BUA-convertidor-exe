@@ -1,5 +1,5 @@
 /* ========================================================================
-   CID 2026-27 — Estilo eXeLearning
+   CID 2026 — Estilo eXeLearning
    Biblioteca Universitaria · Universidad de Alicante
    Paleta: #135d87 · #deb13c · #2a2a2a · #6b7280 · #e5e7eb · #f5f6f7 · #fff
    ======================================================================== */
@@ -281,9 +281,9 @@ body.siteNav-off .exe-web-site .exe-content {
 }
 
 .exe-web-site main.page {
-    padding-top: 5em;
-    padding-left: 320px;
-    padding-right: 40px;
+    padding-top: 2em;
+    padding-left: 255px;
+    padding-right: 10px;
     padding-bottom: 2em;
 }
 
@@ -306,7 +306,7 @@ body.siteNav-off #siteFooter {
     width: 280px;
     padding-top: 66px;
     padding-left: 8px;
-    font-size: 0.8rem;
+    font-size:0.8rem;
 }
 
 html.js .in-iframe.exe-web-site::after {
@@ -665,9 +665,9 @@ label[for="teacher-mode-toggler"] {
     border-radius: 0;
 }
 
-.bua_ejemplo::before    { content: "Ejemplo";    color: #135d87; }
-.bua_definicion::before { content: "Definición"; color: #6b7280; }
-.bua_importante::before { content: "Importante"; color: #deb13c; }
+.bua_ejemplo::before    { content: "Exemple";    color: #135d87; }
+.bua_definicion::before { content: "Definició"; color: #6b7280; }
+.bua_importante::before { content: "Important"; color: #deb13c; }
 
 /* ========================================================================
    19. TABLAS — minimalistas, líneas finas, sin esquinas redondeadas
@@ -737,12 +737,12 @@ label[for="teacher-mode-toggler"] {
 .bua_tabla_vertical tr:hover td:not(:first-child) { background: #fafbfc; }
 
 /* ========================================================================
-   20. ETIQUETA LATERAL "CURSO CID 2026-27"
+   20. ETIQUETA LATERAL "CID 2026-27"
    ======================================================================== */
 
 @media screen and (min-width: 1320px) {
     .exe-web-site .exe-content::before {
-        content: 'CURSO CID 2026-27';
+        content: 'CURS CID 2026-27';
         position: fixed;
         right: 0;
         top: 50%;

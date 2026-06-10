@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <theme>
     <exe-version>3.0</exe-version>
-    <name>Doctorat_26-27</name>
-    <title>DOCTORADO (VALENCIANO)</title>
-<language>ca</language>
+    <name>CID_es</name>
+    <title>CURSOS CID (CASTELLANO) 2026-27</title>
+    <language>es</language>
     <version>2</version>
     <compatibility>3.0</compatibility>
     <author>Florido</author>
     <license>Creative Commons by-sa</license>
     <license-url>http://creativecommons.org/licenses/by-sa/3.0/</license-url>
-    <description>Estilo simple para los temas de doctorado</description>
+    <description>Estilo para los temas CID en castellano</description>
     <downloadable>1</downloadable>
 </theme>
