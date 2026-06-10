@@ -23,8 +23,16 @@ export interface PreviewPageInfo {
  * El preview es una representación HTML simplificada y navegable del proyecto.
  * No es la representación interna de eXeLearning (que usa XML).
  */
+export interface PreviewServiceOptions {
+  /** Si true, inyecta CSS para que el índice lateral arranque desplegado. */
+  navExpanded?: boolean;
+}
+
 export class PreviewService {
-  constructor(private project: SemanticDocument) {}
+  constructor(
+    private project: SemanticDocument,
+    private options: PreviewServiceOptions = {},
+  ) {}
 
   /**
    * Construir todas las páginas de preview HTML
@@ -149,7 +157,7 @@ export class PreviewService {
 body.exe-export.exe-web-site{min-width:0}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}
-.page-content .box+.box{margin-top:1.25rem}
+.page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}
 </style>
 </head>
 <body class="exe-export exe-web-site">

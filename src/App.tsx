@@ -313,6 +313,11 @@ export function App() {
                   result={state.result}
                   semanticDoc={semanticDoc}
                   themeId={options.themeId}
+                  onRegenerateElpx={semanticDoc && file ? async ({ navExpanded }) => {
+                    const effectiveThemeId = options.themeId && options.themeId !== 'base' ? options.themeId : undefined;
+                    const r = await semanticDocumentToElpx(semanticDoc, file.name, { themeId: effectiveThemeId, navExpanded });
+                    return { blob: r.blob, filename: r.filename };
+                  } : undefined}
                 />
 
                 {/* Acción secundaria */}
