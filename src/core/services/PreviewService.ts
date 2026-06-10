@@ -157,7 +157,7 @@ export class PreviewService {
 body.exe-export.exe-web-site{min-width:0}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}
-.page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section{display:block}' : ''}
+.page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}
 </style>
 </head>
 <body class="exe-export exe-web-site">
