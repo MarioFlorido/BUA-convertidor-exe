@@ -43,7 +43,9 @@ export class ElpxRenderer {
     await this.extractImagesToFiles(entries);
 
     // Generar content.xml
-    entries['content.xml'] = new TextEncoder().encode(this.generateContentXml(effectiveThemeId));
+    entries['content.xml'] = new TextEncoder().encode(
+      this.generateContentXml(effectiveThemeId, options.navExpanded === true),
+    );
 
     // Generar páginas de preview (una sola vez)
     const previewService = new PreviewService(this.project, { navExpanded: options.navExpanded });
@@ -87,11 +89,23 @@ export class ElpxRenderer {
 
   /**
    * Generar XML de contenido (content.xml)
+   *
+   * @param navExpanded - Si true, añade pp_extraHeadContent con CSS que despliega
+   *   el índice lateral completo. Esta propiedad es la que eXeLearning 4 inyecta
+   *   al final del <head> de cada página al exportar (PageRenderer), por lo que
+   *   sobrevive al reexport — a diferencia de las páginas de preview del ZIP,
+   *   que eXeLearning regenera y descarta.
    */
-  private generateContentXml(themeId: string = 'base'): string {
+  private generateContentXml(themeId: string = 'base', navExpanded = false): string {
     const odeId = createResourceId();
     const odeVersionId = createResourceId();
     const modified = String(Date.now());
+    // El CSS del índice desplegado va escapado dentro del XML; eXeLearning lo
+    // desescapa al importar y lo coloca tal cual al final del <head> exportado,
+    // después del style.css del tema (misma especificidad → gana la cascada).
+    const extraHeadXml = navExpanded
+      ? `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml('<style>#siteNav .other-section{display:block}</style>')}</value></odeProperty>\n`
+      : '';
     const pageIds = this.project.pages.map(() => createPageId());
     const navStructuresXml = this.project.pages
       .map((page, index) => this.generateOdeNavStructureXml(page, index, pageIds))
@@ -128,7 +142,7 @@ export class ElpxRenderer {
   <odeProperty><key>pp_addMathJax</key><value>false</value></odeProperty>
   <odeProperty><key>exportSource</key><value>true</value></odeProperty>
   <odeProperty><key>pp_globalFont</key><value>default</value></odeProperty>
-</odeProperties>
+${extraHeadXml}</odeProperties>
 <odeNavStructures>
 ${navStructuresXml}</odeNavStructures>
 </ode>`;
