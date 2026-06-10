@@ -184,7 +184,7 @@ function renderBlock(block: SemanticBlock): string {
 
   if (isDefaultTitle) {
     // Bloque sin título de iDevice: sólo contenido
-    const htmlUpperH2 = convertIframesToLinks(expandAccordions(block.html)).replace(
+    const htmlUpperH2 = markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))).replace(
       /<h2([^>]*)>([^<]*)<\/h2>/gi,
       (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
     );
@@ -194,7 +194,7 @@ function renderBlock(block: SemanticBlock): string {
   }
 
   // iDevice con título: cabecera coloreada + borde perimetral (igual que en eXeLearning)
-  const blockHtmlUpperH2 = convertIframesToLinks(expandAccordions(block.html)).replace(
+  const blockHtmlUpperH2 = markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))).replace(
     /<h2([^>]*)>([^<]*)<\/h2>/gi,
     (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
   );
@@ -231,6 +231,22 @@ function convertIframesToLinks(html: string): string {
  */
 function expandAccordions(html: string): string {
   return html.replace(/<details(\s|>)/gi, '<details open$1');
+}
+
+/**
+ * Marca la primera fila (<tr>) de cada tabla horizontal BUA con la clase
+ * `bua-hrow`, para que la cabecera se estile por CLASE y no por `tr:first-child`.
+ *
+ * Motivo: Paged.js, al partir una tabla larga entre páginas, clona la <table>
+ * en la continuación; con `tr:first-child` la primera fila de DATOS de esa
+ * continuación se teñía como cabecera (gris oscuro). Con una clase en la fila
+ * real, eso ya no ocurre.
+ */
+function markHorizontalTableHeaderRows(html: string): string {
+  return html.replace(
+    /(<table\b[^>]*\bbua_tabla_horizontal\b[^>]*>(?:\s*<(?:tbody|thead|colgroup)\b[^>]*>)*\s*)<tr>/gi,
+    '$1<tr class="bua-hrow">',
+  );
 }
 
 // ─── Ensamblador final ────────────────────────────────────────────────────────
@@ -326,7 +342,7 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
       font-family: var(--font-body);
       color: #2a2a2a;
       font-size: 10.5pt;
-      line-height: 1.65;
+      line-height: 1.5;
     }
 
     .toc-heading,
