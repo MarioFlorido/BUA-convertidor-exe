@@ -11,10 +11,11 @@
     {
       "id": "CID_es",
       "name": "CID es",
-      "activity": "",
+      "activity": "Cursos CID",
       "language": "es",
-      "description": "Estilo para los temas CID en castellano",
-      "screenshot": null
+      "description": "Tema minimalista en castellano para los cursos CID 2026-27",
+      "screenshot": null,
+      "updatedAt": "2026-06-10T14:22:28.515Z"
     },
     {
       "id": "CID_va",
