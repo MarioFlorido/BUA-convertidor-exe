@@ -7,6 +7,8 @@ interface DownloadButtonProps {
   result: ImportToElpxResult;
   semanticDoc: SemanticDocument | null;
   themeId?: string;
+  /** Función para regenerar el ELPX con opciones diferentes (nav expandido, etc.) */
+  onRegenerateElpx?: (opts: { navExpanded: boolean }) => Promise<{ blob: Blob; filename: string }>;
 }
 
 function DownloadArrow() {
@@ -27,24 +29,46 @@ function DownloadArrow() {
   );
 }
 
-export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonProps) {
+export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx }: DownloadButtonProps) {
   const [printLoading, setPrintLoading] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
   const [printNotice, setPrintNotice] = useState<string | null>(null);
   const [useCoverImage, setUseCoverImage] = useState(false);
+  const [navExpanded, setNavExpanded] = useState(false);
+  const [elpxLoading, setElpxLoading] = useState(false);
 
   const base = import.meta.env.BASE_URL;
 
   // ── Descarga ELPX ────────────────────────────────────────────────────────
-  const handleDownloadElpx = () => {
-    const url = URL.createObjectURL(result.blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = result.filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownloadElpx = async () => {
+    // Si no se necesita regenerar (índice plegado, el default), descarga directa.
+    if (!navExpanded || !onRegenerateElpx) {
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = result.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    }
+
+    // Con índice desplegado: regenerar el ELPX al vuelo con la opción activada.
+    setElpxLoading(true);
+    try {
+      const { blob, filename } = await onRegenerateElpx({ navExpanded: true });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setElpxLoading(false);
+    }
   };
 
   // ── Exportar Print HTML (Paged.js) ───────────────────────────────────────
@@ -98,20 +122,40 @@ export function DownloadButton({ result, semanticDoc, themeId }: DownloadButtonP
 
   return (
     <div className="result-downloads">
-      {/* Descarga ELPX */}
-      <button onClick={handleDownloadElpx} className="btn-download-elpx">
-        <img
-          src={`${base}elpx-icon.png`}
-          alt=""
-          className="download-btn-icon"
-          aria-hidden="true"
-        />
-        <div className="download-btn-body">
-          <span className="download-btn-title">Descargar proyecto eXeLearning</span>
-          <span className="download-btn-sub">{result.filename}</span>
-        </div>
-        <DownloadArrow />
-      </button>
+      {/* Descarga ELPX + switch índice */}
+      <div className="pdf-download-group">
+        <button onClick={handleDownloadElpx} className="btn-download-elpx" disabled={elpxLoading}>
+          <img
+            src={`${base}elpx-icon.png`}
+            alt=""
+            className="download-btn-icon"
+            aria-hidden="true"
+            style={{ opacity: elpxLoading ? 0.4 : 1 }}
+          />
+          <div className="download-btn-body">
+            <span className="download-btn-title">
+              {elpxLoading ? 'Generando…' : 'Descargar proyecto eXeLearning'}
+            </span>
+            <span className="download-btn-sub">{result.filename}</span>
+          </div>
+          {!elpxLoading && <DownloadArrow />}
+        </button>
+        <span className="pdf-cover-toggle-inline">
+          <span className="pdf-cover-toggle-inline__label">
+            {navExpanded ? 'Índice desplegado' : 'Índice plegado'}
+          </span>
+          <button
+            role="switch"
+            aria-checked={navExpanded}
+            aria-label="Estado del índice lateral"
+            title={navExpanded ? 'El índice arrancará desplegado' : 'El índice arrancará plegado (por defecto)'}
+            onClick={() => setNavExpanded((v) => !v)}
+            className={`toggle-switch ${navExpanded ? 'toggle-switch--on' : ''}`}
+          >
+            <span className="toggle-switch__thumb" />
+          </button>
+        </span>
+      </div>
 
       {/* Exportar PDF + switch imagen de portada */}
       <div className="pdf-download-group">

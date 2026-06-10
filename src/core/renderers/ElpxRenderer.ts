@@ -6,6 +6,8 @@ import { escapeHtml } from '../utils/html';
 
 export interface ElpxRenderOptions {
   themeId?: string;
+  /** Si true, el índice lateral del ELPX arranca desplegado (todos los niveles visibles). */
+  navExpanded?: boolean;
 }
 
 export interface RenderedElpx {
@@ -44,7 +46,7 @@ export class ElpxRenderer {
     entries['content.xml'] = new TextEncoder().encode(this.generateContentXml(effectiveThemeId));
 
     // Generar páginas de preview (una sola vez)
-    const previewService = new PreviewService(this.project);
+    const previewService = new PreviewService(this.project, { navExpanded: options.navExpanded });
     const previewPages = previewService.buildPages();
     previewService.addToZipEntries(entries, previewPages);
 

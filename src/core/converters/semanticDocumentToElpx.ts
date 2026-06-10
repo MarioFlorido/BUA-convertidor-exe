@@ -88,7 +88,7 @@ export async function semanticDocumentToElpx(
 
   // Delegar renderización a ElpxRenderer
   const renderer = new ElpxRenderer(template, project);
-  const rendered = await renderer.render({ themeId: options.themeId });
+  const rendered = await renderer.render({ themeId: options.themeId, navExpanded: options.navExpanded });
 
   const previewHtml = rendered.previewPages['index.html']
     ? rendered.previewPages['index.html']
