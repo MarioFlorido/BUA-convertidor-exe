@@ -2073,6 +2073,53 @@ button {
   font-family: var(--font);
 }
 
+.admin-theme-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+/* Editor de metadatos inline: ocupa toda la fila (wrap bajo el nombre). */
+.admin-meta-edit {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.admin-meta-edit label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: var(--text-2);
+}
+
+.admin-meta-edit input {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  color: var(--text);
+}
+
+.admin-meta-edit input:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+
+.admin-meta-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+}
+
 /* ── Config Panel ────────────────────────────────────────────────────────── */
 .config-panel {
   display: flex;

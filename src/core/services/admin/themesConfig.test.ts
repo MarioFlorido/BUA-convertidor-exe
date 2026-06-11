@@ -54,6 +54,18 @@ describe('upsertThemeEntry', () => {
     upsertThemeEntry(config, { id: 'a', name: 'Cambiado' });
     assert.equal(config.themes[0].name, 'A');
   });
+
+  test('editar solo metadatos (sin updatedAt) conserva la versión del .zip', () => {
+    // Escenario del editor de metadatos: corregir nombre y descripción sin tocar
+    // los archivos del tema → updatedAt NO debe cambiar (la URL del .zip usa ?v=).
+    const config: ThemesConfig = {
+      themes: [{ id: 'CID_es', name: 'CID es', description: 'vieja', updatedAt: '2026-06-10T00:00:00.000Z' }],
+    };
+    const out = upsertThemeEntry(config, { id: 'CID_es', name: 'CID ES', description: 'corregida' });
+    assert.equal(out.themes[0].name, 'CID ES');
+    assert.equal(out.themes[0].description, 'corregida');
+    assert.equal(out.themes[0].updatedAt, '2026-06-10T00:00:00.000Z');
+  });
 });
 
 describe('removeThemeEntry', () => {
