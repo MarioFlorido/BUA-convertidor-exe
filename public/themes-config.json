@@ -19,11 +19,12 @@
     },
     {
       "id": "CID_va",
-      "name": "CID va",
-      "activity": "",
+      "name": "CID - VALENCIANO - 2026-27",
+      "activity": "Cursos de Competencias Digitales ",
       "language": "ca",
-      "description": "Estilo para los temas CID en valenciano",
-      "screenshot": null
+      "description": "Para los temas básicos e intermedios",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T12:15:49.340Z"
     },
     {
       "id": "Ciencia_abierta",
