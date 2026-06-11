@@ -51,11 +51,12 @@
     },
     {
       "id": "Doctorat",
-      "name": "Doctorat",
-      "activity": "",
+      "name": "DOCTORADO - VALENCIANO - 2026-27",
+      "activity": "Cursos de Doctorado",
       "language": "ca",
-      "description": "Estilo minimalista en valenciano para los temas de Doctorado",
-      "screenshot": null
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T07:00:44.127Z"
     },
     {
       "id": "Open_Science",
