@@ -662,6 +662,7 @@ button {
   align-items: center;
   gap: 0.625rem;
   width: 100%;
+  min-height: 72px;
 }
 
 .pdf-download-group .btn-download-pdf {
@@ -732,6 +733,7 @@ button {
   text-align: left;
   transition: all 0.15s;
   letter-spacing: -0.01em;
+  min-height: 60px;
 }
 
 .btn-download-elpx {

@@ -146,13 +146,13 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
         </button>
         <span className="pdf-cover-toggle-inline">
           <span className="pdf-cover-toggle-inline__label">
-            {navExpanded ? 'Índice desplegado' : 'Índice plegado'}
+            {navExpanded ? 'Menú lateral desplegado' : 'Menú lateral plegado'}
           </span>
           <button
             role="switch"
             aria-checked={navExpanded}
-            aria-label="Estado del índice lateral"
-            title={navExpanded ? 'El índice arrancará desplegado' : 'El índice arrancará plegado (por defecto)'}
+            aria-label="Estado del menú lateral"
+            title={navExpanded ? 'El menú arrancará desplegado' : 'El menú arrancará plegado (por defecto)'}
             onClick={() => setNavExpanded((v) => !v)}
             className={`toggle-switch ${navExpanded ? 'toggle-switch--on' : ''}`}
           >
@@ -195,7 +195,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
         </button>
         <span className="pdf-cover-toggle-inline">
           <span className="pdf-cover-toggle-inline__label">
-            {useCoverImage ? 'Con foto portada' : 'Sin foto portada'}
+            {useCoverImage ? 'Con foto de portada' : 'Sin foto de portada'}
           </span>
           <button
             role="switch"
