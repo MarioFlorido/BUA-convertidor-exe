@@ -52,6 +52,13 @@ export function OfficialThemeAdmin() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmText, setConfirmText] = useState('');
 
+  // ── Editar metadatos (sin tocar el tema) ──
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editActivity, setEditActivity] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editOriginal, setEditOriginal] = useState({ name: '', activity: '', description: '' });
+
   // Temas oficiales cargados en la app (excluye "base", que no se borra).
   const officialThemes = ThemeRegistry.getAll().filter(
     (t) => t.source === 'builtin' && t.id !== 'base',
@@ -85,6 +92,7 @@ export function OfficialThemeAdmin() {
     setDescription('');
     setError(null);
     setResult(null);
+    setEditingId(null);
   };
 
   const handlePickFolder = async () => {
@@ -132,6 +140,42 @@ export function OfficialThemeAdmin() {
   const cancelDelete = () => {
     setDeletingId(null);
     setConfirmText('');
+  };
+
+  const startEdit = (t: { id: string; name: string; metadata?: { name?: string; activity?: string; description?: string } }) => {
+    const name = t.metadata?.name ?? t.name;
+    const activity = t.metadata?.activity ?? '';
+    const description = t.metadata?.description ?? '';
+    setEditingId(t.id);
+    setEditName(name);
+    setEditActivity(activity);
+    setEditDescription(description);
+    setEditOriginal({ name, activity, description });
+    setDeletingId(null);
+    setError(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleSaveMetadata = async () => {
+    if (!editingId) return;
+    setBusy(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await GitHubThemePublisher.updateThemeMetadata(
+        { id: editingId, name: editName, activity: editActivity, description: editDescription },
+        { branch, dryRun },
+      );
+      setResult(res);
+      cancelEdit();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error guardando los metadatos.');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -196,6 +240,10 @@ export function OfficialThemeAdmin() {
   const report = loaded?.report;
   const hasErrors = (report?.errors.length ?? 0) > 0;
   const hasExisting = loaded ? officialThemes.some((t) => t.id === loaded.id) : false;
+  const editChanged =
+    editName !== editOriginal.name ||
+    editActivity !== editOriginal.activity ||
+    editDescription !== editOriginal.description;
 
   return (
     <div className="admin-panel">
@@ -209,13 +257,26 @@ export function OfficialThemeAdmin() {
 
       {error && <div className="alert alert-error">{error}</div>}
 
-      {/* Resultado de la operación (publicar / actualizar / eliminar) */}
+      {/* Resultado de la operación (publicar / actualizar / eliminar / metadatos) */}
       {result && (
         <div className={`alert ${result.dryRun ? 'alert-info' : 'alert-success'}`}>
           {result.dryRun ? (
+            result.metadataOnly ? (
+              <>
+                <strong>Simulación (dry-run)</strong> en <code>{result.branch}</code>: se actualizarían
+                {' '}los metadatos del catálogo. No se ha modificado nada.
+              </>
+            ) : (
+              <>
+                <strong>Simulación (dry-run)</strong> en <code>{result.branch}</code>: se subirían{' '}
+                {result.upserted} archivo(s) y se eliminarían {result.deleted}. No se ha modificado nada.
+              </>
+            )
+          ) : result.metadataOnly ? (
             <>
-              <strong>Simulación (dry-run)</strong> en <code>{result.branch}</code>: se subirían{' '}
-              {result.upserted} archivo(s) y se eliminarían {result.deleted}. No se ha modificado nada.
+              <strong>✓ Metadatos actualizados</strong> en <code>{result.branch}</code>. Commit{' '}
+              <code>{result.commitSha?.slice(0, 7)}</code>.
+              {result.branch === DEFAULT_PUBLISH_BRANCH && ' El despliegue se actualiza en 1-2 minutos.'}
             </>
           ) : (
             <>
@@ -268,7 +329,37 @@ export function OfficialThemeAdmin() {
                     <strong>{t.metadata?.name ?? t.name}</strong>
                     <span className="theme-id">({t.id})</span>
                   </span>
-                  {deletingId === t.id ? (
+                  {editingId === t.id ? (
+                    <div className="admin-meta-edit">
+                      <label>
+                        Nombre
+                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
+                      </label>
+                      <label>
+                        Actividad
+                        <input type="text" value={editActivity} onChange={(e) => setEditActivity(e.target.value)} />
+                      </label>
+                      <label>
+                        Descripción
+                        <input type="text" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                      </label>
+                      <p className="help-text">
+                        El idioma (<strong>{t.metadata?.language ?? '—'}</strong>) se toma del{' '}
+                        <code>config.xml</code> del tema; no se edita aquí.
+                      </p>
+                      <div className="admin-meta-edit-actions">
+                        <button
+                          className="btn-confirm"
+                          onClick={handleSaveMetadata}
+                          disabled={busy || !editChanged}
+                          title={!editChanged ? 'No has cambiado ningún metadato' : undefined}
+                        >
+                          {busy ? 'Guardando…' : dryRun ? 'Simular' : 'Guardar metadatos'}
+                        </button>
+                        <button className="link-button" onClick={cancelEdit} disabled={busy}>Cancelar</button>
+                      </div>
+                    </div>
+                  ) : deletingId === t.id ? (
                     <span className="admin-delete-confirm">
                       <input
                         type="text"
@@ -287,21 +378,31 @@ export function OfficialThemeAdmin() {
                       <button className="link-button" onClick={cancelDelete} disabled={busy}>Cancelar</button>
                     </span>
                   ) : (
-                    <button
-                      className="btn-delete"
-                      onClick={() => { setDeletingId(t.id); setConfirmText(''); setError(null); }}
-                      disabled={busy}
-                    >
-                      Eliminar
-                    </button>
+                    <span className="admin-theme-actions">
+                      <button
+                        className="btn-edit"
+                        onClick={() => startEdit(t)}
+                        disabled={busy}
+                      >
+                        Editar metadatos
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => { setDeletingId(t.id); setConfirmText(''); setError(null); }}
+                        disabled={busy}
+                      >
+                        Eliminar
+                      </button>
+                    </span>
                   )}
                 </div>
               ))}
             </div>
           )}
           <p className="help-text">
-            Para <strong>actualizar</strong> un tema, vuelve a publicar su carpeta con el mismo nombre
-            (mismo id) en el asistente de abajo: se reemplazan los archivos y se conservan sus metadatos.
+            Para corregir solo el <strong>nombre, actividad o descripción</strong> usa «Editar metadatos»:
+            cambia el catálogo sin tocar los archivos del tema. Para sustituir los archivos del tema,
+            vuelve a publicar su carpeta (mismo id) en el asistente de abajo.
           </p>
         </div>
       )}

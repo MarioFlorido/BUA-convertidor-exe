@@ -41,6 +41,8 @@ export interface PublishResult {
   deleted: number;
   /** Plan de entradas del tree (útil en dry-run). */
   treeEntries: GitTreeEntry[];
+  /** True si la operación solo editó el catálogo (metadatos), sin tocar el tema. */
+  metadataOnly?: boolean;
 }
 
 // ── Helpers base64 (navegador) ───────────────────────────────────────────────
@@ -357,6 +359,57 @@ class GitHubThemePublisherClass {
     await this.updateRef(branch, commitSha);
 
     return { dryRun: false, branch, commitSha, upserted: 0, deleted: existingRelPaths.length, treeEntries };
+  }
+
+  /**
+   * Edita SOLO los metadatos de un tema en el catálogo (nombre, actividad,
+   * descripción): un único commit que toca exclusivamente `themes-config.json`,
+   * sin tocar los archivos del tema ni su `<version>`.
+   *
+   * Deliberadamente NO escribe `updatedAt`: los archivos del tema no cambian, así
+   * que la URL del `.zip` (que usa `?v=updatedAt`) debe seguir igual para no forzar
+   * descargas innecesarias. `upsertThemeEntry` conserva el `updatedAt` previo.
+   *
+   * Nota: el `language` no se edita aquí — el runtime lo deriva del `<language>`
+   * del config.xml del tema, que tiene prioridad sobre el catálogo.
+   */
+  async updateThemeMetadata(
+    input: ThemeEntryInput,
+    opts: PublishOptions = {},
+  ): Promise<PublishResult> {
+    const branch = opts.branch ?? DEFAULT_PUBLISH_BRANCH;
+    const dryRun = opts.dryRun ?? false;
+
+    const headSha = await this.getRefSha(branch);
+    const baseTreeSha = await this.getBaseTreeSha(headSha);
+
+    const config = await this.fetchThemesConfig(branch);
+    // Sin updatedAt: ver doc del método. upsertThemeEntry conserva el previo.
+    const newConfig = upsertThemeEntry(config, input);
+    const configBytes = new TextEncoder().encode(serializeThemesConfig(newConfig));
+
+    if (dryRun) {
+      const treeEntries = buildThemeTreeEntries({
+        themeId: input.id,
+        upsertBlobs: {},
+        configBlobSha: '<dry-run-config>',
+      });
+      return { dryRun: true, branch, upserted: 0, deleted: 0, treeEntries, metadataOnly: true };
+    }
+
+    const configBlobSha = await this.createBlob(configBytes);
+    const treeEntries = buildThemeTreeEntries({
+      themeId: input.id,
+      upsertBlobs: {},
+      configBlobSha,
+    });
+
+    const treeSha = await this.createTree(baseTreeSha, treeEntries);
+    const message = opts.message ?? `chore(themes): editar metadatos de ${input.id}`;
+    const commitSha = await this.createCommit(message, treeSha, headSha);
+    await this.updateRef(branch, commitSha);
+
+    return { dryRun: false, branch, commitSha, upserted: 0, deleted: 0, treeEntries, metadataOnly: true };
   }
 }
 
