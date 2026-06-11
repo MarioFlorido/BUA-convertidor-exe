@@ -36,6 +36,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
   const [useCoverImage, setUseCoverImage] = useState(false);
   const [navExpanded, setNavExpanded] = useState(false);
   const [elpxLoading, setElpxLoading] = useState(false);
+  const [elpxError, setElpxError] = useState<string | null>(null);
 
   const base = import.meta.env.BASE_URL;
 
@@ -56,6 +57,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
 
     // Con índice desplegado: regenerar el ELPX al vuelo con la opción activada.
     setElpxLoading(true);
+    setElpxError(null);
     try {
       const { blob, filename } = await onRegenerateElpx({ navExpanded: true });
       const url = URL.createObjectURL(blob);
@@ -66,6 +68,8 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    } catch (err) {
+      setElpxError(err instanceof Error ? err.message : 'Error al generar el proyecto eXeLearning');
     } finally {
       setElpxLoading(false);
     }
@@ -156,6 +160,12 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </button>
         </span>
       </div>
+
+      {elpxError && (
+        <div className="download-error">
+          Error al generar el proyecto eXeLearning: {elpxError}
+        </div>
+      )}
 
       {/* Exportar PDF + switch imagen de portada */}
       <div className="pdf-download-group">
