@@ -43,11 +43,12 @@
     },
     {
       "id": "Doctorado",
-      "name": "Doctorado",
-      "activity": "",
+      "name": "DOCTORADO - CASTELLANO -2026-27",
+      "activity": "Cursos de Doctorado",
       "language": "es",
-      "description": "Estilo minimalista en castellano para los temas de Doctorado",
-      "screenshot": null
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T07:44:46.681Z"
     },
     {
       "id": "Doctorat",
