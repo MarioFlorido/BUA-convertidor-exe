@@ -61,6 +61,30 @@ function base64ToString(b64: string): string {
   return new TextDecoder().decode(bytes);
 }
 
+// ── Robustez ante el rate limit / parpadeos de red ───────────────────────────
+//
+// Publicar un tema son ~50 escrituras seguidas; varios temas en pocos minutos
+// cruzan el "secondary rate limit" de GitHub (anti-abuso por crear contenido
+// demasiado rápido). Sus respuestas llegan SIN cabecera CORS, así que en el
+// navegador el fetch lanza un TypeError "Failed to fetch" en vez de un status.
+// Mitigamos en dos frentes: (1) throttle entre blobs para no cruzar el umbral,
+// (2) reintentos con backoff para absorber el límite o un parpadeo puntual.
+
+/** Pausa entre subidas de blob consecutivas (~80 escrituras/min, bajo el umbral). */
+const BLOB_THROTTLE_MS = 600;
+/** Intentos totales por petición (1 inicial + reintentos). */
+const MAX_API_ATTEMPTS = 4;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Espera del reintento `attempt` (1-based): ~2s, 6s, 15s, con jitter. */
+function backoffMs(attempt: number): number {
+  const base = [2000, 6000, 15000][Math.min(attempt - 1, 2)];
+  return Math.round(base * (0.8 + Math.random() * 0.4));
+}
+
 class GitHubThemePublisherClass {
   constructor(private getToken: () => string | null) {}
 
@@ -71,15 +95,45 @@ class GitHubThemePublisherClass {
   }
 
   private async api<T>(pathSuffix: string, init?: RequestInit): Promise<T> {
-    const resp = await fetch(repoApiUrl(pathSuffix), {
-      ...init,
-      headers: { ...this.headers(), ...(init?.headers ?? {}) },
-    });
-    if (!resp.ok) {
-      const body = await resp.text().catch(() => '');
-      throw new Error(`GitHub API ${resp.status} en ${pathSuffix}: ${body.slice(0, 200)}`);
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= MAX_API_ATTEMPTS; attempt++) {
+      let resp: Response;
+      try {
+        resp = await fetch(repoApiUrl(pathSuffix), {
+          ...init,
+          headers: { ...this.headers(), ...(init?.headers ?? {}) },
+        });
+      } catch (err) {
+        // TypeError "Failed to fetch": red caída o respuesta del rate limit
+        // secundario sin cabecera CORS. Reintentable: la operación es atómica
+        // (el repo solo cambia en updateRef; los blobs sueltos los recolecta GitHub).
+        lastError = err;
+        if (attempt < MAX_API_ATTEMPTS) {
+          await delay(backoffMs(attempt));
+          continue;
+        }
+        throw new Error(
+          `No se pudo contactar con GitHub en ${pathSuffix} tras ${MAX_API_ATTEMPTS} intentos ` +
+            `(posible límite de GitHub o red inestable). No se ha modificado nada en el repositorio.`,
+        );
+      }
+
+      // 403/429 (rate limit) o 5xx (sobrecarga transitoria): esperar y reintentar,
+      // respetando Retry-After si GitHub lo indica.
+      if ((resp.status === 403 || resp.status === 429 || resp.status >= 500) && attempt < MAX_API_ATTEMPTS) {
+        const retryAfter = Number(resp.headers.get('retry-after'));
+        const waitMs = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : backoffMs(attempt);
+        await delay(waitMs);
+        continue;
+      }
+
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => '');
+        throw new Error(`GitHub API ${resp.status} en ${pathSuffix}: ${body.slice(0, 200)}`);
+      }
+      return resp.json() as Promise<T>;
     }
-    return resp.json() as Promise<T>;
+    throw new Error(`No se pudo completar ${pathSuffix}: ${String(lastError)}`);
   }
 
   private async getRefSha(branch: string): Promise<string> {
@@ -121,8 +175,15 @@ class GitHubThemePublisherClass {
         `/contents/${THEMES_DIR}/${themeId}/config.xml?ref=${branch}`,
       );
       return readThemeVersion(base64ToString(data.content));
-    } catch {
-      return null; // tema nuevo: aún no hay config.xml publicado
+    } catch (err) {
+      // SOLO el 404 significa "tema nuevo, aún sin config.xml publicado".
+      // Cualquier otro error (rate limit, red) NO debe interpretarse como tema
+      // nuevo: hacerlo dejaría el <version> sin incrementar en silencio y
+      // eXeLearning no detectaría la actualización. Mejor propagar el fallo.
+      if ((err as Error).message.includes('404')) {
+        return null;
+      }
+      throw err;
     }
   }
 
@@ -177,10 +238,22 @@ class GitHubThemePublisherClass {
   }
 
   private async updateRef(branch: string, commitSha: string): Promise<void> {
-    await this.api(`/git/refs/heads/${branch}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ sha: commitSha, force: false }),
-    });
+    try {
+      await this.api(`/git/refs/heads/${branch}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ sha: commitSha, force: false }),
+      });
+    } catch (err) {
+      // 422 not a fast forward: otro commit entró en la rama durante la subida.
+      // El commit que creamos quedó suelto (no referenciado) → el repo no cambió.
+      if ((err as Error).message.includes('422')) {
+        throw new Error(
+          'La rama cambió durante la publicación (entró otro commit en main). ' +
+            'No se ha modificado nada en el repositorio; vuelve a publicar el tema.',
+        );
+      }
+      throw err;
+    }
   }
 
   /**
@@ -226,10 +299,14 @@ class GitHubThemePublisherClass {
     // la actualización (identifica los estilos por <name> y usa <version>).
     const filesToPublish = await this.withBumpedThemeVersion(input.id, branch, files);
 
-    // Crear blobs de cada archivo del tema
+    // Crear blobs de cada archivo del tema. Throttle entre subidas para no
+    // cruzar el límite secundario de GitHub al publicar varios temas seguidos.
     const upsertBlobs: Record<string, string> = {};
-    for (const [relPath, bytes] of Object.entries(filesToPublish)) {
+    const blobEntries = Object.entries(filesToPublish);
+    for (let i = 0; i < blobEntries.length; i++) {
+      const [relPath, bytes] = blobEntries[i];
       upsertBlobs[relPath] = await this.createBlob(bytes);
+      if (i < blobEntries.length - 1) await delay(BLOB_THROTTLE_MS);
     }
     const configBlobSha = await this.createBlob(configBytes);
 
