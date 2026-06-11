@@ -67,11 +67,12 @@
     },
     {
       "id": "PhD",
-      "name": "PhD",
-      "activity": "",
+      "name": "DOCTORADO - INGLES - 2026-27",
+      "activity": "Cursos de Doctorado",
       "language": "en",
-      "description": "Estilo minimalista en inglés para los temas de Doctorado",
-      "screenshot": null
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T06:50:13.265Z"
     }
   ]
 }
