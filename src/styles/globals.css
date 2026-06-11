@@ -724,7 +724,8 @@ button {
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 0.875rem 1.25rem;
   border-radius: var(--radius);
   font-size: 0.875rem;
