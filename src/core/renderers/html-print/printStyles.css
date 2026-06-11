@@ -343,7 +343,7 @@
 
 /* H2 dentro de bloques de contenido (opción "H2 en HTML") */
 .block-html h2 {
-  font-size: 13pt;
+  font-size: 14pt;
   font-weight: 700;
   color: var(--color-primary, #135d87);
   margin: 24px 0 3px 0;
@@ -354,7 +354,7 @@
 
 /* H3 dentro de bloques de contenido */
 .block-html h3 {
-  font-size: 12pt; /* un poco mayor, para diferenciarlo del H4 (punto 1) */
+  font-size: 13pt; /* un poco mayor, para diferenciarlo del H4 (punto 1) */
   font-weight: 700;
   color: var(--color-primary, #135d87);
   margin: 18px 0 3px 0;
@@ -365,7 +365,7 @@
 /* H4 dentro de bloques de contenido — menor que el H3, con símbolo de acento.
    (Antes se perdía en la conversión: SemanticBuilder no contemplaba el nivel 4.) */
 .block-html h4 {
-  font-size: 11pt;
+  font-size: 12pt;
   font-weight: 700;
   color: var(--color-primary, #135d87);
   margin: 14px 0 3px 0;
