@@ -769,8 +769,8 @@ button {
 }
 
 .download-btn-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
 }
 
@@ -801,6 +801,21 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.download-btn-sub-browser {
+  font-size: 0.75rem;
+  color: #8E8E93;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.browser-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .download-btn-arrow {
