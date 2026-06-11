@@ -35,11 +35,12 @@
     },
     {
       "id": "Ciencia_oberta",
-      "name": "Ciencia oberta",
-      "activity": "",
+      "name": "CIENCIA ABIERTA - VALENCIANO - 2026-27",
+      "activity": "Actividad doctorado",
       "language": "ca",
-      "description": "Estilo minimalista en valenciano para los temas de Ciencia Abierta",
-      "screenshot": null
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T11:32:27.975Z"
     },
     {
       "id": "Doctorado",
