@@ -27,11 +27,12 @@
     },
     {
       "id": "Ciencia_abierta",
-      "name": "Ciencia abierta",
-      "activity": "",
+      "name": "CIENCIA ABIERTA - CASTELLANO - 2026-27",
+      "activity": "Temas transversales de Doctorado",
       "language": "es",
-      "description": "Estilo minimalista en castellano para los temas de Ciencia Abierta",
-      "screenshot": null
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-11T12:10:18.197Z"
     },
     {
       "id": "Ciencia_oberta",
