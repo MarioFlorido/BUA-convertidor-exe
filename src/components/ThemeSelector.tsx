@@ -14,11 +14,12 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
   const availableThemes = ThemeOrderService.applyOrder(ThemeRegistry.getAll()).filter(
     (theme) => theme.id !== 'base'
   );
-  const [selectedThemeId, setSelectedThemeId] = useState<string>(() => {
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(() => {
     const saved = localStorage.getItem('bua-last-theme');
-    // Verificar que el estilo guardado sigue existiendo en el registry
-    if (saved && ThemeRegistry.get(saved)) return saved;
-    return 'base';
+    // Restaurar solo si sigue siendo un tema visible de la lista ('base' no:
+    // está oculto, y una selección invisible permitiría continuar sin elegir)
+    if (saved && saved !== 'base' && ThemeRegistry.get(saved)) return saved;
+    return null;
   });
 
   return (
@@ -74,7 +75,12 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
       </div>
 
       <div className="theme-actions">
-        <button onClick={() => onConfirm(selectedThemeId)} className="btn-confirm">
+        <button
+          onClick={() => selectedThemeId && onConfirm(selectedThemeId)}
+          className="btn-confirm"
+          disabled={!selectedThemeId}
+          title={!selectedThemeId ? 'Elige un estilo para continuar' : undefined}
+        >
           Continuar con este estilo
         </button>
         <button onClick={onCancel} className="btn-cancel">
