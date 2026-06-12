@@ -2,6 +2,10 @@ import type { DocumentStructure } from '../types';
 
 interface ContentTreeViewProps {
   structure: DocumentStructure;
+  /** IDs de H1 que tienen algún error (de nivel o de H2). */
+  errorH1Ids?: ReadonlySet<string>;
+  /** Callback al pulsar una página en el árbol. */
+  onPageClick?: (h1Id: string) => void;
 }
 
 /* Geometría del árbol (unidades del viewBox) */
@@ -32,7 +36,7 @@ function truncate(text: string, maxChars: number): string {
  * El alto se calcula fila a fila, así el SVG crece o encoge con el documento
  * y reacciona en vivo a los cambios de nivel y de opción de H2.
  */
-export function ContentTreeView({ structure }: ContentTreeViewProps) {
+export function ContentTreeView({ structure, errorH1Ids, onPageClick }: ContentTreeViewProps) {
   const elements: JSX.Element[] = [];
   /** Última página dibujada en cada nivel: ancla de los conectores. */
   const lastAtLevel: Partial<Record<number, { x: number; y: number }>> = {};
@@ -67,19 +71,42 @@ export function ContentTreeView({ structure }: ContentTreeViewProps) {
     if (level < 3) delete lastAtLevel[3];
 
     // Nodo de página
+    const isError = errorH1Ids?.has(section.id) ?? false;
     const titleMax = Math.floor((W - px - 17) / 6.6);
     elements.push(
-      <circle key={`p-${section.id}`} cx={px} cy={py} r="5" fill="var(--text-2)" opacity="0.45" />,
-      <text
-        key={`t-${section.id}`}
-        x={px + 13}
-        y={py + 4.5}
-        fontSize="13"
-        fontWeight="600"
-        fill="var(--text)"
+      <g
+        key={`page-${section.id}`}
+        onClick={onPageClick ? () => onPageClick(section.id) : undefined}
+        className={onPageClick ? 'tree-page-node' : undefined}
+        aria-label={onPageClick ? `Ir a sección: ${section.title}` : undefined}
+        role={onPageClick ? 'button' : undefined}
       >
-        {truncate(section.title, titleMax)}
-      </text>,
+        {onPageClick && (
+          <rect
+            x="0"
+            y={py - 13}
+            width={W}
+            height="26"
+            className="tree-hit"
+          />
+        )}
+        <circle
+          cx={px}
+          cy={py}
+          r="5"
+          fill={isError ? 'var(--red)' : 'var(--text-2)'}
+          opacity={isError ? '0.7' : '0.45'}
+        />
+        <text
+          x={px + 13}
+          y={py + 4.5}
+          fontSize="13"
+          fontWeight="600"
+          fill={isError ? 'var(--red)' : 'var(--text)'}
+        >
+          {truncate(section.title, titleMax)}
+        </text>
+      </g>,
     );
     y += PAGE_ROW;
 

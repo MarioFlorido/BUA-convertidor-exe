@@ -90,6 +90,31 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
 
   const validation = useMemo(() => validateStructure(localStructure), [localStructure]);
 
+  const errorH1Ids = useMemo(() => {
+    const ids = new Set<string>(Object.keys(validation.h1Errors));
+    localStructure.h1Sections.forEach((h1) => {
+      if (h1.h2Items.some((h2) => validation.h2Errors[h2.id])) ids.add(h1.id);
+    });
+    return ids;
+  }, [validation, localStructure]);
+
+  const expandAll = () =>
+    setOpenSections(new Set(localStructure.h1Sections.map((h1) => h1.id)));
+  const collapseAll = () => setOpenSections(new Set());
+
+  const handleTreePageClick = (h1Id: string) => {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      next.add(h1Id);
+      return next;
+    });
+    setTimeout(() => {
+      document
+        .getElementById(`h1-card-${h1Id}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+  };
+
   /** Nº de H2 con error dentro de una sección (para avisar aunque esté plegada) */
   const countH2Errors = (h1Id: string) => {
     const section = localStructure.h1Sections.find((h1) => h1.id === h1Id);
@@ -150,9 +175,28 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
         </div>
       )}
 
-      <p className="help-text">
-        Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
-      </p>
+      <div className="structure-top-bar">
+        <p className="help-text">
+          Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
+        </p>
+        <div className="expand-collapse-bar">
+          <button
+            className="btn-expand-all"
+            onClick={expandAll}
+            disabled={openSections.size === localStructure.h1Sections.length}
+          >
+            Expandir todo
+          </button>
+          <span className="expand-sep" aria-hidden="true">·</span>
+          <button
+            className="btn-expand-all"
+            onClick={collapseAll}
+            disabled={openSections.size === 0}
+          >
+            Contraer todo
+          </button>
+        </div>
+      </div>
 
       <div className="structure-main-layout">
         <div className="structure-sections">
@@ -166,6 +210,7 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
           return (
             <div
               key={h1.id}
+              id={`h1-card-${h1.id}`}
               className={`h1-card${isOpen ? ' h1-card--open' : ''}${hasError ? ' h1-card--error' : ''}`}
             >
 
@@ -299,7 +344,11 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
         })}
         </div>
 
-        <ContentTreeView structure={localStructure} />
+        <ContentTreeView
+          structure={localStructure}
+          errorH1Ids={errorH1Ids}
+          onPageClick={handleTreePageClick}
+        />
       </div>
 
       {validation.hasErrors && (
