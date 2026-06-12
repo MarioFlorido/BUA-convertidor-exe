@@ -1046,11 +1046,18 @@ button {
   margin: 0 auto;
 }
 
+.structure-main-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2rem;
+  margin: 2rem 0;
+  align-items: start;
+}
+
 .structure-sections {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
-  margin: 2rem 0;
 }
 
 /* H1 Card */
@@ -1325,6 +1332,27 @@ button {
   font-size: 0.9rem;
   text-align: center;
   margin: 0.5rem 0 1rem;
+}
+
+.content-tree-view {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.content-tree-header {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 0.7rem;
+}
+
+.content-tree-svg {
+  width: 100%;
+  height: auto;
+  min-height: 300px;
 }
 
 .btn-confirm:disabled {

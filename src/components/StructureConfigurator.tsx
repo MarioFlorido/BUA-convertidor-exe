@@ -4,6 +4,7 @@ import {
   describeSemanticTagIssue,
   type SemanticTagIssue,
 } from '../core/validation/semanticTagBalance';
+import { ContentTreeView } from './ContentTreeView';
 
 interface StructureConfiguratorProps {
   structure: DocumentStructure;
@@ -153,7 +154,8 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
         Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
       </p>
 
-      <div className="structure-sections">
+      <div className="structure-main-layout">
+        <div className="structure-sections">
         {localStructure.h1Sections.map((h1, index) => {
           const isFirst = index === 0;
           const isOpen = openSections.has(h1.id);
@@ -295,6 +297,9 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
             </div>
           );
         })}
+        </div>
+
+        <ContentTreeView structure={localStructure} />
       </div>
 
       {validation.hasErrors && (
