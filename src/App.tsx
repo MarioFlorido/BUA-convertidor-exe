@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UploadZone } from './components/UploadZone';
 import { StructureConfigurator } from './components/StructureConfigurator';
 import { ThemeSelector } from './components/ThemeSelector';
@@ -51,6 +51,12 @@ export function App() {
     heading4Mode: 'block',
     themeId: 'base',
   });
+
+  // Al cambiar de pantalla, volver al inicio (p. ej. del configurador largo
+  // a la selección de tema se aterrizaba a mitad de página).
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [screen]);
 
   // ── Paso del wizard ────────────────────────────────────────────────────────
   const currentStep = ((): 1 | 2 | 3 | 4 => {
@@ -184,7 +190,7 @@ export function App() {
 
         {/* ── Conversión en curso ── */}
         {isProcessing && (
-          <div className="conversion-pipeline">
+          <div className="conversion-pipeline screen-enter">
             <div className="pipeline-header">
               <div className="pipeline-spinner" />
               <h2>Convirtiendo documento…</h2>
@@ -225,9 +231,11 @@ export function App() {
           </div>
         )}
 
-        {/* ── Pantallas del wizard (solo cuando no hay conversión en curso) ── */}
+        {/* ── Pantallas del wizard (solo cuando no hay conversión en curso) ──
+             key={screen} remonta el contenedor en cada cambio de pantalla para
+             que la animación de entrada se reproduzca de nuevo. */}
         {!isProcessing && (
-          <>
+          <div className="screen-enter" key={screen}>
             {file && (screen === 'structure' || screen === 'theme') && (
               <div className="doc-title-banner">
                 <img
@@ -328,7 +336,7 @@ export function App() {
                 </div>
               </div>
             )}
-          </>
+          </div>
         )}
       </main>
 

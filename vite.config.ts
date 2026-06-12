@@ -71,8 +71,10 @@ export default defineConfig({
   plugins: [react(), themeZipMiddleware()],
 
   server: {
-    port: 5173,
-    open: true,
+    // PORT lo inyectan herramientas (p. ej. el preview de Claude) para no
+    // chocar con el dev server habitual de 5173; sin PORT todo sigue igual.
+    port: Number(process.env.PORT) || 5173,
+    open: !process.env.PORT,
   },
 
   build: {

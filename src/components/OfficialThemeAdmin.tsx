@@ -294,8 +294,15 @@ export function OfficialThemeAdmin() {
       {/* Opciones avanzadas (rama destino + dry-run) — aplican a todas las operaciones */}
       {!result && (
         <div className="admin-wizard-step" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <button type="button" className="link-button" onClick={() => setShowAdvanced((v) => !v)}>
-            {showAdvanced ? '▲ Ocultar opciones avanzadas' : '▼ Opciones avanzadas'}
+          <button type="button" className="link-button link-button--toggle" onClick={() => setShowAdvanced((v) => !v)}>
+            <svg
+              className={`chevron${showAdvanced ? ' chevron--open' : ''}`}
+              viewBox="0 0 16 16"
+              aria-hidden="true"
+            >
+              <polyline points="4 6 8 10 12 6" />
+            </svg>
+            {showAdvanced ? 'Ocultar opciones avanzadas' : 'Opciones avanzadas'}
           </button>
           {showAdvanced && (
             <div className="admin-advanced">

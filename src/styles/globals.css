@@ -600,6 +600,26 @@ button {
   stroke-linejoin: round;
 }
 
+/* El círculo entra con un pop y después el check se dibuja a trazo */
+.result-success-icon {
+  animation: success-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.result-success-icon svg polyline {
+  stroke-dasharray: 24; /* ≥ longitud de la polilínea (~22.6) */
+  stroke-dashoffset: 24;
+  animation: draw-check 0.45s ease-out 0.25s forwards;
+}
+
+@keyframes success-pop {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes draw-check {
+  to { stroke-dashoffset: 0; }
+}
+
 .result-success-body {
   flex: 1;
 }
@@ -1216,7 +1236,14 @@ button {
   font-weight: 500;
 }
 
-.level-option input[type="radio"] { display: none; }
+/* Oculto pero enfocable: con display:none el teclado no podía llegar al radio */
+.level-option input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  clip-path: inset(50%);
+}
 
 .level-option--active {
   background: var(--blue);
@@ -1251,9 +1278,49 @@ button {
 
 .h1-toggle-count { font-weight: 600; }
 
-.h1-toggle-arrow {
-  font-size: 0.58rem;
+/* Chevron SVG (sustituye a los caracteres ▲/▼): rota 180º al abrir */
+.chevron {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   opacity: 0.65;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevron--open { transform: rotate(180deg); }
+
+.link-button--toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Despliegue animado de la lista H2: grid 0fr→1fr permite animar alto auto.
+   visibility oculta el contenido plegado y lo saca del orden de tabulación. */
+.h2-list-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+
+.h2-list-wrap--open {
+  grid-template-rows: 1fr;
+}
+
+.h2-list-clip {
+  overflow: hidden;
+  min-height: 0;
+  visibility: hidden;
+  transition: visibility 0.28s;
+}
+
+.h2-list-wrap--open .h2-list-clip {
+  visibility: visible;
 }
 
 .h2-list {
@@ -1322,7 +1389,14 @@ button {
   font-weight: 500;
 }
 
-.h2-option input[type="radio"] { display: none; }
+/* Oculto pero enfocable, como en .level-option */
+.h2-option input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  clip-path: inset(50%);
+}
 
 .h2-option--active {
   background: var(--blue);
@@ -1381,6 +1455,17 @@ button {
   border-radius: var(--radius-sm);
   padding: 0.1rem 0.4rem;
   margin-right: 0.4rem;
+}
+
+.badge-warn-icon {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
 }
 
 .structure-error-summary {
@@ -2356,5 +2441,40 @@ button {
     align-items: flex-start;
     gap: 0.375rem;
     padding: 0.75rem 1rem;
+  }
+}
+
+/* ── Pulido visual: entrada de pantalla, foco de teclado, motion ─────────── */
+
+/* Cada pantalla del asistente entra con un fundido + leve deslizamiento */
+.screen-enter {
+  animation: screen-in 0.22s ease-out;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Anillo de foco corporativo para navegación por teclado */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Las píldoras de opción ocultan su radio: cuando este recibe el foco por
+   teclado, el anillo se dibuja sobre la propia píldora */
+.level-option:has(input:focus-visible),
+.h2-option:has(input:focus-visible) {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* Respetar la preferencia del sistema de reducir el movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

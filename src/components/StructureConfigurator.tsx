@@ -108,10 +108,11 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
       next.add(h1Id);
       return next;
     });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(() => {
       document
         .getElementById(`h1-card-${h1Id}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        ?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
     }, 50);
   };
 
@@ -264,13 +265,24 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
                         className="h1-error-badge"
                         title={`${h2ErrorCount} H2 con errores`}
                       >
-                        ⚠ {h2ErrorCount}
+                        <svg className="badge-warn-icon" viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                          <line x1="12" y1="9" x2="12" y2="13" />
+                          <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                        {h2ErrorCount}
                       </span>
                     )}
                     <span className="h1-toggle-count">
                       {h1.h2Items.length} H2
                     </span>
-                    <span className="h1-toggle-arrow">{isOpen ? '▲' : '▼'}</span>
+                    <svg
+                      className={`chevron${isOpen ? ' chevron--open' : ''}`}
+                      viewBox="0 0 16 16"
+                      aria-hidden="true"
+                    >
+                      <polyline points="4 6 8 10 12 6" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -278,8 +290,10 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
               {/* Error de jerarquía de nivel — siempre visible */}
               {levelError && <p className="config-error config-error--level">{levelError}</p>}
 
-              {/* LISTA DE H2 — expandible */}
-              {isOpen && (
+              {/* LISTA DE H2 — siempre montada; el despliegue se anima con
+                  grid-template-rows 0fr→1fr y visibility (ver .h2-list-wrap) */}
+              <div className={`h2-list-wrap${isOpen ? ' h2-list-wrap--open' : ''}`}>
+                <div className="h2-list-clip">
                 <div className="h2-list">
                   {h1.h2Items.length === 0 ? (
                     <p className="no-h2">No contiene encabezamientos H2</p>
@@ -338,7 +352,8 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
                     })
                   )}
                 </div>
-              )}
+                </div>
+              </div>
             </div>
           );
         })}
