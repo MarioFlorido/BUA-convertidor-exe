@@ -180,7 +180,7 @@ export function App() {
         </div>
       )}
 
-      <main className="container">
+      <main className={`container${screen === 'structure' ? ' container--wide' : ''}`}>
 
         {/* ── Conversión en curso ── */}
         {isProcessing && (

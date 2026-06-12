@@ -1046,12 +1046,27 @@ button {
   margin: 0 auto;
 }
 
+/* El paso de estructura ensancha el contenedor para que el configurador
+   conserve su ancho de siempre y el árbol quepa al lado sin robárselo. */
+.container--wide {
+  max-width: 1320px;
+}
+
 .structure-main-layout {
   display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1.5rem;
   margin: 2rem 0;
   align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .structure-main-layout {
+    grid-template-columns: 1fr;
+  }
+  .content-tree-view {
+    position: static;
+  }
 }
 
 .structure-sections {
@@ -1338,21 +1353,23 @@ button {
   background: var(--surface);
   border: 1px solid var(--border-light);
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: 0.9rem 1rem;
   box-shadow: var(--shadow-xs);
+  position: sticky;
+  top: 84px; /* bajo el header fijo de 60px */
 }
 
 .content-tree-header {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text);
-  margin: 0 0 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 0 0 0.6rem;
 }
 
 .content-tree-svg {
   width: 100%;
   height: auto;
-  min-height: 300px;
+  display: block;
 }
 
 .btn-confirm:disabled {
