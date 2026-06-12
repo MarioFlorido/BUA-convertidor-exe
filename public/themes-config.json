@@ -10,12 +10,12 @@
     },
     {
       "id": "CID_es",
-      "name": "CID es",
+      "name": "CID - CASTELLANO - 2026-27",
       "activity": "Cursos CID",
       "language": "es",
-      "description": "Tema minimalista en castellano para los cursos CID 2026-27",
+      "description": "Plantilla minimalista para los cursos CID Básico y Avanzado",
       "screenshot": null,
-      "updatedAt": "2026-06-10T14:22:28.515Z"
+      "updatedAt": "2026-06-12T09:04:41.427Z"
     },
     {
       "id": "CID_va",
