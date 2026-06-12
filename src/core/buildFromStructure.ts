@@ -45,11 +45,15 @@ export function buildProjectFromStructure(
 
     if (match) {
       const level = Number(match[1]);
-      const text = node.textContent || '';
+      const text = normalizeText(node.textContent || '');
+
+      // Encabezado vacío (restos de Word): se ignora, igual que en
+      // parseDocumentStructure — así los índices posicionales coinciden.
+      if (!text) continue;
 
       if (currentHtml.trim()) {
         sections.push({
-          level: sections.length === 0 ? 1 : 999, // contenido previo
+          level: 999, // contenido (también el anterior al primer encabezado)
           text: '',
           html: currentHtml.trim(),
         });
@@ -57,7 +61,7 @@ export function buildProjectFromStructure(
 
       sections.push({
         level,
-        text: normalizeText(text),
+        text,
         html: '',
       });
 
