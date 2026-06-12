@@ -153,6 +153,9 @@ export function ContentTreeView({ structure }: ContentTreeViewProps) {
       >
         {elements}
       </svg>
+      <p className="content-tree-note">
+        Al convertir, los títulos H1 y H2 se normalizarán a MAYÚSCULAS.
+      </p>
     </aside>
   );
 }

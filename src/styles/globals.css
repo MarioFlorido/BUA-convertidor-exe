@@ -1360,10 +1360,24 @@ button {
 }
 
 .content-tree-header {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--text-2);
-  margin: 0 0 0.6rem;
+  text-align: center;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.content-tree-note {
+  margin: 0.75rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-light);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--text-3);
 }
 
 .content-tree-svg {
