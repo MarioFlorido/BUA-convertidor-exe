@@ -11,7 +11,7 @@ import { openDB, deleteDB, type IDBPDatabase } from 'idb';
 import { unzipSync } from 'fflate';
 import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
-import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { validateThemeBundle, filterSystemFiles, stripCommonRootDir } from './ThemeValidator';
 import { screenshotToObjectUrl } from './themeConfigParser';
 
 const DB_NAME = 'bua-themes';
@@ -91,7 +91,9 @@ class UserThemeProviderClass {
     for (const record of stored) {
       try {
         const raw = unzipSync(new Uint8Array(record.zipBuffer));
-        const files = filterSystemFiles(raw);
+        // stripCommonRootDir también repara temas "con carpeta" ya guardados
+        // en IndexedDB por versiones anteriores
+        const files = stripCommonRootDir(filterSystemFiles(raw));
         const validation = validateThemeBundle(files);
 
         if (!validation.valid) {

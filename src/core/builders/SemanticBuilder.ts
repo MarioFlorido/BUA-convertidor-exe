@@ -8,27 +8,43 @@ interface DocumentSection {
   html: string;
 }
 
+/** Rango semiabierto [start, end) de índices dentro del array de secciones. */
+interface SectionRange {
+  start: number;
+  end: number;
+}
+
 /**
  * Construye la jerarquía de páginas, bloques e iDevices a partir de:
  * - sections: array de H1/H2/H3/contenido extraído del HTML
  * - structure: parseDocumentStructure que define H1s y sus H2 items
  *
- * Máquina de estados:
- * - Para cada H1: crear una página
+ * Emparejado estructura↔contenido POR POSICIÓN, nunca por texto visible:
+ * los ids de la estructura codifican el ordinal del encabezado en el documento
+ * (`h1-N` = N-ésimo H1, `h2-X-M` = M-ésimo H2 global). Así los títulos
+ * repetidos no se pisan entre sí y cada sección recibe exactamente su contenido.
+ * La sección sintética «Contenido» (synthetic) cubre el rango anterior al
+ * primer H1 — o el documento entero si no hay H1.
+ *
+ * Máquina de estados por página:
  * - Para cada H2 dentro del H1:
  *   - 'html': mantener como H2 en HTML
  *   - 'idevice-title': crear iDevice con título
- *   - 'accordion': acumular para acordeón
+ *   - 'accordion'/'tabs': acumular en grupo exe-fx
  */
 export class SemanticBuilder {
   private sections: DocumentSection[];
   private structure: DocumentStructure;
-  private h1Indices: Map<string, number>;
+  /** Índices (en `sections`) de cada H1 del documento, en orden. */
+  private h1Positions: number[];
+  /** Índices (en `sections`) de cada H2 del documento, en orden. */
+  private h2Positions: number[];
 
   constructor(sections: DocumentSection[], structure: DocumentStructure) {
     this.sections = sections;
     this.structure = structure;
-    this.h1Indices = this.buildH1Map();
+    this.h1Positions = this.collectPositions(1);
+    this.h2Positions = this.collectPositions(2);
   }
 
   /**
@@ -39,8 +55,8 @@ export class SemanticBuilder {
     const stemmed = filename.replace(/\.[^.]+$/, '').trim() || 'Documento importado';
 
     for (const h1Section of this.structure.h1Sections) {
-      const h1Index = this.h1Indices.get(h1Section.title.trim()) ?? -1;
-      const page = this.buildPageFromH1(h1Section, h1Index, pages);
+      const range = this.rangeForSection(h1Section);
+      const page = this.buildPageFromH1(h1Section, range, pages);
       pages.push(page);
     }
 
@@ -70,10 +86,46 @@ export class SemanticBuilder {
     return pages;
   }
 
+  /** Índices de las secciones con el nivel dado, en orden de documento. */
+  private collectPositions(level: number): number[] {
+    const positions: number[] = [];
+    for (let i = 0; i < this.sections.length; i++) {
+      if (this.sections[i].level === level) positions.push(i);
+    }
+    return positions;
+  }
+
+  /** Ordinal (1-based) codificado al final de un id `h1-N` / `h2-X-M`, o null. */
+  private ordinalFromId(id: string): number | null {
+    const match = /-(\d+)$/.exec(id);
+    if (!match) return null;
+    const n = Number(match[1]);
+    return Number.isInteger(n) && n > 0 ? n : null;
+  }
+
+  /**
+   * Rango de contenido de una sección de la estructura:
+   * - sintética: desde el inicio del documento hasta el primer H1 (o el final).
+   * - real (`h1-N`): desde después del N-ésimo H1 hasta el siguiente H1 (o el final).
+   * - id no reconocido (no debería ocurrir): rango vacío.
+   */
+  private rangeForSection(h1Section: H1Section): SectionRange {
+    if (h1Section.synthetic) {
+      return { start: 0, end: this.h1Positions[0] ?? this.sections.length };
+    }
+
+    const ordinal = this.ordinalFromId(h1Section.id);
+    const pos = ordinal !== null ? this.h1Positions[ordinal - 1] : undefined;
+    if (pos === undefined) {
+      return { start: 0, end: 0 };
+    }
+    return { start: pos + 1, end: this.h1Positions[ordinal!] ?? this.sections.length };
+  }
+
   /**
    * Construir una página individual a partir de un H1
    */
-  private buildPageFromH1(h1Section: H1Section, h1Index: number, pages: SemanticPage[]): SemanticPage {
+  private buildPageFromH1(h1Section: H1Section, range: SectionRange, pages: SemanticPage[]): SemanticPage {
     // Calcular parentIndex basándose en el nivel
     let parentIndex: number | null = null;
     if (h1Section.level === 2) {
@@ -101,8 +153,11 @@ export class SemanticBuilder {
       blocks: [],
     };
 
-    // Extraer contenido entre H1 y el primer H2
-    const contentBeforeFirstH2 = this.extractContentBeforeFirstH2(h1Index);
+    // H2s del documento que caen dentro del rango de esta sección
+    const h2InRange = this.h2Positions.filter((p) => p >= range.start && p < range.end);
+
+    // Extraer contenido entre el arranque de la sección y su primer H2
+    const contentBeforeFirstH2 = this.serializeRange(range.start, h2InRange[0] ?? range.end);
 
     // Crear un iDevice sin título por defecto (para contenido antes del primer H2 y H2s en HTML)
     let currentBlock: SemanticBlock | null = null;
@@ -135,7 +190,7 @@ export class SemanticBuilder {
     while (i < h1Section.h2Items.length) {
       const h2Item = h1Section.h2Items[i];
       const option = h2Item.option;
-      const h2Html = this.extractH2Content(h2Item.text, h1Index);
+      const h2Html = this.extractH2Content(h2Item.id, range);
 
       if (option === 'html') {
         flushGroup();
@@ -183,104 +238,41 @@ export class SemanticBuilder {
   }
 
   /**
-   * Construir map de H1 texto -> índice en sections
+   * Contenido de un H2 (`h2-X-M` = M-ésimo H2 del documento): desde después
+   * del propio H2 hasta el siguiente encabezado de nivel ≤ 2 dentro del rango
+   * de su sección.
    */
-  private buildH1Map(): Map<string, number> {
-    const map = new Map<string, number>();
-    for (let i = 0; i < this.sections.length; i++) {
-      if (this.sections[i].level === 1) {
-        map.set(this.sections[i].text.trim(), i);
-      }
+  private extractH2Content(h2Id: string, range: SectionRange): string {
+    const ordinal = this.ordinalFromId(h2Id);
+    const pos = ordinal !== null ? this.h2Positions[ordinal - 1] : undefined;
+    if (pos === undefined || pos < range.start || pos >= range.end) {
+      return ''; // id no reconocido o fuera de la sección: no inventar contenido
     }
-    return map;
+
+    // Fin: el siguiente H2 dentro del rango, o el final del rango
+    const next = this.h2Positions.find((p) => p > pos && p < range.end) ?? range.end;
+    return this.serializeRange(pos + 1, next);
   }
 
   /**
-   * Extraer contenido entre H1 y el primer H2
+   * Serializa un rango [start, end) de secciones a HTML:
+   * contenido (999) tal cual; H3/H4 como encabezados escapados.
    */
-  private extractContentBeforeFirstH2(h1Index: number): string {
-    if (h1Index < 0) return '';
-
+  private serializeRange(start: number, end: number): string {
     let content = '';
-
-    // Encontrar el siguiente H1 para saber dónde termina esta sección
-    let nextH1Index = this.sections.length;
-    for (let i = h1Index + 1; i < this.sections.length; i++) {
-      if (this.sections[i].level === 1) {
-        nextH1Index = i;
-        break;
-      }
-    }
-
-    // Extraer contenido desde h1Index+1 hasta el primer H2 o siguiente H1
-    for (let i = h1Index + 1; i < nextH1Index; i++) {
+    for (let i = start; i < end; i++) {
       const section = this.sections[i];
-
-      if (section.level === 2) {
-        // Primer H2 encontrado, terminar
-        break;
-      }
-
       if (section.level === 999) {
-        // Contenido entre H1 y primer H2
         content += section.html;
       } else if (section.level === 3) {
         content += `<h3>${escapeHtml(section.text)}</h3>`;
       } else if (section.level === 4) {
+        // H4 como encabezado (antes se descartaba → el título desaparecía)
         content += `<h4>${escapeHtml(section.text)}</h4>`;
       }
+      // Niveles 1/2 son fronteras de rango (no aparecen dentro);
+      // 5/6 se omiten, como hacía la versión anterior.
     }
-
-    return content;
-  }
-
-  /**
-   * Extraer contenido de un H2 (delimitado a su sección H1)
-   */
-  private extractH2Content(h2Text: string, h1Index: number): string {
-    if (h1Index < 0) return '';
-
-    const cleanH2 = h2Text.trim();
-    let foundH2 = false;
-    let content = '';
-
-    // Encontrar el siguiente H1 para saber dónde termina esta sección H1
-    let nextH1Index = this.sections.length;
-    for (let i = h1Index + 1; i < this.sections.length; i++) {
-      if (this.sections[i].level === 1) {
-        nextH1Index = i;
-        break;
-      }
-    }
-
-    // Buscar H2 solo dentro de la sección actual (entre h1Index y nextH1Index)
-    for (let i = h1Index + 1; i < nextH1Index; i++) {
-      const section = this.sections[i];
-
-      if (section.level === 2 && section.text.trim() === cleanH2) {
-        foundH2 = true;
-        continue;
-      }
-
-      if (foundH2) {
-        if (section.level <= 2) {
-          // Siguiente H2 o fin de sección, terminar
-          break;
-        }
-
-        if (section.level === 999) {
-          // Contenido
-          content += section.html;
-        } else if (section.level === 3) {
-          // H3 como encabezado
-          content += `<h3>${escapeHtml(section.text)}</h3>`;
-        } else if (section.level === 4) {
-          // H4 como encabezado (antes se descartaba → el título desaparecía)
-          content += `<h4>${escapeHtml(section.text)}</h4>`;
-        }
-      }
-    }
-
     return content;
   }
 
@@ -306,4 +298,3 @@ export class SemanticBuilder {
     return existing ? `${existing}\n${paragraphHtml}` : paragraphHtml;
   }
 }
-

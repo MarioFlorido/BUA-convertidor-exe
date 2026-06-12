@@ -1,6 +1,7 @@
 import { unzipSync } from 'fflate';
 import { themeZipUrl } from './themeUrl';
 import { ThemeRegistry } from './ThemeRegistry';
+import { stripCommonRootDir } from './ThemeValidator';
 
 export interface TemplateData {
   entries: Record<string, Uint8Array>;
@@ -144,7 +145,11 @@ export class ThemeService {
   private static filterAndPrefixThemeEntries(entries: Record<string, Uint8Array>): Record<string, Uint8Array> {
     const prefixedEntries: Record<string, Uint8Array> = {};
 
-    for (const [path, data] of Object.entries(entries)) {
+    // ZIP "con carpeta" → archivos en raíz, para que el prefijo theme/ no
+    // produzca theme/MiCarpeta/style.css (no-op si ya están en raíz)
+    const normalized = stripCommonRootDir(entries);
+
+    for (const [path, data] of Object.entries(normalized)) {
       // Filtrar archivos del sistema
       if (path === '__MACOSX' || path.startsWith('__MACOSX/') || path === '.DS_Store') {
         continue;

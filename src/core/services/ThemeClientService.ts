@@ -11,7 +11,7 @@ import type { ThemeBundle } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
 import { UserThemeProvider } from './UserThemeProvider';
 import { ThemeService } from './ThemeService';
-import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { validateThemeBundle, filterSystemFiles, stripCommonRootDir } from './ThemeValidator';
 import { extractLanguageFromConfigXml, screenshotToObjectUrl } from './themeConfigParser';
 
 export class ThemeClientService {
@@ -31,7 +31,8 @@ export class ThemeClientService {
 
     const zipBuffer = await file.arrayBuffer();
     const raw = unzipSync(new Uint8Array(zipBuffer));
-    const files = filterSystemFiles(raw);
+    // Aceptar ZIPs comprimidos "con carpeta" (MiTema/style.css → style.css)
+    const files = stripCommonRootDir(filterSystemFiles(raw));
 
     const validation = validateThemeBundle(files);
     if (!validation.valid) {

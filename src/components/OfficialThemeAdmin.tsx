@@ -202,7 +202,7 @@ export function OfficialThemeAdmin() {
         <p className="help-text">
           Zona restringida. Introduce un <strong>token de acceso de GitHub</strong> (fine-grained PAT
           limitado a este repositorio, con permiso <code>Contents: Read and write</code>). El token
-          no se guarda en la aplicación.
+          se usa solo desde tu navegador para llamar a GitHub; abajo eliges si se recuerda y dónde.
         </p>
 
         {authError && <div className="alert alert-error">{authError}</div>}

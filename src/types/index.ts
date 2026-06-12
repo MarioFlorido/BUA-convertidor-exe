@@ -60,6 +60,12 @@ export interface H1Section {
   title: string;
   level: 1 | 2 | 3;
   h2Items: H2Item[];
+  /**
+   * Sección creada por el parser (no proviene de un H1 del documento):
+   * recoge el contenido anterior al primer H1, o todo el documento si no
+   * hay H1. SemanticBuilder la empareja con ese rango por posición.
+   */
+  synthetic?: boolean;
 }
 
 export interface DocumentStructure {
