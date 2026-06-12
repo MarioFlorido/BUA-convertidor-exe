@@ -12,7 +12,7 @@ import { unzipSync } from 'fflate';
 import { themeZipUrl } from './themeUrl';
 import type { ThemeBundle, ThemeMetadata } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
-import { validateThemeBundle, filterSystemFiles } from './ThemeValidator';
+import { validateThemeBundle, filterSystemFiles, stripCommonRootDir } from './ThemeValidator';
 import { extractLanguageFromConfigXml } from './themeConfigParser';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
@@ -129,7 +129,8 @@ class BuiltInThemeProviderClass {
 
       const buffer = await response.arrayBuffer();
       const raw = unzipSync(new Uint8Array(buffer));
-      const files = filterSystemFiles(raw);
+      // Los ZIP oficiales ya vienen con archivos en raíz (no-op defensivo)
+      const files = stripCommonRootDir(filterSystemFiles(raw));
 
       const validation = validateThemeBundle(files);
       if (!validation.valid) {
