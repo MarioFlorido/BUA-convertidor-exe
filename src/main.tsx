@@ -1,5 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// Inter auto-alojada (sin CDN): Vite la empaqueta → la app funciona offline.
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
 import { App } from './App.tsx';
 import { bootThemeSystem } from './core/boot/ThemeBoot.ts';
 
