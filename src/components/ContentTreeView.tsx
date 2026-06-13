@@ -22,6 +22,15 @@ const OPTION_LABELS: Record<string, string | null> = {
   'tabs': 'pestañas',
 };
 
+/* Color de la píldora por tipo de H2 — reutiliza la paleta de avisos:
+   iDevice → azul claro (.alert-info); acordeón/pestañas → amarillo (.alert-warning). */
+const NEUTRAL_PILL = { fill: 'var(--bg)', stroke: 'var(--border-light)', text: 'var(--text-2)' };
+const OPTION_COLORS: Record<string, { fill: string; stroke: string; text: string }> = {
+  'idevice-title': { fill: 'var(--blue-light)', stroke: 'var(--blue-border)',     text: 'var(--blue-active)' },
+  'accordion':     { fill: '#FFF8E6',           stroke: 'rgba(183,121,31,.45)',   text: '#8a5a00' },
+  'tabs':          { fill: '#FFF8E6',           stroke: 'rgba(183,121,31,.45)',   text: '#8a5a00' },
+};
+
 function truncate(text: string, maxChars: number): string {
   if (text.length <= maxChars) return text;
   return text.slice(0, Math.max(1, maxChars - 1)).trimEnd() + '…';
@@ -121,6 +130,7 @@ export function ContentTreeView({ structure, errorH1Ids, onPageClick }: ContentT
       if (label) {
         const badgeW = Math.round(label.length * 5.6) + 14;
         const badgeX = W - badgeW - 4;
+        const pill = OPTION_COLORS[h2.option] ?? NEUTRAL_PILL;
         textMax = Math.floor((badgeX - textX - 10) / 6.1);
         elements.push(
           <rect
@@ -130,8 +140,8 @@ export function ContentTreeView({ structure, errorH1Ids, onPageClick }: ContentT
             width={badgeW}
             height="16"
             rx="8"
-            fill="var(--bg)"
-            stroke="var(--border-light)"
+            fill={pill.fill}
+            stroke={pill.stroke}
             strokeWidth="1"
           />,
           <text
@@ -139,7 +149,8 @@ export function ContentTreeView({ structure, errorH1Ids, onPageClick }: ContentT
             x={badgeX + 7}
             y={cy + 3.5}
             fontSize="10.5"
-            fill="var(--text-2)"
+            fontWeight="500"
+            fill={pill.text}
           >
             {label}
           </text>,

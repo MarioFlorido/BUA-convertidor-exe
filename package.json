@@ -17,6 +17,7 @@
     "unpublish-theme": "tsx scripts/unpublish-theme.ts"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
     "fflate": "^0.8.1",
     "idb": "^8.0.3",
     "mammoth": "^1.6.0",

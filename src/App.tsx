@@ -186,7 +186,7 @@ export function App() {
         </div>
       )}
 
-      <main className={`container${screen === 'structure' ? ' container--wide' : ''}`}>
+      <main className={`container${screen === 'structure' ? ' container--wide' : ''}${screen === 'upload' ? ' container--center' : ''}`}>
 
         {/* ── Conversión en curso ── */}
         {isProcessing && (
