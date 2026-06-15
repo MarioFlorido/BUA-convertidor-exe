@@ -73,7 +73,7 @@ export interface PrintHtmlResult {
  *     → assembleHtmlDocument()   [interno]
  *   → string HTML autónomo
  *
- * El HTML resultante incluye Paged.js vía CDN.
+ * El HTML resultante incluye Paged.js embebido inline (sin CDN; ver nota de cabecera).
  * Al abrirse en un navegador (o con @pagedjs/cli), Paged.js:
  *   - Aplica CSS @page
  *   - Resuelve target-counter() en el TOC
@@ -304,7 +304,7 @@ function injectRunningElements(
  * Ensambla el documento HTML completo autónomo con:
  * - Variables CSS del tema (colores, tipografías)
  * - Referencia al printStyles.css
- * - Script de Paged.js (CDN)
+ * - Script de Paged.js (embebido inline, sin CDN)
  * - Contenido: portada + TOC + secciones
  */
 function assembleHtmlDocument(opts: AssemblyOptions): string {
