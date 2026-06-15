@@ -72,6 +72,20 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   (la infraestructura de regresión existe: fixtures DOCX, `validate-regression.ts`,
   baseline de checksums). Repasar y reflejar el estado real para que no confunda.
 
+- [ ] ⚪ **Reorganización de carpetas (antigua «Fase 4»).** Reordenar `src/` en
+  una estructura más limpia. **Se saltó a propósito** en su día: es cosmética y el
+  riesgo de romper rutas en producción supera al valor. Decisión consciente, no un
+  olvido. Reevaluar solo si algún día compensa. Los 3 CLI de temas
+  (`themes`/`publish-theme`/`unpublish-theme`) se conservan como _fallback_.
+
+### Seguridad
+
+- [ ] ⚪ **Endurecimiento XSS (condicional).** Quitar los atributos `on*`
+  (`onerror`, `onclick`…) del HTML que se escribe en el ZIP exportado. Hoy **no hay
+  vector**: la app no renderiza vivo el HTML del DOCX y los temas los publica el
+  propio admin. Solo cobra sentido **si en el futuro se aceptan temas de terceros**
+  (su `style.js` sí se ejecuta). Mientras tanto, baja prioridad.
+
 ### Errores no prioritarios / depuración
 
 - _(Sin elementos concretos ahora mismo.)_ Apuntar aquí los fallos menores que
@@ -85,15 +99,10 @@ Ideas mencionadas en sesiones anteriores cuyo contexto exacto se ha perdido.
 Antes de retomarlas hay que reconstruir qué eran (revisar transcripciones de
 sesiones previas o notas sueltas).
 
-- [ ] **«Fase 4» no prioritaria.** Al analizar el proyecto en su día se saltó una
-  fase (¿la 4?) por no ser prioritaria, dejándola para valorar a futuro. Pendiente
-  de localizar a qué se refería.
-
-- [ ] **Prevención de un posible bug futuro.** Quedó anotada una intervención para
-  evitar un bug que aún no se ha producido. Pendiente de recuperar el detalle.
-
-- [ ] **Posible duplicidad a evitar.** Se habló de eliminar una duplicidad de
-  «algo» (sin concretar). Pendiente de identificar.
+- _(Ninguno ahora mismo.)_ Los tres ítems que había aquí se reconstruyeron
+  (15 jun 2026): la «Fase 4» y la «prevención de bug» se aclararon y movieron a
+  §2 (Reorganización de carpetas / Endurecimiento XSS); la «duplicidad» resultó
+  estar ya hecha (Fase 3) y se movió a §4.
 
 ---
 
@@ -112,3 +121,6 @@ Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
   _secondary rate limit_ de GitHub).
 - [x] Botones de descarga mejorados (iconos mayores, aviso de compatibilidad
   con Chrome/Edge).
+- [x] **Consolidación de duplicados (Fase 3):** `ElpxRenderOptions`, alias
+  `ImportedProject/Page/Block` y `DocumentStructure` unificados. (Era la «posible
+  duplicidad a evitar» que estaba en «pendientes de precisar».)
