@@ -24,6 +24,16 @@
 ### UX impresión
 - Overlay «Preparando…» + barra con botón de impresión/guardado, fuera del DOM al imprimir para que no salgan en el PDF.
 
+### UX — Ayuda contextual
+- **Globo de ayuda por pantalla** (`WelcomeTour.tsx`): modal centrado con fondo
+  oscurecido a pantalla completa (bloquea la interacción mientras está
+  visible), uno por paso del asistente (subir / estructura / tema /
+  resultado), con texto en varios párrafos independientes.
+- **Switch «Ayuda» en la cabecera** (`AppHeader.tsx`): activado por defecto,
+  preferencia persistida en `localStorage` (`bua-help-enabled`). Mientras está
+  activo, el globo de cada pantalla reaparece en cada visita; el botón
+  «Entendido» solo cierra esa visita concreta, no el conjunto.
+
 ---
 
 ## v0.2.0 — Mayo 2026

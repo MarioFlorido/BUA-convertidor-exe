@@ -6,6 +6,7 @@ import { ThemeManager } from './components/ThemeManager';
 import { DownloadButton } from './components/DownloadButton';
 import { AppHeader } from './components/AppHeader';
 import { StepIndicator } from './components/StepIndicator';
+import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/parseStructure';
@@ -22,6 +23,8 @@ import type {
 import './styles/globals.css';
 
 type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager';
+
+const HELP_ENABLED_KEY = 'bua-help-enabled';
 
 // Fases del pipeline de conversión y sus etiquetas
 const PIPELINE_PHASES: { id: DocxImportProgress['phase']; label: string }[] = [
@@ -51,12 +54,25 @@ export function App() {
     heading4Mode: 'block',
     themeId: 'base',
   });
+  // Interruptor de ayuda contextual: activado por defecto, persiste la
+  // preferencia del usuario en localStorage (no es un "ya lo he visto" de
+  // una sola vez, sino un on/off explícito que el usuario controla siempre
+  // desde el switch de la cabecera).
+  const [helpEnabled, setHelpEnabled] = useState<boolean>(() => {
+    const stored = localStorage.getItem(HELP_ENABLED_KEY);
+    return stored === null ? true : stored === 'true';
+  });
 
   // Al cambiar de pantalla, volver al inicio (p. ej. del configurador largo
   // a la selección de tema se aterrizaba a mitad de página).
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [screen]);
+
+  const handleToggleHelp = (enabled: boolean) => {
+    setHelpEnabled(enabled);
+    localStorage.setItem(HELP_ENABLED_KEY, String(enabled));
+  };
 
   // ── Paso del wizard ────────────────────────────────────────────────────────
   const currentStep = ((): 1 | 2 | 3 | 4 => {
@@ -174,7 +190,15 @@ export function App() {
 
   return (
     <div className="app">
-      <AppHeader onThemeManagerClick={() => setScreen('theme-manager')} />
+      <AppHeader
+        onThemeManagerClick={() => setScreen('theme-manager')}
+        helpEnabled={helpEnabled}
+        onToggleHelp={handleToggleHelp}
+      />
+
+      {helpEnabled && screen !== 'theme-manager' && !isProcessing && (
+        <WelcomeTour screen={screen as TourScreen} />
+      )}
 
       {/* Barra de pasos — solo en el flujo principal */}
       {screen !== 'theme-manager' && (

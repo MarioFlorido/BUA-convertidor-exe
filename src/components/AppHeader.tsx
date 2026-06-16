@@ -1,5 +1,7 @@
 interface AppHeaderProps {
   onThemeManagerClick?: () => void;
+  helpEnabled?: boolean;
+  onToggleHelp?: (enabled: boolean) => void;
 }
 
 function HelpIcon() {
@@ -21,7 +23,7 @@ function HelpIcon() {
   );
 }
 
-export function AppHeader({ onThemeManagerClick }: AppHeaderProps) {
+export function AppHeader({ onThemeManagerClick, helpEnabled, onToggleHelp }: AppHeaderProps) {
   const base = import.meta.env.BASE_URL;
 
   const handleHelpClick = () => {
@@ -61,6 +63,22 @@ export function AppHeader({ onThemeManagerClick }: AppHeaderProps) {
             title="Administrar estilos eXeLearning"
           >
             Estilos eXeLearning
+          </button>
+        )}
+
+        {onToggleHelp && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={helpEnabled}
+            onClick={() => onToggleHelp(!helpEnabled)}
+            className={`help-switch${helpEnabled ? ' help-switch--on' : ''}`}
+            title={helpEnabled ? 'Ayuda activada — pulsa para desactivarla' : 'Ayuda desactivada — pulsa para activarla'}
+          >
+            <span className="help-switch-label">Ayuda</span>
+            <span className="help-switch-track">
+              <span className="help-switch-thumb" />
+            </span>
           </button>
         )}
 

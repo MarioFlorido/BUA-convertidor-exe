@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **15 jun 2026**
+> Última actualización: **16 jun 2026**
 
 ---
 
@@ -21,18 +21,11 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 
 ### Diseñadas, pendientes de implementar
 
-- [ ] 🟡 **Tour de bienvenida (coach marks).** Recorrido guiado la primera vez
-  que se abre la app: resalta cada zona (subir documento, configurar estructura,
-  elegir tema, descargar) con globos explicativos. Se puede reabrir desde el
-  icono de ayuda de la cabecera.
-
 - [ ] 🟡 **Modo demostración / tutorial auto-reproducible.** Botón
   «▶ Ver demostración» que carga un documento de ejemplo incluido en la app y
   avanza solo por los 4 pasos, con rótulos explicando cada uno. Da sensación de
   vídeo pero corre sobre la **interfaz real**, así que no se queda desfasado.
-  Reutiliza la misma infraestructura que el tour (es el tour + autoplay + un
-  `.docx` de muestra empaquetado). _Recomendado frente al vídeo grabado mientras
-  la interfaz siga cambiando._
+  _Recomendado frente al vídeo grabado mientras la interfaz siga cambiando._
 
 - [ ] ⚪ **Árbol de contenido en el paso 4 (Resultado).** Mostrar el árbol ya
   generado, en modo resumen de solo lectura, encima de los botones de descarga
@@ -124,3 +117,11 @@ Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 - [x] **Consolidación de duplicados (Fase 3):** `ElpxRenderOptions`, alias
   `ImportedProject/Page/Block` y `DocumentStructure` unificados. (Era la «posible
   duplicidad a evitar» que estaba en «pendientes de precisar».)
+- [x] **Ayuda contextual por pantalla** (`WelcomeTour.tsx`): globo modal
+  explicativo (varios párrafos) en cada paso del asistente, controlado por un
+  interruptor «Ayuda» en la cabecera — activado por defecto, preferencia
+  persistida en `localStorage`. Mientras está activo, el globo reaparece cada
+  vez que se entra en una pantalla; «Entendido» solo cierra esa visita. Se
+  simplificó respecto a la idea original de «coach marks» ancladas a un
+  elemento (este ítem, ya tachado): un modal centrado a pantalla completa deja
+  sitio a textos explicativos más largos.

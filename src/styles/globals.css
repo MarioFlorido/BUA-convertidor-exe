@@ -177,6 +177,59 @@ button {
   color: inherit;
 }
 
+/* ── Switch "Ayuda" (globos de ayuda contextual on/off) ──────────────────── */
+.help-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.help-switch:hover {
+  background: var(--bg);
+}
+
+.help-switch-label {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.help-switch-track {
+  position: relative;
+  width: 34px;
+  height: 19px;
+  flex-shrink: 0;
+  background: var(--border);
+  border-radius: 999px;
+  transition: background 0.15s;
+}
+
+.help-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+
+.help-switch--on .help-switch-track {
+  background: var(--blue);
+}
+
+.help-switch--on .help-switch-thumb {
+  transform: translateX(15px);
+}
+
 /* ── Step Bar ─────────────────────────────────────────────────────────────── */
 .step-bar {
   background: var(--surface);
@@ -2486,5 +2539,80 @@ button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Tour de bienvenida (modal) ────────────────────────────────────────────
+   A diferencia de unos coach marks anclados a un elemento, este overlay
+   oscurece y bloquea toda la pantalla (pointer-events: auto) mientras el
+   globo está visible — deja al texto explicativo todo el sitio que necesite,
+   sin las limitaciones de ancho/posición de un tooltip pegado a un elemento.
+   El usuario recupera el control de la pantalla al pulsar "Continuar". */
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(20, 20, 24, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  pointer-events: auto;
+  animation: tour-fade-in 0.2s ease-out;
+}
+
+@keyframes tour-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.tour-tooltip {
+  width: 480px;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.75rem 1.75rem 1.5rem;
+}
+
+.tour-step-counter {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.tour-tooltip-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.625rem;
+}
+
+.tour-tooltip-text {
+  font-size: 0.9rem;
+  color: var(--text-2);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tour-tooltip-text + .tour-tooltip-text {
+  margin-top: 0.75rem;
+}
+
+.tour-tooltip-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-overlay {
+    animation: none !important;
   }
 }
