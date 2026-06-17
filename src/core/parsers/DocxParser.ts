@@ -33,6 +33,14 @@ const DOCX_STYLE_MAP: string[] = [
   "r[style-name='Código'] => code",
   "r[style-name='Codigo'] => code",
   "r[style-name='HTML'] => code",
+  // Estilos de lista en español (Word instalado en español usa estos nombres)
+  "p[style-name='Lista con viñetas'] => ul > li:fresh",
+  "p[style-name='Lista con viñetas 2'] => ul > li:fresh",
+  "p[style-name='Lista con viñetas 3'] => ul > li:fresh",
+  "p[style-name='Lista numerada'] => ol > li:fresh",
+  "p[style-name='Lista numerada 2'] => ol > li:fresh",
+  "p[style-name='Lista numerada 3'] => ol > li:fresh",
+  "p[style-name='Párrafo de lista'] => ul > li:fresh",
 ];
 
 /**

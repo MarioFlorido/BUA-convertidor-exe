@@ -386,8 +386,25 @@ function normalizeImportedNode(node: Node): string {
       return wrapTag('del', normalizedChildren);
     case 'p':
     case 'ul':
-    case 'ol':
-    case 'li':
+      return wrapTag(tag, normalizedChildren);
+    case 'ol': {
+      const type = node.getAttribute('type');
+      const start = node.getAttribute('start');
+      const reversed = node.hasAttribute('reversed');
+      const attrs = [
+        type && /^[1aAiI]$/.test(type) ? ` type="${type}"` : '',
+        start && /^\d+$/.test(start) ? ` start="${start}"` : '',
+        reversed ? ' reversed' : '',
+      ].join('');
+      if (!normalizedChildren) return '';
+      return attrs ? `<ol${attrs}>${normalizedChildren}</ol>` : `<ol>${normalizedChildren}</ol>`;
+    }
+    case 'li': {
+      const value = node.getAttribute('value');
+      const attrs = value && /^-?\d+$/.test(value) ? ` value="${value}"` : '';
+      if (!normalizedChildren) return '';
+      return attrs ? `<li${attrs}>${normalizedChildren}</li>` : `<li>${normalizedChildren}</li>`;
+    }
     case 'table':
     case 'thead':
     case 'tbody':

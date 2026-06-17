@@ -25,6 +25,7 @@ import {
   processIframes,
   autolinkUrls,
   openExternalLinksInNewTab,
+  continueInterruptedOrderedLists,
   applyAllTransforms,
 } from './HtmlTransformer';
 
@@ -204,6 +205,71 @@ describe('openExternalLinksInNewTab', () => {
   test('mailto: no se toca', () => {
     const input = '<a href="mailto:a@b.com">x</a>';
     assert.equal(openExternalLinksInNewTab(input), input);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// continueInterruptedOrderedLists — listas numeradas con contenido intercalado
+// ─────────────────────────────────────────────────────────────────────────────
+describe('continueInterruptedOrderedLists', () => {
+  test('dos <ol> separados por un <p> → el segundo recibe start="2"', () => {
+    const input = '<ol><li>Uno</li></ol><p>Texto</p><ol><li>Dos</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.match(out, /<ol start="2">/);
+  });
+
+  test('conteo correcto con varios ítems en el primer grupo', () => {
+    const input = '<ol><li>A</li><li>B</li><li>C</li></ol><p>x</p><ol><li>D</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.match(out, /<ol start="4">/);
+  });
+
+  test('cadena de tres grupos: todos con start correcto', () => {
+    const input =
+      '<ol><li>1</li><li>2</li></ol>' +
+      '<p>sep</p>' +
+      '<ol><li>3</li></ol>' +
+      '<p>sep</p>' +
+      '<ol><li>4</li><li>5</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.match(out, /<ol start="3">/);
+    assert.match(out, /<ol start="4">/);
+  });
+
+  test('un heading entre dos <ol> resetea la numeración', () => {
+    const input = '<ol><li>A</li></ol><h2>Título</h2><ol><li>B</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.doesNotMatch(out, /start="/);
+  });
+
+  test('una <ul> entre dos <ol> resetea la numeración', () => {
+    const input = '<ol><li>A</li></ol><ul><li>viñeta</li></ul><ol><li>B</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.doesNotMatch(out, /start="/);
+  });
+
+  test('<ol> con start existente no se sobreescribe', () => {
+    const input = '<ol><li>A</li></ol><p>x</p><ol start="10"><li>B</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.match(out, /<ol start="10">/);
+    const starts = out.match(/start="\d+"/g) || [];
+    assert.equal(starts.length, 1, 'solo debe haber un start');
+  });
+
+  test('sublistas anidadas no cuentan como ítems del padre', () => {
+    // El <ol> padre tiene 2 <li> directos; el anidado tiene 3 <li>
+    const input =
+      '<ol><li>A<ol><li>a1</li><li>a2</li><li>a3</li></ol></li><li>B</li></ol>' +
+      '<p>x</p>' +
+      '<ol><li>C</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.match(out, /<ol start="3">/, 'debe empezar en 3, no en 6');
+  });
+
+  test('<ol> único sin interrupciones: HTML sin cambios', () => {
+    const input = '<ol><li>Uno</li><li>Dos</li></ol>';
+    const out = continueInterruptedOrderedLists(input);
+    assert.doesNotMatch(out, /start="/);
   });
 });
 

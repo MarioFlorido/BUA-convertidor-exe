@@ -356,18 +356,76 @@ export function openExternalLinksInNewTab(htmlValue: string): string {
 }
 
 /**
+ * Detecta listas ordenadas (<ol>) que Mammoth ha partido en varios elementos
+ * separados por contenido intercalado (párrafos, imágenes, tablas…) y añade
+ * start="N" para que la numeración continúe sin reiniciarse.
+ *
+ * En Word, una lista con "no reiniciar numeración" comparte el mismo numId;
+ * Mammoth pierde esa información y produce múltiples <ol> empezando todos
+ * desde 1. Esta función lo restaura contando los <li> directos del grupo
+ * anterior y ajustando el start del siguiente <ol>.
+ *
+ * Fronteras que reinician el grupo: h1-h6 (cambio de sección) y <ul>
+ * (lista de viñetas intercalada). Cualquier otro contenido no rompe el grupo.
+ */
+export function continueInterruptedOrderedLists(htmlValue: string): string {
+  if (typeof DOMParser === 'undefined') return htmlValue;
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${htmlValue}</body></html>`,
+    'text/html',
+  );
+  const body = doc.body;
+
+  let accumulated = 0; // ítems acumulados en el grupo ol activo
+  let inGroup = false;
+  let changed = false;
+
+  for (const node of Array.from(body.children)) {
+    const tag = node.tagName.toLowerCase();
+
+    if (/^h[1-6]$/.test(tag) || tag === 'ul') {
+      accumulated = 0;
+      inGroup = false;
+      continue;
+    }
+
+    if (tag === 'ol') {
+      if (inGroup && accumulated > 0 && !node.hasAttribute('start')) {
+        node.setAttribute('start', String(accumulated + 1));
+        changed = true;
+      }
+      // Contar solo los <li> directos (no los de sublistas anidadas)
+      const effectiveStart = parseInt(node.getAttribute('start') || '1', 10);
+      const directLi = Array.from(node.children).filter(
+        (c) => c.tagName.toLowerCase() === 'li',
+      ).length;
+      accumulated = (effectiveStart - 1) + directLi;
+      inGroup = true;
+      continue;
+    }
+
+    // p, table, div (cajas semánticas, vídeos)… no rompen el grupo
+  }
+
+  return changed ? body.innerHTML : htmlValue;
+}
+
+/**
  * Aplica todas las transformaciones HTML en orden:
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
  * 2. clases semánticas [ejemplo], [definición], [importante]
  * 3. clases de tabla [horizontal], [vertical]
- * 4. autolink de URLs en texto plano (al final: re-serializa el DOM)
- * 5. enlaces externos → abrir en pestaña nueva
+ * 4. listas numeradas interrumpidas → continuar numeración con start="N"
+ * 5. autolink de URLs en texto plano (al final: re-serializa el DOM)
+ * 6. enlaces externos → abrir en pestaña nueva
  */
 export function applyAllTransforms(htmlValue: string): string {
   let transformed = htmlValue;
   transformed = processIframes(transformed);
   transformed = applyDivClasses(transformed);
   transformed = applyTableClasses(transformed);
+  transformed = continueInterruptedOrderedLists(transformed);
   transformed = autolinkUrls(transformed);
   transformed = openExternalLinksInNewTab(transformed);
   return transformed;

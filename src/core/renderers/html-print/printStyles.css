@@ -461,8 +461,10 @@
 
 .block-html p          { margin: 0 0 12px 0; } /* más separación entre párrafos (punto 3) */
 .block-html ul,
-.block-html ol         { margin: 7px 0; padding-left: 34px; } /* más sangría para resaltar listas (punto 6) */
-.block-html li         { margin-bottom: 6px; } /* he separado de 3 a 6 px la altura) */
+.block-html ol         { margin: 7px 0; padding-left: 34px; }
+.block-html li         { margin-bottom: 6px; }
+.block-html ul li::marker { color: var(--color-accent, #deb13c); }
+.block-html ol li::marker { color: var(--color-primary, #135d87); font-weight: 700; }
 .block-html strong     { font-weight: 700; }
 .block-html em         { font-style: italic; }
 .block-html blockquote { margin: 8px 0 8px 16px; padding-left: 10px; border-left: 3px solid #ccc; }
