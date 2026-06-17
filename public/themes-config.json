@@ -10,12 +10,12 @@
     },
     {
       "id": "CID_es",
-      "name": "CID - CASTELLANO - 2026-27",
-      "activity": "Cursos CID",
+      "name": "CID es",
+      "activity": "Cursos CID básico e intermedio",
       "language": "es",
-      "description": "Plantilla minimalista para los cursos CID Básico y Avanzado",
+      "description": "",
       "screenshot": null,
-      "updatedAt": "2026-06-12T09:04:41.427Z"
+      "updatedAt": "2026-06-17T12:26:59.007Z"
     },
     {
       "id": "CID_va",

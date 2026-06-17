@@ -637,7 +637,7 @@ label[for="teacher-mode-toggler"] {
 .bua_importante {
     display: block;
     margin: 1.8em 60px;
-    padding: 18px 22px 16px 22px;
+    padding: 16px 22px 14px 22px;
     background: #fafbfc;
     border: 1px solid #e5e7eb;
     border-radius: 0px 5px 5px 0px;
@@ -654,8 +654,8 @@ label[for="teacher-mode-toggler"] {
 .bua_importante::before {
     display: block;
     font-weight: 600;
-    font-size: 1.5rem;
-    letter-spacing: 0.12em;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-bottom: 8px;
     background: transparent;
@@ -1066,6 +1066,18 @@ max-width: 100%;
 height: auto;
 margin-left: auto;
 margin-right: auto;
+}
+
+
+.bua_pie {
+    font-family: 'Encode Sans', Arial, sans-serif;
+    font-size: 0.85em;
+    font-style: italic;
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.4;
+    margin-top: 0.5em;
+    margin-bottom: 1.8em;
 }
 
 /* Los iconos de los iDevices/cajas no se centran ni llevan sombra */
