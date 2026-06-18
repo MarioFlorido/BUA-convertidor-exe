@@ -1693,6 +1693,72 @@ button {
   color: var(--text-2);
 }
 
+/* Selector: familia (curso) con varias variantes de idioma seleccionables */
+.theme-family-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  border: 1px solid var(--border-light);
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.15s;
+}
+
+.theme-family-option:hover {
+  border-color: var(--blue-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-family-option:has(input[type="radio"]:checked) {
+  border-color: var(--blue);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-family-option:hover .theme-thumbnail,
+.theme-family-option:has(input[type="radio"]:checked) .theme-thumbnail {
+  opacity: 1;
+  border-color: var(--blue-border);
+}
+
+.theme-lang-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.theme-lang-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.8rem;
+  transition: all 0.12s;
+}
+
+.theme-lang-option:hover { border-color: var(--blue-border); }
+
+.theme-lang-option:has(input[type="radio"]:checked) {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 8%, var(--surface));
+  font-weight: 500;
+}
+
+.theme-lang-option input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+
+.theme-lang-name { color: var(--text); }
+
 .theme-info {
   border: 1px solid var(--border-light);
   padding: 1.125rem;
@@ -1849,7 +1915,68 @@ button {
   margin: 0;
 }
 
-.theme-item-actions { display: flex; gap: 0.375rem; }
+.theme-item-actions { display: flex; gap: 0.375rem; align-items: center; }
+
+/* Familia con varias variantes de idioma: rejilla de celdas en una fila */
+.theme-item--family { gap: 0; }
+
+.theme-family-count {
+  margin-left: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.theme-variant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.theme-variant {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+}
+
+.theme-variant-lang {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.theme-lang-pill {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-2);
+}
+
+.theme-variant-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.theme-variant-id {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .btn-edit, .btn-delete {
   padding: 0.3rem 0.75rem;
@@ -1881,6 +2008,8 @@ button {
   background: var(--red);
   color: #fff;
 }
+
+.btn-delete--sm { padding: 0.15rem 0.5rem; font-size: 0.7rem; }
 
 .theme-form-container {
   background: var(--bg);

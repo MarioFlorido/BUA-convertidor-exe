@@ -17,6 +17,8 @@ export interface ThemeValidationReport {
   warnings: string[];
   meta: {
     language: 'es' | 'en' | 'ca' | null;
+    /** `<title>` del config.xml: nombre legible del tema (con espacios). */
+    title: string | null;
     /** Colores hex detectados en el comentario `Paleta:` del style.css. */
     palette: string[];
     hasScreenshot: boolean;
@@ -54,6 +56,13 @@ function extractLanguage(configXml: string): 'es' | 'en' | 'ca' | null {
   if (!m) return null;
   const v = m[1].toLowerCase();
   return v === 'es' || v === 'en' || v === 'ca' ? v : null;
+}
+
+/** Extrae el `<title>` del config.xml (nombre legible del tema). */
+function extractTitle(configXml: string): string | null {
+  const m = configXml.match(/<title>([\s\S]*?)<\/title>/i);
+  const v = m?.[1]?.trim();
+  return v || null;
 }
 
 /**
@@ -128,14 +137,16 @@ export function validateThemeForPublish(
 
   // 4. Metadatos
   const configBytes = findFile(files, 'config.xml');
-  const language = configBytes ? extractLanguage(decode(configBytes)) : null;
+  const configXml = configBytes ? decode(configBytes) : null;
+  const language = configXml ? extractLanguage(configXml) : null;
   if (configBytes && !language) {
     warnings.push('No se pudo detectar `<language>` en config.xml: se usará "es" por defecto.');
   }
+  const title = configXml ? extractTitle(configXml) : null;
 
   return {
     errors,
     warnings,
-    meta: { language, palette, hasScreenshot, hasCover },
+    meta: { language, title, palette, hasScreenshot, hasCover },
   };
 }
