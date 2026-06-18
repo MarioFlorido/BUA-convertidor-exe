@@ -110,7 +110,9 @@ export function OfficialThemeAdmin() {
         totalBytes,
         fileCount: Object.keys(files).length,
       });
-      setName(id.replace(/_/g, ' '));
+      // El nombre se toma del <title> del config.xml (nombre legible con
+      // espacios); si no lo hubiera, se cae al id de la carpeta.
+      setName(report.meta.title ?? id.replace(/_/g, ' '));
       setActivity('');
       setDescription('');
     } catch (err) {
@@ -462,6 +464,7 @@ export function OfficialThemeAdmin() {
                     <label>
                       Nombre
                       <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                      <small className="help-text">Tomado del &lt;title&gt; del config.xml. Edítalo solo si quieres otro nombre.</small>
                     </label>
                     <label>
                       Actividad

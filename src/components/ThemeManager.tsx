@@ -1,8 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { themeClientService } from '../core/services/ThemeClientService';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
 import { ThemeOrderService } from '../core/services/ThemeOrderService';
 import type { ThemeBundle } from '../core/services/ThemeBundle';
+import {
+  groupIntoFamilies,
+  flattenFamilies,
+  languageLabel,
+  languageCode,
+} from '../core/services/themeGrouping';
 import { OfficialThemeAdmin } from './OfficialThemeAdmin';
 
 export function ThemeManager() {
@@ -20,38 +26,43 @@ export function ThemeManager() {
   const refreshThemes = () =>
     setThemes(ThemeOrderService.applyOrder(ThemeRegistry.getAll()));
 
-  const reorder = (from: number, to: number) => {
+  // Vista derivada: los estilos agrupados por familia (mismo curso en varios idiomas).
+  const families = useMemo(() => groupIntoFamilies(themes), [themes]);
+
+  // El reordenado opera a nivel de familia; se persiste la lista de IDs aplanada.
+  const reorderFamilies = (from: number, to: number) => {
     if (from === to) return;
-    const next = themes.slice();
+    const next = families.slice();
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
-    setThemes(next);
-    ThemeOrderService.save(next.map((t) => t.id));
+    const flat = flattenFamilies(next);
+    setThemes(flat);
+    ThemeOrderService.save(flat.map((t) => t.id));
   };
 
-  const handleRowDragStart = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+  const handleFamilyDragStart = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
     setDraggingIdx(idx);
     e.dataTransfer.effectAllowed = 'move';
     // Necesario en Firefox para que arranque el drag
     e.dataTransfer.setData('text/plain', String(idx));
   };
 
-  const handleRowDragOver = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+  const handleFamilyDragOver = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
     if (draggingIdx === null) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     if (overIdx !== idx) setOverIdx(idx);
   };
 
-  const handleRowDrop = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
+  const handleFamilyDrop = (idx: number) => (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (draggingIdx === null) return;
-    reorder(draggingIdx, idx);
+    reorderFamilies(draggingIdx, idx);
     setDraggingIdx(null);
     setOverIdx(null);
   };
 
-  const handleRowDragEnd = () => {
+  const handleFamilyDragEnd = () => {
     setDraggingIdx(null);
     setOverIdx(null);
   };
@@ -199,27 +210,29 @@ export function ThemeManager() {
         </p>
       </div>
 
-      {/* Lista unificada de estilos */}
+      {/* Lista de estilos agrupados por familia (mismo curso en varios idiomas) */}
       <div className="themes-list">
         <h3>Estilos disponibles ({themes.length})</h3>
-        {themes.length === 0 ? (
+        {families.length === 0 ? (
           <p className="no-items">No hay estilos cargados</p>
         ) : (
           <div className="theme-items">
-            {themes.map((theme, idx) => {
+            {families.map((family, idx) => {
               const isDragging = draggingIdx === idx;
               const isOver = overIdx === idx && draggingIdx !== null && draggingIdx !== idx;
               const dropAbove = isOver && (draggingIdx ?? -1) > idx;
               const dropBelow = isOver && (draggingIdx ?? -1) < idx;
+              const single = family.variants.length === 1;
+              const isOfficial = family.variants[0].source === 'builtin';
               return (
                 <div
-                  key={theme.id}
-                  className={`theme-item${isDragging ? ' theme-item--dragging' : ''}${dropAbove ? ' theme-item--drop-above' : ''}${dropBelow ? ' theme-item--drop-below' : ''}`}
+                  key={family.key}
+                  className={`theme-item${single ? '' : ' theme-item--family'}${isDragging ? ' theme-item--dragging' : ''}${dropAbove ? ' theme-item--drop-above' : ''}${dropBelow ? ' theme-item--drop-below' : ''}`}
                   draggable
-                  onDragStart={handleRowDragStart(idx)}
-                  onDragOver={handleRowDragOver(idx)}
-                  onDrop={handleRowDrop(idx)}
-                  onDragEnd={handleRowDragEnd}
+                  onDragStart={handleFamilyDragStart(idx)}
+                  onDragOver={handleFamilyDragOver(idx)}
+                  onDrop={handleFamilyDrop(idx)}
+                  onDragEnd={handleFamilyDragEnd}
                 >
                   <div className="theme-item-header">
                     <span className="theme-drag-handle" aria-hidden="true" title="Arrastra para reordenar">
@@ -232,21 +245,24 @@ export function ThemeManager() {
                         <circle cx="10.5" cy="12" r="0.8" fill="currentColor" />
                       </svg>
                     </span>
-                    <div>
-                      <strong>{theme.metadata.name ?? theme.name}</strong>
-                      <span className="theme-id">({theme.id})</span>
-                    </div>
+                    {single ? (
+                      <div>
+                        <strong>{family.variants[0].metadata.name ?? family.variants[0].name}</strong>
+                        <span className="theme-id">({family.variants[0].id})</span>
+                      </div>
+                    ) : (
+                      <div>
+                        <strong>{family.name}</strong>
+                        <span className="theme-family-count">{family.variants.length} idiomas</span>
+                      </div>
+                    )}
                     <div className="theme-item-actions">
-                      <span
-                        className={`theme-badge theme-badge--${
-                          theme.source === 'builtin' ? 'official' : 'user'
-                        }`}
-                      >
-                        {theme.source === 'builtin' ? 'Oficial' : 'Local'}
+                      <span className={`theme-badge theme-badge--${isOfficial ? 'official' : 'user'}`}>
+                        {isOfficial ? 'Oficial' : 'Local'}
                       </span>
-                      {theme.source === 'user' && (
+                      {single && family.variants[0].source === 'user' && (
                         <button
-                          onClick={() => handleDeleteTheme(theme)}
+                          onClick={() => handleDeleteTheme(family.variants[0])}
                           className="btn-delete"
                           disabled={uploading}
                         >
@@ -255,6 +271,31 @@ export function ThemeManager() {
                       )}
                     </div>
                   </div>
+
+                  {!single && (
+                    <div className="theme-variant-grid">
+                      {family.variants.map((v) => (
+                        <div className="theme-variant" key={v.id}>
+                          <div className="theme-variant-lang">
+                            <span className="theme-lang-pill">{languageCode(v.metadata.language)}</span>
+                            <span>{languageLabel(v.metadata.language) || v.id}</span>
+                          </div>
+                          <div className="theme-variant-foot">
+                            <span className="theme-variant-id" title={v.id}>{v.id}</span>
+                            {v.source === 'user' && (
+                              <button
+                                onClick={() => handleDeleteTheme(v)}
+                                className="btn-delete btn-delete--sm"
+                                disabled={uploading}
+                              >
+                                Eliminar
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}
