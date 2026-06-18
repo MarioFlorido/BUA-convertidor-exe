@@ -628,6 +628,20 @@
   color: var(--bua-color-importante, #deb13c);
 }
 
+/* Pie polivalente (tablas e ilustraciones) — NO es una caja de color: es un
+   pie/leyenda discreto. Hereda la fuente del cuerpo del documento para quedar
+   en consonancia con el resto del PDF; gris, cursiva y centrado como en el tema.
+   No se parte entre páginas para no separar el pie de su figura o tabla. */
+.block-html .bua_pie {
+  font-size: 0.85em;
+  font-style: italic;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0.4em 0 1.2em;
+  break-inside: avoid;
+}
+
 
 /* ============================================================
    8. ACORDEONES (siempre expandidos en print)

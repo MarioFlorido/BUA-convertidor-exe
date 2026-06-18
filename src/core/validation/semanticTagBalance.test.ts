@@ -29,6 +29,19 @@ describe('detectSemanticTagIssues', () => {
     assert.deepEqual(detectSemanticTagIssues('<p>Hola mundo</p>'), []);
   });
 
+  test('[pie] bien cerrado → sin avisos', () => {
+    const html = '<p>[pie]</p><p>Figura 1</p><p>[fin]</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('falta el [fin] de un [pie] → avisa de [pie] sin cerrar', () => {
+    const html = '<p>[pie]</p><p>Figura 1</p>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'unclosed-box');
+    assert.equal(issues[0].label, 'pie');
+  });
+
   test('falta el [fin] de la primera caja → avisa de [ejemplo] sin cerrar', () => {
     const html =
       '<p>[ejemplo]</p><p>A</p><p>[definicion]</p><p>B</p><p>[fin]</p>';

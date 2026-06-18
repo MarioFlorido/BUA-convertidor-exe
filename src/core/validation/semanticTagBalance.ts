@@ -6,6 +6,7 @@
  *   [ejemplo]      …contenido…   [fin]
  *   [definición]   …contenido…   [fin]
  *   [importante]   …contenido…   [fin]
+ *   [pie]          …contenido…   [fin]
  *
  * Si el autor olvida un [fin], la transformación por regex de HtmlTransformer
  * empareja la apertura con el [fin] de la SIGUIENTE caja: se "traga" la etiqueta
@@ -24,7 +25,7 @@
  * no se cuentan aquí como aperturas.
  */
 
-export type SemanticBoxLabel = 'ejemplo' | 'definición' | 'importante';
+export type SemanticBoxLabel = 'ejemplo' | 'definición' | 'importante' | 'pie';
 
 export interface SemanticTagIssue {
   /** 'unclosed-box': falta el [fin]. 'stray-fin': un [fin] sin caja abierta. */
@@ -40,6 +41,7 @@ const PRETTY_LABEL: Record<string, SemanticBoxLabel> = {
   ejemplo: 'ejemplo',
   definicion: 'definición',
   importante: 'importante',
+  pie: 'pie',
 };
 
 /** minúsculas + sin tildes/diacríticos, igual que mapDelimiterToClass. */
@@ -82,7 +84,7 @@ export function detectSemanticTagIssues(html: string): SemanticTagIssue[] {
   if (!html) return [];
 
   const source = preNormalize(html);
-  const marker = /\[\s*(ejemplo|definici[oó]n|importante|fin)\s*\]/gi;
+  const marker = /\[\s*(ejemplo|definici[oó]n|importante|pie|fin)\s*\]/gi;
   const issues: SemanticTagIssue[] = [];
 
   let open: { label: SemanticBoxLabel; context: string } | null = null;

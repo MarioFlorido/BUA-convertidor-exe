@@ -45,6 +45,18 @@ describe('applyDivClasses', () => {
     assert.equal(out, '<p><div class="bua_importante">Contenido</div></p>');
   });
 
+  test('[pie] se mapea a bua_pie (Caso A)', () => {
+    const input = '<p>[pie]</p><p>Figura 1. Esquema del proceso</p><p>[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<div class="bua_pie"><p>Figura 1. Esquema del proceso</p></div>');
+  });
+
+  test('[pie] inline se mapea a bua_pie (Caso B)', () => {
+    const input = '<p>[pie]Tabla 2. Datos de matrícula[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<p><div class="bua_pie">Tabla 2. Datos de matrícula</div></p>');
+  });
+
   test('case-insensitive: [EJEMPLO] funciona', () => {
     const out = applyDivClasses('<p>[EJEMPLO]</p><p>x</p><p>[fin]</p>');
     assert.match(out, /class="bua_ejemplo"/);

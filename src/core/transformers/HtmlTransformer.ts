@@ -5,6 +5,7 @@
  * - [ejemplo]...[fin] → <div class="bua_ejemplo">
  * - [definición]...[fin] → <div class="bua_definicion">
  * - [importante]...[fin] → <div class="bua_importante">
+ * - [pie]...[fin] → <div class="bua_pie">  (pie polivalente: tablas e ilustraciones)
  * - [horizontal] + tabla → class="bua_tabla_horizontal"
  * - [vertical] + tabla → class="bua_tabla_vertical"
  *
@@ -28,6 +29,7 @@ function mapDelimiterToClass(delimitador: string): string | null {
     ejemplo: 'bua_ejemplo',
     definicion: 'bua_definicion',
     importante: 'bua_importante',
+    pie: 'bua_pie',
   };
 
   return classMap[normalized] || null;
@@ -68,7 +70,7 @@ export function applyDivClasses(htmlValue: string): string {
   // <br/> en lugar de </p><p>. Eso impide que la regex de Caso A matchee y
   // genera HTML inválido (<div> dentro de <p>) cuando entra Caso B. Convertimos
   // todo <br/> contiguo a un marcador en una ruptura real de párrafo.
-  const MARKER = /\[\s*(?:ejemplo|definici[oó]n|importante|fin)\s*\]/.source;
+  const MARKER = /\[\s*(?:ejemplo|definici[oó]n|importante|pie|fin)\s*\]/.source;
   const BR = /<br\s*\/?>/.source;
   normalized = normalized.replace(
     new RegExp(`${BR}\\s*(${MARKER})`, 'gi'),
@@ -83,7 +85,7 @@ export function applyDivClasses(htmlValue: string): string {
   // delimitadores no-semánticos como [horizontal] o [vertical] (que se procesan
   // después en applyTableClasses) consuman el siguiente [fin] y "se coman" la
   // siguiente caja semántica del documento.
-  const SEMANTIC_LABEL = /(ejemplo|definici[oó]n|importante)/i;
+  const SEMANTIC_LABEL = /(ejemplo|definici[oó]n|importante|pie)/i;
 
   // Caso A: etiqueta en párrafo propio → consume los <p> de apertura y cierre
   let result = normalized.replace(
@@ -414,7 +416,7 @@ export function continueInterruptedOrderedLists(htmlValue: string): string {
 /**
  * Aplica todas las transformaciones HTML en orden:
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
- * 2. clases semánticas [ejemplo], [definición], [importante]
+ * 2. clases semánticas [ejemplo], [definición], [importante], [pie]
  * 3. clases de tabla [horizontal], [vertical]
  * 4. listas numeradas interrumpidas → continuar numeración con start="N"
  * 5. autolink de URLs en texto plano (al final: re-serializa el DOM)

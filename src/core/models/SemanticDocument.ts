@@ -70,6 +70,7 @@ export const BUA_CLASSES = {
   EJEMPLO: 'bua_ejemplo',
   DEFINICION: 'bua_definicion',
   IMPORTANTE: 'bua_importante',
+  PIE: 'bua_pie',
   TABLA_HORIZONTAL: 'bua_tabla_horizontal',
   TABLA_VERTICAL: 'bua_tabla_vertical',
 } as const;
