@@ -7,6 +7,15 @@
       "language": "es",
       "description": "Tema estándar de eXeLearning sin personalización",
       "screenshot": null
+    },
+    {
+      "id": "Doctorado",
+      "name": "DOCTORADO 2026-27 (CASTELLANO)",
+      "activity": "Estilo minimalista para los temas de Doctorado en castellano",
+      "language": "es",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-18T12:36:01.859Z"
     }
   ]
 }
