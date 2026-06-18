@@ -25,6 +25,15 @@
       "description": "Estilo minimalista para los cursos de doctorado",
       "screenshot": null,
       "updatedAt": "2026-06-18T12:45:52.427Z"
+    },
+    {
+      "id": "PhD",
+      "name": "DOCTORADO 2026-27 (INGLÉS)",
+      "activity": "Cursos de doctorado",
+      "language": "en",
+      "description": "Estilo minimalista para los temas de doctorado",
+      "screenshot": null,
+      "updatedAt": "2026-06-18T12:52:09.958Z"
     }
   ]
 }
