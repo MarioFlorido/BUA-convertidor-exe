@@ -34,6 +34,15 @@
   activo, el globo de cada pantalla reaparece en cada visita; el botón
   «Entendido» solo cierra esa visita concreta, no el conjunto.
 
+### Contenido — Etiquetas semánticas
+- **Cuarta etiqueta semántica: `[pie]`** — pie polivalente para ilustraciones,
+  tablas y leyendas. Se aplica igual que `[ejemplo]`, `[definición]` e
+  `[importante]` (envuelve contenido entre `[pie]` y `[fin]`). En el PDF se
+  renderi­za como texto pequeño, cursiva, gris y centrado, sin recuadro de
+  color. En el ELPX, se estiliza según la clase `.bua_pie` definida en cada
+  tema. Validación: detecta `[pie]` sin cerrar igual que las demás cajas,
+  avisa antes de convertir.
+
 ---
 
 ## v0.2.0 — Mayo 2026

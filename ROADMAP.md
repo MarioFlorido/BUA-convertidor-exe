@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **16 jun 2026**
+> Última actualización: **18 jun 2026**
 
 ---
 
@@ -125,3 +125,7 @@ Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
   simplificó respecto a la idea original de «coach marks» ancladas a un
   elemento (este ítem, ya tachado): un modal centrado a pantalla completa deja
   sitio a textos explicativos más largos.
+- [x] **Cuarta etiqueta semántica: `[pie]`** — pie polivalente (`[pie]…[fin]`)
+  para ilustraciones, tablas y leyendas. En el PDF: texto pequeño, cursiva,
+  gris y centrado, sin recuadro. En ELPX: estilizado por `.bua_pie` del tema.
+  Validación: detecta pies sin cerrar igual que el resto de cajas semánticas.
