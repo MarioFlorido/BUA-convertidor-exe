@@ -36,6 +36,15 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   convierten documentos parecidos a menudo, recordar las últimas elecciones
   (tipo de H2 por defecto, tema, índice plegado/desplegado) ahorra clics.
 
+- [ ] 🟡 **Modo mantenimiento activable desde el panel de admin.** Un toggle
+  en `OfficialThemeAdmin` que escribe `public/maintenance.json`
+  (`{ "enabled": true/false, "message": "..." }`) vía GitHub API. La app lee
+  ese archivo al cargar y, si está activo, muestra una pantalla a pantalla
+  completa («En mantenimiento — perdone las molestias») en lugar de la
+  interfaz normal. Útil para actualizaciones masivas de temas sin que los
+  usuarios encuentren la app a medias. Activar y desactivar en segundos,
+  sin tocar código ni hacer un nuevo deploy.
+
 ### Ideas a valorar
 
 - [ ] ⚪ **Editor visual de estructura (drag & drop).** En el paso 2, poder
