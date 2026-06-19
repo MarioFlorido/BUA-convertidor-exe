@@ -1,5 +1,6 @@
 import type { SemanticDocument } from '../../models/SemanticDocument';
 import type { PrintThemeAssets, PrintLanguage } from './PrintThemeLoader';
+import { escHtml } from '../../utils/html';
 
 // ─── Licencia Creative Commons ────────────────────────────────────────────────
 
@@ -127,12 +128,4 @@ function darken(hex: string, amount: number): string {
   const g = Math.max(0, ((n >> 8) & 0xff) * (1 - amount)) | 0;
   const b = Math.max(0, (n & 0xff) * (1 - amount)) | 0;
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-}
-
-function escHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }

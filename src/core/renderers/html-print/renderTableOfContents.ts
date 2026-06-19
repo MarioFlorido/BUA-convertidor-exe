@@ -1,4 +1,5 @@
 import type { SemanticDocument, SemanticPage } from '../../models/SemanticDocument';
+import { escHtml } from '../../utils/html';
 
 /**
  * Entrada normalizada del TOC (una fila en el índice).
@@ -75,12 +76,4 @@ function renderTocItem(entry: TocEntry): string {
   return `<li class="toc-entry toc-level-${entry.level}">
         <a href="#${entry.id}">${escHtml(entry.title.toUpperCase())}</a>
       </li>`;
-}
-
-function escHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }

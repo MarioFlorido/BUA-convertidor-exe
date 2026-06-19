@@ -14,6 +14,7 @@
  */
 
 import type { ThemeBundle } from './ThemeBundle';
+import { stripDiacritics } from '../utils/html';
 
 export interface ThemeFamily {
   /** Clave normalizada de agrupación (nombre de familia sin tildes/mayúsculas). */
@@ -45,11 +46,7 @@ const LANG_TOKENS = new Set([
 ]);
 
 function normalize(s: string): string {
-  return s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim();
+  return stripDiacritics(s).toLowerCase().trim();
 }
 
 /** Etiqueta legible para un código de idioma (es → "Castellano"). */

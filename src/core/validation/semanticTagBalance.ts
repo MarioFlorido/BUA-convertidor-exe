@@ -25,6 +25,8 @@
  * no se cuentan aquí como aperturas.
  */
 
+import { stripDiacritics } from '../utils/html';
+
 export type SemanticBoxLabel = 'ejemplo' | 'definición' | 'importante' | 'pie';
 
 export interface SemanticTagIssue {
@@ -46,11 +48,7 @@ const PRETTY_LABEL: Record<string, SemanticBoxLabel> = {
 
 /** minúsculas + sin tildes/diacríticos, igual que mapDelimiterToClass. */
 function normalizeLabel(raw: string): string {
-  return raw
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
+  return stripDiacritics(raw.toLowerCase().trim());
 }
 
 /**
