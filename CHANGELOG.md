@@ -16,6 +16,12 @@
 
 ### Administración de temas oficiales
 - **Panel de administración integrado en la app** (`OfficialThemeAdmin.tsx`, en «Estilos eXeLearning»): crear, actualizar y eliminar temas oficiales sin Terminal, autenticando con un token fine-grained de GitHub. Núcleo en `src/core/services/admin/`. El flujo por CLI queda como _fallback_.
+- **Nombre pre-rellenado desde `<title>`** del `config.xml` al seleccionar la carpeta del tema (antes había que escribirlo a mano, y un desajuste con el XML producía temas con nombres inconsistentes). Sigue siendo editable.
+
+### Selector y administración — agrupación por familias
+- **Agrupación de temas por familia** (`themeGrouping.ts`): los temas que comparten el mismo curso en varios idiomas (castellano/valenciano/inglés) se presentan como una sola fila, con una variante seleccionable por idioma, en vez de tres entradas sueltas. Afecta a `ThemeSelector.tsx` (selección) y `ThemeManager.tsx` (reordenación, que ahora opera a nivel de familia).
+- La familia se detecta quitando del nombre el idioma entre paréntesis (al final o en medio, como en el `<title>` de eXeLearning: `CURSO (CASTELLANO)` o `CURSO (CASTELLANO) 2026-27`). El idioma de cada variante se lee de forma fiable del `<language>` del `config.xml`, no del texto del nombre.
+- **Importante:** el resto del nombre (fuera del paréntesis de idioma) debe coincidir **exactamente** entre las variantes para que se agrupen; un desajuste (p. ej. un año escrito de forma distinta) hace que esa variante aparezca como familia propia en vez de agruparse con las demás.
 
 ### Calidad
 - Tests automatizados de `HtmlTransformer` (27 tests) con `node:test` vía `tsx` (`npm test`), sin dependencias nuevas.

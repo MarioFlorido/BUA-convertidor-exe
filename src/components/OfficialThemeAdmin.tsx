@@ -354,7 +354,9 @@ export function OfficialThemeAdmin() {
                       </label>
                       <p className="help-text">
                         El idioma (<strong>{t.metadata?.language ?? '—'}</strong>) se toma del{' '}
-                        <code>config.xml</code> del tema; no se edita aquí.
+                        <code>config.xml</code> del tema; no se edita aquí. Para que este tema se agrupe
+                        con sus otros idiomas, el nombre debe coincidir exactamente con el de las demás
+                        variantes fuera del paréntesis de idioma.
                       </p>
                       <div className="admin-meta-edit-actions">
                         <button
@@ -464,7 +466,12 @@ export function OfficialThemeAdmin() {
                     <label>
                       Nombre
                       <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                      <small className="help-text">Tomado del &lt;title&gt; del config.xml. Edítalo solo si quieres otro nombre.</small>
+                      <small className="help-text">
+                        Tomado del &lt;title&gt; del config.xml. Edítalo solo si quieres otro nombre.
+                        Si es el mismo curso en varios idiomas, usa el mismo texto en todas las variantes
+                        y cambia solo el idioma entre paréntesis (p. ej. <code>CURSO 26-27 (CASTELLANO)</code>,
+                        <code>(VALENCIANO)</code>, <code>(INGLÉS)</code>) para que se agrupen en una familia.
+                      </small>
                     </label>
                     <label>
                       Actividad

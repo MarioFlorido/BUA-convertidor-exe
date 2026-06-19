@@ -264,7 +264,7 @@ flowchart TD
         <div class="action-card-body">
           <ol class="steps">
             <li><span>En el panel, pulsa <strong>«Seleccionar carpeta…»</strong> y elige la carpeta del tema (p. ej. <code>Doctorado_26-27</code>).</span></li>
-            <li><span>Revisa la <strong>validación</strong> (errores en rojo bloquean; avisos en amarillo no) y la <strong>previsualización</strong> (nombre, actividad y descripción son editables).</span></li>
+            <li><span>Revisa la <strong>validación</strong> (errores en rojo bloquean; avisos en amarillo no) y la <strong>previsualización</strong>. El <strong>nombre</strong> se pre-rellena con el <code>&lt;title&gt;</code> del <code>config.xml</code> (actividad y descripción también son editables).</span></li>
             <li><span>Pulsa <strong>«Publicar tema oficial»</strong>. Si el id ya existe, el botón pasa a <strong>«Actualizar»</strong>: se reemplazan los archivos y se borran los que ya no estén en la carpeta.</span></li>
             <li><span>Listo: se hace un único commit en <code>main</code> y el CI reconstruye y despliega en 1-2 minutos.</span></li>
           </ol>
@@ -272,6 +272,15 @@ flowchart TD
             <strong>Importante:</strong> la carpeta debe contener al menos <code>config.xml</code> y <code>style.css</code>.
             El <strong>nombre de la carpeta es el ID</strong> del estilo (<code>Doctorado_26-27</code> → ID <code>Doctorado_26-27</code>).
             La basura de macOS (<code>__MACOSX</code>, <code>.DS_Store</code>) se descarta automáticamente.
+          </div>
+          <div class="callout">
+            <strong>Agrupación por familias:</strong> si vas a publicar el mismo curso en varios idiomas
+            (castellano/valenciano/inglés), el selector los junta en una sola fila <em>siempre que el
+            nombre coincida exactamente</em> fuera del paréntesis de idioma. Usa el mismo texto en las
+            tres variantes y cambia solo el idioma entre paréntesis, por ejemplo:
+            <code>CURSO 26-27 (CASTELLANO)</code>, <code>CURSO 26-27 (VALENCIANO)</code>,
+            <code>CURSO 26-27 (INGLÉS)</code>. Un desajuste (un año escrito de otra forma, una palabra de
+            más) deja esa variante fuera de la familia, como entrada suelta.
           </div>
         </div>
       </div>

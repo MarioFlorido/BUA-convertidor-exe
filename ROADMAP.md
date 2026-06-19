@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **18 jun 2026**
+> Última actualización: **19 jun 2026**
 
 ---
 
@@ -138,3 +138,15 @@ Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
   para ilustraciones, tablas y leyendas. En el PDF: texto pequeño, cursiva,
   gris y centrado, sin recuadro. En ELPX: estilizado por `.bua_pie` del tema.
   Validación: detecta pies sin cerrar igual que el resto de cajas semánticas.
+- [x] **Agrupación de temas por familia (idioma)** en selector y
+  administración (`themeGrouping.ts`): el mismo curso en castellano/valenciano/
+  inglés se presenta como una sola fila con una variante por idioma. Requiere
+  que el `<title>` de cada variante coincida exactamente fuera del paréntesis
+  de idioma (`CURSO (CASTELLANO)` / `(VALENCIANO)` / `(INGLÉS)`); un desajuste
+  (p. ej. un año escrito distinto) la deja fuera de la familia. **19 jun 2026:**
+  esto pasó de verdad con el tema "Doctorado" (`2026-27` vs `26-27` en las
+  otras dos variantes) — corregido a mano. Documentado en `CHANGELOG.md`,
+  `README.md` y `gestionar-temas-oficiales.html`; el panel de admin avisa de
+  la convención junto al campo «Nombre».
+- [x] **Nombre pre-rellenado desde `<title>`** del `config.xml` al publicar un
+  tema oficial (antes se escribía a mano y podía no coincidir con el XML).

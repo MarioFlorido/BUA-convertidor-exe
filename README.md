@@ -65,9 +65,15 @@ Los temas oficiales se gestionan desde el propio Convertidor, en **«Estilos eXe
 
 Guía detallada: [Gestionar estilos oficiales](public/docs/gestionar-temas-oficiales.html). El antiguo flujo por Terminal (`npm run publish-theme` / `unpublish-theme`) queda como _fallback_.
 
+### Agrupación por familias (idioma)
+
+Cuando varios temas oficiales son el mismo curso traducido (castellano, valenciano, inglés), el selector los junta en **una sola fila** con una variante seleccionable por idioma, en vez de mostrarlos como entradas sueltas.
+
+La agrupación se basa en el nombre (`<title>` del `config.xml`): se le quita el idioma entre paréntesis —al final (`CURSO 26-27 (CASTELLANO)`) o en medio (`CURSO (CASTELLANO) 26-27`)— y lo que queda debe **coincidir exactamente** entre las variantes. Si un nombre tiene una errata o un dato distinto (un año escrito de otra forma, por ejemplo), esa variante no se agrupa y aparece como familia propia. El idioma de cada variante no depende del nombre: se lee del `<language>` del `config.xml`.
+
 ### Reordenar temas
 
-En el selector de temas hay un icono (≡) a la izquierda de cada uno. Arrastra para cambiar el orden. Se guarda automáticamente.
+En el selector de temas hay un icono (≡) a la izquierda de cada uno. Arrastra para cambiar el orden (a nivel de familia, si los temas están agrupados). Se guarda automáticamente.
 
 ### Estructura de un ZIP de tema
 
@@ -130,6 +136,9 @@ El ZIP no incluye `screenshot.png` en la raíz. El tema funciona igual, solo que
 **"La interfaz dice [ES] pero el tema es en inglés"**  
 El `config.xml` del tema necesita `<language>en</language>` o `<language>ca</language>`. Sin eso, asume español.
 
+**"Un tema sale solo, separado de sus otros idiomas"**  
+Su nombre no coincide exactamente con el de las otras variantes fuera del paréntesis de idioma. Edita el nombre en el panel de administración (Administración de temas oficiales) hasta que el texto sea idéntico al de los demás, y vuelve a publicar.
+
 **"El PDF no tiene encabezados ni pies"**  
 Revisa que el tema defina sus *running elements*. El PDF funciona sin conexión: Paged.js va embebido en la propia app (no se descarga de ningún CDN), así que la exportación funciona aunque no tengas internet.
 
@@ -174,6 +183,7 @@ Lo que está hecho:
 -  Panel de administración de temas oficiales (publicar/actualizar/eliminar desde el navegador, sin Terminal)
 -  PDF 100% offline (Paged.js embebido) + optimización automática de imágenes
 -  Tests automatizados de la capa de transformación HTML (`npm test`)
+-  Agrupación de temas por familia/idioma en selector y administración
 
 Lo que me falta:
 
