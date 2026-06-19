@@ -23,7 +23,7 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
-      if (file.name.endsWith('.docx')) {
+      if (file.name.toLowerCase().endsWith('.docx')) {
         setFileError(null);
         onFileSelect(file);
       } else {
