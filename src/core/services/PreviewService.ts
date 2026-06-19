@@ -1,5 +1,5 @@
 import type { SemanticDocument, SemanticBlock } from '../models/SemanticDocument';
-import { escapeHtml } from '../utils/html';
+import { escapeHtml, stripDiacritics } from '../utils/html';
 import { RESOURCE_DIR } from '../transformers/ImageExtractor';
 
 export interface PreviewPageInfo {
@@ -261,9 +261,7 @@ function createPageDomId(pageNumber: number): string {
 }
 
 function slugifyPageTitle(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+  return stripDiacritics(value)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');

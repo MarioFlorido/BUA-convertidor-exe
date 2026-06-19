@@ -29,7 +29,6 @@ export type {
   SemanticDocument,
   SemanticPage,
   SemanticBlock,
-  BUA_CLASSES,
 } from '../core/models/SemanticDocument';
 
 export interface Theme {

@@ -3,6 +3,7 @@ import { loadPrintThemeAssets, type BuaBoxStyles } from './PrintThemeLoader';
 import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
 import { renderTableOfContents, sectionId } from './renderTableOfContents';
 import { optimizeImagesForPrint } from './optimizeImagesForPrint';
+import { escHtml, upperCaseH2 } from '../../utils/html';
 
 // CSS importado como string raw para inyectarlo inline en el HTML generado.
 // Necesario porque el HTML se abre como blob: URL — rutas relativas no resuelven.
@@ -179,30 +180,28 @@ function renderBlock(block: SemanticBlock): string {
     return '';
   }
 
+  // Cadena de transformación del bloque, idéntica en ambas ramas: expandir
+  // acordeones → iframes a enlaces → marcar cabeceras de tabla → H2 en mayúsculas.
+  const html = upperCaseH2(
+    markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))),
+  );
+
   // "Contenido" es el título genérico por defecto asignado a bloques sin H2/H3.
   const isDefaultTitle = !block.title || block.title === 'Contenido';
 
   if (isDefaultTitle) {
     // Bloque sin título de iDevice: sólo contenido
-    const htmlUpperH2 = markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))).replace(
-      /<h2([^>]*)>([^<]*)<\/h2>/gi,
-      (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
-    );
     return `<div class="content-block">
-  <div class="block-html">${htmlUpperH2}</div>
+  <div class="block-html">${html}</div>
 </div>`;
   }
 
   // iDevice con título: cabecera coloreada + borde perimetral (igual que en eXeLearning)
-  const blockHtmlUpperH2 = markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))).replace(
-    /<h2([^>]*)>([^<]*)<\/h2>/gi,
-    (_, attrs, text) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
-  );
   return `<div class="content-block idevice-with-title">
   <header class="idevice-header">
     <h4 class="idevice-title">${escHtml(block.title.toUpperCase())}</h4>
   </header>
-  <div class="block-html">${blockHtmlUpperH2}</div>
+  <div class="block-html">${html}</div>
 </div>`;
 }
 
@@ -463,12 +462,4 @@ ${opts.contentHtml}
 
 </body>
 </html>`;
-}
-
-function escHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }

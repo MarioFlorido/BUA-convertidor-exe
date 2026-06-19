@@ -13,17 +13,15 @@
  * Validación: SHA-256 de content.xml debe ser byte-identical
  */
 
+import { stripDiacritics } from '../utils/html';
+
 /**
  * Mapea delimitadores a clases BUA
  * Case-insensitive y normaliza tildes
  */
 function mapDelimiterToClass(delimitador: string): string | null {
   // Normalizar: convertir a minúsculas y remover tildes/acentos
-  const normalized = delimitador
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, ''); // Remover diacríticos
+  const normalized = stripDiacritics(delimitador.toLowerCase().trim());
 
   const classMap: Record<string, string> = {
     ejemplo: 'bua_ejemplo',
