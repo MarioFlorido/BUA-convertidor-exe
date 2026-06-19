@@ -84,19 +84,6 @@ export class ThemeService {
   }
 
   /**
-   * Cargar tema si es necesario (helper para lógica condicional)
-   *
-   * @param themeId ID del tema o undefined
-   * @returns Record con entries prefixadas, o undefined si themeId es falsy o "base"
-   */
-  static async loadThemeIfNeeded(themeId?: string): Promise<Record<string, Uint8Array> | undefined> {
-    if (themeId && themeId !== 'base') {
-      return this.loadTheme(themeId);
-    }
-    return undefined;
-  }
-
-  /**
    * Limpiar caché (útil para testing o cambio de tema)
    *
    * @param themeId - Si se proporciona, solo limpia el tema específico.
