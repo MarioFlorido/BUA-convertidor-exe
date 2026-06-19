@@ -34,6 +34,15 @@
       "description": "",
       "screenshot": null,
       "updatedAt": "2026-06-19T07:00:43.663Z"
+    },
+    {
+      "id": "CID_es",
+      "name": "CURSOS CID 26-27 (CASTELLANO)",
+      "activity": "Cursos de Competencias Digitales",
+      "language": "es",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T08:34:48.361Z"
     }
   ]
 }
