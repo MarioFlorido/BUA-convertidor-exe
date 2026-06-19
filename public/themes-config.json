@@ -16,6 +16,15 @@
       "description": "",
       "screenshot": null,
       "updatedAt": "2026-06-19T06:19:18.162Z"
+    },
+    {
+      "id": "Doctorat",
+      "name": "DOCTORADO 26-27 (VALENCIANO)",
+      "activity": "Cursos de Doctorado",
+      "language": "ca",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T06:58:33.582Z"
     }
   ]
 }
