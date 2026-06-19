@@ -43,6 +43,15 @@
       "description": "",
       "screenshot": null,
       "updatedAt": "2026-06-19T08:34:48.361Z"
+    },
+    {
+      "id": "CID_va",
+      "name": "CURSOS CID 26-27 (VALENCIANO)",
+      "activity": "Cursos de Competencias Digitales",
+      "language": "ca",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T08:36:34.110Z"
     }
   ]
 }
