@@ -25,6 +25,15 @@
       "description": "",
       "screenshot": null,
       "updatedAt": "2026-06-19T06:58:33.582Z"
+    },
+    {
+      "id": "PhD",
+      "name": "DOCTORADO 26-27 (INGLÉS)",
+      "activity": "Cursos de Doctorado",
+      "language": "en",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T07:00:43.663Z"
     }
   ]
 }
