@@ -49,6 +49,26 @@
   tema. Validación: detecta `[pie]` sin cerrar igual que las demás cajas,
   avisa antes de convertir.
 
+### Auditoría y consolidación técnica (refactor P0/P1/P2)
+- **Invariante posicional blindado con test** (`structureContentSymmetry.test.ts`,
+  6 tests): `parseDocumentStructure` y `buildProjectFromStructure` deben ignorar
+  los encabezados vacíos con idéntico criterio para que los ordinales (`h1-N`,
+  `h2-X-M`) sigan alineados. El test verifica que el contenido sobrevive en su
+  página aun con `<h1></h1>`/`<h2></h2>`/`&nbsp;` en posiciones que, de romperse
+  el acoplamiento, lo desplazarían en silencio.
+- **Helpers de string centralizados en `utils/html.ts`**: `escHtml` (unifica las
+  3 copias de `html-print/`), `upperCaseH2` (unifica la regex de mayúsculas de
+  H2 en `ElpxRenderer` y el renderer de impresión) y `stripDiacritics` (unifica
+  la normalización NFD de `HtmlTransformer`, `PreviewService`, `themeGrouping` y
+  `semanticTagBalance`). Salida idéntica; sin cambios de comportamiento.
+- **Código muerto eliminado**: `BUA_CLASSES` (constante sin consumidores) y
+  `ThemeService.loadThemeIfNeeded` (método sin llamadas).
+- **`UploadZone`**: la validación de extensión al arrastrar es ahora
+  *case-insensitive* (`INFORME.DOCX` ya no se rechaza).
+- **Node alineado dev/CI** (`.nvmrc` + workflow a Node 24) e higiene de
+  dependencias (`npm audit fix` sin *breaking*; las vulnerabilidades restantes
+  son solo de la cadena de desarrollo, no del sitio desplegado).
+
 ---
 
 ## v0.2.0 — Mayo 2026
