@@ -4,11 +4,11 @@
 
 /* ── Tokens ──────────────────────────────────────────────────────────────── */
 :root {
-  --blue:         #1B6EC2;
-  --blue-hover:   #155FAF;
-  --blue-active:  #1054A0;
-  --blue-light:   #EBF3FF;
-  --blue-border:  #BDD8FF;
+  --blue:         #1560D8;  /* Aumentado saturación: más vibrante, más audaz que #1B6EC2 */
+  --blue-hover:   #0F4BA0;  /* Hover más pronunciado */
+  --blue-active:  #0A3A7F;  /* Active más decisivo */
+  --blue-light:   #E8F1FF;  /* Más saturado que #EBF3FF */
+  --blue-border:  #B3D9FF;  /* Más vibrante */
 
   --text:         #1D1D1F;
   --text-2:       #4A4A50;   /* era #6E6E73 — más contraste para texto secundario */
@@ -29,9 +29,9 @@
   --radius:     10px;
   --radius-lg:  14px;
 
-  --shadow-xs: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
-  --shadow-sm: 0 2px 8px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.07);
-  --shadow:    0 8px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);  /* Más définido */
+  --shadow-sm: 0 4px 12px rgba(0,0,0,.15), 0 16px 40px rgba(0,0,0,.10);  /* Más audaz que antes */
+  --shadow:    0 12px 36px rgba(0,0,0,.18), 0 4px 8px rgba(0,0,0,.12);  /* Sombras más dramáticas */
 
   /* Escala de spacing: base 4px para ritmo consistente */
   --space-xs:   0.25rem;  /* 4px  — tight spacing entre elementos relacionados */
@@ -954,15 +954,13 @@ button {
   cursor: pointer;
   transition: background 0.15s, box-shadow 0.15s;
   letter-spacing: -0.01em;
-  box-shadow: 0 2px 8px rgba(27,110,194,.30);
-}
-
-.btn-confirm:hover {
-  box-shadow: 0 4px 14px rgba(27,110,194,.40);
+  box-shadow: 0 4px 16px rgba(21,96,216,.35);  /* Más audaz */
 }
 
 .btn-confirm:hover {
   background: var(--blue-hover);
+  box-shadow: 0 8px 24px rgba(21,96,216,.50);  /* Hover muy dramático */
+  transform: translateY(-2px);  /* Pequeña elevación */
 }
 
 .btn-cancel {
@@ -1087,11 +1085,11 @@ button {
 }
 
 .section-heading {
-  font-size: 1.35rem;
+  font-size: 1.5rem;  /* Aumentado de 1.35rem — más presencia */
   font-weight: 700;
   color: var(--text);
   margin-bottom: 0.4rem;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;  /* Más apretado para drama */
 }
 
 .section-sub {
@@ -1228,8 +1226,8 @@ button {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.7rem 1rem;
-  background: var(--bg);
+  padding: 0.9rem 1rem;  /* Más padding para presencia */
+  background: linear-gradient(135deg, #DFE9F6 0%, #EDF1F7 100%);  /* Fondo más visual que plano */
   flex-wrap: wrap;
   transition: background 0.15s;
 }
