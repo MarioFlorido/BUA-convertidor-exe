@@ -31,14 +31,6 @@ export type {
   SemanticBlock,
 } from '../core/models/SemanticDocument';
 
-export interface Theme {
-  id: string;
-  name: string;
-  activity: string;
-  language: string;
-  description: string;
-}
-
 export interface ConversionState {
   status: 'idle' | 'loading' | 'processing' | 'complete' | 'error';
   progress?: DocxImportProgress;
