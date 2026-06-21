@@ -12,7 +12,7 @@
 
   --text:         #1D1D1F;
   --text-2:       #4A4A50;   /* era #6E6E73 — más contraste para texto secundario */
-  --text-3:       #8E8E93;   /* era #AEAEB2 — más contraste para texto terciario */
+  --text-3:       #626268;   /* Actualizado a #626268 para alcanzar 4.5:1 WCAG AA (6.06:1 sobre blanco, 5.34:1 sobre fondo) */
 
   --border:       #D2D2D7;
   --border-light: #E8E8ED;
@@ -917,8 +917,7 @@ button {
 .download-error {
   color: var(--red);
   background: var(--red-light);
-  border: 1px solid rgba(217,43,43,.2);
-  border-left: 3px solid var(--red);
+  border: 1px solid rgba(217,43,43,.3);
   padding: 0.875rem 1rem;
   border-radius: var(--radius-sm);
   font-size: 0.825rem;
@@ -995,8 +994,7 @@ button {
 /* ── Error ───────────────────────────────────────────────────────────────── */
 .error-message {
   background: var(--red-light);
-  border: 1px solid rgba(217,43,43,.2);
-  border-left: 3px solid var(--red);
+  border: 1px solid rgba(217,43,43,.3);
   padding: 1rem;
   border-radius: var(--radius-sm);
   margin-top: 1rem;
@@ -2053,6 +2051,12 @@ button {
   color: var(--text);
 }
 
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-3);
+  opacity: 1;
+}
+
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
   outline: none;
   border-color: var(--blue);
@@ -2506,6 +2510,7 @@ button {
 .admin-meta-edit input:focus {
   outline: none;
   border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-light);
 }
 
 .admin-meta-edit-actions {

@@ -1,0 +1,10 @@
+{
+  "framework": "react-vite",
+  "files": [
+    "src/main.tsx",
+    "index.html"
+  ],
+  "insertBefore": "</body>",
+  "commentSyntax": "// %s",
+  "cspChecked": true
+}

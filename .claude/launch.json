@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "cd \"$HOME/BUA-convertidor-exe\" && npm run dev"],
-      "port": 5174,
-      "autoPort": true
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173,
+      "autoPort": false
     }
   ]
 }
