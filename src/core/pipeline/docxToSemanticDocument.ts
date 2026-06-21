@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { escapeHtml } from './utils/html';
+import { escapeHtml } from '../utils/html';
 
 /**
  * Pipeline Semántica - Convierte DOCX/HTML a SemanticDocument (SemanticDocument)
@@ -17,9 +17,9 @@ import { escapeHtml } from './utils/html';
  * del documento de forma agnóstica al formato de salida.
  */
 
-import { DocxParser } from './parsers/DocxParser';
+import { DocxParser } from '../parsers/DocxParser';
 import { buildProjectFromStructure } from './buildFromStructure';
-import { applyAllTransforms } from './transformers/HtmlTransformer';
+import { applyAllTransforms } from '../transformers/HtmlTransformer';
 import type {
   DocxImportProgress,
   DocxImportOptions,
@@ -27,7 +27,7 @@ import type {
   SemanticPage,
   SemanticBlock,
   DocumentStructure,
-} from '../types';
+} from '../../types';
 
 /**
  * Convertir archivo DOCX a SemanticDocument (SemanticDocument)

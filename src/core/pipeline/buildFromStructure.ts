@@ -1,10 +1,10 @@
-import type { SemanticDocument } from './models/SemanticDocument';
-import { SemanticBuilder } from './builders/SemanticBuilder';
-import type { DocumentStructure } from '../types';
-import { normalizeText } from './utils/html';
+import type { SemanticDocument } from '../models/SemanticDocument';
+import { SemanticBuilder } from '../builders/SemanticBuilder';
+import type { DocumentStructure } from '../../types';
+import { normalizeText } from '../utils/html';
 
 // Re-exportar funciones de transformación HTML
-export { applyDivClasses, applyTableClasses } from './transformers/HtmlTransformer';
+export { applyDivClasses, applyTableClasses } from '../transformers/HtmlTransformer';
 
 interface DocumentSection {
   level: number;

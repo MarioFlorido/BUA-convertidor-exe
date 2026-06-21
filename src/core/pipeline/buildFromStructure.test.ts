@@ -24,7 +24,7 @@ g.NodeFilter = jsdom.window.NodeFilter;
 
 import { parseDocumentStructure } from './parseStructure';
 import { buildProjectFromStructure } from './buildFromStructure';
-import type { DocumentStructure } from '../types';
+import type { DocumentStructure } from '../../types';
 
 /** Pipeline completo: HTML → estructura (por defecto) → SemanticDocument. */
 async function convert(html: string, mutate?: (s: DocumentStructure) => void) {

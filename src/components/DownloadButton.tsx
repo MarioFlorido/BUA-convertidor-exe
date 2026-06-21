@@ -130,7 +130,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
       <div className="pdf-download-group">
         <button onClick={handleDownloadElpx} className="btn-download-elpx" disabled={elpxLoading}>
           <img
-            src={`${base}elpx-icon.png`}
+            src={`${base}img/elpx-icon.png`}
             alt=""
             className="download-btn-icon"
             aria-hidden="true"
@@ -176,7 +176,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           title={!semanticDoc ? 'El documento semántico no está disponible' : undefined}
         >
           <img
-            src={`${base}pdf.png`}
+            src={`${base}img/pdf.png`}
             alt=""
             className="download-btn-icon"
             aria-hidden="true"
@@ -187,8 +187,8 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
               {printLoading ? 'Generando vista de impresión…' : 'Vista previa para imprimir / PDF'}
             </span>
             <span className="download-btn-sub-browser">
-              Mejores resultados con los navegadores Google Chrome <img src={`${base}minichrome.png`} alt="Chrome" className="browser-icon" aria-hidden="true" /> o Microsoft Edge   
-              <img src={`${base}miniedge.png`} alt="Edge" className="browser-icon" aria-hidden="true" />
+              Mejores resultados con los navegadores Google Chrome <img src={`${base}img/minichrome.png`} alt="Chrome" className="browser-icon" aria-hidden="true" /> o Microsoft Edge   
+              <img src={`${base}img/miniedge.png`} alt="Edge" className="browser-icon" aria-hidden="true" />
             </span>
           </div>
           {!printLoading && <DownloadArrow />}

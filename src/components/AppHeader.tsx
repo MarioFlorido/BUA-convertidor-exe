@@ -41,7 +41,7 @@ export function AppHeader({ onThemeManagerClick, helpEnabled, onToggleHelp }: Ap
           title="Biblioteca Universitaria de la Universidad de Alicante"
         >
           <img
-            src={`${import.meta.env.BASE_URL}logo_BUA.png`}
+            src={`${import.meta.env.BASE_URL}img/logo_BUA.png`}
             alt="BUA — Biblioteca Universitaria de la Universidad de Alicante"
             className="header-bua-logo"
           />

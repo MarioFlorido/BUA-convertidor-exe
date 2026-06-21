@@ -7,9 +7,9 @@ import { DownloadButton } from './components/DownloadButton';
 import { AppHeader } from './components/AppHeader';
 import { StepIndicator } from './components/StepIndicator';
 import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
-import { convertDocxToSemanticDocument } from './core/docxToSemanticDocument';
+import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
-import { parseDocumentStructure } from './core/parseStructure';
+import { parseDocumentStructure } from './core/pipeline/parseStructure';
 import { DocxParser } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
@@ -263,7 +263,7 @@ export function App() {
             {file && (screen === 'structure' || screen === 'theme') && (
               <div className="doc-title-banner">
                 <img
-                  src={`${import.meta.env.BASE_URL}docx.png`}
+                  src={`${import.meta.env.BASE_URL}img/docx.png`}
                   alt=""
                   className="doc-title-icon"
                   aria-hidden="true"
@@ -373,7 +373,7 @@ export function App() {
             title="Universidad de Alicante"
           >
             <img
-              src={`${import.meta.env.BASE_URL}logo_UA.png`}
+              src={`${import.meta.env.BASE_URL}img/logo_UA.png`}
               alt="Universidad de Alicante"
               className="footer-ua-logo"
             />
@@ -386,7 +386,7 @@ export function App() {
             title="CID — Competencia Informacional y Digital"
           >
             <img
-              src={`${import.meta.env.BASE_URL}logo_CID.png`}
+              src={`${import.meta.env.BASE_URL}img/logo_CID.png`}
               alt="CID — Centro de Información Documental"
               className="footer-cid-logo"
             />
