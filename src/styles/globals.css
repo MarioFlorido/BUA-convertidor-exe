@@ -33,6 +33,14 @@
   --shadow-sm: 0 2px 8px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.07);
   --shadow:    0 8px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08);
 
+  /* Escala de spacing: base 4px para ritmo consistente */
+  --space-xs:   0.25rem;  /* 4px  — tight spacing entre elementos relacionados */
+  --space-sm:   0.5rem;   /* 8px  — comfortable spacing */
+  --space-md:   1rem;     /* 16px — standard spacing entre elementos */
+  --space-lg:   1.5rem;   /* 24px — generous spacing entre grupos */
+  --space-xl:   2rem;     /* 32px — large separation entre conceptos */
+  --space-xxl:  2.75rem;  /* 44px — extra large separation entre secciones */
+
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -393,7 +401,7 @@ button {
   flex: 1;
   max-width: 900px;
   margin: 0 auto;
-  padding: 2.75rem 2rem;  /* más aire vertical y horizontal */
+  padding: var(--space-xxl) var(--space-xl);  /* 44px vertical, 32px horizontal — ritmo generoso */
   width: 100%;
 }
 
@@ -627,7 +635,7 @@ button {
 .result-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-lg);  /* 24px — generous spacing entre resultados */
 }
 
 .result-success-card {
@@ -1198,7 +1206,7 @@ button {
 .structure-sections {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: var(--space-lg);  /* 24px — generous spacing entre H1 cards para jerarquía clara */
 }
 
 /* H1 Card */
@@ -1393,8 +1401,8 @@ button {
 .h2-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.45rem 0;
+  gap: var(--space-md);  /* 16px — standard spacing */
+  padding: var(--space-sm) 0;  /* 8px vertical — tight within group */
   border-bottom: 1px solid var(--border-light);
   flex-wrap: wrap;
 }
