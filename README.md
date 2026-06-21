@@ -185,10 +185,6 @@ Lo que está hecho:
 -  Tests automatizados de la capa de transformación HTML (`npm test`)
 -  Agrupación de temas por familia/idioma en selector y administración
 
-Lo que me falta:
-
--  Unificar la interfaz `DocumentStructure`, hoy definida dos veces (`src/types/index.ts` y `src/core/models/SemanticDocument.ts`) con una pequeña divergencia (la primera lleva `id` en los items). Deuda técnica menor, sin impacto funcional.
-
 Para la versión 2:
 
 - Vista previa en tiempo real con editor de estructura tipo arbol. Despues de parsear con las utilidades de: drag & drop, mover secciones y cambiar niveles
