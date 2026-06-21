@@ -54,7 +54,7 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
       >
         <div className="upload-content">
           <img
-            src={`${import.meta.env.BASE_URL}docx.png`}
+            src={`${import.meta.env.BASE_URL}img/docx.png`}
             alt=""
             className="upload-icon"
             aria-hidden="true"

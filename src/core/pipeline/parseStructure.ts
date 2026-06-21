@@ -1,5 +1,5 @@
-import type { DocumentStructure, H1Section, H2Item } from '../types';
-import { normalizeText } from './utils/html';
+import type { DocumentStructure, H1Section, H2Item } from '../../types';
+import { normalizeText } from '../utils/html';
 
 /**
  * ¿El elemento aporta contenido real aunque no tenga texto?

@@ -149,8 +149,6 @@ public/*.zip
 .DS_Store
 **/.DS_Store
 
-# Entregables locales que NO van al repo (informes descargables, etc.)
-INFORME-ESTILO-INTERFAZ.html
-INVENTARIO-REPOSITORIO.md
-AUDITORIA-REPOSITORIO.md
-AUDITORIA-ARQUITECTURA-v0.3.0.md
+# Entregables locales que NO van al repo (informes de auditoría, etc.)
+# Consolidados en audits/ (audits/AUDITORIA.md vigente + audits/archivo/).
+/audits/
