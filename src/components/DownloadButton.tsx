@@ -29,11 +29,52 @@ function DownloadArrow() {
   );
 }
 
+interface DownloadToggleProps {
+  /** Etiqueta fija que nombra la opción — nunca cambia de texto con el estado. */
+  label: string;
+  /** Aclaración corta opcional bajo la etiqueta (p.ej. el formato de la numeración). */
+  caption?: string;
+  checked: boolean;
+  onChange: () => void;
+}
+
+/**
+ * Toggle con etiqueta fija + palabra de estado (No/Sí) + switch.
+ * La etiqueta nombra la función; el estado se lee en una palabra, sin
+ * depender solo del color/posición del switch.
+ */
+function DownloadToggle({ label, caption, checked, onChange }: DownloadToggleProps) {
+  return (
+    <span className="pdf-cover-toggle-inline">
+      <span className="pdf-cover-toggle-inline__label-group">
+        <span className="pdf-cover-toggle-inline__label">{label}</span>
+        {caption && <span className="pdf-cover-toggle-inline__caption">{caption}</span>}
+      </span>
+      <span className="toggle-state-control">
+        <span className={`toggle-state-word ${checked ? 'toggle-state-word--on' : ''}`}>
+          {checked ? 'Sí' : 'No'}
+        </span>
+        <button
+          role="switch"
+          aria-checked={checked}
+          aria-label={label}
+          title={checked ? 'Desactivar' : 'Activar'}
+          onClick={onChange}
+          className={`toggle-switch ${checked ? 'toggle-switch--on' : ''}`}
+        >
+          <span className="toggle-switch__thumb" />
+        </button>
+      </span>
+    </span>
+  );
+}
+
 export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx }: DownloadButtonProps) {
   const [printLoading, setPrintLoading] = useState(false);
   const [printError, setPrintError] = useState<string | null>(null);
   const [printNotice, setPrintNotice] = useState<string | null>(null);
   const [useCoverImage, setUseCoverImage] = useState(false);
+  const [numberedHeadings, setNumberedHeadings] = useState(false);
   const [navExpanded, setNavExpanded] = useState(false);
   const [elpxLoading, setElpxLoading] = useState(false);
   const [elpxError, setElpxError] = useState<string | null>(null);
@@ -92,6 +133,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
         includeCover: true,
         includeToc: true,
         useCoverImage,
+        numberedHeadings,
       });
 
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
@@ -144,21 +186,11 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </div>
           {!elpxLoading && <DownloadArrow />}
         </button>
-        <span className="pdf-cover-toggle-inline">
-          <span className="pdf-cover-toggle-inline__label">
-            {navExpanded ? 'Menú lateral desplegado' : 'Menú lateral plegado'}
-          </span>
-          <button
-            role="switch"
-            aria-checked={navExpanded}
-            aria-label="Estado del menú lateral"
-            title={navExpanded ? 'El menú arrancará desplegado' : 'El menú arrancará plegado (por defecto)'}
-            onClick={() => setNavExpanded((v) => !v)}
-            className={`toggle-switch ${navExpanded ? 'toggle-switch--on' : ''}`}
-          >
-            <span className="toggle-switch__thumb" />
-          </button>
-        </span>
+        <DownloadToggle
+          label="Menú lateral desplegado"
+          checked={navExpanded}
+          onChange={() => setNavExpanded((v) => !v)}
+        />
       </div>
 
       {elpxError && (
@@ -193,21 +225,19 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </div>
           {!printLoading && <DownloadArrow />}
         </button>
-        <span className="pdf-cover-toggle-inline">
-          <span className="pdf-cover-toggle-inline__label">
-            {useCoverImage ? 'Con foto de portada' : 'Sin foto de portada'}
-          </span>
-          <button
-            role="switch"
-            aria-checked={useCoverImage}
-            aria-label="Imagen de portada"
-            title={useCoverImage ? 'Desactivar imagen de portada' : 'Activar imagen de portada'}
-            onClick={() => setUseCoverImage((v) => !v)}
-            className={`toggle-switch ${useCoverImage ? 'toggle-switch--on' : ''}`}
-          >
-            <span className="toggle-switch__thumb" />
-          </button>
-        </span>
+        <div className="pdf-toggle-stack">
+          <DownloadToggle
+            label="Foto de portada"
+            checked={useCoverImage}
+            onChange={() => setUseCoverImage((v) => !v)}
+          />
+          <DownloadToggle
+            label="Numerar títulos"
+            caption="1, 1.1, 1.1.1…"
+            checked={numberedHeadings}
+            onChange={() => setNumberedHeadings((v) => !v)}
+          />
+        </div>
       </div>
 
       {printError && (

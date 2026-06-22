@@ -8,6 +8,7 @@ interface TocEntry {
   id: string;
   title: string;
   level: 1 | 2 | 3 | 4;
+  number?: string;
 }
 
 /**
@@ -26,10 +27,12 @@ interface TocEntry {
  *
  * Generado DESDE SemanticDocument, NO parseando HTML renderizado.
  *
- * @param doc  Documento semántico fuente
+ * @param doc      Documento semántico fuente
+ * @param options  `numbered`: prefijar cada entrada con su numeración jerárquica (1, 1.1, 1.1.1…)
  */
-export function renderTableOfContents(doc: SemanticDocument): string {
-  const entries = buildTocEntries(doc.pages);
+export function renderTableOfContents(doc: SemanticDocument, options: { numbered?: boolean } = {}): string {
+  const numbers = options.numbered ? computeHeadingNumbers(doc.pages) : undefined;
+  const entries = buildTocEntries(doc.pages, numbers);
 
   if (entries.length === 0) {
     return '';
@@ -49,6 +52,28 @@ export function renderTableOfContents(doc: SemanticDocument): string {
 }
 
 /**
+ * Calcula la numeración jerárquica (1, 1.1, 1.1.1…) de las páginas de nivel 1-3,
+ * indexada por el índice original del array (el mismo que usa sectionId()).
+ *
+ * Asume orden de documento (pre-order): cada página de nivel N reinicia los
+ * contadores de los niveles N+1 en adelante.
+ */
+export function computeHeadingNumbers(pages: SemanticPage[]): Map<number, string> {
+  const counters = [0, 0, 0]; // niveles 1, 2, 3
+  const numbers = new Map<number, string>();
+
+  pages.forEach((page, idx) => {
+    if (page.level < 1 || page.level > 3) return;
+    const levelIdx = page.level - 1;
+    counters[levelIdx]++;
+    for (let l = levelIdx + 1; l < counters.length; l++) counters[l] = 0;
+    numbers.set(idx, counters.slice(0, levelIdx + 1).join('.'));
+  });
+
+  return numbers;
+}
+
+/**
  * Genera el ID estable de una sección de contenido.
  * Debe coincidir exactamente con el id="" que renderContentPages() pone en el HTML.
  */
@@ -58,7 +83,7 @@ export function sectionId(_page: SemanticPage, pageIndex: number): string {
 
 // ─── Helpers privados ─────────────────────────────────────────────────────────
 
-function buildTocEntries(pages: SemanticPage[]): TocEntry[] {
+function buildTocEntries(pages: SemanticPage[], numbers?: Map<number, string>): TocEntry[] {
   // CRÍTICO: usar el índice original del array completo, NO el del array filtrado.
   // El content renderer usa doc.pages[idx] para asignar id="section-{idx}".
   // Si filtramos primero y luego usamos el idx del array filtrado, los IDs no coinciden.
@@ -69,11 +94,13 @@ function buildTocEntries(pages: SemanticPage[]): TocEntry[] {
       id: sectionId(page, originalIdx),
       title: page.title,
       level: page.level as 1 | 2 | 3 | 4,
+      number: numbers?.get(originalIdx),
     }));
 }
 
 function renderTocItem(entry: TocEntry): string {
+  const prefix = entry.number ? `${entry.number} ` : '';
   return `<li class="toc-entry toc-level-${entry.level}">
-        <a href="#${entry.id}">${escHtml(entry.title.toUpperCase())}</a>
+        <a href="#${entry.id}">${prefix}${escHtml(entry.title.toUpperCase())}</a>
       </li>`;
 }

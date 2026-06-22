@@ -1,7 +1,7 @@
 import type { SemanticDocument, SemanticPage, SemanticBlock } from '../../models/SemanticDocument';
 import { loadPrintThemeAssets, type BuaBoxStyles } from './PrintThemeLoader';
 import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
-import { renderTableOfContents, sectionId } from './renderTableOfContents';
+import { renderTableOfContents, sectionId, computeHeadingNumbers } from './renderTableOfContents';
 import { optimizeImagesForPrint } from './optimizeImagesForPrint';
 import { escHtml, upperCaseH2 } from '../../utils/html';
 
@@ -50,6 +50,12 @@ export interface PrintRenderOptions {
    * para reducir peso y acelerar la paginación. Default: true.
    */
   optimizeImages?: boolean;
+
+  /**
+   * Numerar jerárquicamente los títulos de página/subpágina/sub-subpágina
+   * (1, 1.1, 1.1.1, 2…) tanto en el TOC como en el contenido. Default: false.
+   */
+  numberedHeadings?: boolean;
 }
 
 /**
@@ -100,6 +106,7 @@ export async function semanticDocumentToPrintHtml(
     includeToc = true,
     useCoverImage = true,
     optimizeImages = true,
+    numberedHeadings = false,
   } = options;
 
   // 1. Cargar assets del tema (portada_pdf.*, logos, colores)
@@ -114,10 +121,11 @@ export async function semanticDocumentToPrintHtml(
     : '';
 
   const tocHtml = includeToc
-    ? renderTableOfContents(doc)
+    ? renderTableOfContents(doc, { numbered: numberedHeadings })
     : '';
 
-  const { html: rawContentHtml, pageCount } = renderContentPages(doc);
+  const headingNumbers = numberedHeadings ? computeHeadingNumbers(doc.pages) : undefined;
+  const { html: rawContentHtml, pageCount } = renderContentPages(doc, headingNumbers);
 
   // 2b. Optimizar imágenes embebidas (redimensionar/recomprimir) para reducir
   //     peso del HTML/PDF y acelerar la paginación. No-op si no hay DOM.
@@ -151,9 +159,12 @@ export async function semanticDocumentToPrintHtml(
  * Cada SemanticPage se convierte en un <section> con id="section-{index}".
  * Ese ID es el que usa el TOC para target-counter().
  */
-function renderContentPages(doc: SemanticDocument): { html: string; pageCount: number } {
+function renderContentPages(
+  doc: SemanticDocument,
+  headingNumbers?: Map<number, string>,
+): { html: string; pageCount: number } {
   const sectionsHtml = doc.pages.map((page, idx) =>
-    renderSection(page, idx),
+    renderSection(page, idx, headingNumbers?.get(idx)),
   ).join('\n');
 
   return {
@@ -162,14 +173,15 @@ function renderContentPages(doc: SemanticDocument): { html: string; pageCount: n
   };
 }
 
-function renderSection(page: SemanticPage, idx: number): string {
+function renderSection(page: SemanticPage, idx: number, number?: string): string {
   const id = sectionId(page, idx);
   const blocksHtml = page.blocks.map(renderBlock).join('\n');
   const titleClass = `section-title-${page.level}`;
   const sectionClass = `section-level-${page.level}`;
+  const titleText = number ? `${number} ${page.title}` : page.title;
 
   return `<section id="${id}" class="${sectionClass}">
-  <h${page.level} class="${titleClass}">${escHtml(page.title.toUpperCase())}</h${page.level}>
+  <h${page.level} class="${titleClass}">${escHtml(titleText.toUpperCase())}</h${page.level}>
   ${blocksHtml}
 </section>`;
 }

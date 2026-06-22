@@ -17,6 +17,12 @@
   --border:       #D2D2D7;
   --border-light: #E8E8ED;
 
+  /* Switch (toggle) en estado apagado — neutros propios del componente.
+     El borde alcanza ≥3:1 sobre blanco para cumplir WCAG 1.4.11 (contorno de
+     componente de UI); el activo usa --blue. */
+  --switch-track:        #C7CBD3;
+  --switch-track-border: #7D8497;
+
   --surface:      #FFFFFF;
   --bg:           #EDF1F7;   /* azul grisáceo institucional — más carácter que el gris plano */
 
@@ -747,58 +753,105 @@ button {
   gap: 0.625rem;
 }
 
-/* ── Grupo PDF: botón + switch de portada (elementos hermanos, no anidados) ── */
+/* ── Grupo de descarga: botón (crece) + clúster de opciones (ancho fijo) ──
+   El clúster tiene ancho fijo y queda a la derecha, así TODOS los switches
+   (ELPX y PDF) comparten el mismo eje vertical y la etiqueta queda junto a
+   su control, sin el hueco vacío que aparecía cuando los toggles ocupaban
+   todo el ancho sobrante. */
 .pdf-download-group {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 1.5rem;
   width: 100%;
-  min-height: 72px;
+  min-height: 88px;
 }
 
-.pdf-download-group .btn-download-pdf {
-  flex: 1;
-  width: auto;
-}
-
-/* ── Switch imagen de portada PDF ─────────────────────────── */
-.pdf-cover-toggle-inline {
+/* ── Pila de switches del bloque PDF (portada, numeración…) ── */
+.pdf-toggle-stack {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  flex: 0 0 240px;
+}
+
+/* El toggle suelto del ELPX comparte el mismo ancho de clúster que el bloque PDF. */
+.pdf-download-group > .pdf-cover-toggle-inline {
+  flex: 0 0 240px;
+}
+
+/* ── Fila de toggle: rejilla [etiqueta | control] → switches alineados ── */
+.pdf-cover-toggle-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
+  column-gap: 0.75rem;
+}
+
+.pdf-cover-toggle-inline__label-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
 .pdf-cover-toggle-inline__label {
   font-size: 0.72rem;
-  color: var(--text-2, #6b7280);
+  color: var(--text-2);
   white-space: nowrap;
   user-select: none;
 }
 
+.pdf-cover-toggle-inline__caption {
+  font-size: 0.62rem;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.toggle-state-control {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.toggle-state-word {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-2);
+  min-width: 1.1rem;
+  text-align: right;
+  user-select: none;
+}
+
+.toggle-state-word--on {
+  color: var(--blue);
+}
+
 .toggle-switch {
   position: relative;
-  width: 40px;
-  height: 22px;
-  background: #d1d5db;
-  border: none;
-  border-radius: 11px;
+  width: 44px;
+  height: 24px;
+  background: var(--switch-track);
+  border: 1px solid var(--switch-track-border);
+  border-radius: 12px;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
   padding: 0;
 }
 
 .toggle-switch--on {
   background: var(--blue);
+  border-color: var(--blue);
 }
 
 .toggle-switch__thumb {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   background: #fff;
   border-radius: 50%;
   transition: transform 0.2s;
@@ -807,7 +860,7 @@ button {
 }
 
 .toggle-switch--on .toggle-switch__thumb {
-  transform: translateX(18px);
+  transform: translateX(20px);
 }
 
 .btn-download-elpx,
@@ -815,9 +868,9 @@ button {
   display: flex;
   align-items: center;
   gap: 0.875rem;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 0.875rem 1.25rem;
+  padding: 1.25rem 1.25rem;
   border-radius: var(--radius);
   font-size: 0.875rem;
   font-weight: 500;
@@ -825,7 +878,7 @@ button {
   text-align: left;
   transition: all 0.15s;
   letter-spacing: -0.01em;
-  min-height: 60px;
+  min-height: 88px;
 }
 
 .btn-download-elpx {
@@ -900,16 +953,14 @@ button {
 .download-btn-sub-browser {
   font-size: 0.75rem;
   color: #8E8E93;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
+  line-height: 1.45;
 }
 
 .browser-icon {
   width: 14px;
   height: 14px;
-  flex-shrink: 0;
+  vertical-align: -2px;
+  margin: 0 1px;
 }
 
 .download-btn-arrow {
@@ -2598,6 +2649,19 @@ button {
 
   .result-stats-card {
     grid-template-columns: 1fr 1fr;
+  }
+
+  /* Descargas: el botón y su clúster de opciones se apilan en vertical. */
+  .pdf-download-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .pdf-toggle-stack,
+  .pdf-download-group > .pdf-cover-toggle-inline {
+    flex: none;
+    width: 100%;
   }
 
   .h1-card-header {

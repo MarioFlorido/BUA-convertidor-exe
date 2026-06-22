@@ -12,6 +12,8 @@ colors:
   text-tertiary: "#8E8E93"
   border-standard: "#D2D2D7"
   border-light: "#E8E8ED"
+  switch-track: "#C7CBD3"
+  switch-track-border: "#7D8497"
   surface-default: "#FFFFFF"
   background-institutional: "#EDF1F7"
   feedback-success: "#34C759"
@@ -129,6 +131,7 @@ La paleta es restringida e institucional. El azul domina las acciones primarias;
 - **Texto Terciario** (#8E8E93): Placeholder de entrada, texto deshabilitado, notas muy reducidas. Mantiene contraste 4.5:1 contra fondo blanco.
 - **Borde Estándar** (#D2D2D7): Bordes de entrada, separadores moderados, estructura. Visible sin dominar.
 - **Borde Claro** (#E8E8ED): Divisores sutiles, líneas dentro de tarjetas, separadores de bajo peso. Apenas visible pero define estructura.
+- **Switch Apagado** (#C7CBD3 relleno / #7D8497 borde): Neutros propios del componente toggle en estado apagado. El borde alcanza ≥3:1 sobre blanco para cumplir WCAG 1.4.11 (contorno de componente de UI); el estado activo usa el azul corporativo.
 - **Superficie Predeterminada** (#FFFFFF): Blanco puro para contenido, tarjetas, paneles. Máxima legibilidad.
 - **Fondo Institucional** (#EDF1F7): Azul grisáceo muy suave como fondo de página. No es un neutral puro; retiene un matiz institucional sin ser saturado. Alternativa a blanco cuando se necesita definición visual suave de áreas.
 
