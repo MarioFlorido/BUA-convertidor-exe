@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Toggle } from './Toggle';
 import type { ImportToElpxResult, SemanticDocument } from '../types';
 // El módulo de impresión embebe Paged.js (~491 KB); se carga de forma diferida
 // (import dinámico en handleExportPrint) para no inflar el bundle inicial.
@@ -26,46 +27,6 @@ function DownloadArrow() {
     >
       <path d="M10 3v10M6 9l4 4 4-4M3 17h14" />
     </svg>
-  );
-}
-
-interface DownloadToggleProps {
-  /** Etiqueta fija que nombra la opción — nunca cambia de texto con el estado. */
-  label: string;
-  /** Aclaración corta opcional bajo la etiqueta (p.ej. el formato de la numeración). */
-  caption?: string;
-  checked: boolean;
-  onChange: () => void;
-}
-
-/**
- * Toggle con etiqueta fija + palabra de estado (No/Sí) + switch.
- * La etiqueta nombra la función; el estado se lee en una palabra, sin
- * depender solo del color/posición del switch.
- */
-function DownloadToggle({ label, caption, checked, onChange }: DownloadToggleProps) {
-  return (
-    <span className="pdf-cover-toggle-inline">
-      <span className="pdf-cover-toggle-inline__label-group">
-        <span className="pdf-cover-toggle-inline__label">{label}</span>
-        {caption && <span className="pdf-cover-toggle-inline__caption">{caption}</span>}
-      </span>
-      <span className="toggle-state-control">
-        <span className={`toggle-state-word ${checked ? 'toggle-state-word--on' : ''}`}>
-          {checked ? 'Sí' : 'No'}
-        </span>
-        <button
-          role="switch"
-          aria-checked={checked}
-          aria-label={label}
-          title={checked ? 'Desactivar' : 'Activar'}
-          onClick={onChange}
-          className={`toggle-switch ${checked ? 'toggle-switch--on' : ''}`}
-        >
-          <span className="toggle-switch__thumb" />
-        </button>
-      </span>
-    </span>
   );
 }
 
@@ -186,7 +147,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </div>
           {!elpxLoading && <DownloadArrow />}
         </button>
-        <DownloadToggle
+        <Toggle
           label="Menú lateral desplegado"
           checked={navExpanded}
           onChange={() => setNavExpanded((v) => !v)}
@@ -226,12 +187,12 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           {!printLoading && <DownloadArrow />}
         </button>
         <div className="pdf-toggle-stack">
-          <DownloadToggle
+          <Toggle
             label="Foto de portada"
             checked={useCoverImage}
             onChange={() => setUseCoverImage((v) => !v)}
           />
-          <DownloadToggle
+          <Toggle
             label="Numerar títulos"
             caption="1, 1.1, 1.1.1…"
             checked={numberedHeadings}

@@ -4,8 +4,7 @@ import { StructureConfigurator } from './components/StructureConfigurator';
 import { ThemeSelector } from './components/ThemeSelector';
 import { ThemeManager } from './components/ThemeManager';
 import { DownloadButton } from './components/DownloadButton';
-import { AppHeader } from './components/AppHeader';
-import { StepIndicator } from './components/StepIndicator';
+import { Sidebar } from './components/Sidebar';
 import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
@@ -57,7 +56,7 @@ export function App() {
   // Interruptor de ayuda contextual: activado por defecto, persiste la
   // preferencia del usuario en localStorage (no es un "ya lo he visto" de
   // una sola vez, sino un on/off explícito que el usuario controla siempre
-  // desde el switch de la cabecera).
+  // desde el switch del sidebar).
   const [helpEnabled, setHelpEnabled] = useState<boolean>(() => {
     const stored = localStorage.getItem(HELP_ENABLED_KEY);
     return stored === null ? true : stored === 'true';
@@ -190,27 +189,21 @@ export function App() {
 
   return (
     <div className="app">
-      <AppHeader
-        onThemeManagerClick={() => setScreen('theme-manager')}
-        helpEnabled={helpEnabled}
-        onToggleHelp={handleToggleHelp}
-      />
-
       {helpEnabled && screen !== 'theme-manager' && !isProcessing && (
         <WelcomeTour screen={screen as TourScreen} />
       )}
 
-      {/* Barra de pasos — solo en el flujo principal */}
-      {screen !== 'theme-manager' && (
-        <div className="step-bar">
-          <StepIndicator
-            currentStep={isProcessing ? 3 : currentStep}
-            onStepClick={!isProcessing ? handleStepClick : undefined}
-          />
-        </div>
-      )}
+      <div className="app-body">
+        <Sidebar
+          currentStep={isProcessing ? 3 : currentStep}
+          onStepClick={!isProcessing ? handleStepClick : undefined}
+          showPipeline={screen !== 'theme-manager'}
+          onThemeManagerClick={() => setScreen('theme-manager')}
+          helpEnabled={helpEnabled}
+          onToggleHelp={handleToggleHelp}
+        />
 
-      <main className={`container${screen === 'structure' ? ' container--wide' : ''}${screen === 'upload' ? ' container--center' : ''}`}>
+        <main className={`container${screen === 'upload' ? ' container--center' : ''}`}>
 
         {/* ── Conversión en curso ── */}
         {isProcessing && (
@@ -362,7 +355,8 @@ export function App() {
             )}
           </div>
         )}
-      </main>
+        </main>
+      </div>
 
       <footer className="app-footer">
         <div className="footer-logos">
