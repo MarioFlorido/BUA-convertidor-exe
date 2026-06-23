@@ -87,6 +87,32 @@ export function extractPalette(css: string): string[] {
   return out;
 }
 
+/**
+ * Avisos de calidad sobre el CONTENIDO de style.css, aislados de la validación
+ * de la carpeta completa. Reutilizado por el wizard de publicación y por el
+ * editor rápido de CSS (que solo tiene el texto editado, no la carpeta).
+ */
+export function validateCssText(css: string): { warnings: string[] } {
+  const warnings: string[] = [];
+
+  const missingClasses = EXPECTED_BUA_CLASSES.filter((cls) => !css.includes(cls));
+  if (missingClasses.length > 0) {
+    warnings.push(`Faltan clases BUA en style.css: ${missingClasses.join(', ')}.`);
+  }
+
+  if (!/content\s*:/.test(css)) {
+    warnings.push('No se detectó ninguna regla `content:` (los iconos de los pseudo-elementos podrían no mostrarse).');
+  }
+
+  if (!/\/\*[^]*?Paleta:/i.test(css)) {
+    warnings.push('No se encontró el comentario `Paleta:` en style.css: no se podrán extraer los colores del tema.');
+  } else if (extractPalette(css).length === 0) {
+    warnings.push('El comentario `Paleta:` no contiene colores hex reconocibles.');
+  }
+
+  return { warnings };
+}
+
 export function validateThemeForPublish(
   files: Record<string, Uint8Array>,
 ): ThemeValidationReport {
@@ -115,24 +141,8 @@ export function validateThemeForPublish(
   let palette: string[] = [];
   if (cssBytes) {
     const css = decode(cssBytes);
-
-    const missingClasses = EXPECTED_BUA_CLASSES.filter((cls) => !css.includes(cls));
-    if (missingClasses.length > 0) {
-      warnings.push(`Faltan clases BUA en style.css: ${missingClasses.join(', ')}.`);
-    }
-
-    if (!/content\s*:/.test(css)) {
-      warnings.push('No se detectó ninguna regla `content:` (los iconos de los pseudo-elementos podrían no mostrarse).');
-    }
-
-    if (!/\/\*[^]*?Paleta:/i.test(css)) {
-      warnings.push('No se encontró el comentario `Paleta:` en style.css: no se podrán extraer los colores del tema.');
-    } else {
-      palette = extractPalette(css);
-      if (palette.length === 0) {
-        warnings.push('El comentario `Paleta:` no contiene colores hex reconocibles.');
-      }
-    }
+    warnings.push(...validateCssText(css).warnings);
+    palette = extractPalette(css);
   }
 
   // 4. Metadatos

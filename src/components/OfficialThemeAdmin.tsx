@@ -2,10 +2,59 @@ import { useState } from 'react';
 import { GitHubAuthService, type TokenPersistence } from '../core/services/admin/GitHubAuthService';
 import { GitHubThemePublisher, type PublishResult } from '../core/services/admin/GitHubThemePublisher';
 import { readThemeDirectory, isDirectoryPickerSupported } from '../core/services/admin/readThemeDirectory';
-import { validateThemeForPublish, type ThemeValidationReport } from '../core/services/admin/themeValidation';
+import {
+  validateThemeForPublish,
+  validateCssText,
+  type ThemeValidationReport,
+} from '../core/services/admin/themeValidation';
 import { screenshotToObjectUrl } from '../core/services/themeConfigParser';
 import { DEFAULT_PUBLISH_BRANCH } from '../core/services/admin/githubRepo';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
+
+/** Extensiones que se muestran como miniatura en la pestaña "Archivos". */
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'];
+
+function isImagePath(relPath: string): boolean {
+  return IMAGE_EXTENSIONS.some((ext) => relPath.toLowerCase().endsWith(ext));
+}
+
+function guessMimeType(relPath: string): string {
+  const ext = relPath.toLowerCase().slice(relPath.lastIndexOf('.'));
+  const map: Record<string, string> = {
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+  };
+  return map[ext] ?? 'application/octet-stream';
+}
+
+function bytesToObjectUrl(bytes: Uint8Array, relPath: string): string {
+  const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  return URL.createObjectURL(new Blob([buffer], { type: guessMimeType(relPath) }));
+}
+
+/** Agrupa rutas relativas planas ("img/foo.png") por carpeta para el listado. */
+function groupFilesByFolder(relPaths: string[]): Array<{ folder: string; files: string[] }> {
+  const groups = new Map<string, string[]>();
+  for (const relPath of relPaths) {
+    const slash = relPath.lastIndexOf('/');
+    const folder = slash === -1 ? '' : relPath.slice(0, slash + 1);
+    const list = groups.get(folder) ?? [];
+    list.push(relPath);
+    groups.set(folder, list);
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([folder, files]) => ({ folder, files: files.sort() }));
+}
+
+interface ThemeFileEntry {
+  relPath: string;
+  thumbUrl: string | null;
+}
 
 interface LoadedTheme {
   id: string;
@@ -58,6 +107,24 @@ export function OfficialThemeAdmin() {
   const [editActivity, setEditActivity] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editOriginal, setEditOriginal] = useState({ name: '', activity: '', description: '' });
+
+  // ── Editor rápido de archivos (sin pasar por la carpeta completa) ──
+  const [fileEditId, setFileEditId] = useState<string | null>(null);
+  const [fileEditTab, setFileEditTab] = useState<'css' | 'files'>('css');
+  const [fileOpResult, setFileOpResult] = useState<string | null>(null);
+
+  const [cssText, setCssText] = useState('');
+  const [cssOriginal, setCssOriginal] = useState('');
+  const [cssWarnings, setCssWarnings] = useState<string[]>([]);
+  const [cssLoading, setCssLoading] = useState(false);
+  const [cssSaving, setCssSaving] = useState(false);
+  const [cssError, setCssError] = useState<string | null>(null);
+
+  const [themeFiles, setThemeFiles] = useState<ThemeFileEntry[] | null>(null);
+  const [filesLoading, setFilesLoading] = useState(false);
+  const [filesError, setFilesError] = useState<string | null>(null);
+  const [replacingPath, setReplacingPath] = useState<string | null>(null);
+  const [newFileFolder, setNewFileFolder] = useState('');
 
   // Temas oficiales cargados en la app (excluye "base", que no se borra).
   const officialThemes = ThemeRegistry.getAll().filter(
@@ -154,6 +221,7 @@ export function OfficialThemeAdmin() {
     setEditDescription(description);
     setEditOriginal({ name, activity, description });
     setDeletingId(null);
+    setFileEditId(null);
     setError(null);
   };
 
@@ -193,6 +261,153 @@ export function OfficialThemeAdmin() {
       setError(err instanceof Error ? err.message : 'Error eliminando el tema.');
     } finally {
       setBusy(false);
+    }
+  };
+
+  // ── Editor rápido de archivos ──────────────────────────────────────────────
+
+  const startEditFiles = async (themeId: string) => {
+    setFileEditId(themeId);
+    setFileEditTab('css');
+    setEditingId(null);
+    setDeletingId(null);
+    setError(null);
+    setFileOpResult(null);
+    setThemeFiles(null);
+    setFilesError(null);
+    setCssError(null);
+    setCssLoading(true);
+    try {
+      const text = await GitHubThemePublisher.fetchThemeFileText(themeId, 'style.css', branch);
+      setCssText(text);
+      setCssOriginal(text);
+      setCssWarnings(validateCssText(text).warnings);
+    } catch (err) {
+      setCssError(err instanceof Error ? err.message : 'Error leyendo style.css.');
+    } finally {
+      setCssLoading(false);
+    }
+  };
+
+  const cancelEditFiles = () => {
+    setFileEditId(null);
+    setThemeFiles(null);
+  };
+
+  const handleCssTextChange = (value: string) => {
+    setCssText(value);
+    setCssWarnings(validateCssText(value).warnings);
+  };
+
+  const handleSaveCss = async () => {
+    if (!fileEditId) return;
+    setCssSaving(true);
+    setCssError(null);
+    setFileOpResult(null);
+    try {
+      const res = await GitHubThemePublisher.updateThemeFile(
+        fileEditId,
+        'style.css',
+        new TextEncoder().encode(cssText),
+        { branch, dryRun },
+      );
+      setCssOriginal(cssText);
+      setFileOpResult(
+        dryRun
+          ? 'Simulación: se actualizaría style.css y la versión del tema.'
+          : `✓ style.css actualizado (commit ${res.commitSha?.slice(0, 7)}).`,
+      );
+    } catch (err) {
+      setCssError(err instanceof Error ? err.message : 'Error guardando style.css.');
+    } finally {
+      setCssSaving(false);
+    }
+  };
+
+  const loadThemeFiles = async (themeId: string) => {
+    setFilesLoading(true);
+    setFilesError(null);
+    try {
+      const relPaths = await GitHubThemePublisher.listThemeFiles(themeId, branch);
+      const entries = await Promise.all(
+        relPaths
+          .filter((p) => p !== 'config.xml') // estructural: solo editable vía carpeta completa
+          .map(async (relPath): Promise<ThemeFileEntry> => {
+            if (!isImagePath(relPath)) return { relPath, thumbUrl: null };
+            try {
+              const bytes = await GitHubThemePublisher.fetchThemeFileBytes(themeId, relPath, branch);
+              return { relPath, thumbUrl: bytesToObjectUrl(bytes, relPath) };
+            } catch {
+              return { relPath, thumbUrl: null }; // sin miniatura si falla la lectura; el archivo sigue listado
+            }
+          }),
+      );
+      setThemeFiles(entries);
+    } catch (err) {
+      setFilesError(err instanceof Error ? err.message : 'Error listando los archivos del tema.');
+    } finally {
+      setFilesLoading(false);
+    }
+  };
+
+  const handleOpenFilesTab = () => {
+    setFileEditTab('files');
+    if (fileEditId && themeFiles === null && !filesLoading) {
+      loadThemeFiles(fileEditId);
+    }
+  };
+
+  const handleReplaceFile = async (relPath: string, file: File) => {
+    if (!fileEditId) return;
+    setReplacingPath(relPath);
+    setFilesError(null);
+    setFileOpResult(null);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const res = await GitHubThemePublisher.updateThemeFile(fileEditId, relPath, bytes, { branch, dryRun });
+      setFileOpResult(
+        dryRun
+          ? `Simulación: se sustituiría ${relPath}.`
+          : `✓ ${relPath} sustituido (commit ${res.commitSha?.slice(0, 7)}).`,
+      );
+      if (!dryRun && isImagePath(relPath)) {
+        const thumbUrl = URL.createObjectURL(file);
+        setThemeFiles((prev) => prev?.map((f) => (f.relPath === relPath ? { ...f, thumbUrl } : f)) ?? null);
+      }
+    } catch (err) {
+      setFilesError(err instanceof Error ? err.message : `Error sustituyendo ${relPath}.`);
+    } finally {
+      setReplacingPath(null);
+    }
+  };
+
+  const handleAddNewFile = async (file: File) => {
+    if (!fileEditId) return;
+    const folder = newFileFolder.replace(/^\/+/, '');
+    const relPath = `${folder}${file.name}`;
+    if (relPath.includes('..')) {
+      setFilesError('Ruta de archivo no válida.');
+      return;
+    }
+    setReplacingPath(relPath);
+    setFilesError(null);
+    setFileOpResult(null);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const res = await GitHubThemePublisher.updateThemeFile(fileEditId, relPath, bytes, { branch, dryRun });
+      setFileOpResult(
+        dryRun
+          ? `Simulación: se añadiría ${relPath}.`
+          : `✓ ${relPath} añadido (commit ${res.commitSha?.slice(0, 7)}).`,
+      );
+      if (!dryRun) {
+        const thumbUrl = isImagePath(relPath) ? URL.createObjectURL(file) : null;
+        setThemeFiles((prev) => (prev ? [...prev, { relPath, thumbUrl }] : [{ relPath, thumbUrl }]));
+      }
+    } catch (err) {
+      setFilesError(err instanceof Error ? err.message : `Error añadiendo ${relPath}.`);
+    } finally {
+      setReplacingPath(null);
     }
   };
 
@@ -338,7 +553,141 @@ export function OfficialThemeAdmin() {
                     <strong>{t.metadata?.name ?? t.name}</strong>
                     <span className="theme-id">({t.id})</span>
                   </span>
-                  {editingId === t.id ? (
+                  {fileEditId === t.id ? (
+                    <div className="admin-file-edit">
+                      <div className="admin-file-tabs">
+                        <button
+                          type="button"
+                          className={`admin-file-tab${fileEditTab === 'css' ? ' admin-file-tab--active' : ''}`}
+                          onClick={() => setFileEditTab('css')}
+                        >
+                          CSS
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-file-tab${fileEditTab === 'files' ? ' admin-file-tab--active' : ''}`}
+                          onClick={handleOpenFilesTab}
+                        >
+                          Imágenes y otros archivos
+                        </button>
+                        <button type="button" className="link-button admin-file-edit-close" onClick={cancelEditFiles}>
+                          Cerrar
+                        </button>
+                      </div>
+
+                      {fileOpResult && <div className="alert alert-success">{fileOpResult}</div>}
+
+                      {fileEditTab === 'css' ? (
+                        <div className="admin-css-editor">
+                          {cssLoading ? (
+                            <p className="help-text">Cargando style.css…</p>
+                          ) : cssError ? (
+                            <div className="alert alert-error">{cssError}</div>
+                          ) : (
+                            <>
+                              <p className="help-text">
+                                Editando <code>style.css</code> directamente: se publica solo este
+                                archivo, sin tocar el resto del tema.
+                              </p>
+                              <textarea
+                                className="admin-css-textarea"
+                                value={cssText}
+                                onChange={(e) => handleCssTextChange(e.target.value)}
+                                spellCheck={false}
+                                rows={14}
+                              />
+                              {cssWarnings.map((w, i) => (
+                                <div key={i} className="alert alert-warning">{w}</div>
+                              ))}
+                              <div className="admin-css-actions">
+                                <span className="help-text">
+                                  Sube la <code>&lt;version&gt;</code> del tema automáticamente.
+                                </span>
+                                <button
+                                  className="btn-confirm"
+                                  onClick={handleSaveCss}
+                                  disabled={cssSaving || cssText === cssOriginal}
+                                  title={cssText === cssOriginal ? 'No has cambiado el CSS' : undefined}
+                                >
+                                  {cssSaving ? 'Guardando…' : dryRun ? 'Simular' : 'Guardar cambios CSS'}
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="admin-file-list">
+                          {filesLoading ? (
+                            <p className="help-text">Cargando archivos…</p>
+                          ) : filesError ? (
+                            <div className="alert alert-error">{filesError}</div>
+                          ) : themeFiles && themeFiles.length > 0 ? (
+                            groupFilesByFolder(themeFiles.map((f) => f.relPath)).map(({ folder, files }) => (
+                              <div key={folder || '(raíz)'} className="admin-file-group">
+                                <div className="admin-file-group-label">{folder || 'Raíz'}</div>
+                                {files.map((relPath) => {
+                                  const entry = themeFiles.find((f) => f.relPath === relPath);
+                                  return (
+                                    <div key={relPath} className="admin-file-row">
+                                      <span className="admin-file-row-info">
+                                        {entry?.thumbUrl && (
+                                          <img src={entry.thumbUrl} alt="" className="admin-file-thumb" />
+                                        )}
+                                        {relPath.slice(folder.length)}
+                                      </span>
+                                      <label
+                                        className={`btn-edit admin-file-replace-btn${replacingPath ? ' btn-edit--disabled' : ''}`}
+                                      >
+                                        {replacingPath === relPath ? '…' : 'Sustituir'}
+                                        <input
+                                          type="file"
+                                          hidden
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleReplaceFile(relPath, file);
+                                            e.target.value = '';
+                                          }}
+                                        />
+                                      </label>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ))
+                          ) : (
+                            <p className="help-text">No se encontraron archivos.</p>
+                          )}
+
+                          <div className="admin-file-add-row">
+                            <select
+                              value={newFileFolder}
+                              onChange={(e) => setNewFileFolder(e.target.value)}
+                              className="admin-select"
+                            >
+                              <option value="">raíz</option>
+                              <option value="img/">img/</option>
+                              <option value="icons/">icons/</option>
+                              <option value="fonts/">fonts/</option>
+                            </select>
+                            <label
+                              className={`admin-file-add-label${replacingPath ? ' btn-edit--disabled' : ''}`}
+                            >
+                              + Añadir archivo nuevo en esta carpeta…
+                              <input
+                                type="file"
+                                hidden
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleAddNewFile(file);
+                                  e.target.value = '';
+                                }}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : editingId === t.id ? (
                     <div className="admin-meta-edit">
                       <label>
                         Nombre
@@ -392,6 +741,13 @@ export function OfficialThemeAdmin() {
                     <span className="admin-theme-actions">
                       <button
                         className="btn-edit"
+                        onClick={() => startEditFiles(t.id)}
+                        disabled={busy}
+                      >
+                        Editar archivos
+                      </button>
+                      <button
+                        className="btn-edit"
                         onClick={() => startEdit(t)}
                         disabled={busy}
                       >
@@ -399,7 +755,7 @@ export function OfficialThemeAdmin() {
                       </button>
                       <button
                         className="btn-delete"
-                        onClick={() => { setDeletingId(t.id); setConfirmText(''); setError(null); }}
+                        onClick={() => { setDeletingId(t.id); setConfirmText(''); setError(null); setFileEditId(null); }}
                         disabled={busy}
                       >
                         Eliminar
@@ -411,9 +767,11 @@ export function OfficialThemeAdmin() {
             </div>
           )}
           <p className="help-text">
-            Para corregir solo el <strong>nombre, actividad o descripción</strong> usa «Editar metadatos»:
-            cambia el catálogo sin tocar los archivos del tema. Para sustituir los archivos del tema,
-            vuelve a publicar su carpeta (mismo id) en el asistente de abajo.
+            Para corregir solo el <strong>nombre, actividad o descripción</strong> usa «Editar metadatos».
+            Para un retoque puntual (un atributo CSS, sustituir una imagen) usa «Editar archivos»: publica
+            solo ese archivo, sin tocar el resto. Para cambios estructurales o de varios archivos a la vez
+            (incluido <code>config.xml</code>), vuelve a publicar la carpeta completa (mismo id) en el
+            asistente de abajo.
           </p>
         </div>
       )}

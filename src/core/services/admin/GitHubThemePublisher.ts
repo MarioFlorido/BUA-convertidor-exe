@@ -56,11 +56,15 @@ function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-function base64ToString(b64: string): string {
+function base64ToBytes(b64: string): Uint8Array {
   const binary = atob(b64.replace(/\n/g, ''));
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
+  return bytes;
+}
+
+function base64ToString(b64: string): string {
+  return new TextDecoder().decode(base64ToBytes(b64));
 }
 
 // ── Robustez ante el rate limit / parpadeos de red ───────────────────────────
@@ -157,6 +161,38 @@ class GitHubThemePublisherClass {
     return data.tree
       .filter((e) => e.type === 'blob' && e.path.startsWith(prefix))
       .map((e) => e.path.slice(prefix.length));
+  }
+
+  /** Lista las rutas relativas (al tema) de sus archivos ya publicados en `branch`. */
+  async listThemeFiles(themeId: string, branch = DEFAULT_PUBLISH_BRANCH): Promise<string[]> {
+    const headSha = await this.getRefSha(branch);
+    const baseTreeSha = await this.getBaseTreeSha(headSha);
+    return this.listExistingThemeFiles(themeId, baseTreeSha);
+  }
+
+  /**
+   * Lee el contenido (bytes) de un archivo de un tema ya publicado en `branch`.
+   * Vía Contents API: igual que `fetchPublishedThemeVersion`, así que comparte
+   * su límite de ~1 MB por archivo (suficiente para CSS e imágenes de tema).
+   */
+  async fetchThemeFileBytes(
+    themeId: string,
+    relPath: string,
+    branch = DEFAULT_PUBLISH_BRANCH,
+  ): Promise<Uint8Array> {
+    const data = await this.api<{ content: string }>(
+      `/contents/${THEMES_DIR}/${themeId}/${relPath}?ref=${branch}`,
+    );
+    return base64ToBytes(data.content);
+  }
+
+  /** Como `fetchThemeFileBytes`, decodificado como texto UTF-8 (para CSS/XML). */
+  async fetchThemeFileText(
+    themeId: string,
+    relPath: string,
+    branch = DEFAULT_PUBLISH_BRANCH,
+  ): Promise<string> {
+    return new TextDecoder().decode(await this.fetchThemeFileBytes(themeId, relPath, branch));
   }
 
   /** Lee el catálogo actual de la rama. Devuelve el objeto parseado. */
@@ -410,6 +446,73 @@ class GitHubThemePublisherClass {
     await this.updateRef(branch, commitSha);
 
     return { dryRun: false, branch, commitSha, upserted: 0, deleted: 0, treeEntries, metadataOnly: true };
+  }
+
+  /**
+   * Edición rápida: sustituye o añade UN solo archivo de un tema ya publicado
+   * (p. ej. style.css, una imagen) sin pasar por el selector de carpeta completo.
+   *
+   * En el mismo commit, sin tocar nada más del tema:
+   *  - sube `relPath` con `bytes`;
+   *  - incrementa el `<version>` de config.xml (eXeLearning de escritorio
+   *    detecta así la revisión en instalaciones que ya tengan el tema);
+   *  - actualiza `updatedAt` en el catálogo (cache-busting de la URL del .zip
+   *    que sirve esta app — ver `BuiltInThemeProvider`).
+   *
+   * No editable por esta vía: `config.xml` en sí (cambios estructurales del
+   * tema solo a través de la carpeta completa).
+   */
+  async updateThemeFile(
+    themeId: string,
+    relPath: string,
+    bytes: Uint8Array,
+    opts: PublishOptions = {},
+  ): Promise<PublishResult> {
+    const cleanRelPath = relPath.replace(/^\/+/, '');
+    if (cleanRelPath === 'config.xml') {
+      throw new Error('config.xml no se edita por esta vía: publica la carpeta completa del tema.');
+    }
+
+    const branch = opts.branch ?? DEFAULT_PUBLISH_BRANCH;
+    const dryRun = opts.dryRun ?? false;
+
+    const headSha = await this.getRefSha(branch);
+    const baseTreeSha = await this.getBaseTreeSha(headSha);
+
+    const currentConfigXml = await this.fetchThemeFileText(themeId, 'config.xml', branch);
+    const currentVersion = readThemeVersion(currentConfigXml);
+    const bumpedConfigXml = setThemeVersion(currentConfigXml, nextThemeVersion(currentVersion, currentVersion));
+
+    const catalog = await this.fetchThemesConfig(branch);
+    const newCatalog = upsertThemeEntry(catalog, { id: themeId, updatedAt: new Date().toISOString() });
+    const catalogBytes = new TextEncoder().encode(serializeThemesConfig(newCatalog));
+
+    if (dryRun) {
+      const treeEntries = buildThemeTreeEntries({
+        themeId,
+        upsertBlobs: { [cleanRelPath]: '<dry-run>', 'config.xml': '<dry-run-version>' },
+        configBlobSha: '<dry-run-config>',
+      });
+      return { dryRun: true, branch, upserted: 2, deleted: 0, treeEntries };
+    }
+
+    const fileBlobSha = await this.createBlob(bytes);
+    await delay(BLOB_THROTTLE_MS);
+    const configXmlBlobSha = await this.createBlob(new TextEncoder().encode(bumpedConfigXml));
+    const catalogBlobSha = await this.createBlob(catalogBytes);
+
+    const treeEntries = buildThemeTreeEntries({
+      themeId,
+      upsertBlobs: { [cleanRelPath]: fileBlobSha, 'config.xml': configXmlBlobSha },
+      configBlobSha: catalogBlobSha,
+    });
+
+    const treeSha = await this.createTree(baseTreeSha, treeEntries);
+    const message = opts.message ?? `chore(themes): actualizar ${cleanRelPath} en ${themeId}`;
+    const commitSha = await this.createCommit(message, treeSha, headSha);
+    await this.updateRef(branch, commitSha);
+
+    return { dryRun: false, branch, commitSha, upserted: 2, deleted: 0, treeEntries };
   }
 }
 
