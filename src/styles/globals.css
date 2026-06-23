@@ -35,9 +35,9 @@
   --radius:     10px;
   --radius-lg:  14px;
 
-  --shadow-xs: 0 1px 3px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.06);  /* Más définido */
-  --shadow-sm: 0 4px 12px rgba(0,0,0,.15), 0 16px 40px rgba(0,0,0,.10);  /* Más audaz que antes */
-  --shadow:    0 12px 36px rgba(0,0,0,.18), 0 4px 8px rgba(0,0,0,.12);  /* Sombras más dramáticas */
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.07);
+  --shadow:    0 8px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08);
 
   /* Escala de spacing: base 4px para ritmo consistente */
   --space-xs:   0.25rem;  /* 4px  — tight spacing entre elementos relacionados */
@@ -68,9 +68,7 @@ html {
 }
 
 body {
-  /* Halo muy sutil hacia el centro-superior: da profundidad sin "verse". */
-  background: radial-gradient(1100px 680px at 50% -8%, #F6F9FD 0%, var(--bg) 58%);
-  background-attachment: fixed;
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -340,7 +338,7 @@ button {
   border-color: var(--blue);
   border-width: 2px;
   color: #fff;
-  box-shadow: 0 0 0 5px var(--blue-light), 0 2px 8px rgba(27,110,194,.35);
+  box-shadow: var(--shadow-sm);
 }
 
 .step-circle svg {
@@ -377,7 +375,6 @@ button {
 .step-circle.step-clickable:hover {
   background: var(--blue-hover, #0e4f76);
   border-color: var(--blue-hover, #0e4f76);
-  transform: scale(1.1);
 }
 
 .step-label--clickable {
@@ -664,7 +661,6 @@ button {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--green) 10%, transparent);
 }
 
 .result-success-icon svg {
@@ -890,8 +886,7 @@ button {
 
 .btn-download-elpx:hover {
   background: var(--blue-hover);
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-download-pdf {
@@ -905,13 +900,11 @@ button {
   border-color: var(--border);
   box-shadow: var(--shadow-sm);
   background: var(--bg);
-  transform: translateY(-1px);
 }
 
 .btn-download-pdf:disabled {
   color: var(--text-3);
   cursor: not-allowed;
-  transform: none;
   opacity: 0.7;
 }
 
@@ -1005,13 +998,11 @@ button {
   cursor: pointer;
   transition: background 0.15s, box-shadow 0.15s;
   letter-spacing: -0.01em;
-  box-shadow: 0 4px 16px rgba(21,96,216,.35);  /* Más audaz */
 }
 
 .btn-confirm:hover {
   background: var(--blue-hover);
-  box-shadow: 0 8px 24px rgba(21,96,216,.50);  /* Hover muy dramático */
-  transform: translateY(-2px);  /* Pequeña elevación */
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-cancel {
@@ -1136,11 +1127,11 @@ button {
 }
 
 .section-heading {
-  font-size: 1.5rem;  /* Aumentado de 1.35rem — más presencia */
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 0.4rem;
-  letter-spacing: -0.03em;  /* Más apretado para drama */
+  letter-spacing: -0.025em;
 }
 
 .section-sub {
@@ -1277,8 +1268,8 @@ button {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.9rem 1rem;  /* Más padding para presencia */
-  background: linear-gradient(135deg, #DFE9F6 0%, #EDF1F7 100%);  /* Fondo más visual que plano */
+  padding: 0.9rem 1rem;
+  background: var(--bg);
   flex-wrap: wrap;
   transition: background 0.15s;
 }
