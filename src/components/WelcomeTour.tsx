@@ -56,7 +56,7 @@ interface WelcomeTourProps {
  * espacio a textos explicativos largos sin las limitaciones de posición o
  * ancho de un tooltip anclado a un elemento.
  *
- * Quien decide si esto se muestra o no es el switch "Ayuda" de la cabecera
+ * Quien decide si esto se muestra o no es el switch "Tour" del sidebar
  * (estado `helpEnabled` en App.tsx): mientras esté activado, cada vez que el
  * usuario entra en una pantalla del asistente aparece su globo; "Entendido"
  * solo cierra esa visita concreta (`dismissed` se reactiva al cambiar de

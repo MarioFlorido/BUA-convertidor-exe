@@ -32,8 +32,8 @@
   --red-light:    #FFF0F0;
 
   --radius-sm:  6px;
-  --radius:     10px;
-  --radius-lg:  14px;
+  --radius:     8px;
+  --radius-lg:  10px;
 
   --shadow-xs: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
   --shadow-sm: 0 2px 8px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.07);
@@ -81,175 +81,110 @@ button {
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────── */
-.app-header {
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Sidebar (marca, pipeline de pasos y acciones) ───────────────────────── */
+.sidebar {
+  width: 232px;
+  flex-shrink: 0;
   background: var(--surface);
-  border-bottom: 1px solid var(--border-light);
-  padding: 0 2rem;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-xs);
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-
-.header-bua-logo {
-  height: 34px;
-  width: auto;
-}
-
-.header-divider {
-  width: 1px;
-  height: 26px;
-  background: var(--border);
-}
-
-.header-brand-text {
+  border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
-  line-height: 1.2;
+  overflow-y: auto;
+}
+
+.sidebar-brand {
+  padding: 1.125rem 1rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.sidebar-bua-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
   gap: 0.05rem;
 }
 
-.header-brand-name {
-  font-size: 0.9rem;
+.sidebar-brand-name {
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.01em;
 }
 
-.header-brand-sub {
+.sidebar-brand-sub {
   font-size: 0.7rem;
   color: var(--text-3);
   font-weight: 400;
-  letter-spacing: 0.01em;
 }
 
-.btn-theme-manager {
-  padding: 0.375rem 0.875rem;
-  background: var(--bg);
-  color: var(--text-2);
-  border: 1px solid var(--border);
+.sidebar-section-label {
+  padding: 1.125rem 1rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+/* ── Acciones (Estilos eXeLearning / Ayuda / Información) ────────────────── */
+.sidebar-actions {
+  margin-top: auto;
+  border-top: 1px solid var(--border-light);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.sidebar-action {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem;
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-
-.btn-theme-manager:hover {
-  background: var(--border-light);
-  color: var(--text);
-  border-color: var(--border);
-}
-
-.header-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-help {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
+  border: none;
   background: transparent;
+  font-size: 0.8rem;
+  font-family: var(--font);
   color: var(--text-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  text-align: left;
+  width: 100%;
   cursor: pointer;
-  transition: all 0.15s;
-  font-size: 0;
+  transition: background 0.15s, color 0.15s;
 }
 
-.btn-help:hover {
+.sidebar-action:hover {
   background: var(--bg);
-  color: var(--blue);
-  border-color: var(--blue-border);
+  color: var(--text);
 }
 
-.help-icon {
+.sidebar-action-icon {
+  flex-shrink: 0;
   color: inherit;
 }
 
-/* ── Switch "Ayuda" (globos de ayuda contextual on/off) ──────────────────── */
-.help-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: 1px solid transparent;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.help-switch:hover {
-  background: var(--bg);
-}
-
-.help-switch-label {
-  font-size: 0.825rem;
-  font-weight: 500;
-  color: var(--text-2);
-}
-
-.help-switch-track {
-  position: relative;
-  width: 34px;
-  height: 19px;
-  flex-shrink: 0;
-  background: var(--border);
-  border-radius: 999px;
-  transition: background 0.15s;
-}
-
-.help-switch-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 15px;
-  height: 15px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  transition: transform 0.15s;
-}
-
-.help-switch--on .help-switch-track {
-  background: var(--blue);
-}
-
-.help-switch--on .help-switch-thumb {
-  transform: translateX(15px);
-}
-
-/* ── Step Bar ─────────────────────────────────────────────────────────────── */
-.step-bar {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border-light);
-  padding: 0.625rem 2rem 0.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Fila del toggle "Tour" en el sidebar — mismo padding que .sidebar-action
+   para que quede alineado con las otras filas de acciones. */
+.sidebar-toggle-row {
+  padding: 0.5rem;
 }
 
 /* ── Banner del documento (sobre el configurador) ────────────────────────── */
@@ -262,6 +197,9 @@ button {
   border-radius: var(--radius);
   padding: 0.7rem 1rem;
   margin-bottom: 1.25rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
   box-shadow: var(--shadow-xs);
 }
 
@@ -294,26 +232,35 @@ button {
   white-space: nowrap;
 }
 
-.step-indicator {
+/* ── Pipeline de pasos (vertical, dentro del sidebar) ─────────────────────── */
+.sidebar-pipeline {
+  padding: 0.125rem 1rem 0.5rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 
-.step-item {
+.sidebar-step {
   display: flex;
+  gap: 0.625rem;
+}
+
+.sidebar-step-track {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
+  width: 24px;
+  flex-shrink: 0;
 }
 
 .step-circle {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid var(--border);
+  border: 1.5px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-3);
   background: var(--surface);
@@ -332,40 +279,17 @@ button {
 }
 
 .step-circle.step-active {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   background: var(--blue);
   border-color: var(--blue);
-  border-width: 2px;
+  border-width: 1.5px;
   color: #fff;
-  box-shadow: var(--shadow-sm);
 }
 
 .step-circle svg {
-  width: 13px;
-  height: 13px;
-}
-
-.step-label {
-  font-size: 0.8rem;
-  color: var(--text-3);
-  font-weight: 400;
-  opacity: 0.55;
-  white-space: nowrap;
-  transition: color 0.2s, opacity 0.2s;
-}
-
-.step-label--active {
-  color: var(--blue);
-  font-weight: 700;
-  font-size: 0.85rem;
-  opacity: 1;
-}
-
-.step-label--done {
-  color: var(--text-2);
-  font-weight: 500;
-  opacity: 1;
+  width: 12px;
+  height: 12px;
 }
 
 .step-circle.step-clickable {
@@ -373,8 +297,46 @@ button {
 }
 
 .step-circle.step-clickable:hover {
-  background: var(--blue-hover, #0e4f76);
-  border-color: var(--blue-hover, #0e4f76);
+  background: var(--blue-hover);
+  border-color: var(--blue-hover);
+}
+
+.sidebar-step-connector {
+  width: 1.5px;
+  flex: 1;
+  min-height: 14px;
+  background: var(--border);
+  margin: 2px 0;
+  transition: background 0.2s;
+}
+
+.sidebar-step-connector--done {
+  background: var(--blue);
+}
+
+.sidebar-step-label-wrap {
+  padding-top: 2px;
+  padding-bottom: 18px;
+}
+
+.step-label {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  font-weight: 400;
+  opacity: 0.6;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.step-label--active {
+  color: var(--blue);
+  font-weight: 700;
+  opacity: 1;
+}
+
+.step-label--done {
+  color: var(--text-2);
+  font-weight: 500;
+  opacity: 1;
 }
 
 .step-label--clickable {
@@ -385,27 +347,12 @@ button {
   color: var(--blue);
 }
 
-.step-connector {
-  width: 44px;
-  height: 1px;
-  background: var(--border);
-  margin: 0 0.45rem;
-  flex-shrink: 0;
-  transition: background 0.2s;
-}
-
-.step-connector--done {
-  background: var(--blue);
-  opacity: 0.85;
-}
-
-/* ── Container ───────────────────────────────────────────────────────────── */
+/* ── Container (área de contenido, a la derecha del sidebar) ──────────────── */
 .container {
   flex: 1;
-  max-width: 900px;
-  margin: 0 auto;
+  min-width: 0;
+  overflow-y: auto;
   padding: var(--space-xxl) var(--space-xl);  /* 44px vertical, 32px horizontal — ritmo generoso */
-  width: 100%;
 }
 
 /* Pantalla de inicio: centra el bloque en el alto disponible (sin esto el
@@ -420,6 +367,9 @@ button {
 .upload-zone-wrapper {
   display: flex;
   flex-direction: column;
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .upload-zone {
@@ -639,6 +589,8 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);  /* 24px — generous spacing entre resultados */
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .result-success-card {
@@ -1215,15 +1167,12 @@ button {
 }
 
 /* ── Structure Configurator ──────────────────────────────────────────────── */
+/* Ancho generoso: el sidebar ya liberó el ancho que antes ocupaba la
+   cabecera, así que el árbol de contenido y las H1 cards aprovechan el
+   espacio en vez de quedar centradas en una columna estrecha. */
 .structure-configurator {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
-}
-
-/* El paso de estructura ensancha el contenedor para que el configurador
-   conserve su ancho de siempre y el árbol quepa al lado sin robárselo. */
-.container--wide {
-  max-width: 1320px;
 }
 
 .structure-main-layout {
@@ -1234,7 +1183,9 @@ button {
   align-items: start;
 }
 
-@media (max-width: 1100px) {
+/* +232px respecto al umbral "sin sidebar": el sidebar ahora resta ese
+   ancho al área de contenido antes de que el árbol decida apilarse. */
+@media (max-width: 1340px) {
   .structure-main-layout {
     grid-template-columns: 1fr;
   }
@@ -1325,24 +1276,32 @@ button {
   font-weight: 500;
 }
 
+/* Control segmentado (no "chips" sueltos): un único borde envolvente con
+   esquinas redondeadas solo en los extremos y un divisor de 1px entre
+   opciones — mismo comportamiento de radio nativo, solo cambia el dibujo. */
 .level-selector {
   display: flex;
-  gap: 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
 }
 
 .level-option {
   display: flex;
   align-items: center;
-  padding: 0.18rem 0.55rem;
+  padding: 0.2rem 0.6rem;
   font-size: 0.72rem;
   cursor: pointer;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-left: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-2);
   user-select: none;
   transition: all 0.12s;
   font-weight: 500;
+}
+
+.level-option:first-child {
+  border-left: none;
 }
 
 /* Oculto pero enfocable: con display:none el teclado no podía llegar al radio */
@@ -2761,32 +2720,28 @@ button {
 
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .app-header {
-    padding: 0 1rem;
-    height: 52px;
-  }
+  /* Pantalla estrecha: el sidebar pasa a ocupar todo el ancho, apilado
+     encima del contenido (en vez de forzar una barra horizontal), y la
+     página entera hace scroll normal. */
+  .app { height: auto; min-height: 100vh; }
 
-  .header-brand-sub { display: none; }
-  .header-brand-name { font-size: 0.825rem; }
+  .app-body { flex-direction: column; }
 
-  .step-bar {
-    padding: 0.5rem 1rem;
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-
-  .step-connector { width: 20px; }
-
-  .step-label {
-    display: none;
-  }
-
-  .step-label--active {
-    display: block;
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+    overflow-y: visible;
   }
 
   .container {
+    overflow-y: visible;
     padding: 1.5rem 1.25rem;
+  }
+
+  .level-selector {
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   .upload-zone {
