@@ -46,6 +46,27 @@
       border-bottom: 2px solid #ecf0f1;
     }
 
+    .eje-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 2.1em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 64px;
+      margin-bottom: 8px;
+      padding-bottom: 18px;
+      border-bottom: 3px solid #3498db;
+    }
+
+    .eje-label {
+      font-size: 0.36em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #3498db;
+    }
+
     h3 {
       color: #5b6776;
       font-size: 1.3em;
@@ -53,11 +74,52 @@
       margin-bottom: 12px;
     }
 
+    .paso-title {
+      display: block;
+      font-size: 1.55em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 60px;
+      margin-bottom: 18px;
+    }
+
+    .paso-label {
+      display: block;
+      font-size: 0.5em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5b6776;
+      margin-bottom: 7px;
+    }
+
     h4 {
-      color: #7f8c8d;
-      font-size: 1.1em;
-      margin-top: 20px;
-      margin-bottom: 10px;
+      color: #2c3e50;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    .format-tag {
+      display: inline-block;
+      font-size: 0.6em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: white;
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .format-tag--elpx {
+      background: #3498db;
+    }
+
+    .format-tag--pdf {
+      background: #5b6776;
     }
 
     p {
@@ -155,86 +217,6 @@
       background: #ecf0f1;
     }
 
-    .box-example {
-      background: #fff3cd;
-      border-left: 6px solid #ffc107;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-
-    .box-example strong {
-      color: #856404;
-    }
-
-    .box-definition {
-      background: #d1ecf1;
-      border-left: 6px solid #17a2b8;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-      font-style: italic;
-    }
-
-    .box-definition strong {
-      color: #0c5460;
-    }
-
-    .box-important {
-      background: #f8d7da;
-      border-left: 6px solid #dc3545;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-
-    .box-important strong {
-      color: #721c24;
-    }
-
-    .box-step {
-      background: #d4edda;
-      border-left: 6px solid #28a745;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-
-    .box-step strong {
-      color: #155724;
-    }
-
-    .toc {
-      background: #ecf0f1;
-      padding: 20px;
-      border-radius: 5px;
-      margin-bottom: 30px;
-      border-left: 4px solid #3498db;
-    }
-
-    .toc h3 {
-      margin-top: 0;
-    }
-
-    .toc ul {
-      list-style: none;
-      margin-left: 0;
-    }
-
-    .toc li {
-      margin-bottom: 8px;
-    }
-
-    .toc a {
-      color: #3498db;
-      text-decoration: none;
-      border-bottom: none;
-    }
-
-    .toc a:hover {
-      border-bottom: 1px solid #3498db;
-    }
-
     .divider {
       border-top: 2px solid #ecf0f1;
       margin: 40px 0;
@@ -248,6 +230,14 @@
       padding-top: 20px;
       border-top: 1px solid #ecf0f1;
       font-size: 0.9em;
+    }
+    
+    .subtitulo {
+        color: #7f8c8d;
+    	font-size: 0.9em;
+    	line-height: 1;
+
+
     }
 
     .header-nav {
@@ -286,8 +276,23 @@
         margin-top: 30px;
       }
 
+      .eje-title {
+        font-size: 1.5em;
+        margin-top: 48px;
+      }
+
       h3 {
         font-size: 1.1em;
+      }
+
+      .paso-title {
+        font-size: 1.2em;
+        margin-top: 44px;
+      }
+
+      h4 {
+        font-size: 1.1em;
+        margin-top: 36px;
       }
 
       table {
@@ -337,10 +342,8 @@
 <body>
   <div class="header-nav">
     <a href="#inicio">Inicio</a>
-    <a href="#pasos">Pasos</a>
-    <a href="#etiquetas">Etiquetas</a>
-    <a href="#descargar">Descargar</a>
-    <a href="#troubleshooting">Problemas</a>
+    <a href="#preparar">1. Preparar el Word</a>
+    <a href="#conversion">2. La conversión</a>
   </div>
 
   <div class="container">
@@ -348,366 +351,114 @@
 
     <h2>Introducción</h2>
 
-    <p><strong>ConvertidoreXe</strong> es una herramienta que convierte documentos Word (DOCX) a proyectos eXeLearning (ELPX) con estilos visuales de la UA y estructura semántica.</p>
+    <p><strong>ConvertidoreXe</strong> convierte documentos Word (DOCX) en proyectos eXeLearning (ELPX) con estilos visuales de la UA y estructura semántica, y también puede generar una versión en PDF lista para imprimir.</p>
 
-    <p>Con ConvertidoreXe puedes crear cursos digitales de forma rápida: prepara tu contenido en Word, carga el archivo aquí, elige un tema visual, y descarga el proyecto listo para editar en eXeLearning o exportar como PDF.</p>
-
-    <div class="divider"></div>
-
-    <h2 id="pasos">En resumen</h2>
-
-    <ol>
-      <li><strong>Prepara tu documento Word</strong> con estructura clara (encabezados, tablas, etc.)</li>
-      <li><strong>Sube el archivo DOCX</strong> a ConvertidoreXe</li>
-      <li><strong>Configura opciones</strong> (jerarquía de encabezados, tema visual)</li>
-      <li><strong>Usa etiquetas especiales</strong> para cajas semánticas, tablas, acordeones</li>
-      <li><strong>Descarga como ELPX</strong> (para editar en eXe) o <strong>PDF</strong> (para imprimir)</li>
-    </ol>
+    <p>Esta guía tiene dos partes: cómo <strong>preparar el documento Word</strong> para que se convierta bien, y cómo usar <strong>ConvertidoreXe</strong> para configurarlo y descargarlo.</p>
 
     <div class="divider"></div>
 
-    <h2>Paso 1: Preparar el Documento Word</h2>
+    <h2 id="preparar" class="eje-title"><span class="eje-label">Eje 1</span>Preparar el Documento Word</h2>
 
-    <h3>Estructura de Encabezados</h3>
+    <p>Esta es la parte que escribes en Microsoft Word, antes de subir nada a ConvertidoreXe.</p>
 
-    <p>Los encabezados en Word definen la estructura de tu curso. ConvertidoreXe soporta 4 niveles:</p>
+    <h3 class="paso-title"><span class="paso-label">Paso 1</span>Encabezados (la estructura de tu curso)</h3>
+
+    <p>Usa los estilos de encabezado de Word (Título 1, Título 2, Título 3, Título 4) para marcar la jerarquía. Para los títulos 1 y 2 no importa si los escribes en mayúsculas o minúsculas, el convertidor lo transformará todo en mayúsculas.</p>
 
     <table>
       <thead>
         <tr>
-          <th>Encabezado</th>
-          <th>Qué genera</th>
+          <th>Encabezado en Word</th>
+          <th>Qué decides después en ConvertidoreXe</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong>Título 1</strong></td>
-          <td>Página principal, página secundaria o página de 3er nivel. Da igual  que los pongas en mayúsculas o minúsculas, el renderizado final lo cambiará a lo que establezca el estilo</td>
+          <td><p><strong>Título 1</strong></p><p class="subtitulo">Marca el inicio de cada página del curso.</p></td>
+          <td> Para cada Encabezado 1 (salvo el primero, que siempre es la página principal) eliges si es <strong>Página principal</strong>, <strong>Subpágina</strong> o <strong>3er nivel</strong> dentro del paso "Estructura" de la app: no se decide en Word.</td>
         </tr>
         <tr>
-          <td><strong>Título 2</strong></td>
-          <td>Un encabezado H2 para iniciar una sección dentro del iDevice // La cabecera de un acordeón o una pestaña // El nombre de un iDevice para remarcar un "para saber más", "bibliografía", etc. Igualmente da lo mismo en mayúsculas o minúsculas</td>
+          <td><p><strong>Título 2</strong></p><p class="subtitulo">Crea un apartado dentro de la página.</p></td>
+          <td> Para cada uno eliges si se muestra como título de iDevice, como cabecera de texto normal, o como acordeón/pestaña.</td>
         </tr>
         <tr>
-          <td><strong>Título 3 al 4</strong></td>
-          <td>Secciones dentro del contenido</td>
+          <td><p><strong>Títulos 3 y 4</strong></p></td>
+          <td>Subdivisiones de contenido dentro del apartado. No requieren ninguna decisión adicional.</td>
         </tr>
       </tbody>
     </table>
 
+    <h3 class="paso-title"><span class="paso-label">Paso 2</span>Imágenes</h3>
 
-
-    <h3>Imágenes</h3>
-
-    <p>Las imágenes deben estar insertadas directamente en el DOCX. ConvertidoreXe las exporta centradas en el ELPX. Para el PDF, se recomienda:</p>
+    <p>Insértalas directamente en el documento; ConvertidoreXe las exporta centradas. Recomendaciones:</p>
     <ul>
-      <li>Máximo 900 px de ancho</li>
-      <li>Formato JPG o PNG. Aunque si son capturas de pantalla... no todo un pantallazo que pierde detalle y mejor en png</li>
-      <li>Comprimidas (&lt; 500 KB por imagen)</li>
-      <li>La descripción de la imagen en Word es obligatoria debido a las normas de accesibilidad de la UA. De ahí se toma el atributo "alt".</li>
+      <li>Máximo 900&nbsp;px de ancho.</li>
+      <li>Formato JPG o PNG (PNG si son capturas de pantalla, para no perder nitidez).</li>
+      <li>Comprimidas (idealmente &lt; 500&nbsp;KB por imagen).</li>
+      <li>Añade siempre el texto alternativo en Word: es obligatorio por las normas de accesibilidad de la UA y de ahí se toma el atributo <code>alt</code>.</li>
     </ul>
 
-    <div class="divider"></div>
+    <h3 class="paso-title"><span class="paso-label">Paso 3</span>Etiquetas semánticas</h3>
 
+    <p>Se escriben entre corchetes al inicio de un párrafo nuevo y se cierran con <code>[fin]</code>:</p>
 
-    <h2 id="etiquetas">Paso 2: Etiquetas Semánticas</h2>
-
-    <p>Las etiquetas semánticas se aplican escribiendo el nombre entre corchetes al inicio de un párrafo nuevo, y cerrando con <code>[fin]</code> al final.</p>
-
-    <h3>Las Etiquetas Semánticas</h3>
-
-    <p><strong>[ejemplo]</strong></p>
-
-    <p>En Word, en un párrafo nuevo:</p>
     <pre>[ejemplo]
 Contenido del ejemplo...
 [fin]</pre>
 
-    <p><strong>[definición]</strong></p>
-
-    <p>En Word, en un párrafo nuevo:</p>
-    <pre>[definición]
-Contenido de la definición...
-[fin]</pre>
-
-    <p><strong>[importante]</strong></p>
-
-    <p>En Word, en un párrafo nuevo:</p>
-    <pre>[importante]
-Contenido importante...
-[fin]</pre>
-
-    <p><strong>[pie]</strong></p>
-
-    <p>Pie polivalente para ilustraciones y tablas (leyenda o fuente). Se muestra
-    con texto pequeño, en cursiva, gris y centrado. En Word, en un párrafo nuevo,
-    debajo de la imagen o tabla:</p>
-    <pre>[pie]
-Figura 1. Descripción de la ilustración
-[fin]</pre>
-
-    <h3>Notas sobre Sintaxis</h3>
-
+    <p>Etiquetas disponibles:</p>
     <ul>
-      <li>Mayúsculas y minúsculas no importan: <code>[EJEMPLO]</code>, <code>[Ejemplo]</code>, <code>[ejemplo]</code> funcionan igual</li>
-      <li>Acentos son opcionales: <code>[definición]</code> y <code>[definicion]</code> funcionan igual</li>
-      <li>Obligatorio cerrar con <code>[fin]</code></li>
-      <li>No pueden anidarse</li>
+      <li><code>[ejemplo]</code>: un caso práctico o demostración.</li>
+      <li><code>[definición]</code>: un término nuevo que conviene aclarar.</li>
+      <li><code>[importante]</code>: una advertencia real (no la uses para todo, pierde fuerza).</li>
+      <li><code>[pie]</code>: leyenda o fuente de una imagen o tabla; va en un párrafo nuevo justo debajo. Por ejemplo: <code>[pie]Figura 1. Descripción[fin]</code>.</li>
+    </ul>
+
+    <p>Mayúsculas, minúsculas y tildes son indiferentes (<code>[Definición]</code> = <code>[definicion]</code>). Es obligatorio cerrar siempre con <code>[fin]</code> y no pueden anidarse.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 4</span>Tablas</h3>
+
+    <p>Para que ConvertidoreXe sepa cómo pintar los encabezados de una tabla, añade uno de estos marcadores en un párrafo justo encima (sin <code>[fin]</code> de cierre):</p>
+    <ul>
+      <li><code>[horizontal]</code>: la primera <strong>fila</strong> contiene los títulos de columna.</li>
+      <li><code>[vertical]</code>: la primera <strong>columna</strong> contiene los títulos de fila.</li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2>Paso 3: Tablas</h2>
+    <h2 id="conversion" class="eje-title"><span class="eje-label">Eje 2</span>La conversión en ConvertidoreXe</h2>
 
-    <p>Las tablas organizan datos en filas y columnas. ConvertidoreXe soporta dos tipos.</p>
+    <p>Esta es la parte que ocurre ya dentro de la aplicación, en sus cuatro pasos.</p>
 
-    <h3>[horizontal] — Encabezado Horizontal</h3>
+    <h3 class="paso-title"><span class="paso-label">Paso 1</span>Documento</h3>
+    <p>Arrastra el archivo .docx o haz clic para seleccionarlo. ConvertidoreXe lo analiza y, si hay alguna caja semántica sin cerrar con <code>[fin]</code>, te avisa antes de continuar.</p>
 
-    <p>Usa cuando la primera fila contiene títulos de columna.</p>
+    <h3 class="paso-title"><span class="paso-label">Paso 2</span>Estructura</h3>
+    <p>Cada Título 1 aparece como una sección expandible. Para cada uno (salvo el primero, fijo como página principal) elige el nivel (<strong>Página principal</strong>, <strong>Subpágina</strong> o <strong>3er nivel</strong>) y, dentro, configura cada Título 2 como <strong>Título de iDevice</strong>, <strong>Cabecera 2 en texto</strong>, o como efecto especial: <strong>Acordeón</strong> o <strong>Pestañas</strong>.</p>
 
-    <p>No incluyas <code>[fin]</code> después de la tabla.</p>
+    <h3 class="paso-title"><span class="paso-label">Paso 3</span>Estilo</h3>
+    <p>Elige el tema visual que se aplicará a todo el curso: colores, tipografía y portada. Los <strong>temas oficiales</strong> (cursos CID, Doctorado…) suelen incluir varias variantes de idioma; los <strong>temas locales</strong> son los que hayas cargado tú en el administrador de estilos.</p>
 
-    <h3>[vertical] — Encabezado Vertical</h3>
+    <h3 class="paso-title"><span class="paso-label">Paso 4</span>Resultado y descargas</h3>
 
-    <p>Usa cuando la primera columna contiene títulos de fila.</p>
+    <p>Al terminar la conversión puedes descargar dos formatos distintos, cada uno con sus propias opciones:</p>
 
-    <p>No incluyas <code>[fin]</code> después de la tabla.</p>
-
-    <div class="divider"></div>
-
-    <h2>Paso 4: Efectos Especiales - Acordeones y Pestañas</h2>
-
-    <p>Un H2 dentro de una página puede actuar como iDevice de texto colapsable, útil para biografía, "para saber más" o información complementaria.</p>
-
-    <div class="divider"></div>
-
- <h2>Paso 5: Subir y Configurar</h2>
-
-    <h3>Subir el Archivo</h3>
-
-    <ol>
-      <li>Haz clic en el área <strong>"Arrastra tu archivo DOCX aquí"</strong> o selecciona el archivo desde tu ordenador</li>
-      <li>ConvertidoreXe procesa el documento (puede tardar unos segundos si es grande)</li>
-      <li>Cuando esté listo, aparecerá un panel de configuración</li>
-    </ol>
-
-    <div class="divider"></div>
-    
-
-    <h2>Paso 6: Configuración de Opciones</h2>
-
-    <h3>Elegir estilo Visual</h3>
-
-    <p>Un <strong>estilo</strong> es un conjunto de normas (colores, fuentes, diseño) que se aplica a todo el documento.</p>
-
-    <h3>Dónde Aparecen los estilos</h3>
-
-    <p>Después de subir el archivo, en el panel de configuración verás un selector de <strong>Estilos disponibles</strong>. Incluye:</p>
+    <h4><span class="format-tag format-tag--elpx">ELPX</span>Proyecto eXeLearning (.elpx)</h4>
+    <p>El formato nativo de eXeLearning: editable, con el tema aplicado. Para abrirlo, en eXeLearning ve a <strong>Archivo → Abrir</strong> y selecciona el <code>.elpx</code> descargado.</p>
     <ul>
-      <li><strong>Temas oficiales</strong> — Diseñados para los cursos CID, Doctorado... incluidos en el programa.</li>
-      <li><strong>Temas locales</strong> — Temas personalizados cargados en tu navegador</li>
+      <li><strong>Menú lateral desplegado</strong> (Sí/No): si el índice de páginas aparece desplegado por defecto la primera vez que se abre el proyecto en eXeLearning, o plegado.</li>
     </ul>
 
     <div class="divider"></div>
 
-    <h2 id="descargar">Descargar ELPX</h2>
-
-    <p>Un <strong>ELPX</strong> es el formato nativo de eXeLearning 4.+. Es un archivo comprimido con la estructura del curso.</p>
-
-    <h3>Pasos para Descargar</h3>
-
-    <ol>
-      <li>Haz clic en el botón <strong>"Descargar proyecto eXeLearning"</strong></li>
-      <li>Se descarga un archivo <code>.elpx</code> a tu carpeta de descargas</li>
-      <li>Abre eXeLearning en tu ordenador</li>
-    </ol>
-
-    <h3>Abrir en eXeLearning</h3>
-
-    <ol>
-      <li>En eXeLearning, ve a <strong>Archivo → Abrir</strong></li>
-      <li>Selecciona el archivo <code>.elpx</code> que descargaste</li>
-      <li>eXeLearning carga el proyecto completo con tu tema</li>
-    </ol>
-
-    <h3>Edición Básica en eXe</h3>
-
-    <p>Después de abrir el ELPX en eXeLearning, puedes:</p>
+    <h4><span class="format-tag format-tag--pdf">PDF</span>Vista previa para imprimir / PDF</h4>
+    <p>Una versión estática para imprimir o compartir como documento de lectura. Siempre incluye portada y tabla de contenidos. Da mejores resultados en Google Chrome o Microsoft Edge; si tu navegador bloquea la ventana emergente, el PDF se descarga directamente en su lugar.</p>
     <ul>
-      <li><strong>Editar contenido:</strong> Haz doble clic en cualquier iDevice (cajas de contenido)</li>
-      <li><strong>Añadir iDevices:</strong> Usa el panel izquierdo para insertar nuevas cajas de contenido</li>
-      <li><strong>Reordenar:</strong> Arrastra iDevices para cambiar el orden</li>
-      <li><strong>Cambiar nombre:</strong> Edita el título de cada página/sección</li>
+      <li><strong>Foto de portada</strong> (Sí/No): incluye la imagen de portada del tema elegido, o deja la portada solo con texto.</li>
+      <li><strong>Numerar títulos</strong> (Sí/No): añade numeración jerárquica a los títulos (1, 1.1, 1.1.1…).</li>
     </ul>
 
-    <div class="divider"></div>
-
-    <h2 id="troubleshooting">Solución de Problemas</h2>
-
-    <h3>❓ "El documento es muy grande y es lento"</h3>
-
-    <p><strong>Causa:</strong> Imágenes sin comprimir o documento muy largo.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ol>
-      <li>Comprime las imágenes en Word (click derecho → Comprimir imagen)</li>
-      <li>Divide el documento en partes más pequeñas</li>
-      <li>Intenta subir solo una sección primero</li>
-    </ol>
-
-    <h3>❓ "No veo mi tema en la lista"</h3>
-
-    <p><strong>Causa:</strong> El tema no se cargó correctamente.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ol>
-      <li>Verifica que el archivo ZIP sea un tema válido (debe tener <code>config.xml</code> y <code>style.css</code>)</li>
-      <li>Intenta cargar el tema nuevamente</li>
-      <li>Limpia caché del navegador si es necesario</li>
-    </ol>
-
-    <h3>❓ "Al editar el iDevice en eXe se vacía el contenido"</h3>
-
-    <p><strong>Causa:</strong> Conflicto de estilos CSS del tema con la interfaz de eXeLearning.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ol>
-      <li>Intenta con otro tema (ej: "Clásico")</li>
-      <li>Si funciona, el problema es el tema personalizado</li>
-      <li>Contacta al administrador para revisar el CSS del tema</li>
-    </ol>
-
-    <h3>❓ "Las tablas salen con dos cabeceras"</h3>
-
-    <p><strong>Causa:</strong> La tabla tiene encabezado en Word y ConvertidoreXe también lo marca.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ol>
-      <li>En Word, selecciona la tabla</li>
-      <li>Ve a <strong>Herramientas de tabla → Diseño</strong></li>
-      <li>Desactiva <strong>"Fila de encabezado"</strong> si está marcada</li>
-      <li>Si no, marca la primera fila como encabezado y descarga nuevamente</li>
-    </ol>
-
-    <h3>❓ "Las imágenes no están centradas"</h3>
-
-    <p><strong>Causa:</strong> Configuración de alineación en Word.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ol>
-      <li>En Word, selecciona la imagen</li>
-      <li>Ve a <strong>Inicio → Alinear</strong> y elige <strong>"Centrar"</strong></li>
-      <li>Sube el documento nuevamente</li>
-    </ol>
-
-    <h3>❓ "¿Cuál es la diferencia entre ELPX y PDF?"</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>ELPX</th>
-          <th>PDF</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Formato de eXeLearning</td>
-          <td>Documento estático</td>
-        </tr>
-        <tr>
-          <td>Editable en eXe</td>
-          <td>Solo lectura</td>
-        </tr>
-        <tr>
-          <td>Incluye tema y estilos</td>
-          <td>Estilos optimizados para impresión</td>
-        </tr>
-        <tr>
-          <td>Se puede exportar a web/SCORM</td>
-          <td>Se puede imprimir directamente</td>
-        </tr>
-        <tr>
-          <td>Interactivo en navegador</td>
-          <td>Mejor para distribución física</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p><strong>Usa ELPX si:</strong> Quieres editar el contenido después en eXeLearning.</p>
-    <p><strong>Usa PDF si:</strong> Quieres distribuir como documento final para imprimir o compartir.</p>
-
-    <h3>❓ "El PDF no tiene los colores del tema"</h3>
-
-    <p><strong>Causa:</strong> Los estilos de impresión son diferentes a los estilos de pantalla.</p>
-
-    <p><strong>Solución:</strong></p>
-    <ul>
-      <li>Es normal que algunos colores cambien ligeramente en PDF</li>
-      <li>Los colores de impresión se eligieron para que sean legibles impresos</li>
-      <li>Si necesitas ciertos colores exactos, contacta al administrador</li>
-    </ul>
-
-    <div class="divider"></div>
-
-    <h2>Tips y Mejores Prácticas</h2>
-
-    <h3>✓ Estructura Clara</h3>
-    <ul>
-      <li>Usa encabezados jerárquicos (H1 → H2 → H3)</li>
-      <li>No saltes niveles (no vayas de H1 directamente a H3)</li>
-      <li>Mantén títulos concisos (&lt; 60 caracteres)</li>
-    </ul>
-
-    <h3>✓ Contenido</h3>
-    <ul>
-      <li>Escribe párrafos cortos (3-4 líneas máximo)</li>
-      <li>Usa listas para instrucciones paso a paso</li>
-      <li>Inserta imágenes después de introducir el concepto</li>
-    </ul>
-
-    <h3>✓ Etiquetas Semánticas</h3>
-    <ul>
-      <li>No abuses — 1-2 cajas por página es suficiente</li>
-      <li>Usa <code>[ejemplo]</code> para código o demostraciones</li>
-      <li>Usa <code>[definición]</code> SOLO para términos nuevos y cuando no son obvios</li>
-      <li>Usa <code>[importante]</code> para advertencias reales. Una página llena de "importantes" resta valor al contenido</li>
-    </ul>
-
-    <h3>✓ Revisión Final</h3>
-    <ul>
-      <li>Abre el PDF antes de compartirlo</li>
-      <li>Verifica números de página y tabla de contenidos</li>
-      <li>Comprueba que todas las imágenes se vean bien</li>
-      <li>Prueba los acordeones/pestañas en el navegador</li>
-    </ul>
-
-    <div class="divider"></div>
-
-    <h2>Preguntas Frecuentes</h2>
-
-    <p><strong>P: ¿Puedo editar el documento después de descargar el ELPX?</strong><br>
-    R: Sí. Abre el ELPX en eXeLearning y edita como necesites.</p>
-
-    <p><strong>P: ¿Se pierden mis cambios si genero el PDF después?</strong><br>
-    R: No. El PDF es una "foto" del contenido en ese momento. El ELPX es editable.</p>
-
-    <p><strong>P: ¿Mi documento Word debe tener estilos personalizados como antes?</strong><br>
-    R: No. ConvertidoreXe funciona con estilos estándar de Word (Encabezado 1, Encabezado 2, etc.).</p>
-
-    <p><strong>P: ¿Puedo tener múltiples imágenes en una página?</strong><br>
-    R: Sí, todas se centrarán automáticamente.</p>
-
-    <p><strong>P: ¿Qué pasa si tengo tablas complejas (celdas combinadas)?</strong><br>
-    R: ConvertidoreXe intentará mantener la estructura, pero es mejor simplificar tablas muy complejas.</p>
-
-    <p><strong>P: ¿Puedo usar ConvertidoreXe sin crear un ELPX?</strong><br>
-    R: Sí. Puedes generar solo el PDF si prefieres un documento de lectura.</p>
-
-    <p><strong>P: ¿Los acordeones funcionan en eXeLearning también?</strong><br>
-    R: Sí. Cuando exportas desde eXe a web, los acordeones son interactivos.</p>
-
-    <p><strong>P: ¿Puedo cambiar de tema después de descargar?</strong><br>
-    R: Sí, cuando abres el ELPX en eXe puedes cambiar el tema desde el panel de propiedades.</p>
+    <p>Usa el <strong>ELPX</strong> si vas a seguir editando el curso en eXeLearning; usa el <strong>PDF</strong> si necesitas un documento final para imprimir o repartir tal cual.</p>
 
     <div class="divider"></div>
 
