@@ -1,30 +1,30 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-06-21T17:10:00Z",
+  "generatedAt": "2026-06-26T00:00:00Z",
   "title": "Design System: ConvertidoreXe",
   "extensions": {
     "colorMeta": {
       "primary-blue": {
         "role": "primary",
         "displayName": "Azul Corporativo",
-        "canonical": "#1B6EC2",
-        "tonalRamp": ["#041829", "#0a2847", "#0f3a66", "#1B6EC2", "#4589d9", "#72a5e0", "#9fc0e7", "#cce0f3"]
+        "canonical": "#1560D8",
+        "tonalRamp": ["#041830", "#082c54", "#0c4080", "#1560D8", "#3f7fe0", "#6b9ee8", "#97bcf0", "#c3daf8"]
       },
       "primary-blue-hover": {
         "role": "primary-active",
         "displayName": "Azul Corporativo Hover",
-        "canonical": "#155FAF"
+        "canonical": "#0F4BA0"
       },
       "primary-blue-active": {
         "role": "primary-pressed",
         "displayName": "Azul Corporativo Activo",
-        "canonical": "#1054A0"
+        "canonical": "#0A3A7F"
       },
       "primary-blue-light": {
         "role": "primary-background",
         "displayName": "Azul Claro",
-        "canonical": "#EBF3FF",
-        "tonalRamp": ["#ffffff", "#f7faff", "#eef6ff", "#EBF3FF", "#d9e9ff", "#c7deff", "#b5d3ff", "#a3c8ff"]
+        "canonical": "#E8F1FF",
+        "tonalRamp": ["#ffffff", "#f8fbff", "#f0f7ff", "#E8F1FF", "#d6e8ff", "#c4dfff", "#b2d6ff", "#a0cdff"]
       },
       "text-primary": {
         "role": "text",
@@ -39,7 +39,7 @@
       "text-tertiary": {
         "role": "text-muted",
         "displayName": "Texto Terciario",
-        "canonical": "#8E8E93"
+        "canonical": "#626268"
       },
       "surface-default": {
         "role": "surface",
@@ -61,6 +61,16 @@
         "role": "error",
         "displayName": "Error: Rojo",
         "canonical": "#D92B2B"
+      },
+      "feedback-warning": {
+        "role": "warning",
+        "displayName": "Advertencia: Ámbar",
+        "canonical": "#8A5A00"
+      },
+      "theme-badge-local": {
+        "role": "accent-single-use",
+        "displayName": "Morado de Tema Local",
+        "canonical": "#6A1B9A"
       }
     },
     "shadows": [
@@ -77,7 +87,7 @@
       {
         "name": "shadow-md",
         "value": "0 8px 28px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.08)",
-        "purpose": "Modales, overlays, contenido flotante. Separación clara."
+        "purpose": "Modales (Tour de Bienvenida), overlays, contenido flotante. Separación clara."
       }
     ],
     "motion": [
@@ -95,18 +105,28 @@
         "name": "ease-pop",
         "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
         "purpose": "Animación de entrada de circle (éxito). Overshoot suave."
+      },
+      {
+        "name": "ease-screen-enter",
+        "value": "0.22s ease-out",
+        "purpose": "Entrada de cada pantalla del asistente: fundido + leve deslizamiento vertical (8px)."
+      },
+      {
+        "name": "ease-tour-fade",
+        "value": "0.2s ease-out",
+        "purpose": "Entrada del scrim y tooltip del Tour de Bienvenida."
       }
     ],
     "breakpoints": [
       {
         "name": "tablet-max",
         "value": "1100px",
-        "purpose": "Por encima: layout grid 2-col. Debajo: stack a 1 col."
+        "purpose": "Por encima: layout de dos columnas (secciones + árbol de contenido), con la columna del árbol elástica entre 240px y 320px. Debajo: el árbol se apila bajo las secciones y pierde el position:sticky. El umbral se bajó desde 1340px porque ese valor colapsaba a una columna en portátiles institucionales de 1366px de ancho en cuanto el navegador no estaba maximizado a pantalla completa o tenía scrollbar visible."
       },
       {
         "name": "mobile",
         "value": "640px",
-        "purpose": "Bajo 640px: hide secondary labels, stack navegación, reducir padding."
+        "purpose": "Bajo 640px: el sidebar se apila a ancho completo encima del contenido, se ocultan etiquetas secundarias, y se reduce el padding."
       }
     ]
   },
@@ -117,7 +137,7 @@
       "refersTo": "button-primary",
       "description": "Botón de acción primaria. CTA principal, confirmación, descarga.",
       "html": "<button class=\"ds-btn-primary\">DESCARGAR ELPX</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.875rem; background: #1B6EC2; color: #FFFFFF; border: none; padding: 0.575rem 1.375rem; font-size: 0.875rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; letter-spacing: -0.01em; box-shadow: 0 2px 8px rgba(27,110,194,0.30); } .ds-btn-primary:hover { background: #155FAF; box-shadow: 0 4px 14px rgba(27,110,194,0.40); } .ds-btn-primary:focus-visible { outline: 2px solid #1B6EC2; outline-offset: 2px; } .ds-btn-primary:active { background: #1054A0; } .ds-btn-primary:disabled { background: #8E8E93; cursor: not-allowed; opacity: 0.7; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.875rem; background: #1560D8; color: #FFFFFF; border: none; padding: 0.575rem 1.375rem; font-size: 0.875rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; letter-spacing: -0.01em; box-shadow: 0 2px 8px rgba(21,96,216,0.30); } .ds-btn-primary:hover { background: #0F4BA0; box-shadow: 0 4px 14px rgba(21,96,216,0.40); } .ds-btn-primary:focus-visible { outline: 2px solid #1560D8; outline-offset: 2px; } .ds-btn-primary:active { background: #0A3A7F; } .ds-btn-primary:disabled { background: #626268; cursor: not-allowed; opacity: 0.7; }"
     },
     {
       "name": "Secondary Button",
@@ -125,7 +145,7 @@
       "refersTo": "button-secondary",
       "description": "Botón secundario. Cancelar, atrás, opciones alternativas.",
       "html": "<button class=\"ds-btn-secondary\">CANCELAR</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF; color: #4A4A50; border: 1px solid #D2D2D7; padding: 0.575rem 1.25rem; font-size: 0.875rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.15s; letter-spacing: -0.01em; } .ds-btn-secondary:hover { background: #EDF1F7; color: #1D1D1F; border-color: #D2D2D7; } .ds-btn-secondary:focus-visible { outline: 2px solid #1B6EC2; outline-offset: 2px; } .ds-btn-secondary:active { background: #EBF3FF; border-color: #BDD8FF; }"
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; background: #FFFFFF; color: #4A4A50; border: 1px solid #D2D2D7; padding: 0.575rem 1.25rem; font-size: 0.875rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.15s; letter-spacing: -0.01em; } .ds-btn-secondary:hover { background: #EDF1F7; color: #1D1D1F; border-color: #D2D2D7; } .ds-btn-secondary:focus-visible { outline: 2px solid #1560D8; outline-offset: 2px; } .ds-btn-secondary:active { background: #E8F1FF; border-color: #B3D9FF; }"
     },
     {
       "name": "Text Input",
@@ -133,7 +153,7 @@
       "refersTo": "input-default",
       "description": "Campo de entrada de texto. Estructura, búsqueda, nombres.",
       "html": "<input type=\"text\" class=\"ds-input\" placeholder=\"Ingresa tu búsqueda...\">",
-      "css": ".ds-input { display: block; width: 100%; padding: 0.55rem 0.75rem; border: 1px solid #D2D2D7; border-radius: 6px; font-family: Inter, sans-serif; font-size: 0.875rem; color: #1D1D1F; background: #FFFFFF; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input::placeholder { color: #8E8E93; } .ds-input:hover { border-color: #BDD8FF; } .ds-input:focus { outline: none; border-color: #1B6EC2; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-input:focus-visible { outline: 2px solid #1B6EC2; outline-offset: 2px; border-color: #1B6EC2; } .ds-input:disabled { background: #EDF1F7; color: #8E8E93; cursor: not-allowed; }"
+      "css": ".ds-input { display: block; width: 100%; padding: 0.55rem 0.75rem; border: 1px solid #D2D2D7; border-radius: 6px; font-family: Inter, sans-serif; font-size: 0.875rem; color: #1D1D1F; background: #FFFFFF; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input::placeholder { color: #626268; } .ds-input:hover { border-color: #B3D9FF; } .ds-input:focus { outline: none; border-color: #1560D8; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-input:focus-visible { outline: 2px solid #1560D8; outline-offset: 2px; border-color: #1560D8; } .ds-input:disabled { background: #EDF1F7; color: #626268; cursor: not-allowed; }"
     },
     {
       "name": "Card Default",
@@ -141,7 +161,7 @@
       "refersTo": "card-default",
       "description": "Tarjeta de contenido. Contenedores, paneles, secciones modulares.",
       "html": "<div class=\"ds-card\"><h3 class=\"ds-card-title\">Resultado de conversión</h3><p class=\"ds-card-body\">Tu documento se procesó exitosamente.</p></div>",
-      "css": ".ds-card { background: #FFFFFF; border: 1px solid #E8E8ED; border-radius: 10px; padding: 1.125rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); transition: all 0.15s; } .ds-card:hover { border-color: #BDD8FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: #1D1D1F; } .ds-card-body { font-size: 0.875rem; color: #4A4A50; line-height: 1.5; margin: 0; }"
+      "css": ".ds-card { background: #FFFFFF; border: 1px solid #E8E8ED; border-radius: 8px; padding: 1.125rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); transition: all 0.15s; } .ds-card:hover { border-color: #B3D9FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; color: #1D1D1F; } .ds-card-body { font-size: 0.875rem; color: #4A4A50; line-height: 1.5; margin: 0; }"
     },
     {
       "name": "H1 Section Card",
@@ -149,7 +169,23 @@
       "refersTo": "card-default",
       "description": "Tarjeta de sección H1 en configurador de estructura. Encabezado collapsible.",
       "html": "<div class=\"ds-h1-card\"><button class=\"ds-h1-card-header\"><span class=\"ds-h1-title\">Introducción</span><svg class=\"ds-chevron\" viewBox=\"0 0 11 11\" fill=\"none\" stroke=\"currentColor\"><polyline points=\"2 4 5.5 7.5 9 4\"></polyline></svg></button><div class=\"ds-h2-list-wrap ds-h2-list-wrap--open\"><div class=\"ds-h2-list\"><div class=\"ds-h2-item\"><span class=\"ds-h2-item-name\">Bienvenida</span></div></div></div></div>",
-      "css": ".ds-h1-card { border: 1px solid #E8E8ED; border-radius: 10px; background: #FFFFFF; overflow: hidden; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-h1-card:hover { border-color: #BDD8FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-h1-card-header { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 1rem; background: #EDF1F7; border: none; width: 100%; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: #1D1D1F; transition: background 0.15s; } .ds-h1-card-header:hover { background: #DFE7F0; } .ds-h1-title { flex: 1; } .ds-chevron { width: 11px; height: 11px; flex-shrink: 0; transition: transform 0.2s ease; color: #1B6EC2; } .ds-h2-list-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s ease; } .ds-h2-list-wrap--open { grid-template-rows: 1fr; } .ds-h2-list { overflow: hidden; min-height: 0; padding: 0.625rem 1rem 0.875rem; } .ds-h2-item { display: flex; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid #E8E8ED; font-size: 0.825rem; color: #4A4A50; } .ds-h2-item:last-child { border-bottom: none; }"
+      "css": ".ds-h1-card { border: 1px solid #E8E8ED; border-radius: 8px; background: #FFFFFF; overflow: hidden; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-h1-card:hover { border-color: #B3D9FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-h1-card-header { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 1rem; background: #EDF1F7; border: none; width: 100%; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: #1D1D1F; transition: background 0.15s; } .ds-h1-card-header:hover { background: #DFE7F0; } .ds-h1-title { flex: 1; } .ds-chevron { width: 11px; height: 11px; flex-shrink: 0; transition: transform 0.2s ease; color: #1560D8; } .ds-h2-list-wrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s ease; } .ds-h2-list-wrap--open { grid-template-rows: 1fr; } .ds-h2-list { overflow: hidden; min-height: 0; padding: 0.625rem 1rem 0.875rem; } .ds-h2-item { display: flex; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid #E8E8ED; font-size: 0.825rem; color: #4A4A50; } .ds-h2-item:last-child { border-bottom: none; }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "input",
+      "refersTo": "toggle-track-on",
+      "description": "Interruptor on/off. Opciones de PDF/ELPX, ayuda contextual, admin.",
+      "html": "<button type=\"button\" class=\"ds-toggle ds-toggle--on\" role=\"switch\" aria-checked=\"true\"><span class=\"ds-toggle-thumb\"></span></button>",
+      "css": ".ds-toggle { position: relative; width: 44px; height: 24px; background: #C7CBD3; border: 1px solid #7D8497; border-radius: 12px; cursor: pointer; padding: 0; transition: background 0.2s, border-color 0.2s; } .ds-toggle--on { background: #1560D8; border-color: #1560D8; } .ds-toggle-thumb { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; background: #fff; border-radius: 50%; transition: transform 0.2s; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.2); } .ds-toggle--on .ds-toggle-thumb { transform: translateX(20px); } .ds-toggle:focus-visible { outline: 2px solid #1560D8; outline-offset: 2px; }"
+    },
+    {
+      "name": "Tour Tooltip",
+      "kind": "custom",
+      "refersTo": "card-default",
+      "description": "Modal de ayuda contextual (Tour de Bienvenida). Overlay a pantalla completa + tarjeta centrada.",
+      "html": "<div class=\"ds-tour-overlay\"><div class=\"ds-tour-tooltip\"><span class=\"ds-tour-counter\">PASO 2 DE 4</span><h2 class=\"ds-tour-title\">Configura la estructura</h2><p class=\"ds-tour-text\">Decide qué hace cada encabezado de tu documento: título de sección, contenido, o un bloque especial.</p><div class=\"ds-tour-actions\"><button class=\"ds-tour-btn-ghost\">Saltar</button><button class=\"ds-tour-btn-primary\">Continuar</button></div></div></div>",
+      "css": ".ds-tour-overlay { position: relative; inset: 0; z-index: 1; background: rgba(20,20,24,0.6); display: flex; align-items: center; justify-content: center; padding: 24px; border-radius: 8px; } .ds-tour-tooltip { width: 480px; max-width: 100%; background: #FFFFFF; border-radius: 10px; box-shadow: 0 8px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08); padding: 1.75rem 1.75rem 1.5rem; } .ds-tour-counter { display: block; font-size: 0.75rem; font-weight: 600; color: #1560D8; letter-spacing: 0.02em; margin-bottom: 0.5rem; } .ds-tour-title { font-size: 1.1rem; font-weight: 600; color: #1D1D1F; margin: 0 0 0.625rem; } .ds-tour-text { font-size: 0.9rem; color: #4A4A50; margin: 0; line-height: 1.55; } .ds-tour-actions { display: flex; justify-content: flex-end; gap: 0.625rem; margin-top: 1.5rem; } .ds-tour-btn-ghost { background: none; border: none; padding: 0.575rem 0.75rem; color: #1560D8; font-size: 0.875rem; font-weight: 500; cursor: pointer; border-radius: 6px; } .ds-tour-btn-ghost:hover { background: #EDF1F7; } .ds-tour-btn-primary { background: #1560D8; color: #fff; border: none; padding: 0.575rem 1.375rem; font-size: 0.875rem; font-weight: 500; border-radius: 6px; cursor: pointer; } .ds-tour-btn-primary:hover { background: #0F4BA0; }"
     },
     {
       "name": "Alert Success",
@@ -160,35 +196,63 @@
       "css": ".ds-alert { display: flex; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 6px; font-size: 0.825rem; line-height: 1.5; } .ds-alert-success { background: #E3F9EB; border: 1px solid rgba(52,199,89,0.35); color: #1a6b35; } .ds-alert-icon { width: 20px; height: 20px; flex-shrink: 0; } .ds-alert strong { font-weight: 600; }"
     },
     {
+      "name": "Alert Warning",
+      "kind": "custom",
+      "refersTo": "alert-warning",
+      "description": "Alerta de advertencia no bloqueante. Etiquetas semánticas sin cerrar, avisos que no detienen el flujo.",
+      "html": "<div class=\"ds-alert ds-alert-warning\"><svg class=\"ds-alert-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z\"></path></svg><div><strong>Revisa antes de continuar.</strong> Hay 2 etiquetas [importante] sin cerrar.</div></div>",
+      "css": ".ds-alert { display: flex; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 6px; font-size: 0.825rem; line-height: 1.5; } .ds-alert-warning { background: #FFF8E6; border: 1px solid rgba(183,121,31,.3); color: #8A5A00; } .ds-alert-icon { width: 20px; height: 20px; flex-shrink: 0; } .ds-alert strong { font-weight: 600; }"
+    },
+    {
       "name": "Theme Selector Option",
       "kind": "card",
       "refersTo": "card-default",
       "description": "Opción de tema eXeLearning. Radio button + miniatura + metadatos.",
       "html": "<label class=\"ds-theme-option\"><input type=\"radio\" name=\"theme\" value=\"theme-1\" class=\"ds-theme-input\"><div class=\"ds-theme-content\"><div class=\"ds-theme-name\">Tema Corporativo 2024</div><div class=\"ds-theme-meta\"><span class=\"ds-theme-language\">ES</span><span class=\"ds-theme-activity\">2024-2025</span></div></div></label>",
-      "css": ".ds-theme-option { display: flex; align-items: flex-start; gap: 0.875rem; border: 1px solid #E8E8ED; padding: 0.875rem 1.125rem; border-radius: 10px; cursor: pointer; transition: all 0.15s; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-theme-option:hover { border-color: #BDD8FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-theme-option:has(.ds-theme-input:checked) { border-color: #1B6EC2; background: color-mix(in srgb, #1B6EC2 5%, #FFFFFF); box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-theme-input { margin-top: 0.2rem; cursor: pointer; flex-shrink: 0; accent-color: #1B6EC2; } .ds-theme-content { flex: 1; } .ds-theme-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; color: #1D1D1F; } .ds-theme-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; } .ds-theme-language, .ds-theme-activity { font-size: 0.72rem; color: #4A4A50; padding: 0.12rem 0.45rem; background: #EDF1F7; border: 1px solid #E8E8ED; border-radius: 6px; font-weight: 500; }"
+      "css": ".ds-theme-option { display: flex; align-items: flex-start; gap: 0.875rem; border: 1px solid #E8E8ED; padding: 0.875rem 1.125rem; border-radius: 8px; cursor: pointer; transition: all 0.15s; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04); } .ds-theme-option:hover { border-color: #B3D9FF; box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-theme-option:has(.ds-theme-input:checked) { border-color: #1560D8; background: color-mix(in srgb, #1560D8 5%, #FFFFFF); box-shadow: 0 2px 8px rgba(0,0,0,0.10), 0 12px 32px rgba(0,0,0,0.07); } .ds-theme-input { margin-top: 0.2rem; cursor: pointer; flex-shrink: 0; accent-color: #1560D8; } .ds-theme-content { flex: 1; } .ds-theme-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; color: #1D1D1F; } .ds-theme-meta { display: flex; gap: 0.4rem; flex-wrap: wrap; } .ds-theme-language, .ds-theme-activity { font-size: 0.72rem; color: #4A4A50; padding: 0.12rem 0.45rem; background: #EDF1F7; border: 1px solid #E8E8ED; border-radius: 6px; font-weight: 500; }"
+    },
+    {
+      "name": "Theme Badge",
+      "kind": "custom",
+      "refersTo": "card-default",
+      "description": "Distintivo Oficial / Local. Único lugar del sistema donde aparece el morado de tema local.",
+      "html": "<div class=\"ds-badge-row\"><span class=\"ds-badge ds-badge--official\">Oficial</span><span class=\"ds-badge ds-badge--local\">Local</span></div>",
+      "css": ".ds-badge-row { display: flex; gap: 0.5rem; } .ds-badge { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; } .ds-badge--official { background: #E8F1FF; color: #1560D8; border: 1px solid #B3D9FF; } .ds-badge--local { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }"
     }
   ],
   "narrative": {
     "northStar": "La Herramienta Institucional Confiable",
-    "overview": "ConvertidoreXe es el intermediario invisible entre la tarea y la intención del usuario. Su diseño refleja la seriedad y el rigor de una institución pública (Universidad de Alicante) manteniendo una interfaz que se retrae: los componentes son funcionales, no decorativos; el color es contenido, no llamativo; la tipografía es clara, nunca juguetona. El sistema rechaza explícitamente ornamentación lúdica, animaciones complejas, ambigüedad sobre dónde van los datos, y condescendencia hacia el usuario. Minimalismo sin frialdad: cada elemento comunica o actúa. Paleta institucional azul grisáceo transmite confianza. Tipografía única (Inter) asegura coherencia. Separación limpia por tono de fondo, no por ornamento. Sombras sutiles solo cuando hay cambio de estado.",
+    "overview": "ConvertidoreXe es el intermediario invisible entre la tarea y la intención del usuario. Su diseño refleja la seriedad y el rigor de una institución pública (Universidad de Alicante) manteniendo una interfaz que se retrae: los componentes son funcionales, no decorativos; el color es contenido, no llamativo; la tipografía es clara, nunca juguetona. El sistema rechaza explícitamente ornamentación lúdica, animaciones complejas, ambigüedad sobre dónde van los datos, y condescendencia hacia el usuario. La navegación primaria vive en un sidebar vertical persistente que siempre muestra al usuario dónde está dentro del flujo de 4 pasos. Minimalismo sin frialdad: cada elemento comunica o actúa. Paleta institucional azul grisácea con un azul primario vibrante transmite confianza sin perder calidez. Tipografía única (Inter) asegura coherencia. Cada gris del sistema se verifica contra 4.5:1 de contraste antes de aceptarse, sin excepciones por elegancia.",
     "keyCharacteristics": [
-      "Paleta institucional azul grisáceo—confianza sin agresión",
+      "Navegación lateral persistente (sidebar) con pipeline de pasos vertical",
+      "Paleta institucional azul grisácea—confianza sin agresión, con un azul primario vibrante",
       "Una familia tipográfica única (Inter)—coherencia total",
       "Elevación plana por defecto, sombras sutiles activadas por estado",
       "Componentes funcionales, nunca decorativos",
-      "Sombras ambiales apenas perceptibles; claridad visual por tono y borde",
+      "Contraste de texto verificado contra 4.5:1, no asumido por elegancia",
+      "Un único color de un solo uso (morado) reservado al badge de tema local",
       "Navegación por teclado completamente accesible",
       "Respeto absoluto a prefers-reduced-motion"
     ],
     "rules": [
       {
         "name": "La Regla de la Austeridad Azul",
-        "body": "El azul corporativo aparece en menos del 10% de cualquier pantalla de contenido. Es acento, no decoración. Cuando se requiere más color de marca, se usa azul claro (#EBF3FF) o borde azul (#BDD8FF), no más saturación del primario.",
+        "body": "El azul corporativo aparece en menos del 10% de cualquier pantalla de contenido. Es acento, no decoración. Cuando se requiere más color de marca, se usa azul claro (#E8F1FF) o borde azul (#B3D9FF), no más saturación del primario.",
         "section": "colors"
       },
       {
         "name": "La Regla de la Jerarquía de Grises",
         "body": "Los tres niveles de gris textual (primario / secundario / terciario) crean jerarquía por peso, no por color. Nunca se mezclan con colores de marca; permanecen neutros y predecibles.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Contraste No Negociable",
+        "body": "Todo texto sobre fondo claro alcanza mínimo 4.5:1, sin excepción para texto secundario o terciario. El terciario (#626268) se fijó en ese valor exacto porque el tono anterior no llegaba al mínimo. Cualquier gris nuevo se mide con la misma vara antes de aceptarse.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Morado Único",
+        "body": "El morado de tema local tiene un solo trabajo: el badge 'Local'. Si aparece en cualquier otro lugar de la interfaz, es un error, no una decisión de diseño.",
         "section": "colors"
       },
       {
@@ -214,24 +278,27 @@
     ],
     "dos": [
       "Do usar Inter en toda la interfaz, sin excepciones. Mantén pesos 400 (body), 500 (labels), 600 (títulos), 700 (énfasis).",
-      "Do mantener el azul primario (#1B6EC2) a menos del 10% de cualquier pantalla. Todos los demás puntos de color usan neutros, claros, o feedback.",
+      "Do mantener el azul primario (#1560D8) a menos del 10% de cualquier pantalla. Todos los demás puntos de color usan neutros, claros, o feedback.",
+      "Do verificar el contraste de cualquier gris nuevo contra 4.5:1 antes de incorporarlo al sistema—el terciario ya pasó por este ajuste exacto una vez (#626268).",
       "Do aplicar sombras XS en reposo para inputs/tarjetas pequeñas; shadow-SM en hover/focus; shadow-MD solo en modales/flotantes.",
       "Do escribir etiquetas de entrada y de campo en mayúscula pequeña (0.72rem, weight 500, tracking 0.04em). Esto crea claridad visual sin grito.",
-      "Do mantener el contraste texto/fondo a mínimo 4.5:1 (WCAG AA). Verificar gris terciario (#8E8E93) sobre fondo blanco regularmente.",
       "Do usar chevrones SVG para expandir/contraer en lugar de caracteres ASCII. Son más precisos y animables.",
       "Do respetar prefers-reduced-motion: reemplazar todas las animaciones con crossfades instantáneas o eliminación.",
-      "Do mantener focus rings azules (2px, offset 2px) visibles en navegación por teclado. No esconder nunca."
+      "Do mantener focus rings azules (2px, offset 2px) visibles en navegación por teclado. No esconder nunca.",
+      "Do reservar el morado de 'tema local' exclusivamente para ese badge; no reutilizarlo en botones, alertas u otros componentes."
     ],
     "donts": [
       "Don't usar animaciones complejas o coreografiadas (ver PRODUCT.md: 'Heavy or complex animations'). Motion es solo para cambio de estado: entrada, validación, loading, confirmación.",
       "Don't crear cards anidadas. Jerarquía por indentación, borde sutil, o fondo, nunca por profundidad visual repetida.",
-      "Don't saturar el azul corporativo. Si necesitas más marca visible, usa azul claro (#EBF3FF) o borde azul (#BDD8FF), no más #1B6EC2.",
+      "Don't saturar el azul corporativo. Si necesitas más marca visible, usa azul claro (#E8F1FF) o borde azul (#B3D9FF), no más #1560D8.",
       "Don't inventar affordances. Los botones se ven como botones. Los inputs tienen borde y padding. Los toggles no rotan ni son icónicos.",
       "Don't usar gráficos de degradado, glassmorphism, o bordes laterales gruesos (> 1px) como decoración. Rechazado en PRODUCT.md como 'overly playful'.",
       "Don't etiquetar cada sección con un número pequeño ('01 PASO'). Aparece solo en flujos reales donde el orden importa e informa.",
       "Don't oscurecer o confundir dónde van los datos. Si un documento se procesa localmente, décirlo. Si hay validación, mostrar el error exacto.",
-      "Don't usar display fonts, script, o monoespacial decorativo. Inter es la familia; punto.",
-      "Don't rellenar con placeholder de relleno. Si un estado vacío ocurre, diseñarlo: 'No hay temas cargados aún' es mejor que una tarjeta vacía."
+      "Don't usar display fonts, script, o monoespacial decorativo fuera del editor de código del panel de administración.",
+      "Don't rellenar con placeholder de relleno. Si un estado vacío ocurre, diseñarlo: 'No hay temas cargados aún' es mejor que una tarjeta vacía.",
+      "Don't expandir el ámbar de advertencia a flujos bloqueantes; si detiene el proceso, es rojo, no ámbar.",
+      "Don't volver a una cabecera horizontal con step-bar; la navegación primaria vive en el sidebar vertical."
     ]
   }
 }

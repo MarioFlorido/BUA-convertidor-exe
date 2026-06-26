@@ -92,7 +92,7 @@ button {
 
 /* ── Sidebar (marca, pipeline de pasos y acciones) ───────────────────────── */
 .sidebar {
-  width: 232px;
+  width: 215px;
   flex-shrink: 0;
   background: var(--surface);
   border-right: 1px solid var(--border-light);
@@ -714,18 +714,29 @@ button {
   min-height: 88px;
 }
 
+/* ── Grupo de toggles (panel plano) ──
+   Mismo ancho de clúster (240px) para ELPX y PDF. Esta pantalla ya está
+   sobre el fondo institucional (--bg), así que para que el grupo se note
+   necesita ser más claro que su entorno, no igual: blanco plano, sin
+   borde ni sombra (reposo plano), delimita cada grupo como "zona propia"
+   sin necesitar una etiqueta de texto. */
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.6rem;
+  flex: 0 0 240px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 0.625rem 0.75rem;
+}
+
 /* ── Pila de switches del bloque PDF (portada, numeración…) ── */
 .pdf-toggle-stack {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 0.75rem;
-  flex: 0 0 240px;
-}
-
-/* El toggle suelto del ELPX comparte el mismo ancho de clúster que el bloque PDF. */
-.pdf-download-group > .pdf-cover-toggle-inline {
-  flex: 0 0 240px;
+  width: 100%;
 }
 
 /* ── Fila de toggle: rejilla [etiqueta | control] → switches alineados ── */
@@ -897,7 +908,7 @@ button {
 
 .download-btn-sub-browser {
   font-size: 0.75rem;
-  color: #8E8E93;
+  color: var(--text-3);
   line-height: 1.45;
 }
 
@@ -1177,20 +1188,22 @@ button {
 
 .structure-main-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
   gap: 1.5rem;
   margin: 2rem 0;
   align-items: start;
 }
 
-/* +232px respecto al umbral "sin sidebar": el sidebar ahora resta ese
-   ancho al área de contenido antes de que el árbol decida apilarse. */
-@media (max-width: 1340px) {
+/* El árbol se encoge (320px→240px) antes de apilarse, así que el punto de
+   ruptura real queda muy por debajo de los portátiles institucionales
+   habituales (1366px de ancho): sidebar (215px) + padding del contenedor
+   (64px) + árbol+gap (≤344px) deja ≥477px para el panel de estructura
+   incluso a 1100px de viewport. Antes el umbral era 1340px con el árbol a
+   320px fijos, lo que colapsaba a una columna en cualquier portátil de
+   1366px sin maximizar a pantalla completa o con scrollbar visible. */
+@media (max-width: 1100px) {
   .structure-main-layout {
     grid-template-columns: 1fr;
-  }
-  .content-tree-view {
-    position: static;
   }
 }
 
@@ -1554,7 +1567,17 @@ button {
   padding: 0.9rem 1rem;
   box-shadow: var(--shadow-xs);
   position: sticky;
-  top: 84px; /* bajo el header fijo de 60px */
+  top: 84px;
+}
+
+/* Por debajo del umbral de apilado de .structure-main-layout, el árbol pasa
+   a flujo normal bajo las secciones — sticky no tiene sentido en una sola
+   columna. Esta regla debe ir DESPUÉS de la definición base de arriba para
+   ganarle en cascada (misma especificidad, gana la última en el archivo). */
+@media (max-width: 1100px) {
+  .content-tree-view {
+    position: static;
+  }
 }
 
 .content-tree-header {
@@ -2759,8 +2782,7 @@ button {
     gap: 0.75rem;
   }
 
-  .pdf-toggle-stack,
-  .pdf-download-group > .pdf-cover-toggle-inline {
+  .toggle-group {
     flex: none;
     width: 100%;
   }

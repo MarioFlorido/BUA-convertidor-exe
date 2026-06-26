@@ -53,13 +53,13 @@ export function App() {
     heading4Mode: 'block',
     themeId: 'base',
   });
-  // Interruptor de ayuda contextual: activado por defecto, persiste la
-  // preferencia del usuario en localStorage (no es un "ya lo he visto" de
-  // una sola vez, sino un on/off explícito que el usuario controla siempre
-  // desde el switch del sidebar).
+  // Interruptor de ayuda contextual (Tour inicial): desactivado por defecto,
+  // persiste la preferencia del usuario en localStorage (no es un "ya lo he
+  // visto" de una sola vez, sino un on/off explícito que el usuario controla
+  // siempre desde el switch del sidebar).
   const [helpEnabled, setHelpEnabled] = useState<boolean>(() => {
     const stored = localStorage.getItem(HELP_ENABLED_KEY);
-    return stored === null ? true : stored === 'true';
+    return stored === null ? false : stored === 'true';
   });
 
   // Al cambiar de pantalla, volver al inicio (p. ej. del configurador largo

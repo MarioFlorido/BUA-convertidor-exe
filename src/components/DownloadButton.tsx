@@ -147,11 +147,13 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </div>
           {!elpxLoading && <DownloadArrow />}
         </button>
-        <Toggle
-          label="Menú lateral desplegado"
-          checked={navExpanded}
-          onChange={() => setNavExpanded((v) => !v)}
-        />
+        <div className="toggle-group">
+          <Toggle
+            label="Menú lateral desplegado"
+            checked={navExpanded}
+            onChange={() => setNavExpanded((v) => !v)}
+          />
+        </div>
       </div>
 
       {elpxError && (
@@ -186,18 +188,20 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
           </div>
           {!printLoading && <DownloadArrow />}
         </button>
-        <div className="pdf-toggle-stack">
-          <Toggle
-            label="Foto de portada"
-            checked={useCoverImage}
-            onChange={() => setUseCoverImage((v) => !v)}
-          />
-          <Toggle
-            label="Numerar títulos"
-            caption="1, 1.1, 1.1.1…"
-            checked={numberedHeadings}
-            onChange={() => setNumberedHeadings((v) => !v)}
-          />
+        <div className="toggle-group">
+          <div className="pdf-toggle-stack">
+            <Toggle
+              label="Foto de portada"
+              checked={useCoverImage}
+              onChange={() => setUseCoverImage((v) => !v)}
+            />
+            <Toggle
+              label="Numerar títulos"
+              caption="1, 1.1, 1.1.1…"
+              checked={numberedHeadings}
+              onChange={() => setNumberedHeadings((v) => !v)}
+            />
+          </div>
         </div>
       </div>
 

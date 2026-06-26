@@ -107,7 +107,7 @@ export function Sidebar({
         {onToggleHelp && (
           <div className="sidebar-toggle-row">
             <Toggle
-              label="Tour"
+              label="Tour inicial"
               checked={!!helpEnabled}
               onChange={() => onToggleHelp(!helpEnabled)}
             />
@@ -120,7 +120,7 @@ export function Sidebar({
           title="Abrir guía de uso"
         >
           <InfoIcon />
-          <span>AYUDA</span>
+          <span>Manual de ayuda</span>
         </button>
       </div>
     </aside>
