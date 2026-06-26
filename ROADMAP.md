@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **19 jun 2026**
+> Última actualización: **26 jun 2026**
 
 ---
 
@@ -73,12 +73,6 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   fases de refactor con checkboxes sin marcar, pero gran parte ya está hecha
   (la infraestructura de regresión existe: fixtures DOCX, `validate-regression.ts`,
   baseline de checksums). Repasar y reflejar el estado real para que no confunda.
-
-- [ ] ⚪ **Reorganización de carpetas (antigua «Fase 4»).** Reordenar `src/` en
-  una estructura más limpia. **Se saltó a propósito** en su día: es cosmética y el
-  riesgo de romper rutas en producción supera al valor. Decisión consciente, no un
-  olvido. Reevaluar solo si algún día compensa. Los 3 CLI de temas
-  (`themes`/`publish-theme`/`unpublish-theme`) se conservan como _fallback_.
 
 ### Seguridad
 
@@ -150,3 +144,8 @@ Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
   la convención junto al campo «Nombre».
 - [x] **Nombre pre-rellenado desde `<title>`** del `config.xml` al publicar un
   tema oficial (antes se escribía a mano y podía no coincidir con el XML).
+- [x] **Reorganización de carpetas (Fase 4):** pipeline agrupado en
+  `src/core/pipeline/` y assets en `public/img/` (21 jun 2026). Se había
+  marcado como saltada a propósito por el riesgo de romper rutas en
+  producción; se reevaluó y se hizo igualmente, verificada con tsc limpio,
+  108/108 tests y build OK antes del merge. Detalle en `CHANGELOG.md`.

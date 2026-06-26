@@ -49,6 +49,19 @@
   tema. Validación: detecta `[pie]` sin cerrar igual que las demás cajas,
   avisa antes de convertir.
 
+### Reorganización de carpetas (Fase 4)
+- **Pipeline agrupado en `src/core/pipeline/`**: `docxToSemanticDocument.ts`,
+  `parseStructure.ts`, `buildFromStructure.ts` y sus tests se movieron desde
+  `src/core/` suelto a un subdirectorio propio.
+- **Assets estáticos agrupados en `public/img/`**: `logo_BUA.png`, `logo_UA.png`,
+  `logo_CID.png`, `docx.png`, `pdf.png`, `elpx-icon.png`, `minichrome.png` y
+  `miniedge.png` se movieron desde `public/` suelto.
+- Imports actualizados en `App.tsx`, `AppHeader.tsx`, `DownloadButton.tsx` y
+  `UploadZone.tsx`; sin cambios de comportamiento. Esta fase se había marcado
+  conscientemente como saltada (riesgo de romper rutas en producción vs.
+  beneficio cosmético); se reevaluó y se ejecutó el 21 jun 2026 con verificación
+  previa (tsc limpio, 108/108 tests, build OK).
+
 ### Auditoría y consolidación técnica (refactor P0/P1/P2)
 - **Invariante posicional blindado con test** (`structureContentSymmetry.test.ts`,
   6 tests): `parseDocumentStructure` y `buildProjectFromStructure` deben ignorar
