@@ -82,6 +82,7 @@ export function Sidebar({
         <div className="sidebar-brand-text">
           <span className="sidebar-brand-name">ConvertidoreXe</span>
           <span className="sidebar-brand-sub">DOCX → eXeLearning</span>
+          <span className="sidebar-brand-sub">DOCX → PDF</span>
         </div>
       </div>
 
