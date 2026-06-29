@@ -872,8 +872,8 @@ button {
 }
 
 .download-btn-icon {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
 }
 
@@ -920,7 +920,7 @@ button {
 }
 
 .download-btn-arrow {
-  opacity: 0.5;
+  opacity: 0.7;
   flex-shrink: 0;
 }
 
