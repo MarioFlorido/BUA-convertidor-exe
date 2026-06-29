@@ -182,8 +182,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
               {printLoading ? 'Generando vista de impresión…' : 'Vista previa para imprimir / PDF'}
             </span>
             <span className="download-btn-sub-browser">
-              Mejores resultados con los navegadores Google Chrome <img src={`${base}img/minichrome.png`} alt="Chrome" className="browser-icon" aria-hidden="true" /> o Microsoft Edge   
-              <img src={`${base}img/miniedge.png`} alt="Edge" className="browser-icon" aria-hidden="true" />
+              Los mejores resultados se optienen con los navegadores Google Chrome <img src={`${base}img/minichrome.png`} alt="Chrome" className="browser-icon" aria-hidden="true" /> o Microsoft Edge <img src={`${base}img/miniedge.png`} alt="Edge" className="browser-icon" aria-hidden="true" />
             </span>
           </div>
           {!printLoading && <DownloadArrow />}
