@@ -105,16 +105,6 @@ export function Sidebar({
           </button>
         )}
 
-        {onToggleHelp && (
-          <div className="sidebar-toggle-row">
-            <Toggle
-              label="Tour inicial"
-              checked={!!helpEnabled}
-              onChange={() => onToggleHelp(!helpEnabled)}
-            />
-          </div>
-        )}
-
         <button
           onClick={handleInfoClick}
           className="sidebar-action"
@@ -123,6 +113,16 @@ export function Sidebar({
           <InfoIcon />
           <span>Manual de ayuda</span>
         </button>
+
+        {onToggleHelp && (
+          <div className="sidebar-toggle-row">
+            <Toggle
+              label="Tour inicial"
+              checked={false}
+              onChange={() => onToggleHelp(!helpEnabled)}
+            />
+          </div>
+        )}
       </div>
     </aside>
   );
