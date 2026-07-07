@@ -163,10 +163,12 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
     <div className="structure-configurator">
       {tagIssues.length > 0 && (
         <div className="alert alert-warning" role="alert">
-          <strong>Revisa las cajas semánticas antes de continuar.</strong> Parece que
-          {tagIssues.length === 1 ? ' una caja no está' : ` ${tagIssues.length} cajas no están`}{' '}
-          bien cerrada{tagIssues.length === 1 ? '' : 's'} con <code>[fin]</code>. Si conviertes
-          así, el contenido puede mezclarse o aparecer la etiqueta como texto. Corrige el documento
+          <strong>Revisa el etiquetado semántico antes de continuar.</strong> Se
+          {tagIssues.length === 1
+            ? ' ha detectado un problema'
+            : ` han detectado ${tagIssues.length} problemas`}{' '}
+          con las etiquetas <code>[…]</code> del documento. Si conviertes así, el contenido
+          puede mezclarse o aparecer la etiqueta como texto. Corrige el documento
           de Word y vuelve a subirlo:
           <ul className="tag-issue-list">
             {tagIssues.map((issue, i) => (

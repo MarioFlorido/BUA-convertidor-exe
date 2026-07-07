@@ -301,21 +301,26 @@ function extractThemeStyles(entries: Record<string, Uint8Array>, themeId: string
  * según el idioma del tema cargado.
  */
 function extractBuaStyles(css: string): BuaBoxStyles {
+  // Formatos de color aceptados: #hex, rgb()/rgba(), hsl()/hsla().
+  // No se aceptan var(...) ni gradientes: no resolverían en el PDF
+  // (el :root del tema no se inyecta) — en ese caso se cae al fallback.
+  const COLOR = '(#[0-9a-fA-F]{3,8}|rgba?\\([^)]+\\)|hsla?\\([^)]+\\))';
+
   /**
    * Extrae el color sólido del border-left de una clase BUA.
-   * Soporta: "border-left: 6px solid #135d87"
+   * Soporta: "border-left: 6px solid #135d87" (o rgb/hsl)
    */
   function borderColor(cls: string): string | null {
-    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*border-left:[^;]*solid\\s*(#[0-9a-fA-F]{3,8})`, 's').exec(css);
+    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*border-left:[^;]*solid\\s*${COLOR}`, 's').exec(css);
     return m ? m[1] : null;
   }
 
   /**
-   * Extrae el color/gradiente de fondo de una clase BUA.
-   * Soporta: "background: #fafbfc" y "background-color: rgba(...)"
+   * Extrae el color de fondo de una clase BUA.
+   * Soporta: "background: #fafbfc" y "background-color: rgba(...)" (o rgb/hsl)
    */
   function bgColor(cls: string): string | null {
-    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*background(?:-color)?:\\s*(rgba\\([^)]+\\)|#[0-9a-fA-F]{3,8})`, 's').exec(css);
+    const m = new RegExp(`\\.${cls}\\s*\\{[^}]*background(?:-color)?:\\s*${COLOR}`, 's').exec(css);
     return m ? m[1] : null;
   }
 

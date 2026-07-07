@@ -546,8 +546,10 @@
   background: #f7f7f7;
 }
 
-/* Tabla vertical: primera columna actúa como cabecera */
-.block-html .bua_tabla_vertical td:first-child {
+/* Tabla vertical: primera columna actúa como cabecera. Se cubre también
+   th:first-child (como en el CSS del tema) por si la tabla llega con <th>. */
+.block-html .bua_tabla_vertical td:first-child,
+.block-html .bua_tabla_vertical th:first-child {
   background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;

@@ -39,10 +39,12 @@ describe('applyDivClasses', () => {
     assert.equal(out, '<div class="bua_importante"><p>Contenido</p></div>');
   });
 
-  test('Caso B: etiqueta inline dentro del mismo párrafo', () => {
+  test('etiqueta inline dentro del mismo párrafo → se normaliza a Caso A (HTML válido)', () => {
+    // Antes producía <p><div>…</div></p> (inválido); ahora el marcador se aísla
+    // en su propio párrafo y el resultado es idéntico al Caso A.
     const input = '<p>[importante]Contenido[fin]</p>';
     const out = applyDivClasses(input);
-    assert.equal(out, '<p><div class="bua_importante">Contenido</div></p>');
+    assert.equal(out, '<div class="bua_importante"><p>Contenido</p></div>');
   });
 
   test('[pie] se mapea a bua_pie (Caso A)', () => {
@@ -51,10 +53,59 @@ describe('applyDivClasses', () => {
     assert.equal(out, '<div class="bua_pie"><p>Figura 1. Esquema del proceso</p></div>');
   });
 
-  test('[pie] inline se mapea a bua_pie (Caso B)', () => {
+  test('[pie] inline se mapea a bua_pie (normalizado a Caso A)', () => {
     const input = '<p>[pie]Tabla 2. Datos de matrícula[fin]</p>';
     const out = applyDivClasses(input);
-    assert.equal(out, '<p><div class="bua_pie">Tabla 2. Datos de matrícula</div></p>');
+    assert.equal(out, '<div class="bua_pie"><p>Tabla 2. Datos de matrícula</p></div>');
+  });
+
+  test('mixto: apertura en párrafo propio + [fin] inline al final del contenido', () => {
+    const input = '<p>[ejemplo]</p><p>Contenido [fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<div class="bua_ejemplo"><p>Contenido</p></div>');
+  });
+
+  test('mixto: apertura inline al inicio del contenido + [fin] en párrafo propio', () => {
+    const input = '<p>[ejemplo] Contenido</p><p>[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<div class="bua_ejemplo"><p>Contenido</p></div>');
+  });
+
+  test('marcador con formato de Word alrededor (<strong>[fin]</strong>) funciona', () => {
+    // El "misterio" del [fin] que aparece como texto pese a estar bien escrito:
+    // parte del marcador quedó en negrita/cursiva sin que el autor lo vea.
+    const input = '<p>[importante]</p><p>x</p><p><strong>[fin]</strong></p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<div class="bua_importante"><p>x</p></div>');
+  });
+
+  test('marcador con formato anidado (<strong><em>[fin]</em></strong>) funciona', () => {
+    const input = '<p>[ejemplo]</p><p>x</p><p><strong><em>[fin]</em></strong></p>';
+    const out = applyDivClasses(input);
+    assert.match(out, /class="bua_ejemplo"/);
+    assert.doesNotMatch(out, /\[fin\]/);
+  });
+
+  test('formato parcial DENTRO del marcador ([f<em>in</em>]) funciona', () => {
+    const input = '<p>[importante]</p><p>x</p><p>[f<em>in</em>]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<div class="bua_importante"><p>x</p></div>');
+  });
+
+  test('un [texto] normal con formato dentro NO se toca (solo marcadores)', () => {
+    const input = '<p>Véase [la <em>obra</em> citada] al final</p>';
+    assert.equal(applyDivClasses(input), input);
+  });
+
+  test('nunca queda un <div> dentro de un <p>', () => {
+    const inputs = [
+      '<p>[importante]Contenido[fin]</p>',
+      '<p>[ejemplo]</p><p>A [fin]</p>',
+      '<p>[pie] Figura</p><p>[fin]</p>',
+    ];
+    for (const input of inputs) {
+      assert.doesNotMatch(applyDivClasses(input), /<p>[^<]*<div/, input);
+    }
   });
 
   test('case-insensitive: [EJEMPLO] funciona', () => {
@@ -77,6 +128,23 @@ describe('applyDivClasses', () => {
     assert.equal(matches.length, 2, 'debe haber exactamente 2 divs');
     assert.match(out, /class="bua_ejemplo"/);
     assert.match(out, /class="bua_importante"/);
+  });
+
+  test('una caja NO puede atravesar un encabezado (quedaría fuera de la estructura)', () => {
+    // El H2 debe seguir siendo hijo de primer nivel del body; si la caja lo
+    // envolviera, el troceado por encabezados dejaría de verlo. Al no matchear,
+    // los marcadores quedan como texto (fallo visible, avisado por
+    // semanticTagBalance como 'heading-inside-box').
+    const input =
+      '<p>[importante]</p><p>A</p><h2>Título</h2><p>B</p><p>[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, input, 'no debe transformar nada');
+  });
+
+  test('caja tras un encabezado se transforma con normalidad', () => {
+    const input = '<h2>Título</h2><p>[ejemplo]</p><p>A</p><p>[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(out, '<h2>Título</h2><div class="bua_ejemplo"><p>A</p></div>');
   });
 
   test('etiqueta no reconocida se deja intacta', () => {
@@ -144,6 +212,19 @@ describe('applyTableClasses', () => {
   test('sin tabla detrás: no toca el marcador', () => {
     const input = '<p>[horizontal]</p><p>no es tabla</p>';
     assert.equal(applyTableClasses(input), input);
+  });
+
+  test('texto delante del marcador en el mismo párrafo → se aísla y funciona', () => {
+    const input = '<p>Comparativa: [horizontal]</p><table><tr><td>x</td></tr></table>';
+    const out = applyTableClasses(input);
+    assert.match(out, /<table class="bua_tabla_horizontal">/);
+    assert.match(out, /<p>Comparativa:<\/p>/);
+  });
+
+  test('marcador con formato de Word alrededor (<strong>[vertical]</strong>) funciona', () => {
+    const input = '<p><strong>[vertical]</strong></p><table><tr><td>x</td></tr></table>';
+    const out = applyTableClasses(input);
+    assert.match(out, /<table class="bua_tabla_vertical">/);
   });
 });
 

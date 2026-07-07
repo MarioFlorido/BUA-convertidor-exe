@@ -375,7 +375,14 @@ function normalizeImportedNode(node: Node): string {
     .join('');
 
   switch (tag) {
-    case 'div':
+    case 'div': {
+      // Los <div class="bua_*"> (cajas semánticas, vídeos) los acaba de crear
+      // applyAllTransforms: deben sobrevivir a la sanitización o el etiquetado
+      // no llega a ELPX/PDF. Cualquier otro div se disuelve en sus hijos.
+      const buaAttr = buaClassAttribute(node);
+      if (!buaAttr || !normalizedChildren) return normalizedChildren;
+      return `<div${buaAttr}>${normalizedChildren}</div>`;
+    }
     case 'span':
       return normalizedChildren;
     case 'b':
@@ -405,7 +412,11 @@ function normalizeImportedNode(node: Node): string {
       if (!normalizedChildren) return '';
       return attrs ? `<li${attrs}>${normalizedChildren}</li>` : `<li>${normalizedChildren}</li>`;
     }
-    case 'table':
+    case 'table': {
+      // Conservar bua_tabla_horizontal / bua_tabla_vertical ([horizontal]/[vertical])
+      if (!normalizedChildren) return '';
+      return `<table${buaClassAttribute(node)}>${normalizedChildren}</table>`;
+    }
     case 'thead':
     case 'tbody':
     case 'tr':
@@ -462,6 +473,12 @@ function normalizeImportedNode(node: Node): string {
     default:
       return normalizedChildren;
   }
+}
+
+/** Atributo class con solo las clases bua_* del elemento ('' si no tiene). */
+function buaClassAttribute(node: HTMLElement): string {
+  const buaClasses = Array.from(node.classList).filter((c) => c.startsWith('bua_'));
+  return buaClasses.length ? ` class="${buaClasses.join(' ')}"` : '';
 }
 
 function wrapTag(tag: string, innerHtml: string): string {

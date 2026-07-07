@@ -87,6 +87,22 @@ describe('detectSemanticTagIssues', () => {
     assert.deepEqual(detectSemanticTagIssues(html), []);
   });
 
+  test('[fin] con formato alrededor (<strong>[fin]</strong>) no da falso aviso', () => {
+    // El "misterio": el marcador quedó en negrita sin que el autor lo vea.
+    const html = '<p>[ejemplo]</p><p>A</p><p><strong>[fin]</strong></p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('formato parcial DENTRO del marcador ([f<em>in</em>]) no da falso aviso', () => {
+    const html = '<p>[importante]</p><p>A</p><p>[f<em>in</em>]</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('apertura y cierre inline en el mismo párrafo → sin avisos', () => {
+    const html = '<p>[pie]Figura 1. Esquema[fin]</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
   test('el aviso incluye un contexto para localizar la caja', () => {
     const html = '<p>[ejemplo]</p><p>Las setas son hongos comestibles</p><p>[definicion]</p><p>B</p><p>[fin]</p>';
     const issues = detectSemanticTagIssues(html);
@@ -100,5 +116,70 @@ describe('detectSemanticTagIssues', () => {
     assert.equal(issues.length, 2);
     assert.equal(issues[0].label, 'ejemplo');
     assert.equal(issues[1].label, 'importante');
+  });
+});
+
+describe('detectSemanticTagIssues — encabezado dentro de una caja', () => {
+  test('caja que abarca un H2 → heading-inside-box con el texto del título', () => {
+    const html =
+      '<p>[importante]</p><p>A</p><h2>Título tragado</h2><p>B</p><p>[fin]</p>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'heading-inside-box');
+    assert.equal(issues[0].label, 'importante');
+    assert.match(issues[0].context, /Título tragado/);
+  });
+
+  test('encabezado ENTRE dos cajas bien cerradas → sin avisos', () => {
+    const html =
+      '<p>[ejemplo]</p><p>A</p><p>[fin]</p><h2>Título</h2><p>[pie]</p><p>B</p><p>[fin]</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+});
+
+describe('detectSemanticTagIssues — marcadores de tabla', () => {
+  test('[horizontal] solo en su párrafo y pegado a la tabla → sin avisos', () => {
+    const html = '<p>[horizontal]</p><table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('[vertical] con espacios y mayúsculas, pegado a la tabla → sin avisos', () => {
+    const html = '<p>[ Vertical ]</p>\n<table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('párrafo intermedio entre marcador y tabla → table-marker', () => {
+    const html =
+      '<p>[horizontal]</p><p>Texto colado</p><table><tr><td>A</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-marker');
+    assert.equal(issues[0].marker, 'horizontal');
+  });
+
+  test('marcador inline con más texto en el párrafo → table-marker', () => {
+    const html = '<p>Esta tabla [vertical] importa</p><table><tr><td>A</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-marker');
+    assert.equal(issues[0].marker, 'vertical');
+  });
+
+  test('marcador sin tabla detrás → table-marker', () => {
+    const html = '<p>[horizontal]</p><p>Y aquí no hay tabla</p>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-marker');
+  });
+
+  test('bookmark de Word dentro del marcador no da falso aviso', () => {
+    const html =
+      '<p>[hori<a id="b1"></a>zontal]</p><table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('<br/> tras el marcador (Shift+Enter) no da falso aviso', () => {
+    const html = '<p>[horizontal]<br/></p><table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
   });
 });
