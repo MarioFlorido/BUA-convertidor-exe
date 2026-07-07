@@ -473,13 +473,20 @@
 .block-html img {
   max-width: 100%;
   height: auto;
+  /* Nunca más alta que el área útil de la página (249mm de alto de contenido):
+     sin este límite, una captura vertical larga se recortaba por abajo.
+     Con max-width + max-height y height:auto se conserva la proporción. */
+  max-height: 235mm;
   display: block;
   margin: 12px auto;
   break-inside: avoid;
-  /* filter: drop-shadow en lugar de box-shadow: Chrome degrada box-shadow a un
-     marco sólido al guardar/imprimir a PDF. drop-shadow se rasteriza con la
-     imagen y se mantiene en el PDF final. */
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+  /* Borde fino en lugar de sombra. Cualquier `filter` (el antiguo drop-shadow)
+     obliga a Chrome a RASTERIZAR la imagen al imprimir (~300 DPI, medido:
+     una captura de 2880px quedaba re-muestreada a 1893px + máscara alfa).
+     Sin filtro, el PDF incrusta la imagen a su resolución íntegra. El borde
+     enmarca las capturas como la sombra, se imprime vectorial y no sufre el
+     bug de box-shadow (Chrome lo degrada a un marco sólido en el PDF). */
+  border: 1px solid #d5d9de;
   border-radius: 2px;
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;

@@ -111,10 +111,10 @@ Cuando exportas a PDF, ConvertidoreXe añade:
 - **Pie de página** — Logo UA a la izquierda, número de página en el centro
 - **Cajas semánticas** — Con los colores y etiquetas del tema
 - **Tablas** — Encabezado coloreado
-- **Imágenes** — Centradas con sombra sutil
+- **Imágenes** — Centradas con borde fino; nunca más altas que la página (sin recortes)
 - **Acordeones y pestañas** — Expandidos en impresión (sin solapamientos)
 
-Las imágenes se optimizan automáticamente antes de generar el PDF (redimensionado y recompresión) para reducir el peso del archivo y acelerar la paginación, sin empeorar nunca el original.
+Las imágenes se optimizan automáticamente antes de generar el PDF priorizando la nitidez de las capturas de pantalla: se quedan en PNG (sin pérdida) salvo el contenido claramente fotográfico, que se recomprime a JPEG; solo se redimensionan por encima de 2000×2800 px. Nunca se empeora el original.
 
 Todo el proceso es **offline**: el motor de paginación (Paged.js) va embebido en la app, no se descarga de ningún CDN. El PDF se genera aunque no tengas conexión.
 

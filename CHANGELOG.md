@@ -1,5 +1,15 @@
 # Changelog
 
+## Sin publicar — Julio 2026
+
+### PDF — nitidez de imágenes (capturas de pantalla)
+- **Política PNG-primero en `optimizeImagesForPrint.ts`**: las capturas de pantalla ya **no** se recomprimen a JPEG (que emborronaba el texto de menús y diálogos). El contenido se clasifica midiendo la fracción de píxeles «planos» (idénticos ±2 a su vecino): capturas y diagramas → PNG sin pérdida; solo lo fotográfico (fotos de cámara) → JPEG 0.82. Una PNG dentro de límites que se queda en PNG no se recodifica: conserva sus bytes originales.
+- **Límites de redimensionado ampliados** de 1600×2200 a 2000×2800 px (~320 DPI a ancho útil de A4), y el reescalado se hace **por mitades sucesivas con `imageSmoothingQuality: 'high'`** (antes un único `drawImage` con suavizado por defecto, que emborronaba las capturas Retina).
+- **Borde fino en lugar de `drop-shadow`** en las imágenes del PDF: cualquier `filter` CSS obliga a Chrome a rasterizar la imagen a ~300 DPI al imprimir (medido: una captura de 2880 px quedaba re-muestreada a 1893 px). Sin filtro, el PDF incrusta cada imagen a su resolución íntegra.
+- **Corrección de transparencias**: la detección de alfa se aplica ahora a cualquier formato (antes solo PNG) y recorre todos los píxeles (antes muestreo 1/17). Un GIF/WebP transparente ya no puede acabar como JPEG con las zonas transparentes en negro.
+- **Imágenes más altas que la página**: `max-height: 235mm` en `printStyles.css` — una captura vertical larga se reescala para caber en la página en lugar de recortarse por abajo.
+- **Deduplicación y secuencialidad** en el optimizador: cada data URL única se procesa una sola vez (imágenes repetidas) y en secuencia (acota el pico de memoria con documentos muy fotográficos).
+
 ## v0.3.0 — Junio 2026
 
 ### PDF — motor y rendimiento
