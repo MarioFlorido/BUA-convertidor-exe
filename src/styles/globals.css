@@ -2957,6 +2957,31 @@ button {
   margin-bottom: 1.25rem;
 }
 
+/* Título + crédito de autoría (utilidad original de Silvia Gomis) */
+.limpiador-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.limpiador-credit {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.limpiador-credit::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.8em;
+  margin-right: 0.75rem;
+  background: var(--border);
+  vertical-align: -0.05em;
+}
+
 .limpiador-drop {
   display: flex;
   flex-direction: column;

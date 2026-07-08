@@ -251,7 +251,10 @@ export function Limpiador({ onBack }: LimpiadorProps) {
         </button>
       </div>
 
-      <h2 className="section-heading">Limpiador de Word</h2>
+      <div className="limpiador-title-row">
+        <h2 className="section-heading">Limpiador de Word</h2>
+        <span className="limpiador-credit">By Silvia Gomis</span>
+      </div>
       <p className="section-sub">
         Prepara tu documento Word para el convertidor: quita portada, índice y formato,
         y revisa títulos, cajas y tablas.{' '}
