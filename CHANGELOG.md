@@ -21,6 +21,10 @@
 - **Imágenes más altas que la página**: `max-height: 235mm` en `printStyles.css` — una captura vertical larga se reescala para caber en la página en lugar de recortarse por abajo.
 - **Deduplicación y secuencialidad** en el optimizador: cada data URL única se procesa una sola vez (imágenes repetidas) y en secuencia (acota el pico de memoria con documentos muy fotográficos).
 
+### URLs excesivamente largas (PDF y eXeLearning)
+- Las URLs (o cualquier palabra sin espacios) que no caben en su contenedor ya **no se desbordan ni se pierden por el margen**: se parten en el punto necesario (`overflow-wrap: anywhere`, solo actúa cuando la palabra no cabe entera).
+- Aplicado en los dos sitios: en el PDF (`printStyles.css`, regla heredada a todo el contenido) y en eXeLearning vía `pp_extraHeadContent` en el `content.xml` (`ElpxRenderer.ts`), el único vehículo de estilos que sobrevive al reexport desde eXeLearning — la propiedad ahora se emite siempre, con la regla del índice desplegado añadida cuando corresponde. Las páginas de preview del ZIP (`PreviewService.ts`) llevan la misma regla.
+
 ## v0.3.0 — Junio 2026
 
 ### PDF — motor y rendimiento

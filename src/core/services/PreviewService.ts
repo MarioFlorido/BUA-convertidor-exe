@@ -155,6 +155,7 @@ export class PreviewService {
 <link rel="stylesheet" href="${assetPrefix}content/css/base.css"><script src="${assetPrefix}theme/style.js"> </script><link rel="stylesheet" href="${assetPrefix}theme/style.css">
 <style>
 body.exe-export.exe-web-site{min-width:0}
+body{overflow-wrap:anywhere}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}
 .page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}

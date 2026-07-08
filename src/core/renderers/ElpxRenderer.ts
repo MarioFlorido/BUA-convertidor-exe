@@ -100,12 +100,18 @@ export class ElpxRenderer {
     const odeId = createResourceId();
     const odeVersionId = createResourceId();
     const modified = String(Date.now());
-    // El CSS del índice desplegado va escapado dentro del XML; eXeLearning lo
-    // desescapa al importar y lo coloca tal cual al final del <head> exportado,
-    // después del style.css del tema (misma especificidad → gana la cascada).
-    const extraHeadXml = navExpanded
-      ? `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml('<style>#siteNav .other-section{display:block}</style>')}</value></odeProperty>\n`
-      : '';
+    // El CSS extra va escapado dentro del XML; eXeLearning lo desescapa al
+    // importar y lo coloca tal cual al final del <head> exportado, después del
+    // style.css del tema (misma especificidad → gana la cascada). Es el único
+    // vehículo de estilos que sobrevive al reexport desde eXeLearning.
+    const extraStyles = [
+      // URLs (u otras palabras sin espacios) excesivamente largas: permitir
+      // partirlas en cualquier punto para que no desborden cajas, celdas ni
+      // iDevices. Solo actúa cuando la palabra no cabe entera en la línea.
+      'body{overflow-wrap:anywhere}',
+      ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
+    ].join('');
+    const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;
     const pageIds = this.project.pages.map(() => createPageId());
     const navStructuresXml = this.project.pages
       .map((page, index) => this.generateOdeNavStructureXml(page, index, pageIds))

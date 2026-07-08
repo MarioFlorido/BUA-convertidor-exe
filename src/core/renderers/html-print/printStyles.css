@@ -688,6 +688,14 @@ p, li {
   widows: 3;
 }
 
+/* URLs (u otras palabras sin espacios) excesivamente largas: permitir
+   partirlas en cualquier punto para que no desborden el ancho de página ni
+   desaparezcan por el margen. `anywhere` es heredada y solo actúa cuando la
+   palabra no cabe entera en la línea; el texto normal no se ve afectado. */
+body {
+  overflow-wrap: anywhere;
+}
+
 figure {
   break-inside: avoid;
 }
