@@ -2943,3 +2943,264 @@ button {
     animation: none !important;
   }
 }
+
+/* ── Limpiador de Word ───────────────────────────────────────────────────────
+   Utilidad de Silvia Gomis integrada como pantalla propia. Reutiliza
+   upload-zone, doc-title-banner, result-stats-card, level-selector y los
+   botones compartidos; aquí solo va lo específico de la lista de bloques. */
+.limpiador {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.limpiador-header {
+  margin-bottom: 1.25rem;
+}
+
+.limpiador-drop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 640px;
+  margin: 1.5rem auto 0;
+}
+
+.limpiador-info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+
+.limpiador-info-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 1rem 1.125rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.limpiador-info-card h3 {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.limpiador-info-card p {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.limpiador-review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* El banner del documento ya centra a 900px; dentro del limpiador ocupa todo */
+.limpiador-doc-banner {
+  max-width: none;
+  margin-bottom: 0;
+}
+
+.limpiador-stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Opciones de generación + ajuste de niveles */
+.limpiador-options {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  padding: 0.875rem 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.limpiador-options-toggles {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.limpiador-options-toggles .pdf-cover-toggle-inline__label {
+  font-size: 0.8rem;
+}
+
+.limpiador-options-shift {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.limpiador-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.limpiador-filter-bar .help-text {
+  margin: 0;
+}
+
+/* Lista de bloques */
+.limpiador-block-list {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+
+.limpiador-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.limpiador-row:last-child {
+  border-bottom: none;
+}
+
+/* Barra de color a la izquierda según tipo */
+.limpiador-row-bar {
+  flex: none;
+  width: 4px;
+  align-self: stretch;
+  border-radius: 0 3px 3px 0;
+  background: transparent;
+}
+
+.limpiador-row--h1 .limpiador-row-bar { background: var(--blue); }
+.limpiador-row--h2 .limpiador-row-bar { background: var(--blue-border); }
+.limpiador-row--h3 .limpiador-row-bar,
+.limpiador-row--h4 .limpiador-row-bar { background: var(--blue-light); }
+.limpiador-row--importante .limpiador-row-bar { background: #C2410C; }
+.limpiador-row--definicion .limpiador-row-bar { background: var(--blue); }
+.limpiador-row--ejemplo .limpiador-row-bar { background: var(--green); }
+.limpiador-row--pie .limpiador-row-bar { background: var(--text-3); }
+.limpiador-row--tabla .limpiador-row-bar { background: #7C3AED; }
+
+.limpiador-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.limpiador-row-text {
+  font-size: 0.825rem;
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.limpiador-row--h1 .limpiador-row-text {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.limpiador-row--h2 .limpiador-row-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.limpiador-row--h3 .limpiador-row-text,
+.limpiador-row--h4 .limpiador-row-text {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.limpiador-row--removed .limpiador-row-text {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.limpiador-row--removed {
+  background: var(--bg);
+}
+
+.limpiador-row-select {
+  flex: none;
+  width: 188px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.78rem;
+  color: var(--text);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.limpiador-row-select:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px var(--blue-light);
+}
+
+/* Chips de tipo (caja/tabla) */
+.limpiador-chip {
+  flex: none;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.limpiador-chip--importante { color: #C2410C; background: #FBE6D9; }
+.limpiador-chip--definicion { color: var(--blue); background: var(--blue-light); }
+.limpiador-chip--ejemplo { color: #1E8A43; background: var(--green-light); }
+.limpiador-chip--pie { color: var(--text-2); background: var(--border-light); }
+.limpiador-chip--tabla { color: #7C3AED; background: #ECE1FB; }
+
+/* Marcadores [etiqueta] / [fin] tal como se insertarán */
+.limpiador-marker {
+  padding: 0.375rem 1rem 0.375rem 0.875rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border-light);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.limpiador-marker--importante { color: #C2410C; }
+.limpiador-marker--definicion { color: var(--blue); }
+.limpiador-marker--ejemplo { color: #1E8A43; }
+.limpiador-marker--pie { color: var(--text-2); }
+.limpiador-marker--tabla { color: #7C3AED; }
+.limpiador-marker--fin { color: var(--text-3); }
+
+/* Botón de generar fijo abajo al hacer scroll por la lista */
+.limpiador-generate {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0;
+  background: linear-gradient(to top, var(--bg) 65%, transparent);
+}
+
+.limpiador-done {
+  margin-top: 0.5rem;
+}
+
+.limpiador-download {
+  text-decoration: none;
+}

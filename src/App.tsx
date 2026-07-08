@@ -5,6 +5,7 @@ import { ThemeSelector } from './components/ThemeSelector';
 import { ThemeManager } from './components/ThemeManager';
 import { DownloadButton } from './components/DownloadButton';
 import { Sidebar } from './components/Sidebar';
+import { Limpiador } from './components/Limpiador';
 import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
@@ -21,7 +22,7 @@ import type {
 } from './types';
 import './styles/globals.css';
 
-type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager';
+type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager' | 'limpiador';
 
 const HELP_ENABLED_KEY = 'bua-help-enabled';
 
@@ -189,7 +190,7 @@ export function App() {
 
   return (
     <div className="app">
-      {helpEnabled && screen !== 'theme-manager' && !isProcessing && (
+      {helpEnabled && screen !== 'theme-manager' && screen !== 'limpiador' && !isProcessing && (
         <WelcomeTour screen={screen as TourScreen} />
       )}
 
@@ -197,8 +198,9 @@ export function App() {
         <Sidebar
           currentStep={isProcessing ? 3 : currentStep}
           onStepClick={!isProcessing ? handleStepClick : undefined}
-          showPipeline={screen !== 'theme-manager'}
+          showPipeline={screen !== 'theme-manager' && screen !== 'limpiador'}
           onThemeManagerClick={() => setScreen('theme-manager')}
+          onLimpiadorClick={() => setScreen('limpiador')}
           helpEnabled={helpEnabled}
           onToggleHelp={handleToggleHelp}
         />
@@ -286,6 +288,10 @@ export function App() {
                 onConfirm={handleThemeConfirm}
                 onCancel={handleThemeCancel}
               />
+            )}
+
+            {screen === 'limpiador' && (
+              <Limpiador onBack={() => setScreen('upload')} />
             )}
 
             {screen === 'theme-manager' && (
