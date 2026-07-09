@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Limpiador de Word: ConvertidoreXe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: white;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      border-bottom: 4px solid #3498db;
+      padding-bottom: 15px;
+    }
+
+    h2 {
+      color: #34495e;
+      font-size: 1.8em;
+      margin-top: 40px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .eje-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 2.1em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 64px;
+      margin-bottom: 8px;
+      padding-bottom: 18px;
+      border-bottom: 3px solid #3498db;
+    }
+
+    .eje-label {
+      font-size: 0.36em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #3498db;
+    }
+
+    h3 {
+      color: #5b6776;
+      font-size: 1.3em;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .paso-title {
+      display: block;
+      font-size: 1.55em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 60px;
+      margin-bottom: 18px;
+    }
+
+    .paso-label {
+      display: block;
+      font-size: 0.5em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5b6776;
+      margin-bottom: 7px;
+    }
+
+    h4 {
+      color: #2c3e50;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    .format-tag {
+      display: inline-block;
+      font-size: 0.6em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: white;
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .format-tag--elpx {
+      background: #3498db;
+    }
+
+    .format-tag--pdf {
+      background: #5b6776;
+    }
+
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 30px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    strong {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    em {
+      color: #7f8c8d;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      border-bottom: 1px solid #3498db;
+    }
+
+    a:hover {
+      color: #2980b9;
+      background: #ecf0f1;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: "Courier New", monospace;
+      font-size: 0.95em;
+      color: #c0392b;
+    }
+
+    pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+    }
+
+    pre code {
+      background: none;
+      color: #ecf0f1;
+      padding: 0;
+      border: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: #34495e;
+      color: white;
+    }
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #bdc3c7;
+    }
+
+    td {
+      padding: 12px;
+      border: 1px solid #ecf0f1;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background: #ecf0f1;
+    }
+
+    .divider {
+      border-top: 2px solid #ecf0f1;
+      margin: 40px 0;
+      padding: 0;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7f8c8d;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ecf0f1;
+      font-size: 0.9em;
+    }
+    
+    .subtitulo {
+        color: #7f8c8d;
+    	font-size: 0.9em;
+    	line-height: 1;
+
+
+    }
+
+    .header-nav {
+      position: sticky;
+      top: 0;
+      background: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-nav a {
+      color: #ecf0f1;
+      margin: 0 10px;
+      border: none;
+    }
+
+    .header-nav a:hover {
+      color: #3498db;
+      background: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+        margin-top: 30px;
+      }
+
+      .eje-title {
+        font-size: 1.5em;
+        margin-top: 48px;
+      }
+
+      h3 {
+        font-size: 1.1em;
+      }
+
+      .paso-title {
+        font-size: 1.2em;
+        margin-top: 44px;
+      }
+
+      h4 {
+        font-size: 1.1em;
+        margin-top: 36px;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      pre {
+        padding: 10px;
+        font-size: 0.8em;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      h1, h2 {
+        page-break-after: avoid;
+      }
+
+      table {
+        page-break-inside: avoid;
+      }
+
+      .toc {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-nav">
+    <a href="#inicio">Inicio</a>
+    <a href="#que-hace">Qué hace</a>
+    <a href="#titulos">Títulos = estructura</a>
+    <a href="#paso-a-paso">Paso a paso</a>
+    <a href="#repaso">Repaso final</a>
+  </div>
+
+  <div class="container">
+    <h1 id="inicio">Limpiador de Word</h1>
+
+    <h2>Introducción</h2>
+
+    <p>El <strong>Limpiador de Word</strong> deja un documento Word listo para convertirlo a eXeLearning y PDF con ConvertidoreXe: quita la portada, el índice, el encabezado y el formato visual, y te deja revisar la estructura de títulos, cajas y tablas antes de generar el Word limpio.</p>
+
+    <p>La herramienta funciona <strong>dentro de tu navegador</strong>: tu archivo no se sube a ningún sitio. El documento se procesa en tu ordenador y no necesitas cuenta ni conexión con ningún servidor.</p>
+
+    <div class="divider"></div>
+
+    <h2 id="que-hace">Qué hace realmente el limpiador</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Automático</th>
+          <th>Lo decides tú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <ul>
+              <li>Quita <strong>encabezado y pie</strong> de página.</li>
+              <li>Elimina la <strong>portada y el índice</strong> automático (todo lo anterior al primer título).</li>
+              <li>Borra el <strong>formato visual</strong> (tipos de letra, colores, tamaños, sangrías)…</li>
+              <li>…pero <strong>conserva los enlaces y las imágenes</strong>.</li>
+              <li>Detecta los <strong>recuadros</strong> y les pone <code>[importante]</code>…<code>[fin]</code>.</li>
+              <li>Detecta las <strong>tablas</strong> y las marca como horizontal o vertical.</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>Si cada título es <strong>página (H1)</strong> o <strong>sección (H2)</strong>, H3 o H4.</li>
+              <li>Crear o cambiar <strong>etiquetas</strong> en cualquier párrafo.</li>
+              <li>Qué bloques <strong>quitar</strong> o mantener.</li>
+              <li>La <strong>orientación</strong> de cada tabla.</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><em>🔒 El documento se procesa en tu ordenador. No necesitas cuenta ni conexión con ningún servidor: por eso puedes compartir y usar la herramienta libremente.</em></p>
+
+    <div class="divider"></div>
+
+    <h2 id="titulos">Antes de empezar: títulos = estructura</h2>
+
+    <p>eXeLearning construye el índice del curso a partir de los títulos del Word. Conviene entenderlo para repartir bien el contenido:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Qué crea</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>H1</strong></td>
+          <td><strong>Página.</strong> Crea una página navegable y un salto de página en el PDF. En el convertidor podrás marcarla como página principal, subpágina o tercer nivel.</td>
+        </tr>
+        <tr>
+          <td><strong>H2</strong></td>
+          <td><strong>Sección dentro de la página</strong> (acordeón o pestaña). No crea página nueva ni recarga el índice principal.</td>
+        </tr>
+        <tr>
+          <td><strong>H3 · H4</strong></td>
+          <td><strong>Contenido</strong> dentro de una sección.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><em>Regla práctica: ni demasiada información por página, ni páginas tan cortas que el índice se llene de entradas. Si una página queda muy larga, parte en H1; si tienes muchos apartados breves, agrúpalos como H2.</em></p>
+
+    <div class="divider"></div>
+
+    <h2 id="paso-a-paso">Paso a paso</h2>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 1</span>Abre la herramienta</h3>
+
+    <p>En ConvertidoreXe, pulsa <strong>«Limpiador de Word»</strong> en el menú lateral izquierdo.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 2</span>Carga tu Word</h3>
+
+    <p>Arrastra el archivo <strong>.docx</strong> a la zona punteada o pulsa <em>«Seleccionar archivo»</em>. En segundos verás la pantalla de revisión.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 3</span>Revisa la estructura de títulos</h3>
+
+    <p>Cada bloque tiene un menú a la derecha. Ajusta si es <strong>Título 1 (página)</strong>, <strong>Título 2 (sección)</strong>, H3, H4, texto normal o si se quita. Arriba tienes el resumen (páginas, secciones, cajas, bloques a quitar) y dos botones para <strong>subir o bajar todos los títulos un nivel</strong> de golpe.</p>
+
+    <p><em>💡 Usa la pestaña <strong>«Estructura»</strong> para ver solo títulos, cajas y tablas; <strong>«Todo el texto»</strong> para revisar párrafo a párrafo.</em></p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 4</span>Comprueba las etiquetas</h3>
+
+    <p>Los recuadros aparecen envueltos por sus etiquetas, tal como se insertarán. Verifica que cada caja empieza y termina donde debe. Puedes convertir cualquier párrafo en caja (o cambiar su tipo) desde su menú.</p>
+
+    <p>
+      <code>[importante] … [fin]</code>&nbsp;&nbsp;
+      <code>[definición] … [fin]</code>&nbsp;&nbsp;
+      <code>[ejemplo] … [fin]</code>&nbsp;&nbsp;
+      <code>[horizontal] / [vertical]</code>
+    </p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 5</span>Genera y descarga el Word limpio</h3>
+
+    <p>Pulsa el botón <strong>«Generar Word limpio»</strong> y luego <strong>«Descargar»</strong>. Los interruptores de arriba te permiten, si lo necesitas, no borrar el formato o no quitar el encabezado.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 6</span>Súbelo a ConvertidoreXe</h3>
+
+    <p>Vuelve a la pantalla de inicio, sube el Word limpio y, en el paso de estructura, asigna <strong>«Subpágina»</strong> a las páginas que lo necesiten. Elige índice plegado o desplegado al descargar el eXeLearning.</p>
+
+    <div class="divider"></div>
+
+    <h2 id="repaso">Repaso final antes de convertir</h2>
+
+    <ul>
+      <li>✓ El documento empieza en el primer título, sin portada.</li>
+      <li>✓ Cada caja tiene su etiqueta y su <code>[fin]</code>.</li>
+      <li>✓ Los enlaces siguen funcionando.</li>
+      <li>✓ No queda encabezado, pie ni índice antiguo.</li>
+      <li>✓ Las páginas no son ni enormes ni minúsculas.</li>
+      <li>✓ Las tablas están marcadas horizontal o vertical.</li>
+    </ul>
+
+    <div class="footer">
+      <p>Limpiador de Word — guía de uso · Biblioteca · materiales docentes</p>
+    </div>
+  </div>
+</body>
+</html>
