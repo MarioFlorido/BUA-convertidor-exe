@@ -390,10 +390,18 @@
 
     <h3 class="paso-title"><span class="paso-label">Paso 2</span>Imágenes</h3>
 
-    <p>Insértalas directamente en el documento; ConvertidoreXe las exporta centradas. Recomendaciones:</p>
+    <p>Insértalas directamente en el documento; ConvertidoreXe las exporta centradas. Antes de las recomendaciones, una regla de oro que explica todas las demás: <strong>el convertidor no ve lo que Word muestra en pantalla, sino el archivo de imagen original guardado dentro del documento</strong>, y lo extrae tal cual, sin pérdida de calidad. Por eso, los retoques visuales que hagas sobre la imagen en Word no viajan ni al ELPX ni al PDF:</p>
+
     <ul>
-      <li>Máximo 900&nbsp;px de ancho.</li>
-      <li>Formato JPG o PNG (PNG si son capturas de pantalla, para no perder nitidez).</li>
+      <li><strong>No la estires ni la encojas en Word.</strong> El tamaño que fijas arrastrando las esquinas se ignora: en el ELPX y en el PDF la imagen sale con sus píxeles reales, ajustada como máximo al ancho disponible. Una foto grande que hayas reducido en Word a un tamañito saldrá grande; una imagen pequeña que hayas estirado saldrá pequeña. Si necesitas que se muestre a otro tamaño, cambia el archivo: redimensiónala con un editor de imágenes antes de insertarla.</li>
+      <li><strong>No uses la herramienta de recorte de Word</strong> (o descarta el recorte al terminar). Recortar en Word solo <em>oculta</em> la parte sobrante, no la elimina del archivo, así que en ambos formatos la imagen aparecerá completa, con la zona "recortada" incluida. Recorta la captura antes de insertarla; si ya la recortaste en Word, usa <strong>Formato de imagen → Comprimir imágenes → Eliminar las áreas recortadas de las imágenes</strong>, que sí reescribe el archivo.</li>
+      <li><strong>Captura la zona relevante, no la pantalla entera.</strong> Como los píxeles reales determinan el tamaño final, una pantalla completa capturada para enseñar un diálogo se encogerá hasta caber en la columna y el detalle quedará minúsculo e ilegible; la misma captura ceñida al diálogo se verá grande y nítida.</li>
+    </ul>
+
+    <p>Recomendaciones sobre el archivo de imagen:</p>
+    <ul>
+      <li>Máximo 900&nbsp;px de ancho (coincide con el ancho máximo de la columna de contenido del ELPX).</li>
+      <li>Formato JPG o PNG (PNG si son capturas de pantalla: la compresión JPG emborrona el texto de menús y diálogos).</li>
       <li>Comprimidas (idealmente &lt; 500&nbsp;KB por imagen).</li>
       <li>Añade siempre el texto alternativo en Word: es obligatorio por las normas de accesibilidad de la UA y de ahí se toma el atributo <code>alt</code>.</li>
     </ul>
@@ -464,7 +472,7 @@ Contenido del ejemplo...
 
     <div class="footer">
       <p><strong>Guía de Uso: ConvertidoreXe</strong></p>
-      <p>Última actualización: Junio 2026</p>
+      <p>Última actualización: Julio 2026</p>
       <p><em>Para preguntas o soporte, contacta con PuntBIU.</em></p>
     </div>
   </div>
