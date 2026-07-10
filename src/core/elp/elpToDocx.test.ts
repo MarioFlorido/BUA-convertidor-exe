@@ -108,6 +108,26 @@ describe('convertParsedElpToDocx — OOXML generado', () => {
     assert.match(documentXml, /Columna/);
     assert.match(documentXml, /Dato/);
   });
+
+  test('cajas bua_* (de un .elp que ya pasó por esta app) se reescriben como [etiqueta]…[fin]', async () => {
+    const html =
+      '<div class="bua_importante"><p>Aviso importante.</p></div>' +
+      '<div class="bua_ejemplo"><p>Un ejemplo.</p></div>' +
+      '<div class="bua_definicion"><p>Una definición.</p></div>' +
+      '<div class="bua_pie"><p>Pie de figura.</p></div>';
+    const { entries } = await docxEntriesFromFixture(html);
+    const documentXml = strFromU8(entries['word/document.xml']);
+
+    for (const [tag, text] of [
+      ['importante', 'Aviso importante'],
+      ['ejemplo', 'Un ejemplo'],
+      ['definición', 'Una definición'],
+      ['pie', 'Pie de figura'],
+    ]) {
+      const re = new RegExp(`\\[${tag}\\][\\s\\S]*?${text}[\\s\\S]*?\\[fin\\]`);
+      assert.match(documentXml, re, `caja [${tag}] mal envuelta`);
+    }
+  });
 });
 
 describe('sniffImageSize', () => {

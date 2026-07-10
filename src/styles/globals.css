@@ -169,9 +169,6 @@ button {
   width: 100%;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  /* Holgura entre líneas para las etiquetas largas que se parten en dos
-     (p. ej. «Conversor de elp antiguo a docx»): deja hueco para el badge NEW. */
-  line-height: 1.5;
 }
 
 .sidebar-action:hover {
@@ -184,26 +181,31 @@ button {
   color: inherit;
 }
 
-/* Distintivo «NEW» en superíndice para utilidades recién estrenadas del menú.
-   Mismo idioma visual que .limpiador-chip; quitarlo cuando dejen de ser novedad.
-   El elevado se hace con position/top (no vertical-align: super) y line-height: 0
-   para que no infle la caja de línea: así, cuando la etiqueta ocupa dos líneas,
-   el badge no se cuela sobre el texto de la línea de arriba. */
+/* Etiqueta de la acción: encoge y envuelve antes que empujar el badge NEW
+   fuera de la fila o del botón. */
+.sidebar-action-label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Distintivo «NEW» para utilidades recién estrenadas del menú — elemento propio
+   de la fila (flex), no superíndice dentro del texto: se alinea solo, a la
+   misma altura que la etiqueta, sin desplazamientos manuales que se descuadran
+   al cambiar el tamaño de letra o el ancho del sidebar. Mismo idioma visual
+   que .limpiador-chip; quitarlo cuando dejen de ser novedad. */
 .sidebar-action-new {
-  display: inline-block;
-  font-size: 0.5rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 0;
+  letter-spacing: 0.03em;
+  line-height: 1;
   color: var(--blue);
   background: var(--blue-light);
   border: 1px solid var(--blue-border);
-  padding: 0.16rem 0.28rem;
+  padding: 0.15rem 0.32rem;
   border-radius: 4px;
-  margin-left: 0.3rem;
-  position: relative;
-  top: -0.45em;
-  white-space: nowrap;
 }
 
 /* Fila del toggle "Tour" en el sidebar — mismo padding que .sidebar-action

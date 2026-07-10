@@ -148,9 +148,8 @@ export function Sidebar({
             title="Limpiar un Word antes de convertirlo"
           >
             <BroomIcon />
-            <span>
-              Limpiador de Word<sup className="sidebar-action-new">NEW</sup>
-            </span>
+            <span className="sidebar-action-label">Limpiador de Word</span>
+            <span className="sidebar-action-new">NEW</span>
           </button>
         )}
 
@@ -161,9 +160,8 @@ export function Sidebar({
             title="Convertir un .elp del eXeLearning clásico en un Word (.docx)"
           >
             <ConvertFileIcon />
-            <span>
-              Conversor de elp antiguo a docx<sup className="sidebar-action-new">NEW</sup>
-            </span>
+            <span className="sidebar-action-label">Conversor de elp antiguo a docx</span>
+            <span className="sidebar-action-new">NEW</span>
           </button>
         )}
 

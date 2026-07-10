@@ -120,6 +120,33 @@ function htmlToBlocks(html: string, ctx: BuildContext): FileChild[] {
   return blockify(body, ctx);
 }
 
+/**
+ * Clases semánticas BUA (las mismas que HtmlTransformer.ts aplica al convertir
+ * Word → ELPX) que puede traer un .elp si su contenido pasó antes por esta
+ * misma app. Se reescriben como los marcadores [etiqueta]…[fin] que el resto
+ * del pipeline (Limpiador, convertidor) ya sabe interpretar, en vez de perder
+ * la caja en silencio como un párrafo normal más.
+ */
+const BUA_BOX_MARKERS: Record<string, string> = {
+  bua_importante: 'importante',
+  bua_ejemplo: 'ejemplo',
+  bua_definicion: 'definición',
+  bua_pie: 'pie',
+};
+
+function boxMarkerFor(el: Element): string | null {
+  for (const cls of Array.from(el.classList)) {
+    const marker = BUA_BOX_MARKERS[cls];
+    if (marker) return marker;
+  }
+  return null;
+}
+
+function markerParagraph(ctx: BuildContext, text: string): Paragraph {
+  const { docx } = ctx;
+  return new docx.Paragraph({ children: [new docx.TextRun('[' + text + ']')] });
+}
+
 /** Convierte los hijos de un contenedor HTML en bloques de Word (párrafos y tablas). */
 function blockify(container: Element, ctx: BuildContext): FileChild[] {
   const { docx } = ctx;
@@ -219,7 +246,12 @@ function blockify(container: Element, ctx: BuildContext): FileChild[] {
         // div, section, figure, span-bloque…: si contiene bloques se recorre como
         // contenedor; si solo tiene inlines, se convierte en un párrafo.
         flushLooseRuns();
-        if (containsBlockElements(el)) {
+        const boxMarker = boxMarkerFor(el);
+        if (boxMarker) {
+          blocks.push(markerParagraph(ctx, boxMarker));
+          blocks.push(...blockify(el, ctx));
+          blocks.push(markerParagraph(ctx, 'fin'));
+        } else if (containsBlockElements(el)) {
           blocks.push(...blockify(el, ctx));
         } else {
           const runs = inlineRuns(el, ctx, {});
