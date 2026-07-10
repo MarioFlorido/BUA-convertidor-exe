@@ -169,6 +169,9 @@ button {
   width: 100%;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+  /* Holgura entre líneas para las etiquetas largas que se parten en dos
+     (p. ej. «Conversor de elp antiguo a docx»): deja hueco para el badge NEW. */
+  line-height: 1.5;
 }
 
 .sidebar-action:hover {
@@ -182,19 +185,24 @@ button {
 }
 
 /* Distintivo «NEW» en superíndice para utilidades recién estrenadas del menú.
-   Mismo idioma visual que .limpiador-chip; quitarlo cuando dejen de ser novedad. */
+   Mismo idioma visual que .limpiador-chip; quitarlo cuando dejen de ser novedad.
+   El elevado se hace con position/top (no vertical-align: super) y line-height: 0
+   para que no infle la caja de línea: así, cuando la etiqueta ocupa dos líneas,
+   el badge no se cuela sobre el texto de la línea de arriba. */
 .sidebar-action-new {
-  font-size: 0.55rem;
+  display: inline-block;
+  font-size: 0.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  line-height: 1;
+  line-height: 0;
   color: var(--blue);
   background: var(--blue-light);
   border: 1px solid var(--blue-border);
-  padding: 0.1rem 0.3rem;
+  padding: 0.16rem 0.28rem;
   border-radius: 4px;
   margin-left: 0.3rem;
-  vertical-align: super;
+  position: relative;
+  top: -0.45em;
   white-space: nowrap;
 }
 

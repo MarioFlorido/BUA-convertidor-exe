@@ -103,9 +103,11 @@ export function ConversorElp({ onBack }: ConversorElpProps) {
 
       <h2 className="section-heading">Conversor de elp antiguo a docx</h2>
       <p className="section-sub">
-        Convierte un paquete <strong>.elp</strong> del eXeLearning clásico (2.x) en un documento
-        Word con su texto e imágenes. Después podrás revisarlo, pasarlo por el Limpiador si hace
-        falta y convertirlo en un curso nuevo con el convertidor.
+        Es una herramienta <strong>básica</strong>: su único objetivo es trasladar el texto (y las
+        imágenes) de un paquete <strong>.elp</strong> del eXeLearning clásico (2.x) a un documento
+        Word para que puedas trabajar con el contenido. No reproduce el diseño ni la interactividad
+        del curso original. Después podrás revisarlo, pasarlo por el Limpiador si hace falta y
+        convertirlo en un curso nuevo con el convertidor.
       </p>
 
       {/* ── Cargar el .elp ── */}
