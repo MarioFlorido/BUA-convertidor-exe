@@ -2,11 +2,32 @@ import React, { useRef, useState } from 'react';
 
 interface UploadZoneProps {
   onFileSelect: (file: File) => void;
+  /** Si se suelta un .elp del eXeLearning clásico, permite saltar al conversor. */
+  onOpenConversorElp?: () => void;
 }
 
-export function UploadZone({ onFileSelect }: UploadZoneProps) {
+export function UploadZone({ onFileSelect, onOpenConversorElp }: UploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [isElpFile, setIsElpFile] = useState(false);
+
+  const handleFile = (file: File | undefined | null) => {
+    if (!file) return;
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.docx')) {
+      setFileError(null);
+      setIsElpFile(false);
+      onFileSelect(file);
+    } else if (name.endsWith('.elp')) {
+      setIsElpFile(true);
+      setFileError(
+        'Esto es un paquete del eXeLearning clásico. Conviértelo antes a Word con el Conversor de eXe antiguo.',
+      );
+    } else {
+      setIsElpFile(false);
+      setFileError('El archivo debe ser .docx');
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -20,23 +41,11 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.currentTarget.classList.remove('drag-over');
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const file = files[0];
-      if (file.name.toLowerCase().endsWith('.docx')) {
-        setFileError(null);
-        onFileSelect(file);
-      } else {
-        setFileError('El archivo debe ser .docx');
-      }
-    }
+    handleFile(e.dataTransfer.files?.[0]);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFileError(null);
-      onFileSelect(e.target.files[0]);
-    }
+    handleFile(e.target.files?.[0]);
   };
 
   return (
@@ -83,6 +92,18 @@ export function UploadZone({ onFileSelect }: UploadZoneProps) {
 
           {fileError && (
             <p className="upload-file-error">{fileError}</p>
+          )}
+
+          {isElpFile && onOpenConversorElp && (
+            <button
+              className="btn-cancel"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenConversorElp();
+              }}
+            >
+              Abrir el Conversor de eXe antiguo
+            </button>
           )}
         </div>
       </div>

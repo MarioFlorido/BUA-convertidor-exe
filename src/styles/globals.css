@@ -2250,6 +2250,48 @@ button {
   font-size: 0.92em;
 }
 
+/* ── Conversor de eXe antiguo (.elp → Word) ──────────────────────────────── */
+.conversor-elp {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Estado de conversión en curso: spinner centrado en el hueco del dropzone */
+.conversor-elp-busy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xxl) var(--space-lg);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.conversor-elp-busy p {
+  font-size: 0.825rem;
+  color: var(--text-2);
+  max-width: 34ch;
+}
+
+.conversor-elp-warnings {
+  text-align: left;
+}
+
+/* El enlace de descarga se presenta como el botón primario de la app */
+.conversor-elp-download {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  align-self: center;
+}
+
+.conversor-elp-next {
+  max-width: 52ch;
+  margin: 0 auto;
+}
+
 /* ── Panel de administración de temas oficiales ──────────────────────────── */
 .admin-divider {
   border: none;

@@ -106,6 +106,12 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
+- [x] **Conversor de eXe antiguo (.elp → Word)** (jul 2026): utilidad del menú
+  lateral que convierte paquetes del eXeLearning clásico 2.x en un Word editable
+  (parser propio de `contentv3.xml` + librería `docx` MIT en chunk bajo demanda).
+  Decidido frente a integrar eXeConvert (licencia sin formalizar, bundles pesados).
+  Pendiente opcional: página de ayuda dedicada (`public/docs/conversor-elp.html`)
+  al estilo de la del Limpiador, si el uso lo pide.
 - [x] Árbol de contenido en vivo en el paso 2 (configurador de estructura).
 - [x] Expandir / contraer todo, resaltado de errores en el árbol y
   clic-para-navegar de árbol a tarjeta.

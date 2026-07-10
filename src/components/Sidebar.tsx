@@ -7,6 +7,7 @@ interface SidebarProps {
   showPipeline: boolean;
   onThemeManagerClick?: () => void;
   onLimpiadorClick?: () => void;
+  onConversorElpClick?: () => void;
   helpEnabled?: boolean;
   onToggleHelp?: (enabled: boolean) => void;
 }
@@ -53,6 +54,27 @@ function BroomIcon() {
   );
 }
 
+function ConvertFileIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="sidebar-action-icon"
+      aria-hidden="true"
+      style={{ width: 16, height: 16 }}
+    >
+      <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+      <path d="M19 8v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7Z" />
+      <path d="M9 14h6" />
+      <path d="m13 12 2 2-2 2" />
+    </svg>
+  );
+}
+
 function InfoIcon() {
   return (
     <svg
@@ -78,6 +100,7 @@ export function Sidebar({
   showPipeline,
   onThemeManagerClick,
   onLimpiadorClick,
+  onConversorElpClick,
   helpEnabled,
   onToggleHelp,
 }: SidebarProps) {
@@ -106,6 +129,7 @@ export function Sidebar({
           <span className="sidebar-brand-name">ConvertidoreXe</span>
           <span className="sidebar-brand-sub">DOCX → eXeLearning</span>
           <span className="sidebar-brand-sub">DOCX → PDF</span>
+          <span className="sidebar-brand-sub">ELP → DOCX</span>
         </div>
       </div>
 
@@ -125,6 +149,17 @@ export function Sidebar({
           >
             <BroomIcon />
             <span>Limpiador de Word</span>
+          </button>
+        )}
+
+        {onConversorElpClick && (
+          <button
+            onClick={onConversorElpClick}
+            className="sidebar-action"
+            title="Convertir un .elp del eXeLearning clásico en un Word"
+          >
+            <ConvertFileIcon />
+            <span>Conversor de eXe antiguo</span>
           </button>
         )}
 

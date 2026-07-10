@@ -6,6 +6,7 @@ import { ThemeManager } from './components/ThemeManager';
 import { DownloadButton } from './components/DownloadButton';
 import { Sidebar } from './components/Sidebar';
 import { Limpiador } from './components/Limpiador';
+import { ConversorElp } from './components/ConversorElp';
 import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
@@ -22,7 +23,7 @@ import type {
 } from './types';
 import './styles/globals.css';
 
-type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager' | 'limpiador';
+type AppScreen = 'upload' | 'structure' | 'theme' | 'result' | 'theme-manager' | 'limpiador' | 'conversor-elp';
 
 const HELP_ENABLED_KEY = 'bua-help-enabled';
 
@@ -190,7 +191,7 @@ export function App() {
 
   return (
     <div className="app">
-      {helpEnabled && screen !== 'theme-manager' && screen !== 'limpiador' && !isProcessing && (
+      {helpEnabled && screen !== 'theme-manager' && screen !== 'limpiador' && screen !== 'conversor-elp' && !isProcessing && (
         <WelcomeTour screen={screen as TourScreen} />
       )}
 
@@ -198,9 +199,10 @@ export function App() {
         <Sidebar
           currentStep={isProcessing ? 3 : currentStep}
           onStepClick={!isProcessing ? handleStepClick : undefined}
-          showPipeline={screen !== 'theme-manager' && screen !== 'limpiador'}
+          showPipeline={screen !== 'theme-manager' && screen !== 'limpiador' && screen !== 'conversor-elp'}
           onThemeManagerClick={() => setScreen('theme-manager')}
           onLimpiadorClick={() => setScreen('limpiador')}
+          onConversorElpClick={() => setScreen('conversor-elp')}
           helpEnabled={helpEnabled}
           onToggleHelp={handleToggleHelp}
         />
@@ -271,7 +273,10 @@ export function App() {
             )}
 
             {screen === 'upload' && (
-              <UploadZone onFileSelect={handleFileSelect} />
+              <UploadZone
+                onFileSelect={handleFileSelect}
+                onOpenConversorElp={() => setScreen('conversor-elp')}
+              />
             )}
 
             {screen === 'structure' && structure && (
@@ -292,6 +297,10 @@ export function App() {
 
             {screen === 'limpiador' && (
               <Limpiador onBack={() => setScreen('upload')} />
+            )}
+
+            {screen === 'conversor-elp' && (
+              <ConversorElp onBack={() => setScreen('upload')} />
             )}
 
             {screen === 'theme-manager' && (
