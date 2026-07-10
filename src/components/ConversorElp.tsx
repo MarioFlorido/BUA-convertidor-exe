@@ -3,7 +3,7 @@ import { parseElp } from '../core/elp/elpParser';
 import { convertParsedElpToDocx } from '../core/elp/elpToDocx';
 
 /**
- * Conversor de eXe antiguo — convierte un paquete .elp del eXeLearning
+ * Conversor de elp antiguo a docx — convierte un paquete .elp del eXeLearning
  * clásico (2.x) en un Word editable. Pensado como paso previo al flujo
  * normal: .elp → Word → (retoques del editor) → convertidor → .elpx.
  *
@@ -101,7 +101,7 @@ export function ConversorElp({ onBack }: ConversorElpProps) {
         </button>
       </div>
 
-      <h2 className="section-heading">Conversor de eXe antiguo</h2>
+      <h2 className="section-heading">Conversor de elp antiguo a docx</h2>
       <p className="section-sub">
         Convierte un paquete <strong>.elp</strong> del eXeLearning clásico (2.x) en un documento
         Word con su texto e imágenes. Después podrás revisarlo, pasarlo por el Limpiador si hace

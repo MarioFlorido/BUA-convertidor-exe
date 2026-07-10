@@ -21,7 +21,7 @@ export function UploadZone({ onFileSelect, onOpenConversorElp }: UploadZoneProps
     } else if (name.endsWith('.elp')) {
       setIsElpFile(true);
       setFileError(
-        'Esto es un paquete del eXeLearning clásico. Conviértelo antes a Word con el Conversor de eXe antiguo.',
+        'Esto es un paquete del eXeLearning clásico. Conviértelo antes a Word con el conversor de elp antiguo a docx.',
       );
     } else {
       setIsElpFile(false);
@@ -102,7 +102,7 @@ export function UploadZone({ onFileSelect, onOpenConversorElp }: UploadZoneProps
                 onOpenConversorElp();
               }}
             >
-              Abrir el Conversor de eXe antiguo
+              Abrir el conversor de elp antiguo a docx
             </button>
           )}
         </div>

@@ -106,7 +106,7 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
-- [x] **Conversor de eXe antiguo (.elp → Word)** (jul 2026): utilidad del menú
+- [x] **Conversor de elp antiguo a docx** (jul 2026): utilidad del menú
   lateral que convierte paquetes del eXeLearning clásico 2.x en un Word editable
   (parser propio de `contentv3.xml` + librería `docx` MIT en chunk bajo demanda).
   Decidido frente a integrar eXeConvert (licencia sin formalizar, bundles pesados).

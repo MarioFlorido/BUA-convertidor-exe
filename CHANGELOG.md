@@ -2,8 +2,9 @@
 
 ## Sin publicar — Julio 2026
 
-### Conversor de eXe antiguo (.elp → Word)
+### Conversor de elp antiguo a docx
 - **Nueva utilidad en el menú lateral**: convierte paquetes `.elp` del eXeLearning clásico (2.x, probado con 2.9) en un documento Word editable, como paso previo al flujo normal Word → curso. Todo se procesa en local, como el resto de la app.
+- **Distintivo «NEW» en superíndice** en las dos utilidades recién estrenadas del menú lateral (Limpiador de Word y este conversor), con el idioma visual de los chips existentes; retirarlo cuando dejen de ser novedad.
 - **Parser propio mínimo** (`src/core/elp/elpParser.ts`): lee el `contentv3.xml` (serialización «jelly» de eXe) sin dependencias nuevas — fflate + `DOMParser`. Formato implementado usando como especificación el importador oficial del nuevo eXeLearning (consultado como documentación; sin copiar código, para mantener la licencia GPL limpia).
 - **Generador Word** (`src/core/elp/elpToDocx.ts`, librería `docx` MIT): páginas → Título 1–4 según su profundidad en el árbol, texto con formato básico, listas con viñetas/numeración, tablas, enlaces externos e imágenes incrustadas desde el propio paquete (dimensiones leídas de la cabecera PNG/JPEG/GIF/BMP cuando el HTML no las trae). La librería va en un chunk propio con `import()` dinámico (411 KB min / 118 KB gzip) que solo se descarga al usar la utilidad: el bundle principal no crece más que el propio código del conversor.
 - **Degradación con avisos, nunca en silencio**: iframes/vídeo/actividades interactivas → nota visible en el propio Word + resumen ámbar en pantalla; enlaces internos de eXe (`exe-node:`) → texto plano; adjuntos del paquete (PDF…) → texto con nota `[adjunto: …]`.
