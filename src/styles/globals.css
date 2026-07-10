@@ -832,7 +832,7 @@ button {
   border-radius: 50%;
   transition: transform 0.2s;
   display: block;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow-xs);
 }
 
 .toggle-switch--on .toggle-switch__thumb {
@@ -3168,11 +3168,11 @@ button {
 .limpiador-row--h2 .limpiador-row-bar { background: var(--blue-border); }
 .limpiador-row--h3 .limpiador-row-bar,
 .limpiador-row--h4 .limpiador-row-bar { background: var(--blue-light); }
-.limpiador-row--importante .limpiador-row-bar { background: #C2410C; }
+.limpiador-row--importante .limpiador-row-bar { background: #B53B0B; }
 .limpiador-row--definicion .limpiador-row-bar { background: var(--blue); }
 .limpiador-row--ejemplo .limpiador-row-bar { background: var(--green); }
 .limpiador-row--pie .limpiador-row-bar { background: var(--text-3); }
-.limpiador-row--tabla .limpiador-row-bar { background: #7C3AED; }
+.limpiador-row--tabla .limpiador-row-bar { background: #0F766E; }
 
 .limpiador-row-body {
   flex: 1;
@@ -3247,11 +3247,11 @@ button {
   border-radius: 4px;
 }
 
-.limpiador-chip--importante { color: #C2410C; background: #FBE6D9; }
+.limpiador-chip--importante { color: #B53B0B; background: #FBE6D9; }
 .limpiador-chip--definicion { color: var(--blue); background: var(--blue-light); }
-.limpiador-chip--ejemplo { color: #1E8A43; background: var(--green-light); }
+.limpiador-chip--ejemplo { color: #1B7E3D; background: var(--green-light); }
 .limpiador-chip--pie { color: var(--text-2); background: var(--border-light); }
-.limpiador-chip--tabla { color: #7C3AED; background: #ECE1FB; }
+.limpiador-chip--tabla { color: #0F766E; background: #D5F0EC; }
 
 /* Marcadores [etiqueta] / [fin] tal como se insertarán */
 .limpiador-marker {
@@ -3264,11 +3264,11 @@ button {
   letter-spacing: 0.02em;
 }
 
-.limpiador-marker--importante { color: #C2410C; }
+.limpiador-marker--importante { color: #B53B0B; }
 .limpiador-marker--definicion { color: var(--blue); }
-.limpiador-marker--ejemplo { color: #1E8A43; }
+.limpiador-marker--ejemplo { color: #1B7E3D; }
 .limpiador-marker--pie { color: var(--text-2); }
-.limpiador-marker--tabla { color: #7C3AED; }
+.limpiador-marker--tabla { color: #0F766E; }
 .limpiador-marker--fin { color: var(--text-3); }
 
 /* Botón de generar fijo abajo al hacer scroll por la lista */

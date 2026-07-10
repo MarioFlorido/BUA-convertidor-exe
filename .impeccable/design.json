@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-06-26T00:00:00Z",
+  "generatedAt": "2026-07-10T11:27:15Z",
   "title": "Design System: ConvertidoreXe",
   "extensions": {
     "colorMeta": {
@@ -8,7 +8,16 @@
         "role": "primary",
         "displayName": "Azul Corporativo",
         "canonical": "#1560D8",
-        "tonalRamp": ["#041830", "#082c54", "#0c4080", "#1560D8", "#3f7fe0", "#6b9ee8", "#97bcf0", "#c3daf8"]
+        "tonalRamp": [
+          "#041830",
+          "#082c54",
+          "#0c4080",
+          "#1560D8",
+          "#3f7fe0",
+          "#6b9ee8",
+          "#97bcf0",
+          "#c3daf8"
+        ]
       },
       "primary-blue-hover": {
         "role": "primary-active",
@@ -24,7 +33,16 @@
         "role": "primary-background",
         "displayName": "Azul Claro",
         "canonical": "#E8F1FF",
-        "tonalRamp": ["#ffffff", "#f8fbff", "#f0f7ff", "#E8F1FF", "#d6e8ff", "#c4dfff", "#b2d6ff", "#a0cdff"]
+        "tonalRamp": [
+          "#ffffff",
+          "#f8fbff",
+          "#f0f7ff",
+          "#E8F1FF",
+          "#d6e8ff",
+          "#c4dfff",
+          "#b2d6ff",
+          "#a0cdff"
+        ]
       },
       "text-primary": {
         "role": "text",
@@ -50,7 +68,16 @@
         "role": "background",
         "displayName": "Fondo Institucional",
         "canonical": "#EDF1F7",
-        "tonalRamp": ["#ffffff", "#f8fafd", "#f1f5fb", "#EDF1F7", "#dfe7f0", "#d1dfe9", "#c3d7e2", "#b5cfdb"]
+        "tonalRamp": [
+          "#ffffff",
+          "#f8fafd",
+          "#f1f5fb",
+          "#EDF1F7",
+          "#dfe7f0",
+          "#d1dfe9",
+          "#c3d7e2",
+          "#b5cfdb"
+        ]
       },
       "feedback-success": {
         "role": "success",
@@ -71,6 +98,46 @@
         "role": "accent-single-use",
         "displayName": "Morado de Tema Local",
         "canonical": "#6A1B9A"
+      },
+      "feedback-success-text": {
+        "role": "feedback",
+        "displayName": "Éxito Texto",
+        "canonical": "#1A6B35"
+      },
+      "feedback-warning-border": {
+        "role": "feedback",
+        "displayName": "Ámbar Borde",
+        "canonical": "#B7791F4D"
+      },
+      "overlay-scrim": {
+        "role": "overlay",
+        "displayName": "Scrim del Tour",
+        "canonical": "#14141899"
+      },
+      "semantic-importante": {
+        "role": "semantic",
+        "displayName": "Naranja Importante",
+        "canonical": "#B53B0B"
+      },
+      "semantic-importante-light": {
+        "role": "semantic-background",
+        "displayName": "Naranja Claro Importante",
+        "canonical": "#FBE6D9"
+      },
+      "semantic-ejemplo": {
+        "role": "semantic",
+        "displayName": "Verde Ejemplo",
+        "canonical": "#1B7E3D"
+      },
+      "semantic-tabla": {
+        "role": "semantic",
+        "displayName": "Teal Tabla",
+        "canonical": "#0F766E"
+      },
+      "semantic-tabla-light": {
+        "role": "semantic-background",
+        "displayName": "Teal Claro Tabla",
+        "canonical": "#D5F0EC"
       }
     },
     "shadows": [
@@ -128,7 +195,13 @@
         "value": "640px",
         "purpose": "Bajo 640px: el sidebar se apila a ancho completo encima del contenido, se ocultan etiquetas secundarias, y se reduce el padding."
       }
-    ]
+    ],
+    "typographyMeta": {
+      "code": {
+        "displayName": "Code",
+        "purpose": "Editor CSS del panel de administración y marcadores [etiqueta]/[fin] del Limpiador; nunca decorativo."
+      }
+    }
   },
   "components": [
     {
@@ -218,6 +291,13 @@
       "description": "Distintivo Oficial / Local. Único lugar del sistema donde aparece el morado de tema local.",
       "html": "<div class=\"ds-badge-row\"><span class=\"ds-badge ds-badge--official\">Oficial</span><span class=\"ds-badge ds-badge--local\">Local</span></div>",
       "css": ".ds-badge-row { display: flex; gap: 0.5rem; } .ds-badge { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; } .ds-badge--official { background: #E8F1FF; color: #1560D8; border: 1px solid #B3D9FF; } .ds-badge--local { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }"
+    },
+    {
+      "name": "Chip Semántico (Limpiador)",
+      "kind": "chip",
+      "description": "Identifica el tipo de caja semántica de cada bloque; compacto, mayúsculas, radio xs (4px). Texto calibrado a ≥4.5:1.",
+      "html": "<span class=\"ds-chip ds-chip--importante\">Importante</span> <span class=\"ds-chip ds-chip--ejemplo\">Ejemplo</span> <span class=\"ds-chip ds-chip--tabla\">Tabla</span>",
+      "css": ".ds-chip { display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; } .ds-chip--importante { color: #B53B0B; background: #FBE6D9; } .ds-chip--ejemplo { color: #1B7E3D; background: #E3F9EB; } .ds-chip--tabla { color: #0F766E; background: #D5F0EC; }"
     }
   ],
   "narrative": {

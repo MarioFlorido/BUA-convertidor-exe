@@ -1,0 +1,32 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "reason": "Pop de éxito de descarga documentado con este cubic-bezier exacto en DESIGN.md §Status & Feedback (motion de confirmación, permitido por PRODUCT.md)",
+        "createdAt": "2026-07-10T11:26:53.540Z"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "12px",
+        "reason": "Píldora del toggle 44×24 documentada en DESIGN.md frontmatter components.toggle-track (radio de componente, no de escala)",
+        "createdAt": "2026-07-10T11:26:53.606Z"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "reason": "Esquinas de detalles de 3-4px de grosor (código inline de alertas, barra de tipo del Limpiador); confirmado por Mario 2026-07-10",
+        "createdAt": "2026-07-10T11:26:53.678Z"
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "2px",
+        "reason": "Indicador de destino del drag&drop de temas (línea de 3px de alto); confirmado por Mario 2026-07-10",
+        "createdAt": "2026-07-10T11:26:53.750Z"
+      }
+    ]
+  }
+}

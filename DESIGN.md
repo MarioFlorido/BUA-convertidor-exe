@@ -18,13 +18,21 @@ colors:
   background-institutional: "#EDF1F7"
   feedback-success: "#34C759"
   feedback-success-light: "#E3F9EB"
+  feedback-success-text: "#1A6B35"
   feedback-error: "#D92B2B"
   feedback-error-light: "#FFF0F0"
   feedback-warning: "#8A5A00"
   feedback-warning-light: "#FFF8E6"
+  feedback-warning-border: "#B7791F4D"
+  overlay-scrim: "#14141899"
   theme-badge-local: "#6A1B9A"
   theme-badge-local-light: "#F3E5F5"
   theme-badge-local-border: "#CE93D8"
+  semantic-importante: "#B53B0B"
+  semantic-importante-light: "#FBE6D9"
+  semantic-ejemplo: "#1B7E3D"
+  semantic-tabla: "#0F766E"
+  semantic-tabla-light: "#D5F0EC"
 typography:
   heading-1:
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, sans-serif"
@@ -59,7 +67,13 @@ typography:
     fontWeight: 500
     letterSpacing: "0.04em"
     textTransform: "uppercase"
+  code:
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    fontSize: "0.8rem"
+    fontWeight: 400
+    lineHeight: 1.6
 rounded:
+  xs: "4px"
   sm: "6px"
   md: "8px"
   lg: "10px"
@@ -159,6 +173,14 @@ La paleta es restringida e institucional. El azul domina las acciones primarias;
 ### Distintivo de un solo uso
 - **Morado de Tema Local** (#6A1B9A sobre #F3E5F5, borde #CE93D8): Existe exclusivamente para distinguir a simple vista un tema **local/subido por el usuario** (no auditado, no centralizado) de un tema **oficial** (azul). No se reutiliza en ningún botón, alerta, ni otro componente — ver Regla del Morado Único.
 
+### Etiquetas semánticas (Limpiador de Word)
+Paleta de identificación de las cajas semánticas en la utilidad Limpiador (chips, barras de tipo y marcadores `[etiqueta]`). Cada rol tiene un texto calibrado a ≥4.5:1 sobre su fondo de chip, sobre blanco y sobre el fondo institucional — ver Regla del Contraste No Negociable.
+- **Importante: Naranja** (#B53B0B sobre #FBE6D9): la caja `[importante]`.
+- **Definición: Azul** (reutiliza el azul corporativo sobre azul claro): la caja `[definición]`. No introduce color nuevo.
+- **Ejemplo: Verde** (#1B7E3D sobre #E3F9EB): la caja `[ejemplo]`. Verde de texto propio; el verde de feedback (#34C759) queda para confirmaciones.
+- **Pie: Gris** (reutiliza texto secundario sobre borde claro): la caja `[pie]`. Deliberadamente neutro.
+- **Tabla: Teal** (#0F766E sobre #D5F0EC): los marcadores `[horizontal]`/`[vertical]`. Se eligió teal —único matiz libre de significado en el sistema— para no invadir ni el morado del badge Local (Regla del Morado Único) ni el ámbar de advertencia.
+
 ### Named Rules
 
 **La Regla de la Austeridad Azul.** El azul corporativo aparece en menos del 10% de cualquier pantalla de contenido. Es acento, no decoración. Cuando se requiere más color de marca, se usa azul claro (#E8F1FF) o borde azul (#B3D9FF), no más saturación del primario.
@@ -184,6 +206,7 @@ La paleta es restringida e institucional. El azul domina las acciones primarias;
 - **Body** (400, 0.875rem, 1.5): Párrafos, texto de explicación, descripción. Limitado a 65–75 caracteres de ancho cuando es prosa continua. En flujos de datos o UI denso, puede ser más ancho sin penalización.
 - **Body Small** (400, 0.8rem, 1.5): Ayuda contextual, atributos de metadatos, notas. Aún legible (4.5:1 contraste mínimo).
 - **Label** (500, 0.72rem, tracking 0.04em): Etiquetas de campo, badges, pequeños indicadores de estado. Mayúscula por defecto. Usado para "DOCUMENTO" / "PASO 1" / "DESCARGADO".
+- **Code** (400, 0.8rem, 1.6, `ui-monospace/SFMono-Regular/Menlo/Consolas`): Exclusivo de las dos superficies de "código" de la app — el editor CSS del panel de administración (ver Editor de Código en §5) y los marcadores `[etiqueta]`/`[fin]` del Limpiador, que representan texto literal que se insertará en el documento. Nunca decorativo.
 
 ### Named Rules
 
@@ -268,6 +291,14 @@ ConvertidoreXe es un editor de estructura de documento y configurador de tema. S
 - **Elemento en arrastre:** Opacidad reducida a 0.4 — permanece visible pero inequívocamente "levantado" de su posición.
 - **Indicador de destino:** Línea azul sólida de 3px sobre o bajo la tarjeta objetivo. Sin sombra, sin desenfoque: la señal es binaria (aquí va a caer), no atmosférica.
 - El reordenamiento se guarda automáticamente al soltar; no hay un paso de confirmación separado.
+
+### Chips y distintivos
+
+**Carácter:** Identificación compacta, nunca botón. Un chip dice qué es algo; no se pulsa.
+
+- **Forma común:** radio xs (4px) — el único tier de radio por debajo de `sm`, reservado a elementos ≤28px (chips, muestras de color y miniaturas del admin, distintivo NEW). Texto 0.6–0.72rem, peso 600–700, mayúsculas con tracking 0.02–0.04em.
+- **Chips semánticos del Limpiador:** pares texto/fondo de la paleta de Etiquetas semánticas (§2). La barra de tipo de cada fila usa el mismo tono como bloque sólido.
+- **Distintivo NEW (novedad de menú):** superíndice azul (azul corporativo sobre azul claro, borde azul), mismo idioma que el resto de chips; temporal por definición — se retira cuando la utilidad deja de ser novedad.
 
 ### Status & Feedback
 

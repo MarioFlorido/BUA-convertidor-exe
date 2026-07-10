@@ -2,6 +2,13 @@
 
 ## Sin publicar — Julio 2026
 
+### Auditoría de diseño (impeccable): 26 avisos → 0
+- **Contraste WCAG AA de los chips del Limpiador corregido** (incumplían la Regla del Contraste No Negociable del propio DESIGN.md): texto naranja de `[importante]` #C2410C→`#B53B0B` (4.30→4.85:1 sobre su fondo) y verde de `[ejemplo]` #1E8A43→`#1B7E3D` (3.99→4.64:1). Oscurecimientos mínimos del mismo matiz, verificados también sobre blanco y sobre el fondo institucional.
+- **`[tabla]` recoloreado de violeta #7C3AED a teal `#0F766E`/`#D5F0EC`** (decisión de Mario): el violeta invadía la Regla del Morado Único, que reserva el morado en exclusiva para el badge de tema Local. El teal es el único matiz sin significado previo en el sistema; contraste 4.56:1.
+- **Sombra del pulgar del toggle** pasada de `rgba(0,0,0,0.2)` literal a `var(--shadow-xs)`: cumplía a medias la Regla de la Sombra Ambiental (máx. 0.14 de opacidad).
+- **DESIGN.md ampliado** para que el frontmatter (lo que valida el detector) recoja lo que la prosa ya documentaba o el código ya usaba: paleta de Etiquetas semánticas del Limpiador, `feedback-success-text`, `feedback-warning-border`, `overlay-scrim`, rol tipográfico `code` (editor del admin + marcadores del Limpiador) y radio `xs: 4px` (chips, swatches, miniaturas). Prosa nueva: §2 «Etiquetas semánticas» y §5 «Chips y distintivos».
+- **Sidecar `.impeccable/design.json` regenerado** (estaba desactualizado respecto a DESIGN.md) y **4 excepciones registradas con motivo** en `.impeccable/config.json`: el cubic-bezier del pop de éxito (documentado en §Status & Feedback), el radio 12px de la píldora del toggle (documentado en `components.toggle-track`) y los radios 2px/3px de detalles de 3-4px de grosor.
+
 ### Conversor de elp antiguo a docx
 - **Nueva utilidad en el menú lateral**: convierte paquetes `.elp` del eXeLearning clásico (2.x, probado con 2.9) en un documento Word editable, como paso previo al flujo normal Word → curso. Todo se procesa en local, como el resto de la app.
 - **Distintivo «NEW» en superíndice** en las dos utilidades recién estrenadas del menú lateral (Limpiador de Word y este conversor), con el idioma visual de los chips existentes; retirarlo cuando dejen de ser novedad.
