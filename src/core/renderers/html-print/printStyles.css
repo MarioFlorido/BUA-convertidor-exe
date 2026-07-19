@@ -377,6 +377,19 @@
   margin-right: 4px;
 }
 
+/* Blindaje de títulos huérfanos: un encabezado de contenido (H2/H3/H4 dentro de
+   un bloque) nunca debe quedar solo al final de página con su contenido saltando
+   a la siguiente. break-after: avoid obliga a Paged.js a mantener el título junto
+   a lo que le sigue (lo empuja a la página siguiente si no cabe con él).
+   OJO: esto es SEGURO aquí porque estos encabezados NO llevan break-before:page;
+   la combinación break-before:page + break-after:avoid (que sí daría huecos) solo
+   afectaría a los .section-title-*, y por eso allí se evita a propósito. */
+.block-html h2,
+.block-html h3,
+.block-html h4 {
+  break-after: avoid;
+}
+
 .section-title-3 {
   font-size: 20pt;
   font-weight: 700;
