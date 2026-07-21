@@ -48,6 +48,20 @@
   opacity: 0.65;
 }
 
+/* ── Aire bajo la línea del encabezado ──────────────────────────────────────
+   La línea horizontal del encabezado es el `border-bottom` de las cajas de
+   margen @top-left/@top-right, que rellenan toda la banda de margen superior;
+   por eso el borde queda pegado al contenido (separación real = 0).
+   `padding-bottom` (dentro del borde) solo añade aire ENCIMA de la línea, no
+   debajo. Para subir la línea y dejar aire al contenido damos `margin-bottom`
+   a las cajas de margen generadas por Paged.js: la caja se acorta por abajo
+   (el borde sube) sin mover el inicio del contenido ni cambiar el tamaño de la
+   banda de encabezado. Solo las cajas superiores (no el pie). */
+.pagedjs_margin-top-left,
+.pagedjs_margin-top-right {
+  margin-bottom: 4mm;
+}
+
 /* ── Páginas ────────────────────────────────────────────────────────────── */
 
 @page {
@@ -689,6 +703,31 @@
   content: '▼  ';
   font-size: 8pt;
   color: var(--color-primary, #1a3a5c);
+}
+
+/* ── Cabeceras de items de acordeón/pestañas (grupos .exe-fx) ────────────────
+   SemanticBuilder genera cada item como un <h2>, así que sin estilo propio
+   salían idénticos al H2 "padre" (versalitas, 14pt, color primario) y no se
+   distinguían jerárquicamente. Aquí SIGUEN SIENDO H2: se conservan tamaño
+   (14pt) y versalitas —para que nunca se confundan por tamaño con un H3 interno
+   del panel (13pt)—; la distinción es puramente visual: banda tenue derivada
+   del color primario del tema + barra de acento a la izquierda + chevron.
+   Solo cambia CSS: NO afecta al índice (el TOC se genera desde doc.pages, nunca
+   desde estos H2 internos) ni a los marcadores del PDF. Aplica igual a acordeón
+   y pestañas (ambos producen `.exe-fx h2`). */
+.block-html .exe-fx h2 {
+  background: color-mix(in srgb, var(--color-primary, #135d87) 8%, #fff);
+  border-left: 3px solid var(--color-accent, #deb13c);
+  padding: 6px 12px;
+  margin: 16px 0 4px;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.block-html .exe-fx h2::before {
+  content: '▾  ';
+  font-size: 9pt;
+  color: var(--color-accent, #deb13c);
 }
 
 
