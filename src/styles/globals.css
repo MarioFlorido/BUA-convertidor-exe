@@ -1327,6 +1327,9 @@ button {
 }
 
 .level-option {
+  position: relative; /* ancla el radio oculto (absolute); sin esto se posiciona
+                         respecto al documento raíz, escapa del scroll de .container
+                         y estira la página (franja en blanco tras el footer) */
   display: flex;
   align-items: center;
   padding: 0.2rem 0.6rem;
@@ -1482,6 +1485,7 @@ button {
 }
 
 .h2-option {
+  position: relative; /* ancla el radio oculto (absolute), como en .level-option */
   display: flex;
   align-items: center;
   padding: 0.16rem 0.5rem;
