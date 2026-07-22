@@ -235,10 +235,18 @@ ${nextPage ? `<a href="${escapeHtml(nextHref)}" title="Next" class="nav-button n
       sanitizedHtml = sanitizedHtml.split(`"${RESOURCE_DIR}/`).join(`"${assetPrefix}${RESOURCE_DIR}/`);
     }
 
-    return `<article id="${escapeHtml(blockId)}" class="box">
+    // Los iDevices con título se muestran plegados (igual que en el content.xml):
+    // la clase `minimized` en el <article> activa la regla de base.css que oculta
+    // `.box-content`, y el usuario despliega con el toggle. Los bloques sin título
+    // no tienen cabecera sobre la que plegar → se muestran desplegados.
+    const hasTitle = (block.title || '').trim().length > 0;
+    const articleClass = hasTitle ? 'box minimized' : 'box';
+    const toggleClass = hasTitle ? 'box-toggle box-toggle-off' : 'box-toggle box-toggle-on';
+
+    return `<article id="${escapeHtml(blockId)}" class="${articleClass}">
 <header class="box-head no-icon">
 <h1 class="box-title">${escapeHtml(block.title || 'Contenido')}</h1>
-<button class="box-toggle box-toggle-on" title="Toggle content">
+<button class="${toggleClass}" title="Toggle content">
 <span>Toggle content</span>
 </button></header>
 <div class="box-content">

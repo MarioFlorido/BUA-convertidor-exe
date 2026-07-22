@@ -196,6 +196,11 @@ ${blocksXml}  </odePagStructures>
     const blockId = createBlockId();
     const ideviceId = createIdeviceId();
     const blockName = block.title ? block.title.toUpperCase() : '';
+    // Los iDevices con título (H2 marcado como «título de iDevice») se generan
+    // plegados: tienen cabecera y marco contenedor, así que el usuario los
+    // despliega si quiere ver el contenido. Los bloques sin título no tienen
+    // cabecera sobre la que plegar → quedan desplegados como hasta ahora.
+    const minimized = block.title.trim() ? 'true' : 'false';
     const rawHtml = upperCaseH2(block.html || '<p></p>');
     // eXeLearning resuelve las imágenes de recursos con el placeholder
     // {{context_path}}/ por delante (lo sustituye en runtime). El ImageExtractor
@@ -221,7 +226,7 @@ ${blocksXml}  </odePagStructures>
       <iconName></iconName>
       <odePagStructureOrder>${order}</odePagStructureOrder>
       <odePagStructureProperties>
-${this.generatePagStructurePropertyEntry('visibility', 'true')}${this.generatePagStructurePropertyEntry('teacherOnly', 'false')}${this.generatePagStructurePropertyEntry('allowToggle', 'true')}${this.generatePagStructurePropertyEntry('minimized', 'false')}${this.generatePagStructurePropertyEntry('cssClass', '')}      </odePagStructureProperties>
+${this.generatePagStructurePropertyEntry('visibility', 'true')}${this.generatePagStructurePropertyEntry('teacherOnly', 'false')}${this.generatePagStructurePropertyEntry('allowToggle', 'true')}${this.generatePagStructurePropertyEntry('minimized', minimized)}${this.generatePagStructurePropertyEntry('cssClass', '')}      </odePagStructureProperties>
       <odeComponents>
         <odeComponent>
           <odePageId>${escapeXml(pageId)}</odePageId>
