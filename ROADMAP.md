@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **26 jun 2026**
+> Última actualización: **23 jul 2026**
 
 ---
 
@@ -73,6 +73,21 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   fases de refactor con checkboxes sin marcar, pero gran parte ya está hecha
   (la infraestructura de regresión existe: fixtures DOCX, `validate-regression.ts`,
   baseline de checksums). Repasar y reflejar el estado real para que no confunda.
+
+- [ ] 🟡 **Actualizar las acciones del workflow de deploy (Node 20 → 24).**
+  `.github/workflows/deploy.yml` usa `actions/checkout@v4` y, de forma transitiva
+  a través de `peaceiris/actions-gh-pages@v3`, `actions/upload-artifact@v4`; ambas
+  declaran `node20`, que GitHub está **retirando de los runners** (deprecación
+  anunciada sep-2025:
+  https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/).
+  Hoy es solo un **aviso** —el runner las fuerza a node24 y el deploy sigue en
+  verde—, pero cuando retiren node20 del todo el deploy fallará. Fix de bajo
+  riesgo: subir `actions/checkout@v4 → v5` (y de paso `actions/setup-node@v4 → v5`)
+  y `peaceiris/actions-gh-pages@v3` a su última versión, manteniendo la
+  publicación en la rama `gh-pages`. Alternativa más intrusiva: migrar al flujo
+  oficial de Pages (`actions/upload-pages-artifact` + `actions/deploy-pages`), que
+  ya van en node24 pero cambian la configuración de Pages del repo (de «deploy
+  from branch» a «GitHub Actions»).
 
 ### Seguridad
 
