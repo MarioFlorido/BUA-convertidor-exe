@@ -547,6 +547,23 @@
   break-inside: avoid;
 }
 
+/* Reparto de la tabla horizontal entre páginas: al menos un par de filas juntas
+   a cada lado del corte; nunca el encabezado (o una fila) suelto.
+
+   1) El encabezado (`.bua-hrow`) no puede quedar SOLO al final de una página.
+      `break-after: avoid` hace que Paged.js, si la 1ª fila de datos no cabe,
+      mueva el corte ANTES del encabezado y se lo lleve entero a la página
+      siguiente (honra `data-previous-break-after: avoid`; ver chunker/layout.js).
+      Resultado: el encabezado siempre viaja con, como mínimo, su 1ª fila de datos.
+   2) La última fila no queda como "viuda" solitaria: `break-before: avoid` la
+      mantiene junto a la anterior (el corte se adelanta una fila). */
+.block-html .bua_tabla_horizontal tr.bua-hrow {
+  break-after: avoid;
+}
+.block-html .bua_tabla_horizontal tr:last-child {
+  break-before: avoid;
+}
+
 .block-html th {
   background-color: #d0d5da;
   color: var(--color-primary, #135d87);
@@ -573,6 +590,21 @@
   background: #f7f7f7;
 }
 
+/* Tabla vertical: la primera columna es la cabecera (etiquetas). Con el reparto
+   igualitario de `table-layout: fixed` esa columna se lleva un 50% que casi nunca
+   necesita, dejando la columna de datos apretada. Volvemos a `auto` SOLO en las
+   verticales para que la columna de etiquetas se ajuste a su contenido y la de
+   datos ocupe el resto (como en Word y en el ELPX). Las horizontales siguen en
+   `fixed`: ahí el reparto igualitario se ve bien. Los guardas de word-break y
+   max-width del bloque general siguen evitando desbordes de página.
+   OJO: la clase va en el propio <table> (`<table class="bua_tabla_vertical">`),
+   no en un ancestro, así que el selector es `table.bua_tabla_vertical` (no
+   `.bua_tabla_vertical table`, que no casaría nada). Con 2 clases + elemento gana
+   en especificidad a `.block-html table` del bloque general. */
+.block-html table.bua_tabla_vertical {
+  table-layout: auto;
+}
+
 /* Tabla vertical: primera columna actúa como cabecera. Se cubre también
    th:first-child (como en el CSS del tema) por si la tabla llega con <th>. */
 .block-html .bua_tabla_vertical td:first-child,
@@ -581,6 +613,25 @@
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-right: 3px solid var(--color-accent, #deb13c);
+  /* Con `table-layout: auto` la columna se ajusta a la etiqueta más ancha. La
+     regla general de `td` trae `word-break: break-word` + `overflow-wrap: break-word`,
+     que en modo auto NO ensanchan la columna (el min-content de la celda pasa a
+     ser 1 carácter) y parten la etiqueta a mitad de palabra («Editoria/l»). Al
+     normalizar ambos, cada palabra es indivisible: su min-content vuelve a ser el
+     ancho de la palabra completa, así que `auto` ensancha la columna hasta caber
+     la etiqueta más larga en una línea. Las etiquetas de varias palabras siguen
+     partiendo por los espacios. */
+  word-break: normal;
+  overflow-wrap: normal;
+  /* Suelo de ancho: si la etiqueta es corta, `auto` dejaba la columna muy
+     estrecha (~12%). Lo subimos a un valor más cómodo de leer, sin perder el
+     comportamiento acordado: si una etiqueta es más ancha, la columna sigue
+     creciendo para caberla.
+     OJO: se usa `width` (no `min-width`): Chromium IGNORA el `min-width` en
+     porcentaje sobre celdas de tabla, pero en `table-layout: auto` sí respeta
+     `width` como ancho preferido/mínimo de la columna (crece si el contenido
+     pide más). */
+  width: 20%;
 }
 
 /* Tabla horizontal: primera fila actúa como cabecera. Las celdas llegan como
