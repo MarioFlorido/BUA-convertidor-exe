@@ -187,3 +187,76 @@ describe('opciones de H2 (máquina de estados intacta con el emparejado nuevo)',
     assert.equal(doc.pages[1].parentIndex, 0);
   });
 });
+
+describe('marcador [fin-acordeón] (cerrar el desplegable y continuar el apartado)', () => {
+  /** Marca los dos últimos H2 como acordeón; el resto queda en HTML (por defecto). */
+  const asAccordion = (from: number) => (s: DocumentStructure) => {
+    const items = s.h1Sections[0].h2Items;
+    for (let k = from; k < items.length; k++) items[k].option = 'accordion';
+  };
+
+  test('sin marcador: el texto final se lo TRAGA el último panel (comportamiento previo)', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2>AcoA</h2><p>panel A</p>' +
+        '<h2>AcoB</h2><p>panel B</p><p>cola del apartado</p>',
+      asAccordion(0),
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.equal(html.match(/exe-accordion/g)?.length, 1);
+    // Documenta el problema original: "cola del apartado" cae DENTRO del acordeón.
+    assert.ok(html.indexOf('cola del apartado') < html.indexOf('</div>'));
+  });
+
+  test('con marcador: el texto tras [fin-acordeón] sale FUERA del acordeón', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2>AcoA</h2><p>panel A</p>' +
+        '<h2>AcoB</h2><p>panel B</p><p>[fin-acordeón]</p><p>cola del apartado</p>',
+      asAccordion(0),
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.equal(html.match(/exe-accordion/g)?.length, 1);
+    // "panel B" queda dentro del acordeón; "cola" fluye justo tras el </div>.
+    assert.ok(html.indexOf('panel B') < html.indexOf('</div>'));
+    assert.match(html, /<\/div>\s*<p>cola del apartado<\/p>/);
+    // El marcador nunca se imprime como texto literal.
+    assert.doesNotMatch(html, /fin[\s-]*acorde/i);
+  });
+
+  test('el marcador es flexible: mayúsculas, acentos, guion o espacio', async () => {
+    const variantes = ['[fin-acordeón]', '[Fin-Acordeon]', '[FIN ACORDEON]', '[fin  acordeón]'];
+    for (const marca of variantes) {
+      const doc = await convert(
+        `<h1>Tema</h1><h2>AcoA</h2><p>panel A</p><p>${marca}</p><p>cola</p>`,
+        asAccordion(0),
+      );
+      const html = doc.pages[0].blocks[0].html;
+      assert.match(html, /<\/div>\s*<p>cola<\/p>/, `falló con ${marca}`);
+      assert.doesNotMatch(html, /fin[\s-]*acorde/i, `no se limpió con ${marca}`);
+    }
+  });
+
+  test('marcador a mitad de grupo: corta ahí y los acordeones siguientes forman uno nuevo', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2>A</h2><p>pa</p><p>[fin-acordeón]</p><p>entre</p>' +
+        '<h2>B</h2><p>pb</p><h2>C</h2><p>pc</p>',
+      asAccordion(0),
+    );
+    const html = doc.pages[0].blocks[0].html;
+    // Dos grupos: [A] y [B, C], con "entre" como flujo normal en medio.
+    assert.equal(html.match(/exe-accordion/g)?.length, 2);
+    assert.ok(html.indexOf('pa') < html.indexOf('entre'));
+    assert.ok(html.indexOf('entre') < html.indexOf('pb'));
+  });
+
+  test('marcador mal colocado (H2 en HTML, sin acordeón) se elimina sin ensuciar el texto', async () => {
+    // Sin mutate: los H2 quedan en HTML (opción por defecto), no hay acordeón.
+    const doc = await convert(
+      '<h1>Tema</h1><h2>Apartado</h2><p>texto</p><p>[fin-acordeón]</p><p>más texto</p>',
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.doesNotMatch(html, /exe-accordion/);
+    assert.match(html, /texto/);
+    assert.match(html, /más texto/);
+    assert.doesNotMatch(html, /fin[\s-]*acorde/i);
+  });
+});

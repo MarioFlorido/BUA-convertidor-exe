@@ -37,7 +37,7 @@ function mapDelimiterToClass(delimitador: string): string | null {
 
 /** Todas las etiquetas/marcadores reconocidos, para las normalizaciones. */
 const MARKER_SRC =
-  '\\[\\s*(?:ejemplo|definici[oó]n|importante|pie|fin|horizontal|vertical)\\s*\\]';
+  '\\[\\s*(?:ejemplo|definici[oó]n|importante|pie|fin[\\s-]*acorde[oó]n|fin|horizontal|vertical)\\s*\\]';
 
 /** ¿El texto (ya sin tags) es exactamente un marcador reconocido? */
 const MARKER_EXACT = new RegExp(`^${MARKER_SRC}$`, 'i');

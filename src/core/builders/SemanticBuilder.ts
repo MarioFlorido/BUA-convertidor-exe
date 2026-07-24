@@ -15,6 +15,23 @@ interface SectionRange {
 }
 
 /**
+ * Marcador de cierre de acordeón/pestañas escrito por el autor en Word.
+ * Tolerante, a propósito, a:
+ *   - mayúsculas/minúsculas  → flag `i`
+ *   - acento en «acordeón»   → `acorde[oó]n`
+ *   - guion o espacio (o nada) entre «fin» y «acordeón» → `[\s-]*`
+ * Así `[fin-acordeón]`, `[Fin acordeon]`, `[FIN-ACORDEON]`… funcionan igual.
+ *
+ * `_PARA` (marcador solo en su propio <p>) es el que PARTE el grupo: lo de antes
+ * queda como cuerpo del último panel y lo de después sale FUERA del acordeón,
+ * como flujo normal del apartado. `_ANY` limpia cualquier resto suelto para que
+ * el marcador nunca acabe impreso como texto literal.
+ */
+const ACCORDION_END_PARA = /<p>\s*\[\s*fin[\s-]*acorde[oó]n\s*\]\s*<\/p>/i;
+const ACCORDION_END_PARA_G = /<p>\s*\[\s*fin[\s-]*acorde[oó]n\s*\]\s*<\/p>/gi;
+const ACCORDION_END_ANY = /\[\s*fin[\s-]*acorde[oó]n\s*\]/gi;
+
+/**
  * Construye la jerarquía de páginas, bloques e iDevices a partir de:
  * - sections: array de H1/H2/H3/contenido extraído del HTML
  * - structure: parseDocumentStructure que define H1s y sus H2 items
@@ -156,8 +173,11 @@ export class SemanticBuilder {
     // H2s del documento que caen dentro del rango de esta sección
     const h2InRange = this.h2Positions.filter((p) => p >= range.start && p < range.end);
 
-    // Extraer contenido entre el arranque de la sección y su primer H2
-    const contentBeforeFirstH2 = this.serializeRange(range.start, h2InRange[0] ?? range.end);
+    // Extraer contenido entre el arranque de la sección y su primer H2.
+    // Aquí no hay acordeón abierto: un [fin-acordeón] estaría mal puesto → limpiar.
+    const contentBeforeFirstH2 = this.stripAccordionEnd(
+      this.serializeRange(range.start, h2InRange[0] ?? range.end),
+    );
 
     // Crear un iDevice sin título por defecto (para contenido antes del primer H2 y H2s en HTML)
     let currentBlock: SemanticBlock | null = null;
@@ -202,16 +222,19 @@ export class SemanticBuilder {
         }
         const h2Heading = `<h2>${escapeHtml(h2Item.text)}</h2>`;
         currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Heading);
-        if (h2Html) {
-          currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Html);
+        // H2 en HTML: no es un acordeón, así que un [fin-acordeón] sobra → limpiar.
+        const htmlBody = this.stripAccordionEnd(h2Html);
+        if (htmlBody) {
+          currentBlock.html = this.appendParagraphHtml(currentBlock.html, htmlBody);
         }
         i++;
 
       } else if (option === 'idevice-title') {
         flushGroup();
 
-        // Crear un nuevo iDevice con este H2 como título
-        currentBlock = { title: h2Item.text, html: h2Html || '<p></p>' };
+        // iDevice con título: tampoco es un acordeón → limpiar el marcador si aparece.
+        const ideviceBody = this.stripAccordionEnd(h2Html);
+        currentBlock = { title: h2Item.text, html: ideviceBody || '<p></p>' };
         page.blocks.push(currentBlock);
         i++;
 
@@ -221,11 +244,24 @@ export class SemanticBuilder {
           flushGroup();
         }
         groupType = option;
-        groupItems.push({ title: h2Item.text, html: h2Html || '<p></p>' });
+
+        // Un [fin-acordeón] en el cuerpo de este panel corta el grupo aquí:
+        // `body` = cuerpo del panel; `spill` = lo que sale FUERA del acordeón.
+        const { body, spill } = this.splitAccordionEnd(h2Html);
+        groupItems.push({ title: h2Item.text, html: body || '<p></p>' });
         i++;
 
-        // Cerrar el grupo cuando el siguiente H2 es de distinto tipo o no existe
-        if (i >= h1Section.h2Items.length || h1Section.h2Items[i].option !== option) {
+        if (spill) {
+          // El marcador cerró el grupo: volcamos el div y anexamos el resto como
+          // flujo normal del apartado, DESPUÉS del acordeón.
+          flushGroup();
+          if (!currentBlock) {
+            currentBlock = { title: '', html: '' };
+            page.blocks.push(currentBlock);
+          }
+          currentBlock.html = this.appendParagraphHtml(currentBlock.html, spill);
+        } else if (i >= h1Section.h2Items.length || h1Section.h2Items[i].option !== option) {
+          // Cerrar el grupo cuando el siguiente H2 es de distinto tipo o no existe
           flushGroup();
         }
       }
@@ -252,6 +288,34 @@ export class SemanticBuilder {
     // Fin: el siguiente H2 dentro del rango, o el final del rango
     const next = this.h2Positions.find((p) => p > pos && p < range.end) ?? range.end;
     return this.serializeRange(pos + 1, next);
+  }
+
+  /**
+   * Parte el contenido de un panel de acordeón/pestañas en el primer
+   * `<p>[fin-acordeón]</p>` que encuentre:
+   *   - `body`  = lo anterior al marcador → cuerpo del panel.
+   *   - `spill` = lo posterior → sale fuera del grupo, como flujo del apartado.
+   * Sin marcador (en su propio párrafo): no se parte y se devuelve el contenido
+   * limpio de cualquier resto suelto del marcador. Ambos lados se limpian igual,
+   * así un marcador mal colocado nunca se imprime como texto literal.
+   */
+  private splitAccordionEnd(html: string): { body: string; spill: string } {
+    const match = ACCORDION_END_PARA.exec(html);
+    if (!match) {
+      return { body: this.stripAccordionEnd(html), spill: '' };
+    }
+    return {
+      body: this.stripAccordionEnd(html.slice(0, match.index)),
+      spill: this.stripAccordionEnd(html.slice(match.index + match[0].length)),
+    };
+  }
+
+  /** Elimina cualquier marcador [fin-acordeón] (en párrafo propio o suelto). */
+  private stripAccordionEnd(html: string): string {
+    return html
+      .replace(ACCORDION_END_PARA_G, '')
+      .replace(ACCORDION_END_ANY, '')
+      .trim();
   }
 
   /**

@@ -172,6 +172,29 @@ describe('applyDivClasses', () => {
     const input = '<p>Texto normal</p><h2>Título</h2>';
     assert.equal(applyDivClasses(input), input);
   });
+
+  test('[fin-acordeón] inline se aísla en su propio párrafo y NO se envuelve en div', () => {
+    // El marcador de cierre de acordeón hereda la normalización (aislado a
+    // párrafo propio), imprescindible para que SemanticBuilder lo detecte;
+    // pero NO es una caja semántica, así que nunca genera un <div class="bua_*">.
+    const out = applyDivClasses('<p>cuerpo del panel [fin-acordeón]</p>');
+    assert.equal(out, '<p>cuerpo del panel</p><p>[fin-acordeón]</p>');
+    assert.doesNotMatch(out, /class="bua_/);
+  });
+
+  test('[fin-acordeón] con formato de Word (negrita) se limpia igual que [fin]', () => {
+    const out = applyDivClasses('<p>x</p><p><strong>[fin-acordeón]</strong></p>');
+    assert.match(out, /<p>\[fin-acordeón\]<\/p>/);
+    assert.doesNotMatch(out, /<strong>/);
+  });
+
+  test('[fin-acordeón] no se traga el [fin] de una caja [importante] contigua', () => {
+    const input =
+      '<p>[importante]</p><p>aviso</p><p>[fin]</p><p>[fin-acordeón]</p>';
+    const out = applyDivClasses(input);
+    assert.match(out, /<div class="bua_importante"><p>aviso<\/p><\/div>/);
+    assert.match(out, /<p>\[fin-acordeón\]<\/p>/);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
