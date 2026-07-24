@@ -121,7 +121,7 @@ export async function semanticDocumentToPrintHtml(
     : '';
 
   const tocHtml = includeToc
-    ? renderTableOfContents(doc, { numbered: numberedHeadings })
+    ? renderTableOfContents(doc, { numbered: numberedHeadings, language: assets.language })
     : '';
 
   const headingNumbers = numberedHeadings ? computeHeadingNumbers(doc.pages) : undefined;

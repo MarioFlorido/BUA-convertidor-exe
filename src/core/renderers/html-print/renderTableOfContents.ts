@@ -1,5 +1,17 @@
 import type { SemanticDocument, SemanticPage } from '../../models/SemanticDocument';
+import type { PrintLanguage } from './PrintThemeLoader';
 import { escHtml } from '../../utils/html';
+
+/**
+ * Título de la página de índice por idioma del tema.
+ * Mismo patrón que CC_TEXT en renderCoverPage: se elige con `assets.language`,
+ * que PrintThemeLoader ya detecta (config.xml → etiquetas BUA → ID → 'es').
+ */
+const TOC_HEADING: Record<PrintLanguage, string> = {
+  es: 'Índice',
+  ca: 'Índex',
+  en: 'Table of Contents',
+};
 
 /**
  * Entrada normalizada del TOC (una fila en el índice).
@@ -30,7 +42,10 @@ interface TocEntry {
  * @param doc      Documento semántico fuente
  * @param options  `numbered`: prefijar cada entrada con su numeración jerárquica (1, 1.1, 1.1.1…)
  */
-export function renderTableOfContents(doc: SemanticDocument, options: { numbered?: boolean } = {}): string {
+export function renderTableOfContents(
+  doc: SemanticDocument,
+  options: { numbered?: boolean; language?: PrintLanguage } = {},
+): string {
   const numbers = options.numbered ? computeHeadingNumbers(doc.pages) : undefined;
   const entries = buildTocEntries(doc.pages, numbers);
 
@@ -39,10 +54,11 @@ export function renderTableOfContents(doc: SemanticDocument, options: { numbered
   }
 
   const itemsHtml = entries.map(renderTocItem).join('\n');
+  const heading = TOC_HEADING[options.language ?? 'es'];
 
   return `
 <section class="toc-page">
-  <h2 class="toc-heading">Índice</h2>
+  <h2 class="toc-heading">${heading}</h2>
   <nav class="toc" aria-label="Tabla de contenidos">
     <ol class="toc-list">
       ${itemsHtml}
