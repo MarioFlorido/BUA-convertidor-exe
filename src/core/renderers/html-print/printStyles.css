@@ -756,6 +756,19 @@
   color: var(--color-primary, #1a3a5c);
 }
 
+/* ── Sangría del bloque acordeón/pestañas ───────────────────────────────────
+   En el ELPX cada panel es colapsable y tiene su caja con borde, así que se ve
+   dónde acaba el acordeón; en el PDF va expandido y sin caja, y el texto del
+   apartado padre que va DESPUÉS quedaba pegado al contenido del acordeón, sin
+   distinguirse. Sangrando el bloque entero (cabeceras + contenido), el texto que
+   vuelve al margen izquierdo se lee claramente como del H2 superior. Aplica igual
+   a acordeón y pestañas (ambos son `.exe-fx`). El margen inferior separa el bloque
+   del texto que lo sigue, reforzando el "aquí termina el acordeón". */
+.block-html .exe-fx {
+  margin-left: 20px;
+  margin-bottom: 14px;
+}
+
 /* ── Cabeceras de items de acordeón/pestañas (grupos .exe-fx) ────────────────
    SemanticBuilder genera cada item como un <h2>, así que sin estilo propio
    salían idénticos al H2 "padre" (versalitas, 14pt, color primario) y no se
