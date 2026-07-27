@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **23 jul 2026**
+> Última actualización: **27 jul 2026**
 
 ---
 
@@ -55,6 +55,16 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   correo al profesorado), con narración en voz. Hacerlo **solo cuando la
   interfaz esté estable**; si no, se queda obsoleto enseguida. Complementa al
   modo demostración, no lo sustituye.
+
+- [ ] 🟡 **¿Activar también la barra de accesibilidad de eXeLearning?**
+  (`pp_addAccessibilityToolbar` en `ElpxRenderer`, hoy en `false`). Añade al
+  sitio exportado un panel para cambiar tamaño de letra, mayúsculas y fuentes
+  para dislexia (OpenDyslexic, Atkinson Hyperlegible). Va en el mismo sitio que
+  `pp_addSearchBox`: cambiar el valor a `true` y listo. **El pero es el peso:**
+  arrastra `libs/exe_atools/` con las fuentes en `.woff` sin comprimir, unos
+  **650 KB por curso exportado** (frente a los ~1,5 KB de la caja de búsqueda).
+  Decidir si el beneficio de accesibilidad compensa; quizá ofrecerlo como
+  casilla opcional en el paso 3 en lugar de activarlo de serie.
 
 ---
 
@@ -121,6 +131,11 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
+- [x] **Caja de búsqueda activada de serie** (jul 2026): los ELPX generados
+  llegan a eXeLearning con `pp_addSearchBox` ya marcado, así que el sitio web
+  exportado incluye el buscador sin que el usuario toque las propiedades del
+  proyecto. Coste ~1,5 KB. La barra de accesibilidad se dejó fuera a propósito
+  (ver §1, «Ideas a valorar»).
 - [x] **Conversor de elp antiguo a docx** (jul 2026): utilidad del menú
   lateral que convierte paquetes del eXeLearning clásico 2.x en un Word editable
   (parser propio de `contentv3.xml` + librería `docx` MIT en chunk bajo demanda).

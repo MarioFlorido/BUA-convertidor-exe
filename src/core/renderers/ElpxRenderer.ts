@@ -95,6 +95,14 @@ export class ElpxRenderer {
    *   al final del <head> de cada página al exportar (PageRenderer), por lo que
    *   sobrevive al reexport — a diferencia de las páginas de preview del ZIP,
    *   que eXeLearning regenera y descarta.
+   *
+   * Nota sobre pp_addSearchBox: va a `true` de serie. eXeLearning lee la
+   * propiedad al importar el ELPX y, al exportar el sitio web, inyecta el
+   * contenedor #exe-client-search en cada página y genera search_index.js. El
+   * motor ($exeExport.searchBar, en libs/exe_export.js) y los estilos del tema
+   * ya viajan en toda exportación, así que no hay nada más que añadir: sin ese
+   * contenedor, init() sale sin hacer nada. Coste: ~1,5 KB comprimidos.
+   * Las preview del ZIP no lo llevan, pero da igual: eXeLearning las regenera.
    */
   private generateContentXml(themeId: string = 'base', navExpanded = false): string {
     const odeId = createResourceId();
@@ -143,7 +151,7 @@ export class ElpxRenderer {
   <odeProperty><key>pp_modified</key><value>${escapeXml(modified)}</value></odeProperty>
   <odeProperty><key>pp_addExeLink</key><value>false</value></odeProperty>
   <odeProperty><key>pp_addPagination</key><value>false</value></odeProperty>
-  <odeProperty><key>pp_addSearchBox</key><value>false</value></odeProperty>
+  <odeProperty><key>pp_addSearchBox</key><value>true</value></odeProperty>
   <odeProperty><key>pp_addAccessibilityToolbar</key><value>false</value></odeProperty>
   <odeProperty><key>pp_addMathJax</key><value>false</value></odeProperty>
   <odeProperty><key>exportSource</key><value>true</value></odeProperty>

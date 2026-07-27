@@ -1,6 +1,6 @@
 /**
- * Tests del ElpxRenderer, centrados en el estado de plegado (`minimized`) de
- * los iDevices.
+ * Tests del ElpxRenderer: estado de plegado (`minimized`) de los iDevices y
+ * opciones de exportación (odeProperties pp_*).
  *
  * Regla de negocio: los iDevices con título (H2 marcado como «título de
  * iDevice» → cabecera + marco contenedor) se generan PLEGADOS, tanto en el
@@ -60,6 +60,12 @@ function readContentXml(blob: Uint8Array): string {
   return strFromU8(unzipSync(blob)['content.xml']);
 }
 
+/** Lee el valor de una odeProperty del content.xml. */
+function odeProperty(xml: string, key: string): string | undefined {
+  const pattern = new RegExp(`<key>${key}</key><value>([^<]*)</value>`);
+  return pattern.exec(xml)?.[1];
+}
+
 describe('ElpxRenderer — estado de plegado (minimized)', () => {
   test('content.xml: bloque con título → minimized true; sin título → false', async () => {
     const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
@@ -89,5 +95,32 @@ describe('ElpxRenderer — estado de plegado (minimized)', () => {
     // El bloque sin título permanece desplegado.
     assert.match(html, /class="box">/, 'el bloque sin título no debe plegarse en la preview');
     assert.match(html, /class="box-toggle box-toggle-on"/);
+  });
+});
+
+describe('ElpxRenderer — opciones de exportación', () => {
+  test('content.xml: la caja de búsqueda viene activada de serie', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+    const { blobData } = await renderer.render({});
+    const xml = readContentXml(blobData);
+
+    assert.equal(
+      odeProperty(xml, 'pp_addSearchBox'),
+      'true',
+      'el ELPX debe llegar a eXeLearning con el buscador ya marcado',
+    );
+  });
+
+  test('content.xml: el resto de extras de exportación siguen desactivados', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+    const { blobData } = await renderer.render({});
+    const xml = readContentXml(blobData);
+
+    // La barra de accesibilidad se dejó fuera a propósito: son ~650 KB de
+    // fuentes (OpenDyslexic/Atkinson) por curso exportado. Decisión pendiente.
+    assert.equal(odeProperty(xml, 'pp_addAccessibilityToolbar'), 'false');
+    assert.equal(odeProperty(xml, 'pp_addExeLink'), 'false');
+    assert.equal(odeProperty(xml, 'pp_addPagination'), 'false');
+    assert.equal(odeProperty(xml, 'pp_addMathJax'), 'false');
   });
 });

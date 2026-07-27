@@ -2,6 +2,14 @@
 
 ## Sin publicar — Julio 2026
 
+### Caja de búsqueda activada de serie en los ELPX
+- **Los cursos exportados desde eXeLearning ya incluyen buscador sin configurar nada**: `ElpxRenderer` escribe `pp_addSearchBox` a `true` en el `content.xml` del ELPX (antes `false`). eXeLearning lee esa propiedad al importar el paquete, así que la casilla «Añadir caja de búsqueda» de las propiedades del proyecto llega ya marcada y el sitio web resultante sale con el buscador.
+- **No hace falta tocar nada más.** Analizando dos exportaciones reales de eXeLearning v4.0.2 (con y sin la opción) se comprobó que el motor de búsqueda viaja **siempre** en toda exportación: `$exeExport.searchBar` en `libs/exe_export.js` (búsqueda sin distinción de tildes, resaltado con `<mark>`, deep-linking), los estilos `#exe-client-search-*` de `theme/style.css` y el botón de lupa que inyecta `theme/style.js`. Lo único condicional es el disparador: el contenedor `#exe-client-search` en cada página y el índice `search_index.js`, que genera el propio eXeLearning al exportar. Sin ese contenedor, `searchBar.init()` sale sin hacer nada y el CSS mantiene la lupa oculta (`display: none` salvo `body.exe-search-on`).
+- **Los 8 temas oficiales de la BUA ya lo soportan** (CID_es, CID_va, Ciencia_abierta, Ciencia_oberta, Doctorado, Doctorat, Open_Science, PhD): todos traen las 14 reglas CSS y las 4 referencias JS de `#exe-client-search`. Cero trabajo de tema.
+- **Coste en peso: ~1,5 KB comprimidos** (el `search_index.js` de un curso pequeño). La **barra de accesibilidad** (`pp_addAccessibilityToolbar`) se dejó deliberadamente en `false`: arrastra `libs/exe_atools/` con fuentes OpenDyslexic/Atkinson en `.woff` sin comprimir, unos **650 KB por curso**. Queda anotada en el `ROADMAP.md` como decisión pendiente.
+- **Las páginas de vista previa del ZIP no llevan el buscador, y da igual**: eXeLearning las regenera y descarta al exportar. Lo que sobrevive al viaje es el `content.xml`.
+- 2 tests nuevos en `ElpxRenderer.test.ts`: uno fija el buscador en `true`, otro deja constancia de que el resto de extras de exportación siguen desactivados (para que un cambio accidental salte).
+
 ### Auditoría de diseño (impeccable): 26 avisos → 0
 - **Contraste WCAG AA de los chips del Limpiador corregido** (incumplían la Regla del Contraste No Negociable del propio DESIGN.md): texto naranja de `[importante]` #C2410C→`#B53B0B` (4.30→4.85:1 sobre su fondo) y verde de `[ejemplo]` #1E8A43→`#1B7E3D` (3.99→4.64:1). Oscurecimientos mínimos del mismo matiz, verificados también sobre blanco y sobre el fondo institucional.
 - **`[tabla]` recoloreado de violeta #7C3AED a teal `#0F766E`/`#D5F0EC`** (decisión de Mario): el violeta invadía la Regla del Morado Único, que reserva el morado en exclusiva para el badge de tema Local. El teal es el único matiz sin significado previo en el sistema; contraste 4.56:1.
