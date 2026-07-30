@@ -4,6 +4,7 @@ import { PreviewService } from '../services/PreviewService';
 import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml, upperCaseH2 } from '../utils/html';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
+import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -130,6 +131,10 @@ export class ElpxRenderer {
       // Encabezado (H2/H3/H4) que ADEMÁS es un enlace: icono de «enlace externo»
       // en superíndice detrás del texto enlazado (ver externalLinkIcon.ts).
       LINKED_HEADING_ICON_CSS,
+      // Líneas de recurso ([vídeo:], [documento:], [enlace:]): icono delante y
+      // cursiva, para que la lista de recursos se distinga del cuerpo del texto
+      // (ver resourceIcons.ts).
+      RESOURCE_LINK_CSS,
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;

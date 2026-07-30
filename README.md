@@ -51,6 +51,16 @@ También puedes marcar tablas antes de insertarlas:
 [vertical]      → tabla con encabezado en columnas
 ```
 
+Y señalar los enlaces a recursos escribiendo la etiqueta al principio de la línea.
+Estas no se cierran con `[fin]`: solo afectan a su propia línea, que sale con el
+icono correspondiente delante y en cursiva.
+
+```
+[vídeo:] Título del vídeo           → 🖵  icono de vídeo
+[documento:] Título del documento   → 🗎  icono de documento
+[enlace:] Título del enlace         → 🔗 icono de enlace
+```
+
 El tema que elijas aporta los colores y las etiquetas. ConvertidoreXe es bastante robusto: no le importan mayúsculas/minúsculas, tildes o cosas raras que Word inserta. Funciona.
 
 ---

@@ -128,6 +128,26 @@ describe('convertParsedElpToDocx — OOXML generado', () => {
       assert.match(documentXml, re, `caja [${tag}] mal envuelta`);
     }
   });
+
+  test('líneas de recurso bua_recurso_* recuperan su etiqueta (sin [fin])', async () => {
+    const html =
+      '<p class="bua_recurso bua_recurso_video">La fotosíntesis</p>' +
+      '<p class="bua_recurso bua_recurso_documento">Guía de prácticas</p>' +
+      '<ul><li class="bua_recurso bua_recurso_enlace">Portal de recursos</li></ul>';
+    const { entries } = await docxEntriesFromFixture(html);
+    const documentXml = strFromU8(entries['word/document.xml']);
+
+    for (const [tag, text] of [
+      ['vídeo:', 'La fotosíntesis'],
+      ['documento:', 'Guía de prácticas'],
+      ['enlace:', 'Portal de recursos'],
+    ]) {
+      const re = new RegExp(`\\[${tag}\\][\\s\\S]*?${text}`);
+      assert.match(documentXml, re, `recurso [${tag}] sin su etiqueta`);
+    }
+    // No llevan cierre: un [fin] aquí sería un error de reversibilidad.
+    assert.doesNotMatch(documentXml, /\[fin\]/);
+  });
 });
 
 describe('sniffImageSize', () => {

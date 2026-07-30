@@ -27,6 +27,7 @@ import {
   openExternalLinksInNewTab,
   continueInterruptedOrderedLists,
   classifyInlineImages,
+  applyResourceLinks,
   applyAllTransforms,
 } from './HtmlTransformer';
 
@@ -459,6 +460,90 @@ describe('classifyInlineImages', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// applyResourceLinks — líneas de recurso [vídeo:] [documento:] [enlace:]
+// ─────────────────────────────────────────────────────────────────────────────
+describe('applyResourceLinks', () => {
+  test('[vídeo:] marca el párrafo y retira la etiqueta', () => {
+    const input = '<p>[vídeo:] <a href="https://ua.es/v">La fotosíntesis</a></p>';
+    const out = applyResourceLinks(input);
+    assert.equal(
+      out,
+      '<p class="bua_recurso bua_recurso_video"><a href="https://ua.es/v">La fotosíntesis</a></p>',
+    );
+  });
+
+  test('[documento:] y [enlace:] usan su propia clase', () => {
+    assert.match(
+      applyResourceLinks('<p>[documento:] Guía de prácticas</p>'),
+      /class="bua_recurso bua_recurso_documento"/,
+    );
+    assert.match(
+      applyResourceLinks('<p>[enlace:] Portal de recursos</p>'),
+      /class="bua_recurso bua_recurso_enlace"/,
+    );
+  });
+
+  test('da igual mayúsculas, tildes y los dos puntos', () => {
+    const variantes = ['[vídeo:]', '[Vídeo:]', '[VIDEO:]', '[video]', '[ Vídeo : ]'];
+    for (const etiqueta of variantes) {
+      const out = applyResourceLinks(`<p>${etiqueta} Título</p>`);
+      assert.match(out, /class="bua_recurso bua_recurso_video"/, `falló con ${etiqueta}`);
+      assert.doesNotMatch(out, /\[/, `quedó la etiqueta con ${etiqueta}`);
+    }
+  });
+
+  test('no necesita cierre: el resto del documento queda intacto', () => {
+    const input = '<p>[vídeo:] Título</p><p>Párrafo normal</p>';
+    const out = applyResourceLinks(input);
+    assert.match(out, /class="bua_recurso bua_recurso_video"/);
+    assert.match(out, /<p>Párrafo normal<\/p>/);
+  });
+
+  test('funciona en un ítem de lista', () => {
+    const out = applyResourceLinks('<ul><li>[enlace:] Portal</li><li>Otro</li></ul>');
+    assert.match(out, /<li class="bua_recurso bua_recurso_enlace">Portal<\/li>/);
+    assert.match(out, /<li>Otro<\/li>/);
+  });
+
+  test('el marcador solo cuenta al principio de la línea', () => {
+    const input = '<p>Texto con [vídeo:] en medio</p>';
+    assert.equal(applyResourceLinks(input), input);
+  });
+
+  test('marcador sin texto detrás se deja tal cual (fallo visible)', () => {
+    const input = '<p>[vídeo:]</p>';
+    assert.equal(applyResourceLinks(input), input);
+  });
+
+  test('sobrevive al formato accidental de Word alrededor de la etiqueta', () => {
+    const out = applyResourceLinks('<p><strong>[vídeo:]</strong> Título</p>');
+    assert.match(out, /class="bua_recurso bua_recurso_video"/);
+    assert.doesNotMatch(out, /\[/);
+  });
+
+  test('Shift+Enter: cada línea de recurso pasa a su propio párrafo', () => {
+    const out = applyResourceLinks(
+      '<p>[vídeo:] Uno<br />[documento:] Dos</p>',
+    );
+    assert.match(out, /<p class="bua_recurso bua_recurso_video">Uno<\/p>/);
+    assert.match(out, /<p class="bua_recurso bua_recurso_documento">Dos<\/p>/);
+  });
+
+  test('HTML sin marcadores de recurso pasa intacto', () => {
+    const input = '<p>[importante]</p><p>Contenido</p><p>[fin]</p>';
+    assert.equal(applyResourceLinks(input), input);
+  });
+
+  test('no interfiere con las cajas semánticas ni con su [fin]', () => {
+    const input = '<p>[ejemplo]</p><p>[vídeo:] Título</p><p>[fin]</p>';
+    const out = applyDivClasses(applyResourceLinks(input));
+    assert.match(out, /<div class="bua_ejemplo">/);
+    assert.match(out, /class="bua_recurso bua_recurso_video"/);
+    assert.doesNotMatch(out, /\[fin\]/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // applyAllTransforms — integración
 // ─────────────────────────────────────────────────────────────────────────────
 describe('applyAllTransforms (integración)', () => {
@@ -467,6 +552,13 @@ describe('applyAllTransforms (integración)', () => {
     const out = applyAllTransforms(input);
     assert.match(out, /class="bua_importante"/);
     assert.match(out, /<a href="https:\/\/ua\.es"/);
+    assert.match(out, /target="_blank"/);
+  });
+
+  test('línea de recurso con URL en texto plano acaba enlazada', () => {
+    const out = applyAllTransforms('<p>[vídeo:] La fotosíntesis https://ua.es/v</p>');
+    assert.match(out, /class="bua_recurso bua_recurso_video"/);
+    assert.match(out, /<a href="https:\/\/ua\.es\/v"/);
     assert.match(out, /target="_blank"/);
   });
 

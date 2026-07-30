@@ -9,12 +9,18 @@
  * - [horizontal] + tabla → class="bua_tabla_horizontal"
  * - [vertical] + tabla → class="bua_tabla_vertical"
  *
+ * Y las líneas de recurso, que no llevan cierre porque solo afectan a su línea:
+ * - [vídeo:] Título     → <p class="bua_recurso bua_recurso_video">
+ * - [documento:] Título → <p class="bua_recurso bua_recurso_documento">
+ * - [enlace:] Título    → <p class="bua_recurso bua_recurso_enlace">
+ *
  * IMPORTANTE: Output HTML debe ser idéntico al original
  * Validación: SHA-256 de content.xml debe ser byte-identical
  */
 
 import { stripDiacritics } from '../utils/html';
 import { sniffDataUrlSize } from '../utils/imageSize';
+import { RESOURCE_CLASS, type ResourceKind } from '../utils/resourceIcons';
 
 /**
  * Mapea delimitadores a clases BUA
@@ -36,12 +42,29 @@ function mapDelimiterToClass(delimitador: string): string | null {
 
 // ─── Normalización compartida de marcadores ──────────────────────────────────
 
-/** Todas las etiquetas/marcadores reconocidos, para las normalizaciones. */
+/**
+ * Marcadores que ocupan su propia línea (cajas, cierres y marcadores de tabla).
+ * Son los únicos que se aíslan en un párrafo propio (paso 5).
+ */
 const MARKER_SRC =
   '\\[\\s*(?:ejemplo|definici[oó]n|importante|pie|fin[\\s-]*acorde[oó]n|fin|horizontal|vertical)\\s*\\]';
 
+/**
+ * Marcadores de línea de recurso: [vídeo:], [documento:], [enlace:]. Los dos
+ * puntos son opcionales, como cualquier otra variante de escritura.
+ *
+ * NO entran en el paso 5 (aislar en párrafo propio) A PROPÓSITO: van pegados al
+ * texto que etiquetan, y separarlos en su propio <p> es justo lo que hay que
+ * evitar. Sí entran en los pasos 2-4, que limpian la suciedad de Word alrededor
+ * del marcador.
+ */
+const RESOURCE_MARKER_SRC = '\\[\\s*(?:v[ií]deo|documento|enlace)\\s*:?\\s*\\]';
+
+/** Unión de ambos, para las normalizaciones que valen para todos. */
+const ANY_MARKER_SRC = `(?:${MARKER_SRC}|${RESOURCE_MARKER_SRC})`;
+
 /** ¿El texto (ya sin tags) es exactamente un marcador reconocido? */
-const MARKER_EXACT = new RegExp(`^${MARKER_SRC}$`, 'i');
+const MARKER_EXACT = new RegExp(`^${ANY_MARKER_SRC}$`, 'i');
 
 /**
  * Normaliza los marcadores [etiqueta] frente a la "suciedad" invisible que
@@ -81,7 +104,7 @@ export function normalizeSemanticMarkers(html: string): string {
 
   // 3. Formato que envuelve exactamente el marcador (repetir por anidamiento)
   const WRAPPED = new RegExp(
-    `<(strong|em|u|del|sup|sub|span|a)\\b[^>]*>\\s*(${MARKER_SRC})\\s*</\\1>`,
+    `<(strong|em|u|del|sup|sub|span|a)\\b[^>]*>\\s*(${ANY_MARKER_SRC})\\s*</\\1>`,
     'gi',
   );
   let prev: string;
@@ -91,8 +114,14 @@ export function normalizeSemanticMarkers(html: string): string {
   } while (out !== prev);
 
   // 4. <br/> pegados al marcador — con el paso 5 basta con eliminarlos:
-  //    "<p>[importante]<br/>Contenido</p>" acaba igualmente en párrafos propios
-  out = out.replace(new RegExp(`(${MARKER_SRC})\\s*(?:<br\\s*/?>\\s*)+`, 'gi'), '$1');
+  //    "<p>[importante]<br/>Contenido</p>" acaba igualmente en párrafos propios.
+  //    Para un marcador de recurso el <br/> POSTERIOR también sobra (el autor
+  //    partió la línea justo detrás de la etiqueta, pero el texto es suyo).
+  out = out.replace(new RegExp(`(${ANY_MARKER_SRC})\\s*(?:<br\\s*/?>\\s*)+`, 'gi'), '$1');
+  //    El <br/> ANTERIOR solo se quita a los marcadores de caja: ahí el paso 5
+  //    los devuelve a su propio párrafo. Un marcador de recurso quedaría pegado
+  //    al final de la línea de antes, así que ese <br/> se conserva y lo trata
+  //    applyResourceLinks partiendo el párrafo.
   out = out.replace(new RegExp(`(?:<br\\s*/?>\\s*)+(${MARKER_SRC})`, 'gi'), '$1');
 
   // 5. Marcador a párrafo propio (solo al inicio o final del <p>; un marcador
@@ -188,6 +217,108 @@ export function applyDivClasses(htmlValue: string): string {
   );
 
   return result;
+}
+
+// ─── Líneas de recurso: [vídeo:] · [documento:] · [enlace:] ──────────────────
+
+/**
+ * Marcador de recurso al PRINCIPIO del contenido de un párrafo o ítem de lista.
+ * Tolera el `&nbsp;` que Word deja con frecuencia pegado a la etiqueta.
+ */
+const RESOURCE_LEADING = new RegExp(
+  `^(?:&nbsp;|\\s)*\\[(?:&nbsp;|\\s)*(v[ií]deo|documento|enlace)(?:&nbsp;|\\s)*:?(?:&nbsp;|\\s)*\\](?:&nbsp;|\\s)*`,
+  'i',
+);
+
+/** ¿Hay algún marcador de recurso en el HTML? (atajo barato) */
+const RESOURCE_ANYWHERE = new RegExp(RESOURCE_MARKER_SRC, 'i');
+
+/** Forma normalizada del tipo de recurso, o null si no es de los nuestros. */
+function normalizeResourceKind(raw: string): ResourceKind | null {
+  const norm = stripDiacritics(raw.toLowerCase().trim());
+  return norm === 'video' || norm === 'documento' || norm === 'enlace' ? norm : null;
+}
+
+/**
+ * Convierte las líneas de recurso en párrafos marcados con su clase BUA.
+ *
+ *   <p>[vídeo:] <a href="…">Título</a></p>
+ *   → <p class="bua_recurso bua_recurso_video"><a href="…">Título</a></p>
+ *
+ * El icono y la cursiva los pone el CSS (resourceIcons.ts para ELPX y preview,
+ * printStyles.css para el PDF): en el contenido solo queda la clase, así que lo
+ * que el autor edita después en eXeLearning sigue siendo su texto limpio.
+ *
+ * A diferencia de las cajas, estas etiquetas NO se cierran: afectan a la línea
+ * en la que están y a nada más. Da igual cómo se escriban ([Vídeo:], [video],
+ * [ENLACE :]…): mayúsculas, tildes y los dos puntos son indiferentes.
+ *
+ * Vale en párrafos y en ítems de lista (una lista de recursos es lo natural).
+ * Si el autor partió la línea con Shift+Enter, cada trozo que empiece por un
+ * marcador se convierte en su propio párrafo, igual que hacen las cajas.
+ *
+ * Un marcador SIN texto detrás se deja intacto a propósito: no hay recurso que
+ * etiquetar, y verlo impreso es la pista de que algo falta.
+ */
+export function applyResourceLinks(htmlValue: string): string {
+  if (typeof DOMParser === 'undefined') return htmlValue;
+  if (!RESOURCE_ANYWHERE.test(htmlValue)) return htmlValue;
+
+  const normalized = splitResourceLineBreaks(normalizeSemanticMarkers(htmlValue));
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${normalized}</body></html>`,
+    'text/html',
+  );
+  const body = doc.body;
+  let changed = false;
+
+  for (const el of Array.from(body.querySelectorAll('p,li'))) {
+    const match = RESOURCE_LEADING.exec(el.innerHTML);
+    if (!match) continue;
+
+    const kind = normalizeResourceKind(match[1]);
+    if (!kind) continue;
+
+    const rest = el.innerHTML.slice(match[0].length);
+    if (!rest.trim()) continue; // marcador suelto: sin recurso que etiquetar
+
+    el.innerHTML = rest;
+    el.classList.add(RESOURCE_CLASS, `${RESOURCE_CLASS}_${kind}`);
+    changed = true;
+  }
+
+  return changed ? body.innerHTML : htmlValue;
+}
+
+/**
+ * Parte en párrafos independientes las líneas de recurso que el autor separó
+ * con Shift+Enter dentro de un mismo párrafo. Solo actúa cuando detrás del
+ * <br/> hay realmente un marcador de recurso; el resto de <br/> se conservan.
+ */
+export function splitResourceLineBreaks(html: string): string {
+  const AFTER_BR = new RegExp(`<br\\s*/?>(?:&nbsp;|\\s)*${RESOURCE_MARKER_SRC}`, 'i');
+
+  return html.replace(/<p([^>]*)>([\s\S]*?)<\/p>/gi, (full, attrs: string, inner: string) => {
+    if (!AFTER_BR.test(inner)) return full;
+
+    const segments = inner.split(/<br\s*\/?>/i);
+    const paragraphs: string[] = [];
+    for (const segment of segments) {
+      // Un trozo que no empieza por marcador se vuelve a unir al anterior con
+      // su <br/>: solo se separan las líneas que sí son un recurso.
+      if (paragraphs.length > 0 && !RESOURCE_LEADING.test(segment)) {
+        paragraphs[paragraphs.length - 1] += `<br />${segment}`;
+        continue;
+      }
+      paragraphs.push(segment);
+    }
+
+    return paragraphs
+      .filter((segment) => segment.trim())
+      .map((segment) => `<p${attrs}>${segment}</p>`)
+      .join('');
+  });
 }
 
 /**
@@ -567,16 +698,22 @@ function applyIntrinsicSize(img: Element, width: string | null, height: string |
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
  * 2. clases semánticas [ejemplo], [definición], [importante], [pie]
  * 3. clases de tabla [horizontal], [vertical]
- * 4. listas numeradas interrumpidas → continuar numeración con start="N"
- * 5. autolink de URLs en texto plano (al final: re-serializa el DOM)
- * 6. enlaces externos → abrir en pestaña nueva
- * 7. imágenes en línea (logos) → clase bua_img_inline + tamaño fijado
+ * 4. líneas de recurso [vídeo:], [documento:], [enlace:]
+ * 5. listas numeradas interrumpidas → continuar numeración con start="N"
+ * 6. autolink de URLs en texto plano (al final: re-serializa el DOM)
+ * 7. enlaces externos → abrir en pestaña nueva
+ * 8. imágenes en línea (logos) → clase bua_img_inline + tamaño fijado
+ *
+ * Las líneas de recurso van DESPUÉS de las cajas y las tablas (así el marcador
+ * ya llega limpio de la suciedad de Word) y ANTES del autolink, para que una URL
+ * pegada como texto plano en la línea acabe igualmente enlazada.
  */
 export function applyAllTransforms(htmlValue: string): string {
   let transformed = htmlValue;
   transformed = processIframes(transformed);
   transformed = applyDivClasses(transformed);
   transformed = applyTableClasses(transformed);
+  transformed = applyResourceLinks(transformed);
   transformed = continueInterruptedOrderedLists(transformed);
   transformed = autolinkUrls(transformed);
   transformed = openExternalLinksInNewTab(transformed);

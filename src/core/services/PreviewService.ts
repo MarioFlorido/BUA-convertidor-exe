@@ -1,6 +1,7 @@
 import type { SemanticDocument, SemanticBlock } from '../models/SemanticDocument';
 import { escapeHtml, stripDiacritics } from '../utils/html';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
+import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 import { RESOURCE_DIR } from '../transformers/ImageExtractor';
 
 export interface PreviewPageInfo {
@@ -159,6 +160,7 @@ body.exe-export.exe-web-site{min-width:0}
 body{overflow-wrap:anywhere}
 .exe-content img.bua_img_inline{display:inline;vertical-align:middle;margin:0 .25em 0 0;box-shadow:none;border-radius:0}
 ${LINKED_HEADING_ICON_CSS}
+${RESOURCE_LINK_CSS}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}
 .page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}

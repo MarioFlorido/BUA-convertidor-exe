@@ -143,6 +143,37 @@ function boxMarkerFor(el: Element): string | null {
   return null;
 }
 
+/**
+ * Líneas de recurso ([vídeo:], [documento:], [enlace:]). A diferencia de las
+ * cajas no tienen cierre, así que basta con devolver el marcador al principio
+ * del párrafo para que el viaje de vuelta a Word sea reversible.
+ */
+const BUA_RESOURCE_MARKERS: Record<string, string> = {
+  bua_recurso_video: 'vídeo:',
+  bua_recurso_documento: 'documento:',
+  bua_recurso_enlace: 'enlace:',
+};
+
+function resourceMarkerFor(el: Element): string | null {
+  for (const cls of Array.from(el.classList)) {
+    const marker = BUA_RESOURCE_MARKERS[cls];
+    if (marker) return marker;
+  }
+  return null;
+}
+
+/**
+ * Antepone el marcador de recurso a los runs del párrafo, si lleva la clase.
+ * La cursiva no se reconstruye: la pone el CSS de cada salida, así que en Word
+ * vuelve a ser texto normal precedido de su etiqueta — tal y como se escribió.
+ */
+function withResourceMarker(el: Element, runs: ParagraphChild[], ctx: BuildContext): ParagraphChild[] {
+  if (runs.length === 0) return runs;
+  const marker = resourceMarkerFor(el);
+  if (!marker) return runs;
+  return [new ctx.docx.TextRun(`[${marker}] `), ...runs];
+}
+
 function markerParagraph(ctx: BuildContext, text: string): Paragraph {
   const { docx } = ctx;
   return new docx.Paragraph({ children: [new docx.TextRun('[' + text + ']')] });
@@ -175,7 +206,7 @@ function blockify(container: Element, ctx: BuildContext): FileChild[] {
     switch (tag) {
       case 'p': {
         flushLooseRuns();
-        const runs = inlineRuns(el, ctx, {});
+        const runs = withResourceMarker(el, inlineRuns(el, ctx, {}), ctx);
         if (runs.length > 0) blocks.push(makeParagraph(el, runs, ctx));
         break;
       }
@@ -419,7 +450,7 @@ function listToParagraphs(
       }
     }
 
-    const runs = inlineRuns(liClone, ctx, {});
+    const runs = withResourceMarker(li, inlineRuns(liClone, ctx, {}), ctx);
     if (runs.length > 0) {
       paragraphs.push(
         new docx.Paragraph({

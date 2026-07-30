@@ -776,6 +776,60 @@
 }
 
 
+/* ── Líneas de recurso: [vídeo:] · [documento:] · [enlace:] ─────────────────
+   Escribiendo «[vídeo:] Título» al principio del párrafo, el convertidor pone
+   delante el icono del tipo de recurso y la línea entera en cursiva, para que la
+   lista de recursos se distinga de un vistazo del cuerpo del texto.
+
+   Los iconos son máscaras pintadas con `var(--color-primary, …)`: aquí el
+   renderer SÍ define esa variable en :root con el color real del tema, así que
+   salen en el color de la paleta, igual que los títulos y los filetes.
+
+   Los SVG van percent-encodeados para poder compartir el mismo literal con el
+   ELPX (`resourceIcons.ts`), donde tienen que atravesar el escapado XML del
+   content.xml: si se cambia un dibujo, cambiar los dos.
+
+   No se parte entre páginas: una línea de recurso es una unidad corta. */
+.block-html .bua_recurso {
+  font-style: italic;
+  break-inside: avoid;
+}
+
+.block-html .bua_recurso::before {
+  content: "";
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: .4em;
+  vertical-align: -.2em;
+  background-color: var(--color-primary, #135d87);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  /* El icono es color de fondo: sin esto, la impresión lo descartaría. */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.block-html .bua_recurso_video::before {
+  -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%272%27%20y=%275%27%20width=%2720%27%20height=%2714%27%20rx=%272.5%27/%3E%3Cpath%20d=%27M10.5%209.2l4.8%202.8-4.8%202.8z%27%20fill=%27black%27/%3E%3C/svg%3E);
+  mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%272%27%20y=%275%27%20width=%2720%27%20height=%2714%27%20rx=%272.5%27/%3E%3Cpath%20d=%27M10.5%209.2l4.8%202.8-4.8%202.8z%27%20fill=%27black%27/%3E%3C/svg%3E);
+}
+
+.block-html .bua_recurso_documento::before {
+  -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M14%203H7a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h10a2%202%200%200%200%202-2V8z%27/%3E%3Cpath%20d=%27M14%203v5h5%27/%3E%3Cpath%20d=%27M9%2013.5h6%27/%3E%3Cpath%20d=%27M9%2017h6%27/%3E%3C/svg%3E);
+  mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M14%203H7a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h10a2%202%200%200%200%202-2V8z%27/%3E%3Cpath%20d=%27M14%203v5h5%27/%3E%3Cpath%20d=%27M9%2013.5h6%27/%3E%3Cpath%20d=%27M9%2017h6%27/%3E%3C/svg%3E);
+}
+
+.block-html .bua_recurso_enlace::before {
+  -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M10%2013a5%205%200%200%200%207.5.5l3-3a5%205%200%200%200-7-7l-1.7%201.7%27/%3E%3Cpath%20d=%27M14%2011a5%205%200%200%200-7.5-.5l-3%203a5%205%200%200%200%207%207l1.7-1.7%27/%3E%3C/svg%3E);
+  mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M10%2013a5%205%200%200%200%207.5.5l3-3a5%205%200%200%200-7-7l-1.7%201.7%27/%3E%3Cpath%20d=%27M14%2011a5%205%200%200%200-7.5-.5l-3%203a5%205%200%200%200%207%207l1.7-1.7%27/%3E%3C/svg%3E);
+}
+
+
 /* ============================================================
    8. ACORDEONES (siempre expandidos en print)
    ============================================================ */

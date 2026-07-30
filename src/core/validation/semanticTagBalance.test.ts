@@ -183,3 +183,57 @@ describe('detectSemanticTagIssues — marcadores de tabla', () => {
     assert.deepEqual(detectSemanticTagIssues(html), []);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Marcadores de recurso [vídeo:] [documento:] [enlace:]
+// ─────────────────────────────────────────────────────────────────────────────
+describe('detectSemanticTagIssues — líneas de recurso', () => {
+  test('marcador que abre la línea con recurso detrás → sin avisos', () => {
+    const html =
+      '<p>[vídeo:] <a href="https://ua.es">Título</a></p>' +
+      '<p>[documento:] Guía</p>' +
+      '<ul><li>[enlace:] Portal</li></ul>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('cualquier variante de escritura vale igual', () => {
+    for (const etiqueta of ['[Vídeo:]', '[VIDEO]', '[ video : ]']) {
+      assert.deepEqual(
+        detectSemanticTagIssues(`<p>${etiqueta} Título</p>`),
+        [],
+        `falló con ${etiqueta}`,
+      );
+    }
+  });
+
+  test('marcador en mitad del párrafo → resource-marker', () => {
+    const issues = detectSemanticTagIssues('<p>Mira este [vídeo:] tan bueno</p>');
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'resource-marker');
+    assert.equal(issues[0].marker, 'vídeo');
+  });
+
+  test('marcador sin recurso detrás → resource-marker', () => {
+    const issues = detectSemanticTagIssues('<p>[documento:]</p><p>Otra cosa</p>');
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'resource-marker');
+    assert.equal(issues[0].marker, 'documento');
+  });
+
+  test('línea de recurso escrita con Shift+Enter no da falso aviso', () => {
+    const html = '<p>[vídeo:] Uno<br />[enlace:] Dos</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('formato de Word alrededor del marcador no da falso aviso', () => {
+    const html = '<p><strong>[vídeo:]</strong> Título</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('no interfiere con la detección de cajas sin cerrar', () => {
+    const html = '<p>[ejemplo]</p><p>[vídeo:] Título</p>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'unclosed-box');
+  });
+});
