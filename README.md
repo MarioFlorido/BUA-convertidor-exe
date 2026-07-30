@@ -61,6 +61,11 @@ icono correspondiente delante y en cursiva.
 [enlace:] Título del enlace         → 🔗 icono de enlace
 ```
 
+**Los dos puntos son obligatorios**, y son lo único que no admite variantes: sin
+ellos no hay etiqueta. Así, un texto que transcriba corchetes —los prompts de un
+curso sobre IA, por ejemplo: «resume el [texto] y añade el [enlace]»— llega al
+curso tal cual, sin que nada se convierta en icono.
+
 El tema que elijas aporta los colores y las etiquetas. ConvertidoreXe es bastante robusto: no le importan mayúsculas/minúsculas, tildes o cosas raras que Word inserta. Funciona.
 
 ---

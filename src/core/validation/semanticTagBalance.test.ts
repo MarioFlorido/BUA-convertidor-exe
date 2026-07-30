@@ -197,13 +197,21 @@ describe('detectSemanticTagIssues — líneas de recurso', () => {
   });
 
   test('cualquier variante de escritura vale igual', () => {
-    for (const etiqueta of ['[Vídeo:]', '[VIDEO]', '[ video : ]']) {
+    for (const etiqueta of ['[Vídeo:]', '[VIDEO:]', '[ video : ]']) {
       assert.deepEqual(
         detectSemanticTagIssues(`<p>${etiqueta} Título</p>`),
         [],
         `falló con ${etiqueta}`,
       );
     }
+  });
+
+  test('un corchete sin los dos puntos no es etiqueta: ni se toca ni se avisa', () => {
+    // Prompts transcritos en un curso sobre IA: son contenido, no etiquetas.
+    const html =
+      '<p>Escribe: «resume el [texto] y añade el [enlace] al final».</p>' +
+      '<p>Otro prompt con [vídeo] y [documento] en medio.</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
   });
 
   test('marcador en mitad del párrafo → resource-marker', () => {

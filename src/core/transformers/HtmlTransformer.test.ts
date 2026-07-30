@@ -483,13 +483,27 @@ describe('applyResourceLinks', () => {
     );
   });
 
-  test('da igual mayúsculas, tildes y los dos puntos', () => {
-    const variantes = ['[vídeo:]', '[Vídeo:]', '[VIDEO:]', '[video]', '[ Vídeo : ]'];
+  test('da igual mayúsculas, tildes y espacios', () => {
+    const variantes = ['[vídeo:]', '[Vídeo:]', '[VIDEO:]', '[video:]', '[ Vídeo : ]'];
     for (const etiqueta of variantes) {
       const out = applyResourceLinks(`<p>${etiqueta} Título</p>`);
       assert.match(out, /class="bua_recurso bua_recurso_video"/, `falló con ${etiqueta}`);
       assert.doesNotMatch(out, /\[/, `quedó la etiqueta con ${etiqueta}`);
     }
+  });
+
+  test('sin los dos puntos NO es una etiqueta: el literal llega intacto', () => {
+    // Un curso sobre IA puede transcribir prompts con corchetes; ese texto es
+    // contenido del autor y no se toca.
+    for (const literal of ['[enlace]', '[vídeo]', '[documento]', '[texto]']) {
+      const input = `<p>${literal} pega aquí lo que quieras</p>`;
+      assert.equal(applyResourceLinks(input), input, `se comió ${literal}`);
+    }
+  });
+
+  test('los dos puntos deben ir DENTRO de los corchetes', () => {
+    const input = '<p>[enlace]: pega aquí la URL</p>';
+    assert.equal(applyResourceLinks(input), input);
   });
 
   test('no necesita cierre: el resto del documento queda intacto', () => {

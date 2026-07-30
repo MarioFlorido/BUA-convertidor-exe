@@ -35,7 +35,8 @@
  *
  * - 'resource-marker': un [vídeo:]/[documento:]/[enlace:] que no abre su línea
  *   o que no tiene ningún recurso detrás. Mismo fallo silencioso que el
- *   anterior: sin aviso, el marcador acaba impreso tal cual.
+ *   anterior: sin aviso, el marcador acaba impreso tal cual. Exige los dos
+ *   puntos, igual que la transformación: un [enlace] suelto no es una etiqueta.
  */
 
 import { stripDiacritics } from '../utils/html';
@@ -216,7 +217,10 @@ function detectResourceMarkerIssues(source: string): SemanticTagIssue[] {
   // La MISMA partición por <br/> que aplica applyResourceLinks: una línea de
   // recurso escrita con Shift+Enter es válida y no debe dar aviso.
   const split = splitResourceLineBreaks(source);
-  const marker = /\[\s*(v[ií]deo|documento|enlace)\s*:?\s*\]/gi;
+  // Los dos puntos son obligatorios: un [enlace] o un [texto] sin ellos no es
+  // una etiqueta (puede ser un prompt transcrito), así que ni se transforma ni
+  // se avisa de nada.
+  const marker = /\[\s*(v[ií]deo|documento|enlace)\s*:\s*\]/gi;
 
   for (const match of split.matchAll(marker)) {
     const idx = match.index ?? 0;

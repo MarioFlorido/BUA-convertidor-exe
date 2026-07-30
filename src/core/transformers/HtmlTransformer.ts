@@ -50,15 +50,20 @@ const MARKER_SRC =
   '\\[\\s*(?:ejemplo|definici[oó]n|importante|pie|fin[\\s-]*acorde[oó]n|fin|horizontal|vertical)\\s*\\]';
 
 /**
- * Marcadores de línea de recurso: [vídeo:], [documento:], [enlace:]. Los dos
- * puntos son opcionales, como cualquier otra variante de escritura.
+ * Marcadores de línea de recurso: [vídeo:], [documento:], [enlace:].
+ *
+ * Los dos puntos son OBLIGATORIOS, y son lo único que no admite variantes. El
+ * material puede ser un curso sobre IA en el que se transcriban prompts con
+ * corchetes —«completa el [texto]», «pega aquí el [enlace]»—, y ese literal
+ * tiene que llegar intacto al curso: sin los dos puntos, no es una etiqueta.
+ * Del resto (mayúsculas, tildes, espacios) se sigue encargando la normalización.
  *
  * NO entran en el paso 5 (aislar en párrafo propio) A PROPÓSITO: van pegados al
  * texto que etiquetan, y separarlos en su propio <p> es justo lo que hay que
  * evitar. Sí entran en los pasos 2-4, que limpian la suciedad de Word alrededor
  * del marcador.
  */
-const RESOURCE_MARKER_SRC = '\\[\\s*(?:v[ií]deo|documento|enlace)\\s*:?\\s*\\]';
+const RESOURCE_MARKER_SRC = '\\[\\s*(?:v[ií]deo|documento|enlace)\\s*:\\s*\\]';
 
 /** Unión de ambos, para las normalizaciones que valen para todos. */
 const ANY_MARKER_SRC = `(?:${MARKER_SRC}|${RESOURCE_MARKER_SRC})`;
@@ -223,10 +228,11 @@ export function applyDivClasses(htmlValue: string): string {
 
 /**
  * Marcador de recurso al PRINCIPIO del contenido de un párrafo o ítem de lista.
- * Tolera el `&nbsp;` que Word deja con frecuencia pegado a la etiqueta.
+ * Tolera el `&nbsp;` que Word deja con frecuencia pegado a la etiqueta. Los dos
+ * puntos son obligatorios (ver RESOURCE_MARKER_SRC).
  */
 const RESOURCE_LEADING = new RegExp(
-  `^(?:&nbsp;|\\s)*\\[(?:&nbsp;|\\s)*(v[ií]deo|documento|enlace)(?:&nbsp;|\\s)*:?(?:&nbsp;|\\s)*\\](?:&nbsp;|\\s)*`,
+  `^(?:&nbsp;|\\s)*\\[(?:&nbsp;|\\s)*(v[ií]deo|documento|enlace)(?:&nbsp;|\\s)*:(?:&nbsp;|\\s)*\\](?:&nbsp;|\\s)*`,
   'i',
 );
 
@@ -250,8 +256,10 @@ function normalizeResourceKind(raw: string): ResourceKind | null {
  * que el autor edita después en eXeLearning sigue siendo su texto limpio.
  *
  * A diferencia de las cajas, estas etiquetas NO se cierran: afectan a la línea
- * en la que están y a nada más. Da igual cómo se escriban ([Vídeo:], [video],
- * [ENLACE :]…): mayúsculas, tildes y los dos puntos son indiferentes.
+ * en la que están y a nada más. Da igual cómo se escriban ([Vídeo:], [VIDEO:],
+ * [ enlace : ]…): mayúsculas, tildes y espacios son indiferentes. Los dos
+ * puntos no: sin ellos no hay etiqueta, para que un [enlace] transcrito dentro
+ * de un prompt llegue al curso tal cual.
  *
  * Vale en párrafos y en ítems de lista (una lista de recursos es lo natural).
  * Si el autor partió la línea con Shift+Enter, cada trozo que empiece por un
