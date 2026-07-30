@@ -14,6 +14,7 @@
  */
 
 import { stripDiacritics } from '../utils/html';
+import { sniffDataUrlSize } from '../utils/imageSize';
 
 /**
  * Mapea delimitadores a clases BUA
@@ -470,6 +471,97 @@ export function continueInterruptedOrderedLists(htmlValue: string): string {
   return changed ? body.innerHTML : htmlValue;
 }
 
+/** Clase que marca una imagen como "en línea" (logo, icono, imagen-enlace). */
+export const INLINE_IMAGE_CLASS = 'bua_img_inline';
+
+/** Contenedores de bloque que delimitan "el párrafo" de una imagen. */
+const IMAGE_BLOCK_SELECTOR = 'p,li,td,th,h1,h2,h3,h4,h5,h6,blockquote,pre,figcaption,dt,dd';
+
+/**
+ * Distingue las imágenes EN LÍNEA (logos junto a un título o abriendo un
+ * párrafo, imágenes que son un hiperenlace) de las ILUSTRACIONES de bloque
+ * (capturas de pantalla), y marca las primeras con `bua_img_inline`.
+ *
+ * Criterio: una imagen es "en línea" cuando comparte su bloque (párrafo, ítem
+ * de lista, celda, encabezado…) con OTRO contenido — texto visible u otra
+ * imagen. Una captura sola en su párrafo no cumple la condición, así que
+ * conserva íntegro el tratamiento de siempre: bloque centrado, con marco en el
+ * PDF y con sombra en el ELPX. El cambio es aditivo por diseño.
+ *
+ * A las imágenes marcadas se les fija su tamaño para que NO se redimensionen:
+ *   1. el tamaño de presentación real del DOCX, anotado por DocxParser en
+ *      `data-bua-w`/`data-bua-h` (lo que el autor ve en Word);
+ *   2. si no está disponible, el tamaño intrínseco leído de la cabecera del
+ *      archivo — que es exactamente lo que pintaría el navegador por su cuenta.
+ * Va como atributos width/height (los lee elpToDocx en el viaje de vuelta) y
+ * como `style` inline, que es el único vehículo que gana al CSS del tema de
+ * eXeLearning sin necesidad de !important.
+ *
+ * Los atributos `data-bua-*` se eliminan siempre, también de las imágenes de
+ * bloque: no llegan a la salida.
+ */
+export function classifyInlineImages(htmlValue: string): string {
+  if (typeof DOMParser === 'undefined') return htmlValue;
+  if (!htmlValue.includes('<img')) return htmlValue;
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${htmlValue}</body></html>`,
+    'text/html',
+  );
+  const body = doc.body;
+  let changed = false;
+
+  for (const img of Array.from(body.querySelectorAll('img'))) {
+    const width = img.getAttribute('data-bua-w');
+    const height = img.getAttribute('data-bua-h');
+    if (width || height) {
+      img.removeAttribute('data-bua-w');
+      img.removeAttribute('data-bua-h');
+      changed = true;
+    }
+
+    if (!sharesBlockWithOtherContent(img)) continue;
+
+    img.classList.add(INLINE_IMAGE_CLASS);
+    applyIntrinsicSize(img, width, height);
+    changed = true;
+  }
+
+  return changed ? body.innerHTML : htmlValue;
+}
+
+/**
+ * ¿La imagen convive en su bloque con otro contenido (texto visible u otra
+ * imagen)? Es la señal de que actúa como logo/icono dentro del flujo y no como
+ * ilustración independiente.
+ */
+function sharesBlockWithOtherContent(img: Element): boolean {
+  const block = img.closest(IMAGE_BLOCK_SELECTOR);
+  if (!block) return false; // imagen suelta en el body: ilustración de bloque
+
+  if ((block.textContent || '').trim().length > 0) return true;
+  return block.querySelectorAll('img').length > 1;
+}
+
+/** Fija el tamaño de la imagen para que no se redimensione en ninguna salida. */
+function applyIntrinsicSize(img: Element, width: string | null, height: string | null): void {
+  let size =
+    width && height ? { width: Number(width), height: Number(height) } : null;
+
+  if (!size || !Number.isFinite(size.width) || !Number.isFinite(size.height)) {
+    const sniffed = sniffDataUrlSize(img.getAttribute('src') || '');
+    size = sniffed ? { width: sniffed.width, height: sniffed.height } : null;
+  }
+
+  if (!size || size.width < 1 || size.height < 1) return;
+
+  img.setAttribute('width', String(size.width));
+  img.setAttribute('height', String(size.height));
+  const existing = img.getAttribute('style');
+  const declarations = `width:${size.width}px;height:${size.height}px`;
+  img.setAttribute('style', existing ? `${existing};${declarations}` : declarations);
+}
+
 /**
  * Aplica todas las transformaciones HTML en orden:
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
@@ -478,6 +570,7 @@ export function continueInterruptedOrderedLists(htmlValue: string): string {
  * 4. listas numeradas interrumpidas → continuar numeración con start="N"
  * 5. autolink de URLs en texto plano (al final: re-serializa el DOM)
  * 6. enlaces externos → abrir en pestaña nueva
+ * 7. imágenes en línea (logos) → clase bua_img_inline + tamaño fijado
  */
 export function applyAllTransforms(htmlValue: string): string {
   let transformed = htmlValue;
@@ -487,5 +580,6 @@ export function applyAllTransforms(htmlValue: string): string {
   transformed = continueInterruptedOrderedLists(transformed);
   transformed = autolinkUrls(transformed);
   transformed = openExternalLinksInNewTab(transformed);
+  transformed = classifyInlineImages(transformed);
   return transformed;
 }

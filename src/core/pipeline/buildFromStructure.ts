@@ -10,6 +10,47 @@ interface DocumentSection {
   level: number;
   text: string;
   html: string;
+  /** Logos que el autor puso DENTRO del párrafo del encabezado (ver más abajo). */
+  inlineHtml?: string;
+}
+
+/**
+ * Logos incrustados en el párrafo de un encabezado.
+ *
+ * Es habitual en el material BUA: el autor pone un logo delante del texto del
+ * título, en la misma línea. Mammoth lo entrega como `<h2><img/>Título</h2>`,
+ * pero de un encabezado aquí solo se conservaba el texto (los títulos alimentan
+ * el nombre de página del content.xml, el índice del PDF y titlePage/titleNode,
+ * que tienen que seguir siendo texto plano) — así que el logo se DESCARTABA y no
+ * llegaba ni al ELPX ni al PDF.
+ *
+ * Esta función lo rescata: devuelve el HTML de esas imágenes para que
+ * SemanticBuilder las recoloque (delante del texto cuando el encabezado sigue
+ * siendo HTML; al principio del contenido cuando el título se convierte en
+ * nombre de página o de iDevice). Si la imagen era un hiperenlace, se conserva
+ * el <a> envolvente para que siga siendo clicable.
+ */
+export function extractHeadingMedia(heading: HTMLElement): string {
+  const images = Array.from(heading.querySelectorAll('img'));
+  if (images.length === 0) return '';
+
+  const parts: string[] = [];
+  const emittedLinks = new Set<Element>();
+
+  for (const image of images) {
+    // El <a> solo se arrastra si envuelve la imagen y nada de texto: si también
+    // envuelve el título, arrastrarlo duplicaría el texto del encabezado.
+    const link = image.closest('a[href]');
+    if (link && (link.textContent || '').trim().length === 0) {
+      if (emittedLinks.has(link)) continue; // varias imágenes bajo el mismo enlace
+      emittedLinks.add(link);
+      parts.push(link.outerHTML);
+      continue;
+    }
+    parts.push(image.outerHTML);
+  }
+
+  return parts.join('');
 }
 
 /**
@@ -63,6 +104,7 @@ export function buildProjectFromStructure(
         level,
         text,
         html: '',
+        inlineHtml: extractHeadingMedia(node),
       });
 
       currentHtml = '';

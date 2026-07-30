@@ -117,6 +117,15 @@ export class ElpxRenderer {
       // partirlas en cualquier punto para que no desborden cajas, celdas ni
       // iDevices. Solo actúa cuando la palabra no cabe entera en la línea.
       'body{overflow-wrap:anywhere}',
+      // Imágenes EN LÍNEA (logos junto a un título o abriendo un párrafo,
+      // imágenes que son un hiperenlace). El tema aplica a TODA imagen del
+      // contenido `display:block` + márgenes automáticos + sombra
+      // (`.exe-content img`), que es lo correcto para una captura pero saca al
+      // logo de su párrafo y lo enmarca. Con `.exe-content img.bua_img_inline`
+      // (más específico) y este bloque yendo después del style.css del tema,
+      // gana la cascada sin necesidad de !important. El tamaño lo trae la
+      // propia imagen en su `style` inline: el que tenía en Word.
+      '.exe-content img.bua_img_inline{display:inline;vertical-align:middle;margin:0 .25em 0 0;box-shadow:none;border-radius:0}',
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;

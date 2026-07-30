@@ -15,6 +15,7 @@
  */
 
 import type { ParsedElp } from './elpParser';
+import { sniffImageSize } from '../utils/imageSize';
 import type { FileChild, ISectionOptions, Paragraph, ParagraphChild } from 'docx';
 
 type Docx = typeof import('docx');
@@ -592,59 +593,7 @@ function normalizeImageType(extension: string): DocxImageType | null {
   return null; // svg, webp… no compatibles de forma fiable con Word
 }
 
-/**
- * Dimensiones leídas de la cabecera del archivo (PNG/JPEG/GIF/BMP). Se usa
- * cuando el HTML no trae width/height. Devuelve null si no se puede determinar.
- */
-export function sniffImageSize(data: Uint8Array, type: DocxImageType): { width: number; height: number } | null {
-  try {
-    if (type === 'png' && data.length >= 24) {
-      return { width: readU32BE(data, 16), height: readU32BE(data, 20) };
-    }
-    if (type === 'gif' && data.length >= 10) {
-      return { width: data[6] | (data[7] << 8), height: data[8] | (data[9] << 8) };
-    }
-    if (type === 'bmp' && data.length >= 26) {
-      return { width: readU32LE(data, 18), height: Math.abs(readI32LE(data, 22)) };
-    }
-    if (type === 'jpg') {
-      return sniffJpegSize(data);
-    }
-  } catch {
-    // caída al tamaño por defecto
-  }
-  return null;
-}
-
-function sniffJpegSize(data: Uint8Array): { width: number; height: number } | null {
-  let offset = 2; // tras el marcador SOI (FFD8)
-  while (offset + 9 < data.length) {
-    if (data[offset] !== 0xff) {
-      offset += 1;
-      continue;
-    }
-    const marker = data[offset + 1];
-    // SOF0..SOF15 (excepto DHT/JPG/DAC): contienen las dimensiones.
-    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
-      return {
-        height: (data[offset + 5] << 8) | data[offset + 6],
-        width: (data[offset + 7] << 8) | data[offset + 8],
-      };
-    }
-    const length = (data[offset + 2] << 8) | data[offset + 3];
-    offset += 2 + length;
-  }
-  return null;
-}
-
-function readU32BE(data: Uint8Array, offset: number): number {
-  return ((data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3]) >>> 0;
-}
-
-function readU32LE(data: Uint8Array, offset: number): number {
-  return ((data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset]) >>> 0;
-}
-
-function readI32LE(data: Uint8Array, offset: number): number {
-  return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
-}
+// El sniffing de dimensiones vive en utils/imageSize (lo comparten las dos
+// direcciones del convertidor). Se reexporta para no romper a quien lo importa
+// desde aquí.
+export { sniffImageSize };

@@ -6,6 +6,14 @@ interface DocumentSection {
   level: number;
   text: string;
   html: string;
+  /**
+   * Logos que el autor puso dentro del párrafo del encabezado, ya extraídos por
+   * `extractHeadingMedia`. Reaparecen delante del texto cuando el encabezado se
+   * mantiene como HTML (H2 en HTML, H3, H4) y al principio del contenido cuando
+   * el título se convierte en nombre de página o de iDevice, donde solo cabe
+   * texto plano.
+   */
+  inlineHtml?: string;
 }
 
 /** Rango semiabierto [start, end) de índices dentro del array de secciones. */
@@ -175,8 +183,12 @@ export class SemanticBuilder {
 
     // Extraer contenido entre el arranque de la sección y su primer H2.
     // Aquí no hay acordeón abierto: un [fin-acordeón] estaría mal puesto → limpiar.
-    const contentBeforeFirstH2 = this.stripAccordionEnd(
-      this.serializeRange(range.start, h2InRange[0] ?? range.end),
+    // El H1 de esta sección ocupa la posición range.start - 1: si el autor puso un
+    // logo en su misma línea, abre el contenido de la página (el título de página
+    // es texto plano y no admite la imagen dentro).
+    const contentBeforeFirstH2 = this.prependHeadingMedia(
+      h1Section.synthetic ? '' : this.headingMedia(range.start - 1),
+      this.stripAccordionEnd(this.serializeRange(range.start, h2InRange[0] ?? range.end)),
     );
 
     // Crear un iDevice sin título por defecto (para contenido antes del primer H2 y H2s en HTML)
@@ -211,6 +223,8 @@ export class SemanticBuilder {
       const h2Item = h1Section.h2Items[i];
       const option = h2Item.option;
       const h2Html = this.extractH2Content(h2Item.id, range);
+      // Logo que el autor puso en la misma línea del título, si lo hay.
+      const h2Media = this.headingMedia(this.h2Position(h2Item.id, range));
 
       if (option === 'html') {
         flushGroup();
@@ -220,7 +234,9 @@ export class SemanticBuilder {
           currentBlock = { title: '', html: '' };
           page.blocks.push(currentBlock);
         }
-        const h2Heading = `<h2>${escapeHtml(h2Item.text)}</h2>`;
+        // El encabezado sigue siendo HTML: el logo vuelve a su sitio exacto,
+        // delante del texto del título.
+        const h2Heading = `<h2>${h2Media}${escapeHtml(h2Item.text)}</h2>`;
         currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Heading);
         // H2 en HTML: no es un acordeón, así que un [fin-acordeón] sobra → limpiar.
         const htmlBody = this.stripAccordionEnd(h2Html);
@@ -233,7 +249,7 @@ export class SemanticBuilder {
         flushGroup();
 
         // iDevice con título: tampoco es un acordeón → limpiar el marcador si aparece.
-        const ideviceBody = this.stripAccordionEnd(h2Html);
+        const ideviceBody = this.prependHeadingMedia(h2Media, this.stripAccordionEnd(h2Html));
         currentBlock = { title: h2Item.text, html: ideviceBody || '<p></p>' };
         page.blocks.push(currentBlock);
         i++;
@@ -248,7 +264,8 @@ export class SemanticBuilder {
         // Un [fin-acordeón] en el cuerpo de este panel corta el grupo aquí:
         // `body` = cuerpo del panel; `spill` = lo que sale FUERA del acordeón.
         const { body, spill } = this.splitAccordionEnd(h2Html);
-        groupItems.push({ title: h2Item.text, html: body || '<p></p>' });
+        const panelBody = this.prependHeadingMedia(h2Media, body);
+        groupItems.push({ title: h2Item.text, html: panelBody || '<p></p>' });
         i++;
 
         if (spill) {
@@ -274,20 +291,48 @@ export class SemanticBuilder {
   }
 
   /**
+   * Índice en `sections` del H2 con ese id, si cae dentro del rango de su
+   * sección. `undefined` si el id no se reconoce o queda fuera.
+   */
+  private h2Position(h2Id: string, range: SectionRange): number | undefined {
+    const ordinal = this.ordinalFromId(h2Id);
+    const pos = ordinal !== null ? this.h2Positions[ordinal - 1] : undefined;
+    if (pos === undefined || pos < range.start || pos >= range.end) {
+      return undefined;
+    }
+    return pos;
+  }
+
+  /**
    * Contenido de un H2 (`h2-X-M` = M-ésimo H2 del documento): desde después
    * del propio H2 hasta el siguiente encabezado de nivel ≤ 2 dentro del rango
    * de su sección.
    */
   private extractH2Content(h2Id: string, range: SectionRange): string {
-    const ordinal = this.ordinalFromId(h2Id);
-    const pos = ordinal !== null ? this.h2Positions[ordinal - 1] : undefined;
-    if (pos === undefined || pos < range.start || pos >= range.end) {
+    const pos = this.h2Position(h2Id, range);
+    if (pos === undefined) {
       return ''; // id no reconocido o fuera de la sección: no inventar contenido
     }
 
     // Fin: el siguiente H2 dentro del rango, o el final del rango
     const next = this.h2Positions.find((p) => p > pos && p < range.end) ?? range.end;
     return this.serializeRange(pos + 1, next);
+  }
+
+  /** Logos incrustados en el encabezado de esa sección ('' si no hay). */
+  private headingMedia(index: number | undefined): string {
+    if (index === undefined || index < 0) return '';
+    return this.sections[index]?.inlineHtml || '';
+  }
+
+  /**
+   * Coloca los logos de un encabezado al principio de su contenido, en su propio
+   * párrafo. Es la salida para los títulos que se convierten en nombre de página
+   * o de iDevice: ahí el título es texto plano y el logo no cabe dentro.
+   */
+  private prependHeadingMedia(media: string, html: string): string {
+    if (!media) return html;
+    return this.appendParagraphHtml(`<p>${media}</p>`, html);
   }
 
   /**
@@ -329,10 +374,11 @@ export class SemanticBuilder {
       if (section.level === 999) {
         content += section.html;
       } else if (section.level === 3) {
-        content += `<h3>${escapeHtml(section.text)}</h3>`;
+        // `inlineHtml`: logo puesto en la misma línea del título (ver DocumentSection)
+        content += `<h3>${section.inlineHtml || ''}${escapeHtml(section.text)}</h3>`;
       } else if (section.level === 4) {
         // H4 como encabezado (antes se descartaba → el título desaparecía)
-        content += `<h4>${escapeHtml(section.text)}</h4>`;
+        content += `<h4>${section.inlineHtml || ''}${escapeHtml(section.text)}</h4>`;
       }
       // Niveles 1/2 son fronteras de rango (no aparecen dentro);
       // 5/6 se omiten, como hacía la versión anterior.

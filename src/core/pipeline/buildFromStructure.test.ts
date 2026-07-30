@@ -260,3 +260,57 @@ describe('marcador [fin-acordeón] (cerrar el desplegable y continuar el apartad
     assert.doesNotMatch(html, /fin[\s-]*acorde/i);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Logos dentro del párrafo de un encabezado
+// ─────────────────────────────────────────────────────────────────────────────
+describe('logos incrustados en un encabezado (antes: se descartaban)', () => {
+  /** Logo tal como llega tras classifyInlineImages. */
+  const LOGO = '<img class="bua_img_inline" src="logo.png" width="24" height="18" />';
+
+  test('H2 en HTML: el logo vuelve delante del texto del título', async () => {
+    const doc = await convert(`<h1>Tema</h1><h2>${LOGO}Apartado</h2><p>cuerpo</p>`);
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h2><img class="bua_img_inline" src="logo\.png"[^>]*\/?>Apartado<\/h2>/);
+  });
+
+  test('H1: el título de página sigue siendo texto y el logo abre el contenido', async () => {
+    const doc = await convert(`<h1>${LOGO}Tema</h1><p>cuerpo</p>`);
+    assert.equal(doc.pages[0].title, 'Tema');
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /^<p><img class="bua_img_inline"/);
+    assert.match(html, /<p>cuerpo<\/p>/);
+  });
+
+  test('H3 y H4: el logo se conserva delante del texto', async () => {
+    const doc = await convert(
+      `<h1>Tema</h1><h3>${LOGO}Detalle</h3><p>fino</p><h4>${LOGO}Más</h4>`,
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h3><img class="bua_img_inline"[^>]*\/?>Detalle<\/h3>/);
+    assert.match(html, /<h4><img class="bua_img_inline"[^>]*\/?>Más<\/h4>/);
+  });
+
+  test('iDevice con título: el logo abre el cuerpo del iDevice', async () => {
+    const doc = await convert(`<h1>Tema</h1><h2>${LOGO}Apartado</h2><p>cuerpo</p>`, (s) => {
+      s.h1Sections[0].h2Items[0].option = 'idevice-title';
+    });
+    const block = doc.pages[0].blocks.find((b) => b.title === 'Apartado');
+    assert.ok(block, 'debe existir el bloque del iDevice');
+    assert.match(block.html, /^<p><img class="bua_img_inline"/);
+    assert.match(block.html, /<p>cuerpo<\/p>/);
+  });
+
+  test('logo que es un hiperenlace: conserva el <a> y sigue siendo clicable', async () => {
+    const doc = await convert(
+      `<h1>Tema</h1><h2><a href="https://ua.es">${LOGO}</a>Apartado</h2><p>cuerpo</p>`,
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h2><a href="https:\/\/ua\.es"><img[^>]*\/?><\/a>Apartado<\/h2>/);
+  });
+
+  test('encabezado sin logo: salida idéntica a la de siempre', async () => {
+    const doc = await convert('<h1>Tema</h1><h2>Apartado</h2><p>cuerpo</p>');
+    assert.match(doc.pages[0].blocks[0].html, /<h2>Apartado<\/h2>/);
+  });
+});

@@ -26,6 +26,7 @@ import {
   autolinkUrls,
   openExternalLinksInNewTab,
   continueInterruptedOrderedLists,
+  classifyInlineImages,
   applyAllTransforms,
 } from './HtmlTransformer';
 
@@ -386,6 +387,74 @@ describe('continueInterruptedOrderedLists', () => {
     const input = '<ol><li>Uno</li><li>Dos</li></ol>';
     const out = continueInterruptedOrderedLists(input);
     assert.doesNotMatch(out, /start="/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// classifyInlineImages — logos en línea vs ilustraciones de bloque
+// ─────────────────────────────────────────────────────────────────────────────
+describe('classifyInlineImages', () => {
+  /** data URL de un PNG 2×3 real (cabecera IHDR válida). */
+  const PNG_2X3 =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAASFvFN';
+
+  test('imagen sola en su párrafo: NO se marca (sigue siendo ilustración)', () => {
+    const input = `<p><img src="${PNG_2X3}" /></p>`;
+    const out = classifyInlineImages(input);
+    assert.doesNotMatch(out, /bua_img_inline/);
+    assert.equal(out, input, 'sin cambios debe devolver el string original');
+  });
+
+  test('logo al principio de un párrafo de texto: se marca', () => {
+    const out = classifyInlineImages(`<p><img src="${PNG_2X3}" />Texto del párrafo</p>`);
+    assert.match(out, /class="bua_img_inline"/);
+  });
+
+  test('logo en la misma línea del título: se marca', () => {
+    const out = classifyInlineImages(`<h2><img src="${PNG_2X3}" />Título</h2>`);
+    assert.match(out, /class="bua_img_inline"/);
+  });
+
+  test('logo que es un hiperenlace dentro del texto: se marca', () => {
+    const out = classifyInlineImages(
+      `<p>Más info <a href="https://ua.es"><img src="${PNG_2X3}" /></a> aquí</p>`,
+    );
+    assert.match(out, /class="bua_img_inline"/);
+  });
+
+  test('varios logos en un mismo párrafo sin texto: se marcan todos', () => {
+    const out = classifyInlineImages(
+      `<p><img src="${PNG_2X3}" /><img src="${PNG_2X3}" /></p>`,
+    );
+    assert.equal((out.match(/bua_img_inline/g) || []).length, 2);
+  });
+
+  test('usa el tamaño real de Word (data-bua-*) y no el intrínseco', () => {
+    const out = classifyInlineImages(
+      `<p><img src="${PNG_2X3}" data-bua-w="24" data-bua-h="18" />Texto</p>`,
+    );
+    assert.match(out, /width="24"/);
+    assert.match(out, /height="18"/);
+    assert.match(out, /style="width:24px;height:18px"/);
+    assert.doesNotMatch(out, /data-bua-/, 'los data-bua-* no deben llegar a la salida');
+  });
+
+  test('sin tamaño de Word cae al intrínseco de la cabecera del PNG (2×3)', () => {
+    const out = classifyInlineImages(`<p><img src="${PNG_2X3}" />Texto</p>`);
+    assert.match(out, /width="2"/);
+    assert.match(out, /height="3"/);
+  });
+
+  test('los data-bua-* se limpian también en las imágenes de bloque', () => {
+    const out = classifyInlineImages(`<p><img src="${PNG_2X3}" data-bua-w="800" data-bua-h="600" /></p>`);
+    assert.doesNotMatch(out, /data-bua-/);
+    assert.doesNotMatch(out, /bua_img_inline/);
+    assert.doesNotMatch(out, /width="800"/, 'una ilustración no recibe tamaño fijo');
+  });
+
+  test('HTML sin imágenes pasa intacto', () => {
+    const input = '<p>Solo texto</p>';
+    assert.equal(classifyInlineImages(input), input);
   });
 });
 

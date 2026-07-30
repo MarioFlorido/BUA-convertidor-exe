@@ -524,6 +524,20 @@
   text-align: center;
 }
 
+/* Imágenes EN LÍNEA (logos junto a un título o abriendo un párrafo, imágenes
+   que son un hiperenlace). Las marca classifyInlineImages cuando la imagen
+   comparte párrafo con texto: no son ilustraciones, así que no llevan marco ni
+   se sacan del párrafo. El tamaño lo fija el `style` inline que trae la propia
+   imagen (el que tenía en Word), por eso aquí no se toca. */
+.block-html img.bua_img_inline {
+  display: inline;
+  vertical-align: middle;
+  margin: 0 0.25em 0 0;
+  border: 0;
+  border-radius: 0;
+  break-inside: auto;
+}
+
 
 /* ============================================================
    6. TABLAS

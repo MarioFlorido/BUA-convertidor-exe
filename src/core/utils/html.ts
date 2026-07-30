@@ -30,11 +30,23 @@ export function escHtml(value: string): string {
  * eXeLearning y la vista de impresión muestran los H2 en mayúsculas; esta
  * transformación se aplicaba por separado (con la misma regex) en el renderer
  * ELPX y en el de impresión. Centralizada aquí para no duplicarla.
+ *
+ * Solo toca el TEXTO: las etiquetas de dentro del encabezado (un logo que el
+ * autor puso en la misma línea del título llega como `<h2><img …/>Título</h2>`)
+ * y las entidades HTML se copian tal cual. Poner en mayúsculas una etiqueta
+ * rompería sus atributos, y `&nbsp;` no es lo mismo que `&NBSP;`.
  */
 export function upperCaseH2(html: string): string {
   return html.replace(
-    /<h2([^>]*)>([^<]*)<\/h2>/gi,
-    (_, attrs: string, text: string) => `<h2${attrs}>${text.toUpperCase()}</h2>`,
+    /<h2([^>]*)>([\s\S]*?)<\/h2>/gi,
+    (_, attrs: string, inner: string) => `<h2${attrs}>${upperCaseTextOnly(inner)}</h2>`,
+  );
+}
+
+/** Mayúsculas solo en los tramos de texto llano: ni etiquetas ni entidades. */
+function upperCaseTextOnly(html: string): string {
+  return html.replace(/<[^>]*>|&[a-z][a-z0-9]*;|&#\d+;|[^<&]+|[<&]/gi, (segment) =>
+    /^[<&]/.test(segment) ? segment : segment.toUpperCase(),
   );
 }
 

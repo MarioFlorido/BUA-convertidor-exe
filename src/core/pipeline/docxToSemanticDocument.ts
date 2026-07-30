@@ -455,7 +455,18 @@ function normalizeImportedNode(node: Node): string {
       }
       const alt = (node.getAttribute('alt') || '').trim();
       const altAttribute = alt ? ` alt="${escapeHtml(alt)}"` : '';
-      return `<img src="${escapeHtml(src)}"${altAttribute} />`;
+      // Los logos en línea llegan marcados por classifyInlineImages con su clase
+      // bua_* y su tamaño; sin conservarlos aquí, esta ruta los devolvería al
+      // tratamiento de ilustración de bloque.
+      const width = (node.getAttribute('width') || '').trim();
+      const height = (node.getAttribute('height') || '').trim();
+      const style = (node.getAttribute('style') || '').trim();
+      const sizeAttributes = [
+        /^\d+$/.test(width) ? ` width="${width}"` : '',
+        /^\d+$/.test(height) ? ` height="${height}"` : '',
+        style ? ` style="${escapeHtml(style)}"` : '',
+      ].join('');
+      return `<img src="${escapeHtml(src)}"${altAttribute}${buaClassAttribute(node)}${sizeAttributes} />`;
     }
     case 'iframe': {
       // Vídeos embebidos (YouTube). Se centra con display:block + margin auto

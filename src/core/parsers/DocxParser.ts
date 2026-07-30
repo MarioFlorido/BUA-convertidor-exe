@@ -1,4 +1,5 @@
 import mammoth from 'mammoth';
+import { readDocxImageSizes, assignDocxImageSizes } from './docxImageSizes';
 
 /**
  * Parser para archivos DOCX
@@ -6,9 +7,10 @@ import mammoth from 'mammoth';
  * Responsabilidad única: Convertir DOCX → HTML semántico
  * Usa Mammoth.js como librería de parsing con configuración estándar
  *
- * IMPORTANTE: Salvo la conservación de sangrías (ver más abajo), el HTML de
- * salida es idéntico al de Mammoth.js puro. Cuando un párrafo NO tiene sangría
- * manual, su salida no se toca (byte-identical con Mammoth).
+ * IMPORTANTE: salvo la conservación de sangrías y la anotación del tamaño de las
+ * imágenes (ambas más abajo), el HTML de salida es idéntico al de Mammoth.js
+ * puro. Un párrafo sin sangría manual y un documento sin imágenes salen
+ * byte-identical con Mammoth.
  */
 
 export interface DocxParseResult {
@@ -184,6 +186,20 @@ function applyIndentMarkers(html: string): string {
 }
 
 /**
+ * Conservación del TAMAÑO DE LAS IMÁGENES
+ * ---------------------------------------------------------------------------
+ * Mammoth descarta `wp:extent` (el tamaño con el que la imagen se ve en Word),
+ * así que el HTML llega sin dimensiones y el navegador pinta cada imagen a su
+ * tamaño intrínseco en píxeles. Para las capturas a ancho de columna da igual,
+ * pero un logo insertado en línea con el texto salía enorme.
+ *
+ * Aquí se leen esos tamaños del propio DOCX y se anotan en cada <img> como
+ * `data-bua-w` / `data-bua-h`. Los consume `classifyInlineImages` (en
+ * HtmlTransformer), que los aplica a los logos en línea y los borra del resto:
+ * las imágenes de bloque salen exactamente igual que antes.
+ */
+
+/**
  * Parser DOCX
  * Convierte archivos DOCX a HTML
  */
@@ -198,6 +214,7 @@ export class DocxParser {
    */
   async parse(file: File): Promise<DocxParseResult> {
     const inputBuffer = await file.arrayBuffer();
+    const imageSizes = readDocxImageSizes(inputBuffer);
 
     // Detectar si estamos en Node.js o en el navegador
     const mammothInput =
@@ -217,7 +234,7 @@ export class DocxParser {
     });
 
     return {
-      html: applyIndentMarkers(result.value),
+      html: assignDocxImageSizes(applyIndentMarkers(result.value), imageSizes),
       metadata: {}
     };
   }
