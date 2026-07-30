@@ -3,6 +3,7 @@ import type { SemanticDocument, SemanticPage, SemanticBlock } from '../models/Se
 import { PreviewService } from '../services/PreviewService';
 import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml, upperCaseH2 } from '../utils/html';
+import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -126,6 +127,9 @@ export class ElpxRenderer {
       // gana la cascada sin necesidad de !important. El tamaño lo trae la
       // propia imagen en su `style` inline: el que tenía en Word.
       '.exe-content img.bua_img_inline{display:inline;vertical-align:middle;margin:0 .25em 0 0;box-shadow:none;border-radius:0}',
+      // Encabezado (H2/H3/H4) que ADEMÁS es un enlace: icono de «enlace externo»
+      // en superíndice detrás del texto enlazado (ver externalLinkIcon.ts).
+      LINKED_HEADING_ICON_CSS,
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;

@@ -1,7 +1,7 @@
 import type { SemanticDocument } from '../models/SemanticDocument';
 import { SemanticBuilder } from '../builders/SemanticBuilder';
 import type { DocumentStructure } from '../../types';
-import { normalizeText } from '../utils/html';
+import { escapeHtml, normalizeText } from '../utils/html';
 
 // Re-exportar funciones de transformación HTML
 export { applyDivClasses, applyTableClasses } from '../transformers/HtmlTransformer';
@@ -12,6 +12,8 @@ interface DocumentSection {
   html: string;
   /** Logos que el autor puso DENTRO del párrafo del encabezado (ver más abajo). */
   inlineHtml?: string;
+  /** Texto del encabezado con sus hiperenlaces conservados (ver más abajo). */
+  textHtml?: string;
 }
 
 /**
@@ -51,6 +53,77 @@ export function extractHeadingMedia(heading: HTMLElement): string {
   }
 
   return parts.join('');
+}
+
+/**
+ * Texto de un encabezado CON sus hiperenlaces conservados.
+ *
+ * Un título de Word puede ser además un enlace (todo el título, o solo unas
+ * palabras). De un encabezado aquí solo se guardaba `textContent`, porque los
+ * títulos alimentan el nombre de página y el de iDevice, que en el content.xml
+ * son texto plano obligatoriamente — así que el `<a>` se DESCARTABA incluso
+ * cuando el encabezado sí seguía siendo HTML en la salida (H2 en modo HTML, H3,
+ * H4) y el título enlazado llegaba al curso y al PDF como texto muerto.
+ *
+ * Devuelve el contenido del encabezado con los `<a href>` intactos y el resto de
+ * etiquetas disueltas: un título es texto y enlaces, nada más. Las imágenes se
+ * omiten porque de ellas ya se encarga `extractHeadingMedia` (si no, el logo
+ * saldría dos veces). Si el encabezado no lleva ningún enlace con texto devuelve
+ * `''`, y quien lo use se queda con el camino de siempre (`escapeHtml(text)`):
+ * los documentos sin títulos enlazados salen byte a byte como antes.
+ */
+export function extractHeadingTextHtml(heading: HTMLElement): string {
+  const hasTextLink = Array.from(heading.querySelectorAll('a[href]')).some(
+    (anchor) => (anchor.textContent || '').trim().length > 0,
+  );
+  if (!hasTextLink) return '';
+
+  // Las únicas etiquetas de la cadena las escribimos aquí (y no llevan
+  // espacios significativos), así que normalizar el conjunto es seguro y deja
+  // el mismo espaciado que `normalizeText` da al texto plano del título.
+  return normalizeText(
+    Array.from(heading.childNodes)
+      .map((node) => serializeHeadingNode(node))
+      .join(''),
+  );
+}
+
+/** Un nodo del encabezado: texto escapado, enlaces conservados, resto disuelto. */
+function serializeHeadingNode(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return escapeHtml(node.textContent || '');
+  }
+
+  if (!(node instanceof HTMLElement)) {
+    return '';
+  }
+
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'img') {
+    return ''; // las imágenes del título viajan por extractHeadingMedia
+  }
+
+  const inner = Array.from(node.childNodes)
+    .map((child) => serializeHeadingNode(child))
+    .join('');
+
+  if (tag !== 'a') {
+    return inner; // negrita, cursiva, spans de Word…: se disuelven en su texto
+  }
+
+  const href = (node.getAttribute('href') || '').trim();
+  // Enlace sin destino, o que solo envolvía la imagen (ya rescatada aparte):
+  // queda el texto, si lo hubiera.
+  if (!href || !inner.trim()) {
+    return inner;
+  }
+
+  // Mismo criterio que la ruta sin estructura (normalizeImportedNode): los
+  // enlaces externos se abren en pestaña nueva.
+  const externalAttrs = /^https?:\/\//i.test(href)
+    ? ' target="_blank" rel="noopener noreferrer"'
+    : '';
+  return `<a href="${escapeHtml(href)}"${externalAttrs}>${inner}</a>`;
 }
 
 /**
@@ -105,6 +178,7 @@ export function buildProjectFromStructure(
         text,
         html: '',
         inlineHtml: extractHeadingMedia(node),
+        textHtml: extractHeadingTextHtml(node),
       });
 
       currentHtml = '';

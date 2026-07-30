@@ -391,6 +391,38 @@
   margin-right: 4px;
 }
 
+/* Encabezado (H2/H3/H4) que ADEMÁS es un enlace: detrás del texto enlazado se
+   dibuja en superíndice el icono de «enlace externo» (cuadrado con la flecha
+   saliendo por la esquina superior derecha). En un título grande y en negrita, el
+   color de enlace se confunde con el propio color del título y el lector no llega
+   a saber que ahí hay algo que abrir.
+
+   El icono es una máscara pintada con `currentColor`, así que toma el color del
+   enlace sea el que sea. El SVG va percent-encodeado para poder compartir el
+   mismo literal con el ELPX (`ElpxRenderer`, constante EXTERNAL_LINK_ICON), donde
+   tiene que atravesar el escapado XML del content.xml: si se cambia el dibujo,
+   cambiar los dos. */
+.block-html h2 a[href^=http]::after,
+.block-html h3 a[href^=http]::after,
+.block-html h4 a[href^=http]::after {
+  content: "";
+  display: inline-block;
+  width: .55em;
+  height: .55em;
+  margin-left: .22em;
+  vertical-align: super;
+  background-color: currentColor;
+  -webkit-mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%273%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M19%2013v8H3V5h8%27/%3E%3Cpath%20d=%27M14%203h7v7%27/%3E%3Cpath%20d=%27M21%203L11%2013%27/%3E%3C/svg%3E);
+  mask-image: url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%273%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M19%2013v8H3V5h8%27/%3E%3Cpath%20d=%27M14%203h7v7%27/%3E%3Cpath%20d=%27M21%203L11%2013%27/%3E%3C/svg%3E);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* El icono es color de fondo: sin esto, la impresión lo descartaría. */
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
 /* Blindaje de títulos huérfanos: un encabezado de contenido (H2/H3/H4 dentro de
    un bloque) nunca debe quedar solo al final de página con su contenido saltando
    a la siguiente. break-after: avoid obliga a Paged.js a mantener el título junto

@@ -14,6 +14,13 @@ interface DocumentSection {
    * texto plano.
    */
   inlineHtml?: string;
+  /**
+   * Texto del encabezado con sus hiperenlaces conservados, ya escapado, tal como
+   * lo devuelve `extractHeadingTextHtml`. Solo viene cuando el título del autor
+   * llevaba un enlace con texto; en cualquier otro caso está vacío y el
+   * encabezado se escribe desde `text`, como siempre.
+   */
+  textHtml?: string;
 }
 
 /** Rango semiabierto [start, end) de índices dentro del array de secciones. */
@@ -223,8 +230,9 @@ export class SemanticBuilder {
       const h2Item = h1Section.h2Items[i];
       const option = h2Item.option;
       const h2Html = this.extractH2Content(h2Item.id, range);
+      const h2Index = this.h2Position(h2Item.id, range);
       // Logo que el autor puso en la misma línea del título, si lo hay.
-      const h2Media = this.headingMedia(this.h2Position(h2Item.id, range));
+      const h2Media = this.headingMedia(h2Index);
 
       if (option === 'html') {
         flushGroup();
@@ -235,8 +243,9 @@ export class SemanticBuilder {
           page.blocks.push(currentBlock);
         }
         // El encabezado sigue siendo HTML: el logo vuelve a su sitio exacto,
-        // delante del texto del título.
-        const h2Heading = `<h2>${h2Media}${escapeHtml(h2Item.text)}</h2>`;
+        // delante del texto del título, y si el título era un enlace, el <a>
+        // sobrevive (aquí sí cabe, a diferencia del nombre de página/iDevice).
+        const h2Heading = `<h2>${h2Media}${this.headingTextHtml(h2Index) || escapeHtml(h2Item.text)}</h2>`;
         currentBlock.html = this.appendParagraphHtml(currentBlock.html, h2Heading);
         // H2 en HTML: no es un acordeón, así que un [fin-acordeón] sobra → limpiar.
         const htmlBody = this.stripAccordionEnd(h2Html);
@@ -326,6 +335,15 @@ export class SemanticBuilder {
   }
 
   /**
+   * Texto del encabezado con sus enlaces ('' si el título no llevaba ninguno,
+   * para que el encabezado se escriba desde `text` como siempre).
+   */
+  private headingTextHtml(index: number | undefined): string {
+    if (index === undefined || index < 0) return '';
+    return this.sections[index]?.textHtml || '';
+  }
+
+  /**
    * Coloca los logos de un encabezado al principio de su contenido, en su propio
    * párrafo. Es la salida para los títulos que se convierten en nombre de página
    * o de iDevice: ahí el título es texto plano y el logo no cabe dentro.
@@ -374,11 +392,12 @@ export class SemanticBuilder {
       if (section.level === 999) {
         content += section.html;
       } else if (section.level === 3) {
-        // `inlineHtml`: logo puesto en la misma línea del título (ver DocumentSection)
-        content += `<h3>${section.inlineHtml || ''}${escapeHtml(section.text)}</h3>`;
+        // `inlineHtml`: logo puesto en la misma línea del título; `textHtml`: el
+        // título con su enlace, si lo tenía (ver DocumentSection).
+        content += `<h3>${section.inlineHtml || ''}${section.textHtml || escapeHtml(section.text)}</h3>`;
       } else if (section.level === 4) {
         // H4 como encabezado (antes se descartaba → el título desaparecía)
-        content += `<h4>${section.inlineHtml || ''}${escapeHtml(section.text)}</h4>`;
+        content += `<h4>${section.inlineHtml || ''}${section.textHtml || escapeHtml(section.text)}</h4>`;
       }
       // Niveles 1/2 son fronteras de rango (no aparecen dentro);
       // 5/6 se omiten, como hacía la versión anterior.

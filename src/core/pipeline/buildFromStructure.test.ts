@@ -314,3 +314,85 @@ describe('logos incrustados en un encabezado (antes: se descartaban)', () => {
     assert.match(doc.pages[0].blocks[0].html, /<h2>Apartado<\/h2>/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Encabezados que ADEMÁS son un enlace
+// ─────────────────────────────────────────────────────────────────────────────
+describe('encabezados enlazados (antes: el <a> se descartaba)', () => {
+  test('H2 en HTML: el título entero sigue siendo un enlace externo', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2><a href="https://ua.es/catalogo">Catálogo</a></h2><p>cuerpo</p>',
+    );
+    assert.match(
+      doc.pages[0].blocks[0].html,
+      /<h2><a href="https:\/\/ua\.es\/catalogo" target="_blank" rel="noopener noreferrer">Catálogo<\/a><\/h2>/,
+    );
+  });
+
+  test('H3 y H4 enlazados: conservan su <a>', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h3><a href="https://ua.es/a">Detalle</a></h3><p>fino</p>' +
+        '<h4><a href="https://ua.es/b">Más</a></h4>',
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h3><a href="https:\/\/ua\.es\/a"[^>]*>Detalle<\/a><\/h3>/);
+    assert.match(html, /<h4><a href="https:\/\/ua\.es\/b"[^>]*>Más<\/a><\/h4>/);
+  });
+
+  test('enlace parcial: solo se enlaza lo que el autor enlazó', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h3>Consulta el <a href="https://ua.es">catálogo</a> antes</h3><p>x</p>',
+    );
+    assert.match(
+      doc.pages[0].blocks[0].html,
+      /<h3>Consulta el <a href="https:\/\/ua\.es"[^>]*>catálogo<\/a> antes<\/h3>/,
+    );
+  });
+
+  test('enlace interno (ancla, mailto): se conserva sin abrir pestaña nueva', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h3><a href="mailto:bua@ua.es">Escríbenos</a></h3><p>x</p>',
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h3><a href="mailto:bua@ua\.es">Escríbenos<\/a><\/h3>/);
+    assert.doesNotMatch(html, /target="_blank"/);
+  });
+
+  test('etiquetas de adorno dentro del título: se disuelven, el enlace no', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h3><a href="https://ua.es"><strong>Catálogo</strong></a></h3><p>x</p>',
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h3><a href="https:\/\/ua\.es"[^>]*>Catálogo<\/a><\/h3>/);
+    assert.doesNotMatch(html, /<strong>/);
+  });
+
+  test('logo y texto bajo el mismo enlace: el logo no se duplica', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2><a href="https://ua.es"><img class="bua_img_inline" src="logo.png" />Apartado</a></h2><p>x</p>',
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.equal(html.match(/<img/g)?.length, 1);
+    assert.match(html, /<h2><img[^>]*\/?><a href="https:\/\/ua\.es"[^>]*>Apartado<\/a><\/h2>/);
+  });
+
+  test('título de iDevice: el enlace se pierde (el content.xml solo admite texto)', async () => {
+    const doc = await convert(
+      '<h1>Tema</h1><h2><a href="https://ua.es">Apartado</a></h2><p>cuerpo</p>',
+      (s) => {
+        s.h1Sections[0].h2Items[0].option = 'idevice-title';
+      },
+    );
+    const block = doc.pages[0].blocks.find((b) => b.title === 'Apartado');
+    assert.ok(block, 'debe existir el bloque del iDevice');
+    assert.doesNotMatch(block.html, /<a href/);
+  });
+
+  test('encabezado sin enlace: ni rastro de <a> (salida de siempre)', async () => {
+    const doc = await convert('<h1>Tema</h1><h2>Apartado</h2><h3>Detalle</h3><p>cuerpo</p>');
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<h2>Apartado<\/h2>/);
+    assert.match(html, /<h3>Detalle<\/h3>/);
+    assert.doesNotMatch(html, /<a/);
+  });
+});
