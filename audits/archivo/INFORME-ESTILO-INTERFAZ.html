@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Informe de estilo — BUA ConvertidoreXe</title>
+  <style>
+    :root {
+      --blue:        #1B6EC2;
+      --blue-light:  #EBF3FF;
+      --text:        #1D1D1F;
+      --text-2:      #4A4A50;
+      --text-3:      #8E8E93;
+      --surface:     #FFFFFF;
+      --bg:          #EDF1F7;
+      --border:      #D2D2D7;
+      --border-light:#E8E8ED;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      padding: 3rem 2rem;
+    }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--surface);
+      padding: 3rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.14);
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.025em;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-2);
+      margin-bottom: 2rem;
+    }
+    h2 {
+      font-size: 1.35rem;
+      margin-top: 2.5rem;
+      margin-bottom: 0.8rem;
+      color: var(--blue);
+      border-bottom: 2px solid var(--border-light);
+      padding-bottom: 0.5rem;
+    }
+    h3 {
+      font-size: 1.05rem;
+      margin-top: 1.75rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+    p {
+      margin-bottom: 1rem;
+      color: var(--text-2);
+      line-height: 1.7;
+    }
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    code {
+      font-family: 'SF Mono', Menlo, monospace;
+      background: var(--bg);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    /* ── Tokens de color ── */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .color-swatch {
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    }
+    .color-sample {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0.5rem;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .color-info {
+      padding: 0.75rem;
+      background: var(--bg);
+      font-size: 0.8rem;
+    }
+    .color-name {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+    .color-code {
+      color: var(--text-3);
+      font-family: monospace;
+      font-size: 0.75rem;
+    }
+
+    /* ── Sombras demo ── */
+    .shadow-demo {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .shadow-box {
+      height: 120px;
+      border-radius: 10px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: var(--text-2);
+    }
+    .shadow-xs {
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 0 0 1px rgba(0,0,0,.04);
+    }
+    .shadow-sm {
+      box-shadow: 0 2px 8px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.07);
+    }
+    .shadow-md {
+      box-shadow: 0 8px 28px rgba(0,0,0,.14), 0 2px 6px rgba(0,0,0,.08);
+    }
+
+    /* ── Tipografía ── */
+    .typo-demo {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .typo-item {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .typo-item:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+    .typo-label {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .typo-example {
+      font-size: 1rem;
+    }
+
+    /* ── Botones demo ── */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    button {
+      padding: 0.65rem 1.5rem;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(27,110,194,.30);
+    }
+    .btn-primary:hover {
+      background: #155FAF;
+      box-shadow: 0 4px 14px rgba(27,110,194,.40);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── Cards ── */
+    .card-demo {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.10);
+    }
+    .card-demo h4 {
+      font-size: 0.95rem;
+      padding: 1rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border-light);
+      margin: 0;
+    }
+    .card-demo p {
+      padding: 1rem;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* ── Tabla ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background: var(--blue-light);
+      border: 1px solid var(--border-light);
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    td {
+      border: 1px solid var(--border-light);
+      padding: 0.75rem;
+      font-size: 0.9rem;
+    }
+    tr:nth-child(even) { background: var(--bg); }
+
+    /* ── Print ── */
+    @media print {
+      body { padding: 0; }
+      .page { box-shadow: none; max-width: none; }
+    }
+    @media (max-width: 768px) {
+      .color-grid, .shadow-demo, .button-grid {
+        grid-template-columns: 1fr;
+      }
+      .page { padding: 1.5rem; }
+    }
+    .footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--border-light);
+      color: var(--text-3);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Informe de estilo</h1>
+  <p class="subtitle">BUA ConvertidoreXe — Interfaz, colores, tipografía y estructura visual</p>
+
+  <!-- ── RESUMEN ── -->
+  <h2>Resumen ejecutivo</h2>
+  <p>
+    BUA ConvertidoreXe adopta un <strong>diseño minimalista funcional</strong> con énfasis en la claridad y la accesibilidad.
+    La interfaz prioriza el contenido y las acciones del usuario, eliminando elementos decorativos. El sistema de colores
+    es institucional (azul profesional + escala de grises), las sombras son sutiles, y la tipografía utiliza fuentes del sistema
+    para máxima compatibilidad y legibilidad.
+  </p>
+
+  <!-- ── FILOSOFÍA ── -->
+  <h2>Filosofía de diseño</h2>
+  <h3>Minimalismo</h3>
+  <ul>
+    <li><strong>Sin ornamentación.</strong> Cada elemento tiene un propósito funcional.</li>
+    <li><strong>Mucho espacio en blanco.</strong> Respira el contenido; máximo ancho de contenedor: 900px.</li>
+    <li><strong>Jerarquía clara.</strong> Tamaños de tipo, colores y espacio guían la atención.</li>
+    <li><strong>Transiciones suaves.</strong> Animaciones rápidas (0.12–0.2s) para feedback inmediato sin distracción.</li>
+  </ul>
+
+  <h3>Accesibilidad e inclusión</h3>
+  <ul>
+    <li><strong>Contraste alto.</strong> Ratio WCAG AA+ en todos los textos.</li>
+    <li><strong>Fuentes del sistema.</strong> Ninguna descarga externa; máxima compatibilidad y velocidad.</li>
+    <li><strong>Estados visuales claros.</strong> Hover, active, disabled, error tienen sus propias señales.</li>
+    <li><strong>Responsive.</strong> Diseño fluido desde 320px (mobile) hasta 1400px (desktop).</li>
+  </ul>
+
+  <!-- ── PALETTE ── -->
+  <h2>Paleta de colores</h2>
+  <h3>Primarios y escala principal</h3>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #1B6EC2;">Primario</div>
+      <div class="color-info">
+        <div class="color-name">Blue</div>
+        <div class="color-code">#1B6EC2</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #155FAF;">Blue Hover</div>
+      <div class="color-info">
+        <div class="color-name">Blue Hover</div>
+        <div class="color-code">#155FAF</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #1054A0;">Blue Active</div>
+      <div class="color-info">
+        <div class="color-name">Blue Active</div>
+        <div class="color-code">#1054A0</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #EBF3FF; color: #1B6EC2; text-shadow: none;">Light</div>
+      <div class="color-info">
+        <div class="color-name">Blue Light</div>
+        <div class="color-code">#EBF3FF</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Texto y superficie</h3>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #1D1D1F;">Texto principal</div>
+      <div class="color-info">
+        <div class="color-name">Text</div>
+        <div class="color-code">#1D1D1F</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #4A4A50;">Texto secundario</div>
+      <div class="color-info">
+        <div class="color-name">Text 2</div>
+        <div class="color-code">#4A4A50</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #8E8E93;">Texto terciario</div>
+      <div class="color-info">
+        <div class="color-name">Text 3</div>
+        <div class="color-code">#8E8E93</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #FFFFFF; border: 1px solid #D2D2D7; color: #1D1D1F; text-shadow: none;">Surface</div>
+      <div class="color-info">
+        <div class="color-name">Surface</div>
+        <div class="color-code">#FFFFFF</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Fondos y bordes</h3>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #EDF1F7; color: #1D1D1F; text-shadow: none;">Fondo</div>
+      <div class="color-info">
+        <div class="color-name">BG (azul grisáceo)</div>
+        <div class="color-code">#EDF1F7</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #D2D2D7; color: #fff;">Borde</div>
+      <div class="color-info">
+        <div class="color-name">Border</div>
+        <div class="color-code">#D2D2D7</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #34C759;">Éxito</div>
+      <div class="color-info">
+        <div class="color-name">Green <span style="font-size: 0.7em; font-weight: normal;">(acento)</span></div>
+        <div class="color-code">#34C759</div>
+      </div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-sample" style="background: #D92B2B;">Error</div>
+      <div class="color-info">
+        <div class="color-name">Red <span style="font-size: 0.7em; font-weight: normal;">(acento)</span></div>
+        <div class="color-code">#D92B2B</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top: 1rem; padding: 0.75rem; background: var(--bg); border-radius: 6px; font-size: 0.9rem; color: var(--text-2);">
+    <strong>Nota:</strong> Los colores <strong>Green</strong> y <strong>Red</strong> se utilizan <strong>mínimamente</strong> como pequeños acentos:
+    icono de éxito (✓ verde), textos de error (rojo), bordes de validación. El palette principal es <strong>Blue + escala de grises</strong>.
+  </p>
+
+  <!-- ── TIPOGRAFÍA ── -->
+  <h2>Tipografía</h2>
+  <h3>Stack tipográfico</h3>
+  <code style="display: block; padding: 1rem; background: var(--bg); margin-bottom: 1rem; border-radius: 6px; overflow-x: auto;">
+    -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif
+  </code>
+  <p><strong>Justificación:</strong> Fuentes nativas del navegador y SO. Sin descargas externas, máxima velocidad y compatibilidad. Fallback a Helvetica/Arial si no disponible.</p>
+
+  <h3>Escala y pesos</h3>
+  <div class="typo-demo">
+    <div class="typo-item">
+      <div class="typo-label">H1 (sección principal)</div>
+      <div class="typo-example" style="font-size: 2rem; font-weight: 700; letter-spacing: -0.025em;">Convertidor de documentos</div>
+    </div>
+    <div class="typo-item">
+      <div class="typo-label">H2 (subsección)</div>
+      <div class="typo-example" style="font-size: 1.35rem; font-weight: 700;">Configurador de estructura</div>
+    </div>
+    <div class="typo-item">
+      <div class="typo-label">H3</div>
+      <div class="typo-example" style="font-size: 1.05rem; font-weight: 600;">Elemento de navegación</div>
+    </div>
+    <div class="typo-item">
+      <div class="typo-label">Body (párrafo)</div>
+      <div class="typo-example" style="font-size: 0.95rem; font-weight: 400;">El documento nunca sale de tu navegador. ConvertidoreXe procesa todo localmente sin servidores externos.</div>
+    </div>
+    <div class="typo-item">
+      <div class="typo-label">Caption (ayuda/meta)</div>
+      <div class="typo-example" style="font-size: 0.75rem; color: var(--text-3);">Licencia GNU GPL v3.0</div>
+    </div>
+  </div>
+
+  <p><strong>Pesos disponibles:</strong> 400 (normal), 500 (medium), 600 (semibold), 700 (bold).</p>
+
+  <!-- ── PALETTE CLARIFICATION ── -->
+  <h2>Observación sobre el palette</h2>
+  <p>
+    <strong>El palette de la interfaz es fundamentalmente <code>Blue + escala de grises</code>.</strong>
+  </p>
+  <ul>
+    <li>
+      <strong>Azul (#1B6EC2):</strong> Color primario de la interfaz. Aparece en todos lados:
+      botones de acción, links, paso activo, hovers, focus rings. Es el color <em>omnipresente</em>.
+    </li>
+    <li>
+      <strong>Escala de grises:</strong> Textos (3 pesos), bordes, fondos, superficies.
+      Todo lo demás gira en torno a esta escala.
+    </li>
+    <li>
+      <strong>Green (#34C759) y Red (#D92B2B):</strong> <strong>Acentos puntuales</strong> y muy poco frecuentes.
+      Aparecen <em>solo</em> en: icono de éxito (checkmark verde), textos de error (rojo),
+      bordes de campos inválidos, alerts de error/success. <strong>Nunca</strong> en la UI principal.
+    </li>
+  </ul>
+  <p style="padding: 0.75rem; background: var(--bg); border-radius: 6px; font-size: 0.9rem;">
+    <strong>En resumen:</strong> Es un palette muy contenido. Si el 95% de lo que ves es azul + grises,
+    el 5% restante (rojo/verde) lo uses solo para feedback inmediato de errores o confirmaciones de usuario.
+  </p>
+
+  <!-- ── SOMBRAS ── -->
+  <h2>Sistema de sombras</h2>
+  <p>Tres niveles de elevación para crear jerarquía visual sin usar bordes gruesos ni colores adicionales.</p>
+  <div class="shadow-demo">
+    <div class="shadow-box shadow-xs">shadow-xs<br/><small>(interactivos menores)</small></div>
+    <div class="shadow-box shadow-sm">shadow-sm<br/><small>(cards, hovers)</small></div>
+    <div class="shadow-box shadow-md">shadow-md<br/><small>(modales, overlay)</small></div>
+  </div>
+
+  <!-- ── ESTRUCTURA ── -->
+  <h2>Estructura y layout</h2>
+  <h3>Contenedor principal</h3>
+  <table>
+    <tr>
+      <th>Elemento</th>
+      <th>Ancho</th>
+      <th>Altura</th>
+      <th>Notas</th>
+    </tr>
+    <tr>
+      <td><code>.app-header</code></td>
+      <td>100% (sticky)</td>
+      <td>60px</td>
+      <td>Logo BUA, nombre app, botones de estilos e info</td>
+    </tr>
+    <tr>
+      <td><code>.step-bar</code></td>
+      <td>100%</td>
+      <td>auto</td>
+      <td>4 pasos del pipeline con indicadores</td>
+    </tr>
+    <tr>
+      <td><code>.container</code></td>
+      <td>max 900px, centrado</td>
+      <td>auto</td>
+      <td>Contenido principal (paso actual)</td>
+    </tr>
+    <tr>
+      <td><code>.app-footer</code></td>
+      <td>100%</td>
+      <td>auto</td>
+      <td>Logos, copyright, enlaces a docs</td>
+    </tr>
+  </table>
+
+  <h3>Espaciado</h3>
+  <ul>
+    <li><strong>Padding contenedor:</strong> 2.75rem vertical, 2rem horizontal (desktop).</li>
+    <li><strong>Gap entre elementos:</strong> 0.5–1.5rem según contexto.</li>
+    <li><strong>Margen de sección:</strong> 2.5rem entre h2 y párrafo anterior.</li>
+    <li><strong>Mobile (≤640px):</strong> Padding se reduce a 1.5rem × 1.25rem.</li>
+  </ul>
+
+  <!-- ── COMPONENTES ── -->
+  <h2>Componentes principales</h2>
+
+  <h3>Buttons (familia de botones)</h3>
+  <div class="button-grid" style="margin-bottom: 1rem;">
+    <button class="btn-primary">Acción principal (azul)</button>
+    <button class="btn-secondary">Acción secundaria</button>
+  </div>
+  <table>
+    <tr>
+      <th>Clase</th>
+      <th>Fondo</th>
+      <th>Color texto</th>
+      <th>Uso</th>
+    </tr>
+    <tr>
+      <td><code>.btn-primary</code></td>
+      <td>Blue (#1B6EC2)</td>
+      <td>Blanco</td>
+      <td>Convertir, descargar, confirmar</td>
+    </tr>
+    <tr>
+      <td><code>.btn-secondary</code></td>
+      <td>Surface (blanco)</td>
+      <td>Text-2 (gris oscuro)</td>
+      <td>Cancelar, reset, alternativa</td>
+    </tr>
+    <tr>
+      <td><code>.btn-cancel</code></td>
+      <td>Surface (blanco)</td>
+      <td>Text-2</td>
+      <td>Salir de un modal o acción</td>
+    </tr>
+  </table>
+
+  <h3>Cards</h3>
+  <p>Contenedores de información con borde, sombra sutil y fondo blanco.</p>
+  <div class="card-demo">
+    <h4>Ejemplo: Resultado de conversión</h4>
+    <p>Cada card tiene borde <code>#E8E8ED</code>, sombra-xs, y <code>border-radius: 10px</code>. El header (si existe) tiene fondo <code>#EDF1F7</code>.</p>
+  </div>
+
+  <h3>Alerts (sin borde de acento)</h3>
+  <table>
+    <tr>
+      <th>Tipo</th>
+      <th>Fondo</th>
+      <th>Borde</th>
+      <th>Uso</th>
+    </tr>
+    <tr>
+      <td><strong>error</strong> <span style="font-size: 0.75em; color: var(--text-3);">(acento rojo)</span></td>
+      <td>#FFF0F0</td>
+      <td>rgba(217,43,43,.25), NO borde izq</td>
+      <td>Errores de archivo o validación</td>
+    </tr>
+    <tr>
+      <td><strong>success</strong> <span style="font-size: 0.75em; color: var(--text-3);">(acento verde)</span></td>
+      <td>#E3F9EB</td>
+      <td>rgba(52,199,89,.35)</td>
+      <td>Conversión completada</td>
+    </tr>
+    <tr>
+      <td><strong>warning</strong></td>
+      <td>#FFF8E6</td>
+      <td>rgba(183,121,31,.3)</td>
+      <td>Archivos incompletos (screenshot)</td>
+    </tr>
+    <tr>
+      <td><strong>info</strong> (principal)</td>
+      <td>#EBF3FF</td>
+      <td>#BDD8FF</td>
+      <td>Información adicional (temas, help)</td>
+    </tr>
+  </table>
+  <p style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-2);">
+    <strong>Aclaración:</strong> Los alerts <strong>success (verde) y error (rojo)</strong> son <strong>muy poco frecuentes</strong> en la interfaz
+    y aparecen solo en momentos puntuales (validación fallida, conversión completada). El alert principal es <strong>info (azul)</strong>,
+    que es el que más se ve en ayudas y contextos informativos.
+  </p>
+
+  <!-- ── ESTADOS ── -->
+  <h2>Estados de interacción</h2>
+  <h3>Hover</h3>
+  <ul>
+    <li>Botones azules: cambio de color a <code>#155FAF</code> + elevación vertical (-1px).</li>
+    <li>Cards y items: borde-ligero toma color azul, sombra aumenta a shadow-sm.</li>
+    <li>Links de ayuda: color azul + subrayado.</li>
+  </ul>
+
+  <h3>Focus (para accesibilidad de teclado)</h3>
+  <ul>
+    <li>Inputs: borde azul + ring de 3px en azul light.</li>
+    <li>Botones: box-shadow azul.</li>
+  </ul>
+
+  <h3>Disabled</h3>
+  <ul>
+    <li>Botones: opacidad 0.7, texto gris, sin cursor (not-allowed).</li>
+    <li>Inputs: fondo gris light, texto gris claro, cursor not-allowed.</li>
+  </ul>
+
+  <h3>Error/invalid</h3>
+  <ul>
+    <li>Bordes rojo tenue (<code>rgba(217,43,43,.4)</code>).</li>
+    <li>Mensaje en rojo debajo del campo.</li>
+    <li>No hay borde de acento a la izquierda.</li>
+  </ul>
+
+  <!-- ── OTROS DETALLES ── -->
+  <h2>Detalles notables</h2>
+  <h3>Border radius</h3>
+  <ul>
+    <li><code>--radius-sm: 6px</code> — botones, inputs pequeños.</li>
+    <li><code>--radius: 10px</code> — cards, modales.</li>
+    <li><code>--radius-lg: 14px</code> — upload zone, grandes contenedores.</li>
+  </ul>
+
+  <h3>Transiciones</h3>
+  <p>Todas las animaciones duran <code>0.12s</code> a <code>0.2s</code> para feedback rápido sin sentirse artificial. Solo propiedades: <code>all</code>, <code>color</code>, <code>box-shadow</code>, <code>border-color</code>, <code>background</code>, <code>transform</code>.</p>
+
+  <h3>Iconografía</h3>
+  <p>SVGs inline sin descarga. Colores heredados del texto o contexto (azul primario para acciones). Tamaños: 14–56px según uso (pequeño: meta; grande: hero).</p>
+
+  <h3>Responsive</h3>
+  <ul>
+    <li><strong>≤640px:</strong> Header reduce altura a 52px, oculta subtítulos. Step bar scroll horizontal. Container padding 1.5rem × 1.25rem. Grids a 1 columna.</li>
+    <li><strong>641–1024px:</strong> Layout fluido. Grids: 2 columnas.</li>
+    <li><strong>≥1025px:</strong> Grids: 3–4 columnas, máxima anchura 900px.</li>
+  </ul>
+
+  <h3>Velocidad de carga</h3>
+  <ul>
+    <li>Fuentes nativas (no externos).</li>
+    <li>Iconos SVG inline (no sprites ni iconfonts).</li>
+    <li>CSS minificado sin preprocesadores (puro CSS3 con variables).</li>
+    <li>Sin web fonts o librerías CSS (p. ej., Bootstrap, Tailwind).</li>
+  </ul>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <p>Informe generado automáticamente desde <code>src/styles/globals.css</code> de BUA ConvertidoreXe v0.2.0</p>
+    <p>Documento no incluido en el repositorio. Uso libre para presentaciones, documentación interna o guías de estilos.</p>
+  </div>
+
+</div>
+</body>
+</html>
