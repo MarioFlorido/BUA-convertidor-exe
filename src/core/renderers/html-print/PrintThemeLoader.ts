@@ -1,5 +1,6 @@
 import { unzipSync } from 'fflate';
 import { ThemeRegistry } from '../../services/ThemeRegistry';
+import { themeZipUrl } from '../../services/themeUrl';
 import { extractLanguageFromConfigXml } from '../../services/themeConfigParser';
 
 /** Idioma del tema, detectado desde el ID. Controla los textos CC y etiquetas. */
@@ -148,9 +149,11 @@ async function fetchAndUnzip(themeId: string): Promise<Record<string, Uint8Array
     return bundle.files;
   }
 
-  // Fallback: fetch desde URL estática (built-ins en public/ o dev middleware)
+  // Descarga bajo demanda: los built-in se registran solo con metadatos, así
+  // que lo normal es pasar por aquí la primera vez que se genera un PDF con
+  // ese tema. `updatedAt` versiona la URL (igual que en ThemeService).
   const baseUrl = (import.meta as any).env?.BASE_URL ?? '/';
-  const url = `${baseUrl}${themeId}.zip`;
+  const url = themeZipUrl(baseUrl, themeId, bundle?.metadata.updatedAt);
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`No se pudo cargar el tema: ${url}`);

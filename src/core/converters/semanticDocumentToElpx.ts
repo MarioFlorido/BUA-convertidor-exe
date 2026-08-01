@@ -71,9 +71,11 @@ export async function semanticDocumentToElpx(
 
   // Cargar tema personalizado si es necesario
   if (options.themeId && options.themeId !== 'base') {
-    // Verificar que el tema existe en el registry
-    const themeBundle = ThemeRegistry.get(options.themeId);
-    if (!themeBundle || Object.keys(themeBundle.files).length === 0) {
+    // Basta con que el tema esté en el catálogo. Los built-in se registran solo
+    // con metadatos (`files: {}`) y ThemeService descarga el ZIP aquí, la
+    // primera vez que se usa; exigir ficheros ya cargados rechazaría un tema
+    // perfectamente válido.
+    if (!ThemeRegistry.has(options.themeId)) {
       throw new Error(
         `Tema "${options.themeId}" no está disponible. ` +
         `Verifica que el tema se haya cargado correctamente.`

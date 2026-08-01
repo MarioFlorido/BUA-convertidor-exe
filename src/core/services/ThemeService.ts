@@ -70,9 +70,12 @@ export class ThemeService {
       return prefixedEntries;
     }
 
-    // Fallback: fetch desde URL (compatibilidad dev sin registry completo)
+    // Descarga bajo demanda: los built-in se registran sin ficheros (solo
+    // metadatos) para no traerse ~23 MB en el arranque. Aquí es donde el ZIP
+    // hace falta de verdad. `updatedAt` versiona la URL para no servir una
+    // copia vieja de la caché tras republicar el tema.
     const baseUrl = import.meta.env.BASE_URL ?? '/';
-    const url = themeZipUrl(baseUrl, themeId);
+    const url = themeZipUrl(baseUrl, themeId, bundle?.metadata.updatedAt);
 
     const rawEntries = await this.fetchAndUnzip(url);
     const prefixedEntries = this.filterAndPrefixThemeEntries(rawEntries);

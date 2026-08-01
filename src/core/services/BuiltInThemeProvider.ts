@@ -1,19 +1,25 @@
 /**
- * BuiltInThemeProvider — carga de temas predefinidos desde public/
+ * BuiltInThemeProvider — catálogo de temas predefinidos desde public/
  *
  * Los temas built-in son parte de la aplicación, no plugins externos.
- * Se cargan desde archivos ZIP estáticos en public/ via fetch.
  * No usan IndexedDB ni upload.
+ *
+ * SOLO REGISTRA METADATOS, NO DESCARGA LOS ZIP. Todo lo que la interfaz
+ * necesita para listar y elegir un estilo (nombre, actividad, idioma,
+ * descripción, miniatura) está en `themes-config.json`, que pesa 4 KB. Los ZIP
+ * suman ~23 MB y solo hacen falta al generar el ELPX o el PDF: los descargan
+ * bajo demanda `ThemeService.loadTheme` y `PrintThemeLoader`, que ya saben
+ * hacerlo cuando el bundle del registry viene sin ficheros (y luego lo cachean).
+ *
+ * La miniatura sale de `public/themes/<id>/screenshot.png`, que se sirve como
+ * archivo estático y con `loading="lazy"`: solo baja la de los estilos que el
+ * usuario llega a ver.
  *
  * BASE_URL se encapsula aquí completamente, compatible con GitHub Pages.
  */
 
-import { unzipSync } from 'fflate';
-import { themeZipUrl } from './themeUrl';
 import type { ThemeBundle, ThemeMetadata } from './ThemeBundle';
 import { ThemeRegistry } from './ThemeRegistry';
-import { validateThemeBundle, filterSystemFiles, stripCommonRootDir } from './ThemeValidator';
-import { extractLanguageFromConfigXml } from './themeConfigParser';
 
 const BASE_URL = import.meta.env.BASE_URL ?? '/';
 
@@ -28,20 +34,13 @@ interface ThemesConfigEntry {
 }
 
 class BuiltInThemeProviderClass {
-  private generatedObjectUrls: string[] = [];
-
   /**
-   * Carga todos los temas predefinidos declarados en themes-config.json.
-   * Los fallos individuales no bloquean el boot.
-   *
-   * NOTA: Revoca Object URLs anteriores antes de crear nuevos para evitar memory leaks.
+   * Registra en el registry todos los temas declarados en themes-config.json.
+   * Una sola petición de 4 KB; los ZIP no se tocan.
    */
   async loadAll(): Promise<void> {
-    // Revocar Object URLs anteriores para liberar memoria
-    this.revokeGeneratedUrls();
-
     const configEntries = await this.fetchThemesConfig();
-    await Promise.allSettled(configEntries.map((entry) => this.loadOne(entry)));
+    for (const entry of configEntries) this.registerOne(entry);
   }
 
   private async fetchThemesConfig(): Promise<ThemesConfigEntry[]> {
@@ -63,115 +62,34 @@ class BuiltInThemeProviderClass {
   }
 
   /**
-   * Genera un Object URL para la screenshot si existe en los archivos del tema.
+   * Registra un tema del catálogo con `files: {}`.
+   *
+   * El ZIP se descarga la primera vez que el tema se usa de verdad (exportar
+   * ELPX o PDF). `updatedAt` viaja en los metadatos para que quien lo descargue
+   * pueda versionar la URL y no comerse una copia vieja de la caché.
    */
-  private generateScreenshotUrl(files: Record<string, Uint8Array>): string | undefined {
-    const screenshotBuffer = files['screenshot.png'] || files['screenshot.jpg'];
-    if (!screenshotBuffer) return undefined;
-
-    try {
-      // Convertir Uint8Array a un Blob directamente
-      const type = files['screenshot.png'] ? 'image/png' : 'image/jpeg';
-      const blob = new Blob([new Uint8Array(screenshotBuffer)], { type });
-      return URL.createObjectURL(blob);
-    } catch (err) {
-      console.warn('[BuiltInThemeProvider] Error generando Object URL para screenshot:', err);
-      return undefined;
-    }
-  }
-
-  /**
-   * Revoca todos los Object URLs generados para liberar memoria.
-   * Se llama automáticamente en loadAll() antes de crear nuevas URLs.
-   */
-  private revokeGeneratedUrls(): void {
-    for (const url of this.generatedObjectUrls) {
-      try {
-        URL.revokeObjectURL(url);
-      } catch (err) {
-        // Algunos navegadores pueden lanzar error si la URL ya no es válida
-        console.debug('[BuiltInThemeProvider] No se pudo revocar URL:', url, err);
-      }
-    }
-    this.generatedObjectUrls = [];
-  }
-
-  private async loadOne(entry: ThemesConfigEntry): Promise<void> {
+  private registerOne(entry: ThemesConfigEntry): void {
     const metadata: ThemeMetadata = {
       name: entry.name,
       activity: entry.activity,
       language: entry.language,
       description: entry.description,
-      screenshot: entry.screenshot,
+      // Los temas oficiales publican su miniatura como archivo estático. Si un
+      // tema no la tuviera, ThemeSelector oculta la imagen rota.
+      screenshot: entry.screenshot ?? (entry.id === 'base' ? null : `${BASE_URL}themes/${entry.id}/screenshot.png`),
+      updatedAt: entry.updatedAt,
     };
 
-    // El tema "base" no tiene ZIP propio — usa base.elpx como plantilla.
-    // Solo lo registramos en el registry para que aparezca en ThemeSelector.
-    if (entry.id === 'base') {
-      ThemeRegistry.register({
-        id: 'base',
-        name: entry.name,
-        source: 'builtin',
-        files: {},
-        metadata,
-      });
-      return;
-    }
+    const bundle: ThemeBundle = {
+      id: entry.id,
+      name: entry.name,
+      source: 'builtin',
+      // El tema "base" tampoco tiene ZIP propio: usa base.elpx como plantilla.
+      files: {},
+      metadata,
+    };
 
-    try {
-      // `?v=updatedAt` rompe la caché cuando el tema se ha republicado.
-      const url = themeZipUrl(BASE_URL, entry.id, entry.updatedAt);
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.warn(`[BuiltInThemeProvider] No se pudo cargar ${url}`);
-        return;
-      }
-
-      const buffer = await response.arrayBuffer();
-      const raw = unzipSync(new Uint8Array(buffer));
-      // Los ZIP oficiales ya vienen con archivos en raíz (no-op defensivo)
-      const files = stripCommonRootDir(filterSystemFiles(raw));
-
-      const validation = validateThemeBundle(files);
-      if (!validation.valid) {
-        console.warn(
-          `[BuiltInThemeProvider] Tema "${entry.id}" inválido:`,
-          validation.errors
-        );
-        return;
-      }
-
-      // El <language> del config.xml tiene prioridad sobre themes-config.json
-      const langFromConfig = extractLanguageFromConfigXml(files);
-      if (langFromConfig) {
-        metadata.language = langFromConfig;
-      }
-
-      // Screenshot: preferir URL estática desde public/
-      if (files['screenshot.png'] || files['screenshot.jpg']) {
-        const ext = files['screenshot.png'] ? 'png' : 'jpg';
-        metadata.screenshot = `${BASE_URL}themes/${entry.id}/screenshot.${ext}`;
-      } else {
-        // Fallback: generar Object URL si no existe screenshot estático
-        const screenshotUrl = this.generateScreenshotUrl(files);
-        if (screenshotUrl) {
-          metadata.screenshot = screenshotUrl;
-          this.generatedObjectUrls.push(screenshotUrl);
-        }
-      }
-
-      const bundle: ThemeBundle = {
-        id: entry.id,
-        name: entry.name,
-        source: 'builtin',
-        files,
-        metadata,
-      };
-
-      ThemeRegistry.register(bundle);
-    } catch (err) {
-      console.warn(`[BuiltInThemeProvider] Error cargando "${entry.id}":`, err);
-    }
+    ThemeRegistry.register(bundle);
   }
 }
 

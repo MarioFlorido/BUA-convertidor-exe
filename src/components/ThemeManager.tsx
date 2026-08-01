@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { themeClientService } from '../core/services/ThemeClientService';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
 import { ThemeOrderService } from '../core/services/ThemeOrderService';
@@ -25,6 +25,10 @@ export function ThemeManager() {
 
   const refreshThemes = () =>
     setThemes(ThemeOrderService.applyOrder(ThemeRegistry.getAll()));
+
+  // El catálogo se carga en segundo plano: si esta pantalla se abre antes de
+  // que termine, los temas que vayan llegando deben aparecer solos.
+  useEffect(() => ThemeRegistry.subscribe(refreshThemes), []);
 
   // Vista derivada: los estilos agrupados por familia (mismo curso en varios idiomas).
   const families = useMemo(() => groupIntoFamilies(themes), [themes]);

@@ -72,10 +72,47 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 
 ### Rendimiento / build
 
+- [ ] 🟠 **La interfaz se congela durante la conversión.** El pipeline entero
+  corre en el hilo principal sin ceder nunca al bucle de eventos: mammoth →
+  `HtmlTransformer` → `PreviewService.buildPages()` → `zipSync`. Las funciones
+  son `async`, pero ningún `await` devuelve el control al navegador, así que los
+  `onProgress` hacen `setState` y React no llega a repintar: la barra se queda
+  clavada en una fase y la ventana deja de responder. Arreglo barato (unas cinco
+  líneas): ceder entre fases. Como el renderizado ya itera página a página y
+  bloque a bloque, se puede trocear con pausas intermedias si un tramo concreto
+  sigue siendo largo. **No acelera nada, pero elimina la sensación de cuelgue.**
+
+- [ ] 🟡 **Pasar `zipSync`/`unzipSync` a las variantes asíncronas de fflate.**
+  `fflate` ya trae `zip`/`unzip` con callback, que levantan un worker por dentro:
+  es cambiar la llamada, sin worker propio ni mensajería. Saca del hilo principal
+  el empaquetado del ELPX y la apertura de los ZIP de tema.
+
+- [ ] ⛔ **NO mover el pipeline a un Web Worker.** Analizado y descartado: el DOM
+  es el motor de la transformación, no un detalle de presentación. `DOMParser`
+  (cuatro usos en `HtmlTransformer`, más `parseStructure`, `buildFromStructure`
+  y `PreviewService`) y el `canvas` de `optimizeImagesForPrint` no existen en un
+  worker; Paged.js es 100 % DOM por diseño, porque pagina midiendo cajas reales.
+  Llevarlo allí obligaría a reescribir toda la capa de transformación HTML —el
+  módulo con más bugs históricos y 585 líneas de test— o a empaquetar jsdom
+  (~1 MB añadido al bundle para arreglar un problema de carga). Y cambiar el
+  motor de PDF por uno «puramente matemático» tipo pdfmake ya se probó al inicio
+  del proyecto: daba muchos problemas de maquetado. Vale la pena el worker solo
+  para comprimir/descomprimir (ítem anterior), que sale casi gratis.
+
 - [ ] 🟡 **Reducir el tamaño del bundle.** El build avisa de _chunks_ mayores de
   500 KB (el principal ronda los 750 KB). Evaluar `build.rollupOptions.output.manualChunks`
   o `import()` dinámico para trocear (p. ej. aislar el motor de PDF/Paged.js, que
   ya va en su chunk, y revisar el resto). No urge: la app es offline y carga rápido.
+
+- [ ] ⚪ **Las screenshots viajan dentro de los ZIP de tema sin usarse.** Cada
+  tema lleva su `screenshot.png` (597-777 KB) duplicada: como archivo estático en
+  `public/themes/<id>/` —de donde la coge la interfaz— y dentro del ZIP, que
+  `ThemeService` prefija con `theme/`, así que **acaba dentro de cada .elpx
+  exportado**. Ya no penaliza el arranque (los ZIP no se descargan hasta usarse),
+  pero engorda cada curso que el profesorado sube a la plataforma con ~770 KB que
+  eXeLearning nunca lee. Si se quita del ZIP hay que dejar de deducir la URL de la
+  miniatura de su presencia ahí (`BuiltInThemeProvider`) y apoyarse en la ruta
+  estática o en el campo `screenshot` de `themes-config.json`.
 
 ### Calidad / mantenimiento
 
@@ -131,6 +168,13 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
+- [x] **Arranque instantáneo: los temas se descargan al usarlos** (ago 2026): el
+  boot bajaba y descomprimía los ocho ZIP de temas (22,7 MB) antes de pintar
+  nada. Ahora el catálogo son 4 KB de metadatos (`themes-config.json`), React
+  monta de inmediato y cada ZIP se descarga la primera vez que ese tema se usa.
+  `ThemeRegistry` es observable para que la lista de estilos se vaya rellenando
+  sola. Las miniaturas siguen saliendo de `public/themes/<id>/screenshot.png`,
+  como siempre.
 - [x] **Caja de búsqueda activada de serie** (jul 2026): los ELPX generados
   llegan a eXeLearning con `pp_addSearchBox` ya marcado, así que el sitio web
   exportado incluye el buscador sin que el usuario toque las propiedades del

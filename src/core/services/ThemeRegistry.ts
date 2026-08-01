@@ -10,10 +10,36 @@ import type { ThemeBundle } from './ThemeBundle';
 
 class ThemeRegistryClass {
   private themes = new Map<string, ThemeBundle>();
+  private listeners = new Set<() => void>();
+
+  /**
+   * Suscribe un listener a los cambios del registry.
+   *
+   * Los temas se cargan en segundo plano (ver ThemeBoot), así que un componente
+   * montado antes de que termine la carga debe repintarse cuando lleguen.
+   *
+   * @returns función para cancelar la suscripción
+   */
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
+
+  /**
+   * Avisa a los suscriptores. La llaman `register`/`remove` y también el boot
+   * cuando cambia el estado de carga del catálogo (la lista puede no variar,
+   * pero la UI sí necesita saber que ya no quedan temas por llegar).
+   */
+  notify(): void {
+    for (const listener of this.listeners) listener();
+  }
 
   /** Registra (o sobreescribe) un tema en el registry */
   register(bundle: ThemeBundle): void {
     this.themes.set(bundle.id, bundle);
+    this.notify();
   }
 
   /** Obtiene un tema por ID. undefined si no existe. */
@@ -35,6 +61,7 @@ class ThemeRegistryClass {
   /** Elimina un tema del registry (solo temas de usuario) */
   remove(id: string): void {
     this.themes.delete(id);
+    this.notify();
   }
 
   has(id: string): boolean {

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { ThemeRegistry } from '../core/services/ThemeRegistry';
 import { ThemeOrderService } from '../core/services/ThemeOrderService';
+import { getCatalogStatus } from '../core/boot/ThemeBoot';
 import { groupIntoFamilies, languageLabel, languageCode } from '../core/services/themeGrouping';
 
 
@@ -10,6 +11,15 @@ interface ThemeSelectorProps {
 }
 
 export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
+  // Los temas se cargan en segundo plano tras el arranque (ver ThemeBoot), así
+  // que esta pantalla puede montarse con la lista a medias: repintar en cada
+  // alta del registry para que las opciones vayan apareciendo.
+  const [, refresh] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => ThemeRegistry.subscribe(refresh), []);
+
+  const catalogStatus = getCatalogStatus();
+  const stillLoading = catalogStatus !== 'ready';
+
   // Leer del registry en cada montaje para recoger temas añadidos desde ThemeManager
   // Omitir el tema 'base' (es un fallback automático, no un estilo para elegir)
   const availableThemes = ThemeOrderService.applyOrder(ThemeRegistry.getAll()).filter(
@@ -18,12 +28,24 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
   // Agrupar por familia (mismo curso en varios idiomas): una fila por familia,
   // cada idioma como opción seleccionable. La selección sigue siendo por variante.
   const families = groupIntoFamilies(availableThemes);
-  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(() => {
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(null);
+
+  // Restaurar el último tema usado. No puede hacerse en el estado inicial: al
+  // montar, el tema guardado quizá no haya llegado aún al registry. Se intenta
+  // una sola vez, en cuanto aparece, para no pisar una elección del usuario.
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current) return;
     const saved = localStorage.getItem('bua-last-theme');
     // Restaurar solo si sigue siendo un tema visible de la lista ('base' no:
     // está oculto, y una selección invisible permitiría continuar sin elegir)
-    if (saved && saved !== 'base' && ThemeRegistry.get(saved)) return saved;
-    return null;
+    if (saved && saved !== 'base' && ThemeRegistry.get(saved)) {
+      restored.current = true;
+      setSelectedThemeId(saved);
+    } else if (!stillLoading) {
+      // Catálogo completo y el tema guardado ya no está: no hay nada que restaurar
+      restored.current = true;
+    }
   });
 
   return (
@@ -31,6 +53,12 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
       <p className="help-text">
         Elige el estilo que deseas aplicar a tu recurso eXeLearning:
       </p>
+
+      {stillLoading && (
+        <p className="help-text" role="status">
+          Cargando estilos disponibles…
+        </p>
+      )}
 
       <div className="theme-list">
         {families.map((family) => {
@@ -44,7 +72,16 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
             return (
               <label key={family.key} className="theme-option">
                 {screenshot && (
-                  <img className="theme-thumbnail" src={screenshot} alt="" aria-hidden="true" loading="lazy" />
+                  <img
+                    className="theme-thumbnail"
+                    src={screenshot}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                    // La miniatura es un archivo estático aparte del ZIP: si un tema
+                    // se publicara sin ella, ocultarla en vez de dejar el icono roto.
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
                 )}
                 <input
                   type="radio"
@@ -81,7 +118,16 @@ export function ThemeSelector({ onConfirm, onCancel }: ThemeSelectorProps) {
           return (
             <div key={family.key} className="theme-family-option">
               {screenshot && (
-                <img className="theme-thumbnail" src={screenshot} alt="" aria-hidden="true" loading="lazy" />
+                <img
+                  className="theme-thumbnail"
+                  src={screenshot}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  // La miniatura es un archivo estático aparte del ZIP: si un tema
+                  // se publicara sin ella, ocultarla en vez de dejar el icono roto.
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
               )}
               <div className="theme-content">
                 <div className="theme-name">{family.name}</div>

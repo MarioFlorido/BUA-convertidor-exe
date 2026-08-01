@@ -11,6 +11,12 @@ export interface ThemeMetadata {
   language?: string;
   description?: string;
   screenshot?: string | null;
+  /**
+   * Versión de publicación del tema (`updatedAt` de themes-config.json).
+   * La usa `themeZipUrl` para romper la caché cuando el tema se republica.
+   * Solo built-ins: los temas de usuario no se descargan por URL.
+   */
+  updatedAt?: string;
 }
 
 export interface ThemeBundle {
