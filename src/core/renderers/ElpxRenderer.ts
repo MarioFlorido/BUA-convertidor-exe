@@ -3,6 +3,7 @@ import type { SemanticDocument, SemanticPage, SemanticBlock } from '../models/Se
 import { PreviewService } from '../services/PreviewService';
 import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml, upperCaseH2 } from '../utils/html';
+import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 
@@ -43,16 +44,22 @@ export class ElpxRenderer {
     // Extraer las imágenes embebidas (base64) a archivos dentro del ZIP.
     // Trabaja sobre una copia: el project original (compartido con el PDF) no se toca.
     await this.extractImagesToFiles(entries);
+    // Los cuatro pasos de este método son los tramos largos del final del
+    // pipeline. Ceder entre ellos permite al navegador pintar el progreso;
+    // sin esto, la ventana queda muerta hasta que el ZIP está montado.
+    await yieldToBrowser();
 
     // Generar content.xml
     entries['content.xml'] = new TextEncoder().encode(
       this.generateContentXml(effectiveThemeId, options.navExpanded === true),
     );
+    await yieldToBrowser();
 
     // Generar páginas de preview (una sola vez)
     const previewService = new PreviewService(this.project, { navExpanded: options.navExpanded });
     const previewPages = previewService.buildPages();
     previewService.addToZipEntries(entries, previewPages);
+    await yieldToBrowser();
 
     // Empaquetar como ZIP
     const blobData = zipSync(entries, { level: 0 });
@@ -85,6 +92,9 @@ export class ElpxRenderer {
         blocks.push({ ...block, html });
       }
       pages.push({ ...page, blocks });
+      // Ceder página a página: decodificar base64 y hashear son ~240 ms de un
+      // tirón en un documento de 40 unidades. Repartido, ninguna página bloquea.
+      await yieldToBrowser();
     }
     this.project = { ...this.project, pages };
   }

@@ -18,8 +18,9 @@ import { escapeHtml } from '../utils/html';
  */
 
 import { DocxParser } from '../parsers/DocxParser';
+import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { buildProjectFromStructure } from './buildFromStructure';
-import { applyAllTransforms } from '../transformers/HtmlTransformer';
+import { HTML_TRANSFORM_PASSES } from '../transformers/HtmlTransformer';
 import type {
   DocxImportProgress,
   DocxImportOptions,
@@ -73,6 +74,8 @@ export async function convertDocxToSemanticDocument(
     message: 'Analizando estilos y contenido del DOCX...',
     messageKey: 'progress.parseDocxStyles',
   });
+  // Dejar pintar el progreso antes de bloquear el hilo con mammoth
+  await yieldToBrowser();
 
   let htmlValue: string;
   if (precomputedHtml !== undefined) {
@@ -128,9 +131,17 @@ export async function convertHtmlToSemanticDocument(
     message: 'Interpretando la estructura del documento...',
     messageKey: parseMessageKey,
   });
-
-  // Procesar iframes, delimitadores y tablas, aplicar clases CSS
-  const processedHtml = applyAllTransforms(htmlValue);
+  // Procesar iframes, delimitadores y tablas, aplicar clases CSS.
+  // Se recorren las pasadas una a una cediendo el control entre ellas: de un
+  // tirón son el bloque más largo de la conversión (~730 ms medidos en un
+  // documento de 40 unidades con imágenes) y congelaban la ventana ese rato
+  // entero. Por separado ninguna llega a 170 ms.
+  let processedHtml = htmlValue;
+  for (const pass of HTML_TRANSFORM_PASSES) {
+    await yieldToBrowser();
+    processedHtml = pass.run(processedHtml);
+  }
+  await yieldToBrowser();
 
   const project = buildProjectFromHtml(processedHtml, filename, options, structure);
 

@@ -13,6 +13,7 @@
 import { ElpxRenderer, type ElpxRenderOptions } from '../renderers/ElpxRenderer';
 import { ThemeService } from '../services/ThemeService';
 import { ThemeRegistry } from '../services/ThemeRegistry';
+import { yieldToBrowser } from '../utils/yieldToBrowser';
 import type {
   DocxImportProgress,
   ImportToElpxResult,
@@ -66,6 +67,7 @@ export async function semanticDocumentToElpx(
     message: 'Aplicando la plantilla base de eXeLearning...',
     messageKey: 'progress.applyTemplate',
   });
+  await yieldToBrowser();
 
   const template = await ThemeService.loadTemplate();
 

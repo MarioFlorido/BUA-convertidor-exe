@@ -13,6 +13,7 @@ import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx
 import { parseDocumentStructure } from './core/pipeline/parseStructure';
 import { DocxParser } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
+import { yieldToBrowser } from './core/utils/yieldToBrowser';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
 import type {
   DocxImportOptions,
@@ -91,11 +92,16 @@ export function App() {
 
     try {
       setState({ status: 'processing', progress: { phase: 'read', message: 'Leyendo archivo…' } });
+      // Sin ceder aquí, el «Leyendo archivo…» no llega a pintarse: mammoth
+      // arranca en el mismo tick y bloquea el hilo hasta que termina.
+      await yieldToBrowser();
       const parser = new DocxParser();
       const parseResult = await parser.parse(selectedFile);
 
       setParsedDocxHtml(parseResult.html);
+      await yieldToBrowser();
       setTagIssues(detectSemanticTagIssues(parseResult.html));
+      await yieldToBrowser();
       const parsedStructure = await parseDocumentStructure(parseResult.html);
       setStructure(parsedStructure);
       setScreen('structure');

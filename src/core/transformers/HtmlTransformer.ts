@@ -716,15 +716,26 @@ function applyIntrinsicSize(img: Element, width: string | null, height: string |
  * ya llega limpio de la suciedad de Word) y ANTES del autolink, para que una URL
  * pegada como texto plano en la línea acabe igualmente enlazada.
  */
+export const HTML_TRANSFORM_PASSES: readonly { name: string; run: (html: string) => string }[] = [
+  { name: 'iframes', run: processIframes },
+  { name: 'cajas semánticas', run: applyDivClasses },
+  { name: 'tablas', run: applyTableClasses },
+  { name: 'líneas de recurso', run: applyResourceLinks },
+  { name: 'listas numeradas', run: continueInterruptedOrderedLists },
+  { name: 'autolink de URLs', run: autolinkUrls },
+  { name: 'enlaces externos', run: openExternalLinksInNewTab },
+  { name: 'imágenes en línea', run: classifyInlineImages },
+];
+
+/**
+ * El orden es el de la lista y NO es intercambiable (ver la explicación de
+ * arriba). Se expone como lista para que el pipeline pueda recorrerla cediendo
+ * el control entre pasada y pasada: juntas son el tramo más largo de la
+ * conversión (~730 ms en un documento de 40 unidades con imágenes) y ejecutarlas
+ * de un tirón congelaba la ventana todo ese rato. Por separado ninguna pasa de
+ * ~170 ms. Esta función las encadena sin ceder, para los tests y para cualquier
+ * uso fuera del navegador.
+ */
 export function applyAllTransforms(htmlValue: string): string {
-  let transformed = htmlValue;
-  transformed = processIframes(transformed);
-  transformed = applyDivClasses(transformed);
-  transformed = applyTableClasses(transformed);
-  transformed = applyResourceLinks(transformed);
-  transformed = continueInterruptedOrderedLists(transformed);
-  transformed = autolinkUrls(transformed);
-  transformed = openExternalLinksInNewTab(transformed);
-  transformed = classifyInlineImages(transformed);
-  return transformed;
+  return HTML_TRANSFORM_PASSES.reduce((html, pass) => pass.run(html), htmlValue);
 }

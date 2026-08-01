@@ -72,16 +72,6 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 
 ### Rendimiento / build
 
-- [ ] 🟠 **La interfaz se congela durante la conversión.** El pipeline entero
-  corre en el hilo principal sin ceder nunca al bucle de eventos: mammoth →
-  `HtmlTransformer` → `PreviewService.buildPages()` → `zipSync`. Las funciones
-  son `async`, pero ningún `await` devuelve el control al navegador, así que los
-  `onProgress` hacen `setState` y React no llega a repintar: la barra se queda
-  clavada en una fase y la ventana deja de responder. Arreglo barato (unas cinco
-  líneas): ceder entre fases. Como el renderizado ya itera página a página y
-  bloque a bloque, se puede trocear con pausas intermedias si un tramo concreto
-  sigue siendo largo. **No acelera nada, pero elimina la sensación de cuelgue.**
-
 - [ ] 🟡 **Pasar `zipSync`/`unzipSync` a las variantes asíncronas de fflate.**
   `fflate` ya trae `zip`/`unzip` con callback, que levantan un worker por dentro:
   es cambiar la llamada, sin worker propio ni mensajería. Saca del hilo principal
@@ -168,6 +158,14 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
+- [x] **La ventana ya no se congela al convertir** (ago 2026): las fases se
+  separaban con `await`, que solo vacía microtareas y no deja pintar, así que la
+  conversión era un único bloque de 1,3 s (2,7 s en frío) con la barra de
+  progreso clavada. Nuevo `yieldToBrowser()` (con `MessageChannel`, porque
+  `setTimeout` se limita a 1/s en pestañas de fondo) en las fronteras de fase,
+  las 8 pasadas de `HtmlTransformer` recorridas una a una y la extracción de
+  imágenes cediendo por página. Bloqueo seguido más largo: 1299 ms → 180 ms.
+  A cambio, la conversión tarda ~700 ms más: decisión consciente.
 - [x] **Arranque instantáneo: los temas se descargan al usarlos** (ago 2026): el
   boot bajaba y descomprimía los ocho ZIP de temas (22,7 MB) antes de pintar
   nada. Ahora el catálogo son 4 KB de metadatos (`themes-config.json`), React
