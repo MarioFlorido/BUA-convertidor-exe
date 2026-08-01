@@ -1,0 +1,84 @@
+{
+  "themes": [
+    {
+      "id": "base",
+      "name": "Base eXeLearning",
+      "activity": "Por defecto",
+      "language": "es",
+      "description": "Tema estándar de eXeLearning sin personalización",
+      "screenshot": null
+    },
+    {
+      "id": "Doctorado",
+      "name": "DOCTORADO 26-27 (CASTELLANO)",
+      "activity": "Cursos de Doctorado",
+      "language": "es",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-07-20T11:15:53.981Z"
+    },
+    {
+      "id": "Doctorat",
+      "name": "DOCTORADO 26-27 (VALENCIANO)",
+      "activity": "Cursos de Doctorado",
+      "language": "ca",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-07-20T11:12:04.498Z"
+    },
+    {
+      "id": "PhD",
+      "name": "DOCTORADO 26-27 (INGLÉS)",
+      "activity": "Cursos de Doctorado",
+      "language": "en",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-07-20T11:14:02.048Z"
+    },
+    {
+      "id": "CID_es",
+      "name": "CURSOS CID 26-27 (CASTELLANO)",
+      "activity": "Cursos de Competencias Digitales",
+      "language": "es",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-23T17:55:05.418Z"
+    },
+    {
+      "id": "CID_va",
+      "name": "CURSOS CID 26-27 (VALENCIANO)",
+      "activity": "Cursos de Competencias Digitales",
+      "language": "ca",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T08:36:34.110Z"
+    },
+    {
+      "id": "Ciencia_abierta",
+      "name": "CIENCIA ABIERTA 26-27 (CASTELLANO)",
+      "activity": "",
+      "language": "es",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T08:52:11.838Z"
+    },
+    {
+      "id": "Ciencia_oberta",
+      "name": "CIENCIA ABIERTA 26-27 (VALENCIANO)",
+      "activity": "",
+      "language": "ca",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T08:57:04.983Z"
+    },
+    {
+      "id": "Open_Science",
+      "name": "CIENCIA ABIERTA 26-27 (INGLÉS)",
+      "activity": "",
+      "language": "en",
+      "description": "",
+      "screenshot": null,
+      "updatedAt": "2026-06-19T09:06:42.768Z"
+    }
+  ]
+}

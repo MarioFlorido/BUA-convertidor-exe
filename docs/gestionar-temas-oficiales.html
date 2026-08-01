@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestionar estilos oficiales — BUA Convertidor</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --green: #1a7f4b;
+        --green-soft: #e6f4ec;
+        --red: #b91c1c;
+        --red-soft: #fef2f2;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--blue);
+        margin: 0 0 0.35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 0.5rem; }
+      h2 {
+        font-size: 1.15rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid var(--border);
+      }
+      p { font-size: 0.95rem; margin: 0 0 0.8rem; }
+      .prereq {
+        background: var(--blue-soft);
+        border: 1px solid #c2d9ea;
+        border-radius: 8px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 2rem;
+      }
+      .prereq p { margin: 0; font-size: 0.93rem; }
+      .prereq strong { color: var(--blue); }
+
+      /* Tarjetas de acción */
+      .action-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+      .action-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.9rem 1.2rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+      }
+      .action-card-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .icon--publish { background: var(--green-soft); color: var(--green); }
+      .icon--download { background: var(--blue-soft); color: var(--blue); }
+      .icon--delete { background: var(--red-soft); color: var(--red); }
+      .action-card-title {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .action-card-body {
+        padding: 1.2rem;
+      }
+
+      /* Pasos */
+      ol.steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: steps;
+      }
+      ol.steps li {
+        counter-increment: steps;
+        display: flex;
+        gap: 0.9rem;
+        margin-bottom: 0.9rem;
+        font-size: 0.93rem;
+      }
+      ol.steps li::before {
+        content: counter(steps);
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        background: var(--blue);
+        color: white;
+        border-radius: 50%;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1px;
+      }
+      ol.steps li span { padding-top: 2px; }
+
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.875em;
+        background: var(--code-bg);
+        padding: 0.1em 0.4em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      .cmd {
+        display: block;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.9rem;
+        background: #1d2733;
+        color: #e2e8f0;
+        padding: 0.7rem 1rem;
+        border-radius: 6px;
+        margin: 0.5rem 0 0.3rem;
+        letter-spacing: 0.01em;
+      }
+      .note {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin-top: 0.4rem;
+      }
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: #fff8e8;
+        padding: 0.7rem 1rem;
+        border-radius: 0 6px 6px 0;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-soft);
+      }
+      a { color: var(--blue); }
+      .diagram-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        margin: 0.5rem 0 1.5rem;
+        overflow-x: auto;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <p class="eyebrow">Administración · Solo para mí</p>
+        <h1>Gestionar estilos oficiales</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          Publica, actualiza y elimina los estilos que ven todos los usuarios,
+          <strong>desde el propio Convertidor</strong> — sin Terminal ni scripts.
+        </p>
+      </header>
+
+      <!-- Requisitos previos -->
+      <div class="prereq">
+        <p>
+          <strong>Antes de empezar:</strong> necesitas un <strong>token de acceso de GitHub</strong>
+          (fine-grained PAT) limitado a este repositorio, con permiso
+          <code>Contents: Read and write</code>. Se crea <strong>una sola vez</strong> y se reutiliza.
+          Usa <strong>Chrome o Edge</strong> (la selección de carpeta no funciona en Firefox/Safari).
+        </p>
+      </div>
+
+      <h2>Flujo general</h2>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    Start([Panel de administración]) --> Auth[Introducir token de GitHub]
+    Auth --> Pick[Seleccionar carpeta del tema]
+    Pick --> Val[Validar + previsualizar]
+    Val --> Pub[Publicar / Actualizar / Eliminar]
+    Pub --> Commit[Commit a main vía API de GitHub]
+    Commit --> CI([CI deploy.yml reconstruye y despliega])
+    CI --> GH([Visible para todos en 1-2 min])
+        </pre>
+      </div>
+
+      <h2>Dónde está el panel</h2>
+      <ol class="steps">
+        <li><span>Abre el Convertidor y pulsa <strong>«Estilos eXeLearning»</strong> (arriba a la derecha).</span></li>
+        <li><span>Baja hasta la sección <strong>«Administración de temas oficiales»</strong>.</span></li>
+        <li><span>Pega tu token y pulsa <strong>Entrar</strong>. Si quieres no repetirlo, elige <em>«Recordar… en este dispositivo»</em>.</span></li>
+      </ol>
+
+      <!-- Crear el token -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Crear el token de GitHub (una sola vez)</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En GitHub: <strong>Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token</strong>.</span></li>
+            <li><span><strong>Resource owner:</strong> id_propietario_repo <strong>Expiration:</strong> larga (p. ej. 1 año).</span></li>
+            <li><span><strong>Repository access:</strong> <em>Only select repositories</em> → <code>BUA-convertidor-exe</code>.</span></li>
+            <li><span><strong>Repository permissions → Contents:</strong> <code>Read and write</code>. (GitHub añade <em>Metadata: Read-only</em> solo, es normal.)</span></li>
+            <li><span><strong>Generate token</strong> y copia el valor (<code>github_pat_…</code>). Se muestra una sola vez.</span></li>
+          </ol>
+          <div class="callout">
+            El mismo token vale en los tres entornos (localhost de casa, producción en github.io, localhost del trabajo):
+            es una credencial de GitHub, no del sitio. Cada navegador/equipo lo recuerda por separado.
+          </div>
+        </div>
+      </div>
+
+      <!-- Publicar / actualizar -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--publish">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 20h16"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Publicar o actualizar un estilo oficial</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En el panel, pulsa <strong>«Seleccionar carpeta…»</strong> y elige la carpeta del tema (p. ej. <code>Doctorado_26-27</code>).</span></li>
+            <li><span>Revisa la <strong>validación</strong> (errores en rojo bloquean; avisos en amarillo no) y la <strong>previsualización</strong>. El <strong>nombre</strong> se pre-rellena con el <code>&lt;title&gt;</code> del <code>config.xml</code> (actividad y descripción también son editables).</span></li>
+            <li><span>Pulsa <strong>«Publicar tema oficial»</strong>. Si el id ya existe, el botón pasa a <strong>«Actualizar»</strong>: se reemplazan los archivos y se borran los que ya no estén en la carpeta.</span></li>
+            <li><span>Listo: se hace un único commit en <code>main</code> y el CI reconstruye y despliega en 1-2 minutos.</span></li>
+          </ol>
+          <div class="callout">
+            <strong>Importante:</strong> la carpeta debe contener al menos <code>config.xml</code> y <code>style.css</code>.
+            El <strong>nombre de la carpeta es el ID</strong> del estilo (<code>Doctorado_26-27</code> → ID <code>Doctorado_26-27</code>).
+            La basura de macOS (<code>__MACOSX</code>, <code>.DS_Store</code>) se descarta automáticamente.
+          </div>
+          <div class="callout">
+            <strong>Agrupación por familias:</strong> si vas a publicar el mismo curso en varios idiomas
+            (castellano/valenciano/inglés), el selector los junta en una sola fila <em>siempre que el
+            nombre coincida exactamente</em> fuera del paréntesis de idioma. Usa el mismo texto en las
+            tres variantes y cambia solo el idioma entre paréntesis, por ejemplo:
+            <code>CURSO 26-27 (CASTELLANO)</code>, <code>CURSO 26-27 (VALENCIANO)</code>,
+            <code>CURSO 26-27 (INGLÉS)</code>. Un desajuste (un año escrito de otra forma, una palabra de
+            más) deja esa variante fuera de la familia, como entrada suelta.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eliminar -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--delete">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Eliminar un estilo oficial</span>
+        </div>
+        <div class="action-card-body">
+          <ol class="steps">
+            <li><span>En la lista <strong>«Temas oficiales existentes»</strong>, pulsa <strong>Eliminar</strong> en el que quieras.</span></li>
+            <li><span>Para confirmar, <strong>escribe el id exacto</strong> del tema (doble confirmación de seguridad).</span></li>
+            <li><span>Pulsa <strong>«Eliminar def.»</strong>: se borra la carpeta y se actualiza el catálogo en un commit. <strong>Recuperable desde el historial de git</strong> si hiciera falta.</span></li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Opciones avanzadas -->
+      <div class="action-card">
+        <div class="action-card-header">
+          <div class="action-card-icon icon--download">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <span class="action-card-title">Opciones avanzadas (probar sin riesgo)</span>
+        </div>
+        <div class="action-card-body">
+          <p>Dentro del panel, en <strong>«Opciones avanzadas»</strong>:</p>
+          <ul>
+            <li><strong>Rama destino:</strong> cámbiala a <code>admin-themes-test</code> para ensayar sin tocar producción.</li>
+            <li><strong>Simular (dry-run):</strong> calcula qué se subiría/borraría <strong>sin modificar nada</strong>.</li>
+          </ul>
+          <div class="callout">
+            Para publicar de verdad, deja la rama en <code>main</code> y el dry-run desactivado.
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <p>
+          BUA Convertidor · <a href="../docs/guia-temas.html">Guía de estilos para usuarios</a><br>
+          <span class="note">El antiguo flujo por Terminal (<code>publicar-tema-completo.sh</code> /
+          <code>npm run publish-theme</code>) queda obsoleto: todo se hace desde este panel.</span>
+        </p>
+      </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+  </body>
+</html>

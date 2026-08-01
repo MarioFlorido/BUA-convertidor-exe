@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<theme>
+    <exe-version>3.0</exe-version>
+    <name>Ciencia_oberta</name>
+    <title>CIENCIA ABIERTA 26-27 (VALENCIANO)</title>
+    <language>ca</language>
+    <version>3</version>
+    <compatibility>3.0</compatibility>
+    <author>Florido</author>
+    <license>Creative Commons by-sa</license>
+    <license-url>http://creativecommons.org/licenses/by-sa/3.0/</license-url>
+    <description>Estilo minimalista en valenciano para los temas de Ciencia Abierta</description>
+    <downloadable>1</downloadable>
+</theme>

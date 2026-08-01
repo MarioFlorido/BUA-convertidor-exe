@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Uso: ConvertidoreXe</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: white;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      border-bottom: 4px solid #3498db;
+      padding-bottom: 15px;
+    }
+
+    h2 {
+      color: #34495e;
+      font-size: 1.8em;
+      margin-top: 40px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .eje-title {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 2.1em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 64px;
+      margin-bottom: 8px;
+      padding-bottom: 18px;
+      border-bottom: 3px solid #3498db;
+    }
+
+    .eje-label {
+      font-size: 0.36em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #3498db;
+    }
+
+    h3 {
+      color: #5b6776;
+      font-size: 1.3em;
+      margin-top: 25px;
+      margin-bottom: 12px;
+    }
+
+    .paso-title {
+      display: block;
+      font-size: 1.55em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-top: 60px;
+      margin-bottom: 18px;
+    }
+
+    .paso-label {
+      display: block;
+      font-size: 0.5em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #5b6776;
+      margin-bottom: 7px;
+    }
+
+    h4 {
+      color: #2c3e50;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-top: 48px;
+      margin-bottom: 16px;
+    }
+
+    .format-tag {
+      display: inline-block;
+      font-size: 0.6em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: white;
+      padding: 3px 9px;
+      border-radius: 4px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .format-tag--elpx {
+      background: #3498db;
+    }
+
+    .format-tag--pdf {
+      background: #5b6776;
+    }
+
+    p {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 30px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    strong {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    em {
+      color: #7f8c8d;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      border-bottom: 1px solid #3498db;
+    }
+
+    a:hover {
+      color: #2980b9;
+      background: #ecf0f1;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: "Courier New", monospace;
+      font-size: 0.95em;
+      color: #c0392b;
+    }
+
+    pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+    }
+
+    pre code {
+      background: none;
+      color: #ecf0f1;
+      padding: 0;
+      border: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: #34495e;
+      color: white;
+    }
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid #bdc3c7;
+    }
+
+    td {
+      padding: 12px;
+      border: 1px solid #ecf0f1;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+      background: #ecf0f1;
+    }
+
+    .divider {
+      border-top: 2px solid #ecf0f1;
+      margin: 40px 0;
+      padding: 0;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7f8c8d;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ecf0f1;
+      font-size: 0.9em;
+    }
+    
+    .subtitulo {
+        color: #7f8c8d;
+    	font-size: 0.9em;
+    	line-height: 1;
+
+
+    }
+
+    .header-nav {
+      position: sticky;
+      top: 0;
+      background: #2c3e50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-nav a {
+      color: #ecf0f1;
+      margin: 0 10px;
+      border: none;
+    }
+
+    .header-nav a:hover {
+      color: #3498db;
+      background: none;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      h1 {
+        font-size: 1.8em;
+      }
+
+      h2 {
+        font-size: 1.4em;
+        margin-top: 30px;
+      }
+
+      .eje-title {
+        font-size: 1.5em;
+        margin-top: 48px;
+      }
+
+      h3 {
+        font-size: 1.1em;
+      }
+
+      .paso-title {
+        font-size: 1.2em;
+        margin-top: 44px;
+      }
+
+      h4 {
+        font-size: 1.1em;
+        margin-top: 36px;
+      }
+
+      table {
+        font-size: 0.9em;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      pre {
+        padding: 10px;
+        font-size: 0.8em;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        box-shadow: none;
+      }
+
+      .header-nav {
+        display: none;
+      }
+
+      h1, h2 {
+        page-break-after: avoid;
+      }
+
+      table {
+        page-break-inside: avoid;
+      }
+
+      .toc {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-nav">
+    <a href="#inicio">Inicio</a>
+    <a href="#preparar">1. Preparar el Word</a>
+    <a href="#conversion">2. La conversión</a>
+  </div>
+
+  <div class="container">
+    <h1 id="inicio">Guía de Uso: ConvertidoreXe</h1>
+
+    <h2>Introducción</h2>
+
+    <p><strong>ConvertidoreXe</strong> convierte documentos Word (DOCX) en proyectos eXeLearning (ELPX) con estilos visuales de la UA y estructura semántica, y también puede generar una versión en PDF lista para imprimir.</p>
+
+    <p>Esta guía tiene dos partes: cómo <strong>preparar el documento Word</strong> para que se convierta bien, y cómo usar <strong>ConvertidoreXe</strong> para configurarlo y descargarlo.</p>
+
+    <div class="divider"></div>
+
+    <h2 id="preparar" class="eje-title"><span class="eje-label">Eje 1</span>Preparar el Documento Word</h2>
+
+    <p>Esta es la parte que escribes en Microsoft Word, antes de subir nada a ConvertidoreXe.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 1</span>Encabezados (la estructura de tu curso)</h3>
+
+    <p>Usa los estilos de encabezado de Word (Título 1, Título 2, Título 3, Título 4) para marcar la jerarquía. Para los títulos 1 y 2 no importa si los escribes en mayúsculas o minúsculas, el convertidor lo transformará todo en mayúsculas.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Encabezado en Word</th>
+          <th>Qué decides después en ConvertidoreXe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p><strong>Título 1</strong></p><p class="subtitulo">Marca el inicio de cada página del curso.</p></td>
+          <td> Para cada Encabezado 1 (salvo el primero, que siempre es la página principal) eliges si es <strong>Página principal</strong>, <strong>Subpágina</strong> o <strong>3er nivel</strong> dentro del paso "Estructura" de la app: no se decide en Word.</td>
+        </tr>
+        <tr>
+          <td><p><strong>Título 2</strong></p><p class="subtitulo">Crea un apartado dentro de la página.</p></td>
+          <td> Para cada uno eliges si se muestra como título de iDevice, como cabecera de texto normal, o como acordeón/pestaña.</td>
+        </tr>
+        <tr>
+          <td><p><strong>Títulos 3 y 4</strong></p></td>
+          <td>Subdivisiones de contenido dentro del apartado. No requieren ninguna decisión adicional.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 2</span>Imágenes</h3>
+
+    <p>Insértalas directamente en el documento; ConvertidoreXe las exporta centradas. Antes de las recomendaciones, una regla de oro que explica todas las demás: <strong>el convertidor no ve lo que Word muestra en pantalla, sino el archivo de imagen original guardado dentro del documento</strong>, y lo extrae tal cual, sin pérdida de calidad. Por eso, los retoques visuales que hagas sobre la imagen en Word no viajan ni al ELPX ni al PDF:</p>
+
+    <ul>
+      <li><strong>No la estires ni la encojas en Word.</strong> El tamaño que fijas arrastrando las esquinas se ignora: en el ELPX y en el PDF la imagen sale con sus píxeles reales, ajustada como máximo al ancho disponible. Una foto grande que hayas reducido en Word a un tamañito saldrá grande; una imagen pequeña que hayas estirado saldrá pequeña. Si necesitas que se muestre a otro tamaño, cambia el archivo: redimensiónala con un editor de imágenes antes de insertarla.</li>
+      <li><strong>No uses la herramienta de recorte de Word</strong> (o descarta el recorte al terminar). Recortar en Word solo <em>oculta</em> la parte sobrante, no la elimina del archivo, así que en ambos formatos la imagen aparecerá completa, con la zona "recortada" incluida. Recorta la captura antes de insertarla; si ya la recortaste en Word, usa <strong>Formato de imagen → Comprimir imágenes → Eliminar las áreas recortadas de las imágenes</strong>, que sí reescribe el archivo.</li>
+      <li><strong>Captura la zona relevante, no la pantalla entera.</strong> Como los píxeles reales determinan el tamaño final, una pantalla completa capturada para enseñar un diálogo se encogerá hasta caber en la columna y el detalle quedará minúsculo e ilegible; la misma captura ceñida al diálogo se verá grande y nítida.</li>
+    </ul>
+
+    <p>Recomendaciones sobre el archivo de imagen:</p>
+    <ul>
+      <li>Máximo 900&nbsp;px de ancho (coincide con el ancho máximo de la columna de contenido del ELPX).</li>
+      <li>Formato JPG o PNG (PNG si son capturas de pantalla: la compresión JPG emborrona el texto de menús y diálogos).</li>
+      <li>Comprimidas (idealmente &lt; 500&nbsp;KB por imagen).</li>
+      <li>Añade siempre el texto alternativo en Word: es obligatorio por las normas de accesibilidad de la UA y de ahí se toma el atributo <code>alt</code>.</li>
+    </ul>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 3</span>Etiquetas semánticas</h3>
+
+    <p>Se escriben entre corchetes al inicio de un párrafo nuevo y se cierran con <code>[fin]</code>:</p>
+
+    <pre>[ejemplo]
+Contenido del ejemplo...
+[fin]</pre>
+
+    <p>Etiquetas disponibles:</p>
+    <ul>
+      <li><code>[ejemplo]</code>: un caso práctico o demostración.</li>
+      <li><code>[definición]</code>: un término nuevo que conviene aclarar.</li>
+      <li><code>[importante]</code>: una advertencia real (no la uses para todo, pierde fuerza).</li>
+      <li><code>[pie]</code>: leyenda o fuente de una imagen o tabla; va en un párrafo nuevo justo debajo. Por ejemplo: <code>[pie]Figura 1. Descripción[fin]</code>.</li>
+    </ul>
+
+    <p>Mayúsculas, minúsculas y tildes son indiferentes (<code>[Definición]</code> = <code>[definicion]</code>). Es obligatorio cerrar siempre con <code>[fin]</code> y no pueden anidarse.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 4</span>Tablas</h3>
+
+    <p>Para que ConvertidoreXe sepa cómo pintar los encabezados de una tabla, añade uno de estos marcadores en un párrafo justo encima (sin <code>[fin]</code> de cierre):</p>
+    <ul>
+      <li><code>[horizontal]</code>: la primera <strong>fila</strong> contiene los títulos de columna.</li>
+      <li><code>[vertical]</code>: la primera <strong>columna</strong> contiene los títulos de fila.</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <h2 id="conversion" class="eje-title"><span class="eje-label">Eje 2</span>La conversión en ConvertidoreXe</h2>
+
+    <p>Esta es la parte que ocurre ya dentro de la aplicación, en sus cuatro pasos.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 1</span>Documento</h3>
+    <p>Arrastra el archivo .docx o haz clic para seleccionarlo. ConvertidoreXe lo analiza y, si hay alguna caja semántica sin cerrar con <code>[fin]</code>, te avisa antes de continuar.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 2</span>Estructura</h3>
+    <p>Cada Título 1 aparece como una sección expandible. Para cada uno (salvo el primero, fijo como página principal) elige el nivel (<strong>Página principal</strong>, <strong>Subpágina</strong> o <strong>3er nivel</strong>) y, dentro, configura cada Título 2 como <strong>Título de iDevice</strong>, <strong>Cabecera 2 en texto</strong>, o como efecto especial: <strong>Acordeón</strong> o <strong>Pestañas</strong>.</p>
+
+    <p>Un acordeón (o grupo de pestañas) se queda con <em>todo</em> el texto que le sigue hasta el próximo Título 2. Si quieres que, tras el desplegable, el apartado <strong>continúe</strong> con texto normal (no dentro del panel), escribe en Word <code>[fin-acordeón]</code> en un párrafo propio, en el punto donde el acordeón debe terminar: lo que vaya después saldrá fuera del desplegable. Como los demás marcadores, es indiferente a mayúsculas, tildes y al guion o espacio (<code>[Fin acordeon]</code> también vale) y no necesita <code>[fin]</code>.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 3</span>Estilo</h3>
+    <p>Elige el tema visual que se aplicará a todo el curso: colores, tipografía y portada. Los <strong>temas oficiales</strong> (cursos CID, Doctorado…) suelen incluir varias variantes de idioma; los <strong>temas locales</strong> son los que hayas cargado tú en el administrador de estilos.</p>
+
+    <h3 class="paso-title"><span class="paso-label">Paso 4</span>Resultado y descargas</h3>
+
+    <p>Al terminar la conversión puedes descargar dos formatos distintos, cada uno con sus propias opciones:</p>
+
+    <h4><span class="format-tag format-tag--elpx">ELPX</span>Proyecto eXeLearning (.elpx)</h4>
+    <p>El formato nativo de eXeLearning: editable, con el tema aplicado. Para abrirlo, en eXeLearning ve a <strong>Archivo → Abrir</strong> y selecciona el <code>.elpx</code> descargado.</p>
+    <ul>
+      <li><strong>Menú lateral desplegado</strong> (Sí/No): si el índice de páginas aparece desplegado por defecto la primera vez que se abre el proyecto en eXeLearning, o plegado.</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <h4><span class="format-tag format-tag--pdf">PDF</span>Vista previa para imprimir / PDF</h4>
+    <p>Una versión estática para imprimir o compartir como documento de lectura. Siempre incluye portada y tabla de contenidos. Da mejores resultados en Google Chrome o Microsoft Edge; si tu navegador bloquea la ventana emergente, el PDF se descarga directamente en su lugar.</p>
+    <ul>
+      <li><strong>Foto de portada</strong> (Sí/No): incluye la imagen de portada del tema elegido, o deja la portada solo con texto.</li>
+      <li><strong>Numerar títulos</strong> (Sí/No): añade numeración jerárquica a los títulos (1, 1.1, 1.1.1…).</li>
+    </ul>
+
+    <p>Usa el <strong>ELPX</strong> si vas a seguir editando el curso en eXeLearning; usa el <strong>PDF</strong> si necesitas un documento final para imprimir o repartir tal cual.</p>
+
+    <div class="divider"></div>
+
+    <div class="footer">
+      <p><strong>Guía de Uso: ConvertidoreXe</strong></p>
+      <p>Última actualización: Julio 2026</p>
+      <p><em>Para preguntas o soporte, contacta con PuntBIU.</em></p>
+    </div>
+  </div>
+</body>
+</html>

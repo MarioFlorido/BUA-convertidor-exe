@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arquitectura — BUA Convertidor</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--blue);
+        margin: 0 0 0.35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 0.5rem; }
+      h2 {
+        font-size: 1.15rem;
+        margin: 2.5rem 0 0.8rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid var(--border);
+      }
+      p { font-size: 0.95rem; margin: 0 0 0.8rem; }
+      .diagram-wrap {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        margin: 1rem 0 1.5rem;
+        overflow-x: auto;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0.8rem 0 1rem;
+        font-size: 0.9rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th { background: var(--blue-soft); font-weight: 600; }
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.85em;
+        background: var(--code-bg);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-soft);
+      }
+      a { color: var(--blue); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <p class="eyebrow">Documentación técnica</p>
+        <h1>Arquitectura</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          Pipeline de conversión, sistema de estilos y secuencia de arranque de BUA ConvertidoreXe.
+        </p>
+      </header>
+
+      <!-- 1. Flujo del wizard -->
+      <h2>Flujo del wizard (usuario)</h2>
+      <p>Pasos que sigue el usuario para convertir un documento.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart LR
+    A([Subir DOCX]) --> B[Parsear con Mammoth]
+    B --> C[Configurar estructura]
+    C --> D[Seleccionar estilo]
+    D --> E[Convertir]
+    E --> F([Descargar ELPX / PDF])
+        </pre>
+      </div>
+
+      <!-- 2. Pipeline de conversión -->
+      <h2>Pipeline interno de conversión</h2>
+      <p>
+        El <strong>SemanticDocument</strong> es el núcleo del sistema: un modelo agnóstico
+        al formato de salida. Los renderers ELPX y PDF son independientes entre sí;
+        añadir un nuevo formato es escribir un renderer adicional sin tocar lo demás.
+      </p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    DOCX([DOCX]) --> Parser[DocxParser / Mammoth.js]
+    Parser --> HTML[HTML intermedio]
+    HTML --> Struct[parseDocumentStructure]
+    HTML --> Builder[SemanticBuilder]
+    Struct --> Builder
+    Builder --> SemDoc([SemanticDocument])
+    SemDoc --> ELPX[ElpxRenderer / .elpx]
+    SemDoc --> PDF[PrintHtmlRenderer / PDF]
+        </pre>
+      </div>
+
+      <!-- 3. Sistema de estilos -->
+      <h2>Sistema de estilos</h2>
+      <p>
+        Dos fuentes de estilos convergen en el <strong>ThemeRegistry</strong>,
+        la fuente de verdad única de la aplicación.
+      </p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    subgraph Oficiales[Estilos oficiales - todos los usuarios]
+        Repo[public/themes/id/ - en git] -->|pack-themes| ZIP[id.zip - generado]
+        ZIP -->|fetch al arrancar| BIP[BuiltInThemeProvider]
+    end
+    subgraph Locales[Estilos locales - solo este navegador]
+        Upload[ZIP subido por el usuario] --> IDB[IndexedDB]
+        IDB --> UTP[UserThemeProvider]
+    end
+    BIP --> Reg[ThemeRegistry]
+    UTP --> Reg
+    Reg --> Sel[Selector de estilos]
+        </pre>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Vive en</th><th>Visible para</th><th>Gestión</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Base (fijo)</td>
+            <td><code>public/base.elpx</code></td>
+            <td>Todos</td>
+            <td>Inmutable</td>
+          </tr>
+          <tr>
+            <td>Oficiales</td>
+            <td><code>public/themes/&lt;id&gt;/</code> + <code>themes-config.json</code></td>
+            <td>Todos</td>
+            <td>Panel «Administración de temas oficiales» (fallback: <code>npm run themes</code>)</td>
+          </tr>
+          <tr>
+            <td>Locales</td>
+            <td>IndexedDB del navegador</td>
+            <td>Solo ese usuario</td>
+            <td>UI «Importar estilo local»</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 4. Secuencia de arranque -->
+      <h2>Secuencia de arranque</h2>
+      <p>
+        Al cargar la app, <code>ThemeBoot</code> orquesta la carga de ambas fuentes
+        de estilos antes de habilitar la UI.
+      </p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+sequenceDiagram
+    participant App
+    participant ThemeBoot
+    participant BuiltIn as BuiltInThemeProvider
+    participant User as UserThemeProvider
+    participant Registry as ThemeRegistry
+
+    App->>ThemeBoot: bootThemeSystem()
+    ThemeBoot->>User: init() IndexedDB
+    ThemeBoot->>BuiltIn: loadAll()
+    BuiltIn-->>Registry: register(estilos oficiales)
+    ThemeBoot->>User: loadAll()
+    User-->>Registry: register(estilos locales)
+    ThemeBoot-->>App: activeThemeId, themeCount
+        </pre>
+      </div>
+
+      <footer>
+        <p>
+          BUA Convertidor ·
+          <a href="guia-temas.html">Guía de estilos</a> ·
+          <a href="gestionar-temas-oficiales.html">Gestionar estilos oficiales</a>
+        </p>
+      </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+  </body>
+</html>

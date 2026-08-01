@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Léeme — BUA ConvertidoreXe</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --blue-mid: #1a7aad;
+        --mostaza: #deb13c;
+        --mostaza-soft: #fff8e8;
+        --green: #1a7f4b;
+        --green-soft: #e6f4ec;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+        --white: #ffffff;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+
+      .top-nav {
+        position: sticky;
+        top: 0;
+        background: var(--blue);
+        z-index: 100;
+        padding: 0 1.5rem;
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        box-shadow: 0 2px 6px rgba(0,0,0,.18);
+      }
+      .top-nav a {
+        color: rgba(255,255,255,.85);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.65rem 0.9rem;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition: color .15s, border-color .15s;
+      }
+      .top-nav a:hover { color: #fff; border-bottom-color: var(--mostaza); }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+
+      .doc-header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        color: var(--blue);
+        margin: 0 0 .4rem;
+      }
+      h1 { font-size: 2rem; margin: 0 0 .5rem; line-height: 1.2; }
+      .subtitle { color: var(--text-soft); margin: 0; font-size: .95rem; }
+
+      h2 {
+        font-size: 1.25rem;
+        margin: 2.75rem 0 .9rem;
+        padding-bottom: .4rem;
+        border-bottom: 2px solid var(--border);
+        scroll-margin-top: 3rem;
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 1.6rem 0 .5rem;
+        color: var(--text);
+      }
+      h3::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 14px;
+        background: var(--mostaza);
+        border-radius: 2px;
+        margin-right: .5rem;
+        vertical-align: -2px;
+      }
+      p { font-size: .95rem; margin: 0 0 .85rem; }
+      ul, ol { font-size: .95rem; padding-left: 1.5rem; margin: 0 0 1rem; }
+      li { margin-bottom: .35rem; }
+
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: .85em;
+        background: var(--code-bg);
+        padding: .1em .4em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      pre {
+        background: #1d2733;
+        color: #e2e8f0;
+        padding: 1rem 1.1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: .85rem;
+        line-height: 1.5;
+        margin: .5rem 0 1.25rem;
+      }
+      pre code { background: none; border: none; padding: 0; color: inherit; }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: .75rem 0 1.25rem;
+        font-size: .9rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: .55rem .8rem;
+        text-align: left;
+      }
+      th { background: var(--blue-soft); font-weight: 600; }
+
+      .callout {
+        border-left: 3px solid var(--mostaza);
+        background: var(--mostaza-soft);
+        padding: .8rem 1rem;
+        border-radius: 0 6px 6px 0;
+        font-size: .9rem;
+        margin: .75rem 0 1.25rem;
+      }
+      .callout--info {
+        border-left-color: var(--blue);
+        background: var(--blue-soft);
+      }
+      .callout--green {
+        border-left-color: var(--green);
+        background: var(--green-soft);
+      }
+
+      .diagram-wrap {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.5rem 1rem;
+        margin: .75rem 0 1.5rem;
+        overflow-x: auto;
+        text-align: center;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .1rem .45rem;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        margin-right: .15rem;
+      }
+
+      hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--border);
+        font-size: .82rem;
+        color: var(--text-soft);
+      }
+      footer a { color: var(--blue); text-decoration: none; }
+      footer a:hover { text-decoration: underline; }
+
+      a { color: var(--blue); }
+    </style>
+  </head>
+  <body>
+
+    <nav class="top-nav">
+      <a href="#que-hace">¿Qué hace?</a>
+      <a href="#flujo">El flujo</a>
+      <a href="#arquitectura">Arquitectura</a>
+      <a href="#etiquetas">Etiquetas BUA</a>
+      <a href="#estilos">Estilos</a>
+      <a href="#pdf">PDF</a>
+      <a href="#problemas">Problemas</a>
+    </nav>
+
+    <div class="container">
+
+      <header class="doc-header">
+        <p class="eyebrow">Biblioteca Universitaria · Universidad de Alicante</p>
+        <h1>ConvertidoreXe</h1>
+        <p class="subtitle">
+          Transformar documentos Word en cursos eXeLearning o PDF con estilos personalizados para editores de la UA.
+        </p>
+      </header>
+
+      <p>
+        <strong>ConvertidoreXe</strong> nace de la necesidad real: crear cursos digitales sin tocar XML ni configurar nada en eXeLearning. Preparas tu Word con una estructura clara, subes el archivo, configuras cómo quieres que se estructure, eliges un estilo visual, y listo. Tienes tu proyecto .elpx o tu PDF.
+      </p>
+
+      <p>
+        El proyecto se inspira en el trabajo que desarrolla Juanjo de Haro en <a href="https://hackexe4.github.io" target="_blank">HACKeXe4</a>. Para ver las diferencias puedes consultar el <a href="./comparacion.html">documento que las analiza</a>.
+      </p>
+
+      <div class="callout">
+        Si tienes curiosidad y quieres conocer detalles técnicos consulta <a href="./arquitectura.html">la documentación de arquitectura</a>.
+      </div>
+
+      <hr>
+
+      <!-- ── ¿Qué hace? ── -->
+      <h2 id="que-hace">¿Qué hace?</h2>
+
+      <p>
+        En esencia: convierte tu Word en un proyecto interactivo para eXeLearning o en un PDF estructurado con portada, índice automático, encabezados y pies de página.
+      </p>
+
+      <h3>El proceso de 5 pasos</h3>
+      <ol>
+        <li>Subes tu documento Word</li>
+        <li>Configuras la estructura (qué nivel tiene cada título)</li>
+        <li>Defines qué pasa con los H2 (iDevice, HTML, acordeón o pestañas)</li>
+        <li>Eliges un estilo visual</li>
+        <li>Descargas el .elpx o exportas a PDF</li>
+      </ol>
+
+      <p>
+        Si te pierdes, hay un botón "?" en la cabecera con una guía completa integrada en la interfaz.
+      </p>
+
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart LR
+    A([Subir DOCX]) --> B[Parseador]
+    B --> C[Configurar]
+    C --> D[Elegir estilo]
+    D --> E[Convertir]
+    E --> F([ELPX o PDF])
+        </pre>
+      </div>
+
+      <div class="callout callout--info">
+        <strong>Privacidad:</strong> Sin servidores. Tu documento nunca sale de tu navegador.
+      </div>
+
+      <hr>
+
+      <!-- ── El flujo ── -->
+      <h2 id="flujo">El flujo: Word → Documento semántico → Dos salidas</h2>
+
+      <p>
+        Internamente, ConvertidoreXe convierte tu Word en un "documento semántico" — una estructura que describe qué es cada parte del documento sin asumir un formato específico. Desde ahí, puede generar .elpx o PDF de forma independiente.
+      </p>
+
+      <p>
+        Esto significa que si mañana quieres SCORM o EPUB, cambiamos de versión en eXelearning o migramos a otra platarforma podemos seguir aprovechando el trabajo. La arquitectura está pensada para crecer.
+      </p>
+
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    DOCX([Word]) --> Parser["Parser<br/>(Mammoth)"]
+    Parser --> HTML["HTML<br/>intermedio"]
+    HTML --> Struct["Estructura<br/>H1/H2/H3/H4"]
+    HTML --> Builder["Constructores<br/>semánticos"]
+    Struct --> Builder
+    Builder --> SemDoc["Documento<br/>semántico"]
+    SemDoc --> ELPX[".elpx<br/>(eXeLearning)"]
+    SemDoc --> PDF["PDF<br/>(Paged.js)"]
+        </pre>
+      </div>
+
+      <p>
+        El documento semántico contiene las páginas y bloques de contenido. Los renderers (el que genera .elpx y el que genera PDF) son completamente independientes. Uno no sabe del otro, pero los estilos garantizan la consistencia visual entre los dos.
+      </p>
+
+      <hr>
+
+      <!-- ── Arquitectura ── -->
+      <h2 id="arquitectura">Arquitectura</h2>
+
+      <p>
+        Si quieres saber cómo funciona por dentro, ConvertidoreXe está organizado en capas:
+      </p>
+
+      <h3>Capa 1: Parseo</h3>
+      <p>Tu Word entra, Mammoth.js lo convierte a HTML, y un parseador extrae la estructura de encabezados.</p>
+
+      <h3>Capa 2: Construcción semántica</h3>
+      <p>Los encabezados se convierten en un árbol jerárquico (páginas y niveles). El contenido HTML se enriquece con las etiquetas BUA que tengas marcadas ([importante], [ejemplo], [definición]).</p>
+
+      <h3>Capa 3: Renderizado</h3>
+      <p>El documento semántico se envía a dos renderers independientes: uno genera .elpx (ZIP con XML), otro genera HTML/PDF con Paged.js.</p>
+
+      <h3>Sistema de estilos</h3>
+      <p>
+        Los estilos viven en tu IndexedDB (el usuario puede subir los suyos) o en GitHub (los oficiales). Cada estilo es un ZIP con CSS, metadatos, logos y opcionalmente JavaScript. ConvertidoreXe los carga, valida y aplica sin servidor.
+      </p>
+
+      <hr>
+
+      <!-- ── Etiquetas BUA ── -->
+      <h2 id="etiquetas">Etiquetas semánticas BUA</h2>
+
+      <p>
+        Dentro de tu Word puedes marcar bloques especiales que ConvertidoreXe interpretará y estilizará según el tema elegido: los antigüos: bua_imprtante, bua_ejemplo...
+      </p>
+
+      <h3>Cajas semánticas</h3>
+      <p>Rodea con [etiqueta] y [fin]:</p>
+      <ul>
+        <li><code>[importante]</code> — Para destacados, avisos, alertas</li>
+        <li><code>[ejemplo]</code> — Para casos prácticos, demostraciones</li>
+        <li><code>[definición]</code> — Para conceptos, términos clave</li>
+        <li><code>[pie]</code> — Pie de ilustración o tabla (leyenda o fuente; texto pequeño en cursiva centrado)</li>
+      </ul>
+
+      <p>No importan mayúsculas ni tildes. Word puede meter caracters invisible invisibles dentro de los corchetes — ConvertidoreXe limpia eso automáticamente. Además no tienes la limitación de aplicar el atributo a un solo párrafo que teníamos antes </p>
+
+      <h3>Tablas</h3>
+      <p>Marca la línea anterior a la tabla:</p>
+      <ul>
+        <li><code>[horizontal]</code> → Tabla con encabezados en la primera fila</li>
+        <li><code>[vertical]</code> → Tabla con encabezados en la primera columna</li>
+      </ul>
+
+      <hr>
+
+      <!-- ── Estilos ── -->
+      <h2 id="estilos">Estilos (temas)</h2>
+
+      <h3>Dos tipos</h3>
+      <p><strong>Oficiales:</strong> Los que ves todos, están en el servidor, aparecen para cualquiera.</p>
+      <p><strong>Locales:</strong> Los que subes tú. Se guardan en tu navegador (IndexedDB), solo los ves tú.</p>
+
+      <h3>Cargar un estilo local</h3>
+      <p>Pulsa "Importar estilo local" en la cabecera. Arrastra el ZIP o abre el selector. Listo — está disponible en el selector de estilos del wizard.</p>
+
+      <h3>Estructura de un ZIP de estilo</h3>
+      <pre><code>tu-estilo.zip/
+├── style.css          (obligatorio)
+├── config.xml         (obligatorio — metadatos, idioma)
+├── screenshot.png     (recomendado — miniatura)
+├── portada_pdf.png    (opcional — para portadas PDF)
+├── style.js           (opcional — lógica interactiva)
+└── img/
+    ├── logo_BUA.png
+    ├── logo_UA.png
+    └── logo_CID.png</code></pre>
+
+      <p>
+        El <code>style.css</code> debe incluir clases para las cajas semánticas:
+        <code>.bua_importante</code>, <code>.bua_ejemplo</code>, <code>.bua_definicion</code>.
+      </p>
+
+      <hr>
+
+      <!-- ── PDF ── -->
+      <h2 id="pdf">El PDF generado</h2>
+
+      <p>Cuando exportas a PDF, ConvertidoreXe añade estructura automáticamente:</p>
+
+      <table>
+        <tr>
+          <th>Elemento</th>
+          <th>Qué hace</th>
+        </tr>
+        <tr>
+          <td>Portada</td>
+          <td>Opcional (desactivada por defecto). Logo BUA, título, año, licencia</td>
+        </tr>
+        <tr>
+          <td>Índice</td>
+          <td>Automático, paginado con Paged.js</td>
+        </tr>
+        <tr>
+          <td>Encabezado</td>
+          <td>Logo BUA a la izquierda, título del documento a la derecha</td>
+        </tr>
+        <tr>
+          <td>Pie de página</td>
+          <td>Logo UA a la izquierda, número de página en el centro</td>
+        </tr>
+        <tr>
+          <td>Cajas semánticas</td>
+          <td>Con colores y etiquetas del estilo elegido</td>
+        </tr>
+        <tr>
+          <td>Tablas</td>
+          <td>Encabezado coloreado según el estilo</td>
+        </tr>
+        <tr>
+          <td>Imágenes</td>
+          <td>Centradas con sombra sutil. Se optimizan automáticamente (redimensionado + recompresión) para aligerar el PDF sin empeorar el original</td>
+        </tr>
+        <tr>
+          <td>Acordeones/Pestañas</td>
+          <td>Expandidas (sin solapamientos en impresión)</td>
+        </tr>
+      </table>
+
+      <p>
+        Todo el proceso es <strong>offline</strong>: el motor de paginación (Paged.js) va embebido en la app, no se descarga de ningún CDN. El PDF se genera aunque no tengas conexión.
+      </p>
+
+      <p>
+        El idioma del PDF se detecta automáticamente desde el estilo. Si hay confusión, asume español.
+      </p>
+
+        <p>
+        Para un mejor renderizado, más automatico y conservando los márgenes, recomiendo Chrome (o Edge que es el mismo motor)
+      </p>
+
+      <hr>
+
+      <!-- ── Problemas habituales ── -->
+      <h2 id="problemas">Problemas habituales</h2>
+
+      <h3>El tema no aparece después de subirlo</h3>
+      <p>Probablemente le falta <code>style.css</code> o la estructura es inválida. Abre la consola del navegador (F12) para ver el error exacto.</p>
+
+      <h3>Subo el ZIP pero no veo miniatura</h3>
+      <p>El ZIP no incluye <code>screenshot.png</code> en la raíz. El tema funciona igual, solo que sin imagen en el selector.</p>
+
+      <h3>La interfaz dice [ES] pero el tema es en inglés</h3>
+      <p>El <code>config.xml</code> del tema necesita <code>&lt;language&gt;en&lt;/language&gt;</code> o <code>&lt;language&gt;ca&lt;/language&gt;</code>. Sin eso, asume español.</p>
+
+      <h3>El PDF no tiene encabezados ni pies</h3>
+      <p>Revisa que el tema defina sus <em>running elements</em>. El PDF funciona sin conexión: el motor de paginación (Paged.js) va embebido en la propia app, no se descarga de ningún CDN.</p>
+
+      <h3>Las cajas no tienen colores en el PDF</h3>
+      <p>El <code>style.css</code> del tema no define <code>.bua_ejemplo</code>, <code>.bua_definicion</code> o <code>.bua_importante</code> con colores y <code>border-left</code>.</p>
+
+      <h3>El PDF tiene páginas en blanco entre secciones</h3>
+      <p>Algo en el CSS del tema está forzando saltos de página. Revisa los estilos de sección.</p>
+
+      <hr>
+
+      <!-- ── Metadatos ── -->
+      <h2>Metadatos del proyecto ELPX</h2>
+
+      <p>
+        Cuando generas un proyecto eXeLearning, ConvertidoreXe rellena automáticamente, ya no hay que hacerlo a mano:
+      </p>
+
+      <ul>
+        <li><strong>Título:</strong> Del nombre de tu documento</li>
+        <li><strong>Subtítulo:</strong> "Biblioteca Universitaria" (por defecto)</li>
+        <li><strong>Autoría:</strong> Biblioteca de la Universidad de Alicante</li>
+        <li><strong>Idioma:</strong> Español</li>
+        <li><strong>Licencia:</strong> Creative Commons: Reconocimiento - No comercial - Compartir igual 4.0</li>
+      </ul>
+
+      <p>Aunque siempre puedes editar todo esto después en eXeLearning si lo necesitas.</p>
+
+      <hr>
+
+      <footer>
+        <a href="https://github.com/MarioFlorido/BUA-convertidor-exe">Repositorio en GitHub</a> •
+        <a href="./arquitectura.html">Documentación técnica</a>
+      </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+
+  </body>
+</html>
