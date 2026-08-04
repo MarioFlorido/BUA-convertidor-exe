@@ -388,6 +388,8 @@
       </tbody>
     </table>
 
+    <p><strong>Títulos que son además un enlace.</strong> Si pones un hiperenlace en un Título 2, 3 o 4, el enlace se conserva y se marca automáticamente con un pequeño icono de enlace externo (un cuadrado con una flecha saliendo) detrás del texto. No tienes que escribir ninguna etiqueta. Sirve para que se note que el título lleva algo que abrir: dentro de un título grande, en negrita y en mayúsculas, el color de enlace del tema se confunde con el color propio del título. Solo se marcan los enlaces a páginas web (los que empiezan por <code>http</code> o <code>https</code>); una dirección de correo o un salto a otro punto del propio documento se conservan, pero sin icono.</p>
+
     <h3 class="paso-title"><span class="paso-label">Paso 2</span>Imágenes</h3>
 
     <p>Insértalas directamente en el documento; ConvertidoreXe las exporta centradas. Antes de las recomendaciones, una regla de oro que explica todas las demás: <strong>el convertidor no ve lo que Word muestra en pantalla, sino el archivo de imagen original guardado dentro del documento</strong>, y lo extrae tal cual, sin pérdida de calidad. Por eso, los retoques visuales que hagas sobre la imagen en Word no viajan ni al ELPX ni al PDF:</p>
@@ -408,7 +410,11 @@
 
     <h3 class="paso-title"><span class="paso-label">Paso 3</span>Etiquetas semánticas</h3>
 
-    <p>Se escriben entre corchetes al inicio de un párrafo nuevo y se cierran con <code>[fin]</code>:</p>
+    <p>Se escriben entre corchetes y hay dos familias: las <strong>cajas</strong>, que envuelven un bloque de texto y se cierran con <code>[fin]</code>, y las <strong>líneas de recurso</strong>, que marcan una sola línea y no se cierran.</p>
+
+    <h4>Cajas de contenido</h4>
+
+    <p>Se escriben al inicio de un párrafo nuevo y se cierran con <code>[fin]</code>:</p>
 
     <pre>[ejemplo]
 Contenido del ejemplo...
@@ -423,6 +429,26 @@ Contenido del ejemplo...
     </ul>
 
     <p>Mayúsculas, minúsculas y tildes son indiferentes (<code>[Definición]</code> = <code>[definicion]</code>). Es obligatorio cerrar siempre con <code>[fin]</code> y no pueden anidarse.</p>
+
+    <h4>Líneas de recurso: vídeo, documento y enlace</h4>
+
+    <p>Cuando enlazas a un vídeo, a un PDF o a una web, ese enlace se ve igual que cualquier otro del texto: el lector no sabe qué le espera al otro lado hasta que hace clic. Estas tres etiquetas ponen delante el icono del tipo de recurso y dejan la línea en cursiva, de modo que una lista de materiales se distingue de un vistazo del cuerpo del texto. Escríbelas al principio de la línea, seguidas del título del recurso:</p>
+
+    <pre>[vídeo:] Cómo buscar en el catálogo
+[documento:] Guía de citas APA
+[enlace:] Repositorio Institucional de la UA</pre>
+
+    <p>El enlace se pone en Word como un hiperenlace normal sobre el título; la etiqueta solo dice de qué tipo de recurso se trata.</p>
+
+    <ul>
+      <li><code>[vídeo:]</code>: grabaciones, tutoriales, clases en vídeo.</li>
+      <li><code>[documento:]</code>: PDF, guías descargables, material de lectura.</li>
+      <li><code>[enlace:]</code>: páginas web, catálogos, bases de datos.</li>
+    </ul>
+
+    <p><strong>Los dos puntos son obligatorios.</strong> Es lo único de estas etiquetas que no admite variantes: <code>[enlace]</code> sin los dos puntos no es una etiqueta y llega al curso tal cual, para que puedas transcribir textos que lleven corchetes (por ejemplo, un prompt como «pega aquí el [enlace]») sin que el convertidor los toque. Del resto no te preocupes: mayúsculas, tildes y espacios son indiferentes (<code>[Vídeo:]</code>, <code>[VIDEO:]</code> y <code>[ vídeo : ]</code> valen igual).</p>
+
+    <p>A diferencia de las cajas, <strong>no llevan <code>[fin]</code></strong>: afectan a su línea y a nada más. Funcionan tanto en un párrafo como en un elemento de una lista, que es la forma natural de escribir una lista de recursos. Si la etiqueta se queda sola, sin texto detrás, se deja sin transformar a propósito: al verla impresa sabes que ahí falta el recurso.</p>
 
     <h3 class="paso-title"><span class="paso-label">Paso 4</span>Tablas</h3>
 
@@ -474,7 +500,7 @@ Contenido del ejemplo...
 
     <div class="footer">
       <p><strong>Guía de Uso: ConvertidoreXe</strong></p>
-      <p>Última actualización: Julio 2026</p>
+      <p>Última actualización: Agosto 2026</p>
       <p><em>Para preguntas o soporte, contacta con PuntBIU.</em></p>
     </div>
   </div>
