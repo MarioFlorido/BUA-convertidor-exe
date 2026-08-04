@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Etiquetas del Word — BUA Convertidor</title>
+    <style>
+      :root {
+        --blue: #135d87;
+        --blue-soft: #e7f1f8;
+        --mostaza: #deb13c;
+        --text: #1d2733;
+        --text-soft: #5b6776;
+        --border: #d8dde3;
+        --bg: #f7f8fa;
+        --code-bg: #f1f3f5;
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      header {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 1.25rem;
+        margin-bottom: 2rem;
+      }
+      .eyebrow {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--blue);
+        margin: 0 0 0.35rem;
+      }
+      h1 { font-size: 1.8rem; margin: 0 0 0.5rem; }
+      h2 {
+        font-size: 1.15rem;
+        margin: 2.2rem 0 0.9rem;
+        padding-bottom: 0.35rem;
+        border-bottom: 2px solid var(--border);
+      }
+      h2 small {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--text-soft);
+        margin-left: 0.5rem;
+      }
+      p, li { font-size: 0.95rem; }
+      ul { padding-left: 1.2rem; margin: 0.6rem 0 0; }
+      li { margin-bottom: 0.3rem; }
+      code {
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.85em;
+        background: var(--code-bg);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      a { color: var(--blue); }
+      footer {
+        margin-top: 3rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.82rem;
+        color: var(--text-soft);
+      }
+
+      /* ── Rejilla de fichas ─────────────────────────────────────────────── */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+        gap: 1rem;
+      }
+      .card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1rem 1.1rem 1.1rem;
+        min-width: 0;
+      }
+      .card h3 {
+        font-size: 0.95rem;
+        margin: 0 0 0.15rem;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        color: var(--blue);
+      }
+      .card p.what {
+        font-size: 0.85rem;
+        color: var(--text-soft);
+        margin: 0 0 0.8rem;
+      }
+      .panel-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-soft);
+        margin: 0 0 0.3rem;
+      }
+      .card pre {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.6rem 0.75rem;
+        margin: 0 0 0.85rem;
+        overflow-x: auto;
+        font-size: 0.8rem;
+        font-family: "SF Mono", Menlo, Consolas, monospace;
+        line-height: 1.5;
+      }
+
+      /* ── Muestra del resultado — mismos estilos que aplican los temas ───── */
+      .demo {
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        padding: 0.9rem 0.8rem;
+        font-size: 0.85rem;
+        overflow-x: auto;
+      }
+      .demo .bua_ejemplo,
+      .demo .bua_definicion,
+      .demo .bua_importante {
+        display: block;
+        margin: 0;
+        padding: 12px 16px 10px;
+        background: #fafbfc;
+        border: 1px solid #e5e7eb;
+        border-radius: 0 5px 5px 0;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.12);
+      }
+      .demo .bua_ejemplo    { border-left: 8px solid #135d87; }
+      .demo .bua_definicion { border-left: none; font-style: italic; color: #2a2a2a; }
+      .demo .bua_importante { border-left: 8px solid #deb13c; background: rgba(222, 177, 60, 0.3); }
+      .demo .bua_ejemplo::before,
+      .demo .bua_definicion::before,
+      .demo .bua_importante::before {
+        display: block;
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .demo .bua_ejemplo::before    { content: "Ejemplo";    color: #135d87; }
+      .demo .bua_definicion::before { content: "Definición"; color: #6b7280; }
+      .demo .bua_importante::before { content: "Importante"; color: #deb13c; }
+      .demo .bua_pie {
+        font-size: 0.85em;
+        font-style: italic;
+        color: #6b7280;
+        text-align: center;
+        margin: 0.4em 0 0;
+      }
+      .demo .foto {
+        display: block;
+        height: 46px;
+        line-height: 46px;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #9aa4b0;
+        background: #eef1f4;
+        border: 1px solid #e5e7eb;
+        border-radius: 5px;
+      }
+
+      /* Líneas de recurso: el icono va por CSS, igual que en el curso */
+      .demo .bua_recurso {
+        font-style: italic;
+        margin: 0 0 0.3rem;
+      }
+      .demo .bua_recurso:last-child { margin-bottom: 0; }
+      .demo .bua_recurso::before {
+        content: "";
+        display: inline-block;
+        width: 1.1em;
+        height: 1.1em;
+        margin-right: 0.4em;
+        vertical-align: -0.2em;
+        background-color: #135d87;
+        -webkit-mask-size: contain; mask-size: contain;
+        -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+        -webkit-mask-position: center; mask-position: center;
+      }
+      .demo .bua_recurso_video::before {
+        -webkit-mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%272%27%20y=%275%27%20width=%2720%27%20height=%2714%27%20rx=%272.5%27/%3E%3Cpath%20d=%27M10.5%209.2l4.8%202.8-4.8%202.8z%27%20fill=%27black%27/%3E%3C/svg%3E');
+        mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Crect%20x=%272%27%20y=%275%27%20width=%2720%27%20height=%2714%27%20rx=%272.5%27/%3E%3Cpath%20d=%27M10.5%209.2l4.8%202.8-4.8%202.8z%27%20fill=%27black%27/%3E%3C/svg%3E');
+      }
+      .demo .bua_recurso_documento::before {
+        -webkit-mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M14%203H7a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h10a2%202%200%200%200%202-2V8z%27/%3E%3Cpath%20d=%27M14%203v5h5%27/%3E%3Cpath%20d=%27M9%2013.5h6%27/%3E%3Cpath%20d=%27M9%2017h6%27/%3E%3C/svg%3E');
+        mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M14%203H7a2%202%200%200%200-2%202v14a2%202%200%200%200%202%202h10a2%202%200%200%200%202-2V8z%27/%3E%3Cpath%20d=%27M14%203v5h5%27/%3E%3Cpath%20d=%27M9%2013.5h6%27/%3E%3Cpath%20d=%27M9%2017h6%27/%3E%3C/svg%3E');
+      }
+      .demo .bua_recurso_enlace::before {
+        -webkit-mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M10%2013a5%205%200%200%200%207.5.5l3-3a5%205%200%200%200-7-7l-1.7%201.7%27/%3E%3Cpath%20d=%27M14%2011a5%205%200%200%200-7.5-.5l-3%203a5%205%200%200%200%207%207l1.7-1.7%27/%3E%3C/svg%3E');
+        mask-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M10%2013a5%205%200%200%200%207.5.5l3-3a5%205%200%200%200-7-7l-1.7%201.7%27/%3E%3Cpath%20d=%27M14%2011a5%205%200%200%200-7.5-.5l-3%203a5%205%200%200%200%207%207l1.7-1.7%27/%3E%3C/svg%3E');
+      }
+
+      /* Tablas de muestra */
+      .demo table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border: 1px solid #e5e7eb;
+        font-size: 0.82rem;
+      }
+      .demo th, .demo td {
+        padding: 6px 10px;
+        text-align: left;
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        color: #2a2a2a;
+      }
+      .demo tr:last-child th, .demo tr:last-child td { border-bottom: none; }
+      .demo .bua_tabla_horizontal tr:first-child th {
+        background: #f5f6f7;
+        color: #135d87;
+        font-weight: 600;
+        border-bottom: 3px solid #deb13c;
+      }
+      .demo .bua_tabla_vertical tr th:first-child {
+        background: #f5f6f7;
+        color: #135d87;
+        font-weight: 600;
+        border-right: 3px solid #deb13c;
+      }
+
+      /* Acordeón de muestra */
+      .demo .acc {
+        border: 1px solid #e5e7eb;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .demo .acc-head {
+        background: #f5f6f7;
+        color: #135d87;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .demo .acc-body { padding: 6px 10px; }
+      .demo .fuera { margin: 0.5rem 0 0; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <header>
+        <p class="eyebrow">Referencia rápida</p>
+        <h1>Etiquetas del Word</h1>
+        <p style="color: var(--text-soft); margin: 0">
+          Lo que escribes entre corchetes en el documento, y cómo sale después de
+          convertirlo con ConvertidoreXe.
+        </p>
+      </header>
+
+      <h2>Cajas <small>se abren y se cierran con <code>[fin]</code></small></h2>
+      <div class="grid">
+
+        <article class="card">
+          <h3>[importante]</h3>
+          <p class="what">Una advertencia real.</p>
+          <p class="panel-label">En Word</p>
+          <pre>[importante]
+Guarda el trabajo antes de salir.
+[fin]</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <div class="bua_importante">Guarda el trabajo antes de salir.</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>[ejemplo]</h3>
+          <p class="what">Un caso práctico o una demostración.</p>
+          <p class="panel-label">En Word</p>
+          <pre>[ejemplo]
+Busca «historia AND arte» en el catálogo.
+[fin]</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <div class="bua_ejemplo">Busca «historia AND arte» en el catálogo.</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>[definición]</h3>
+          <p class="what">Un término nuevo que conviene aclarar.</p>
+          <p class="panel-label">En Word</p>
+          <pre>[definición]
+DOI: identificador único y permanente.
+[fin]</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <div class="bua_definicion">DOI: identificador único y permanente.</div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>[pie]</h3>
+          <p class="what">Leyenda o fuente de una imagen o una tabla.</p>
+          <p class="panel-label">En Word</p>
+          <pre>(la imagen)
+[pie]Figura 1. Pantalla de búsqueda.[fin]</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <span class="foto">imagen</span>
+            <p class="bua_pie">Figura 1. Pantalla de búsqueda.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <h2>Líneas de recurso <small>no se cierran · los dos puntos son obligatorios</small></h2>
+      <div class="grid">
+
+        <article class="card" style="grid-column: 1 / -1">
+          <h3>[vídeo:] · [documento:] · [enlace:]</h3>
+          <p class="what">
+            Marcan el enlace de la línea con el icono de su tipo y lo ponen en cursiva.
+            El hiperenlace se pone en Word sobre el título, como siempre.
+          </p>
+          <p class="panel-label">En Word</p>
+          <pre>[vídeo:] Cómo buscar en el catálogo
+[documento:] Guía de citas APA
+[enlace:] Repositorio Institucional de la UA</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <p class="bua_recurso bua_recurso_video">Cómo buscar en el catálogo</p>
+            <p class="bua_recurso bua_recurso_documento">Guía de citas APA</p>
+            <p class="bua_recurso bua_recurso_enlace">Repositorio Institucional de la UA</p>
+          </div>
+        </article>
+
+      </div>
+
+      <h2>Tablas <small>en el párrafo justo encima de la tabla · no se cierran</small></h2>
+      <div class="grid">
+
+        <article class="card">
+          <h3>[horizontal]</h3>
+          <p class="what">La primera <strong>fila</strong> son los títulos.</p>
+          <p class="panel-label">En Word</p>
+          <pre>[horizontal]
+(la tabla)</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <table class="bua_tabla_horizontal">
+              <tr><th>Recurso</th><th>Acceso</th></tr>
+              <tr><td>Catálogo</td><td>Libre</td></tr>
+              <tr><td>Scopus</td><td>Con UACloud</td></tr>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>[vertical]</h3>
+          <p class="what">La primera <strong>columna</strong> son los títulos.</p>
+          <p class="panel-label">En Word</p>
+          <pre>[vertical]
+(la tabla)</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <table class="bua_tabla_vertical">
+              <tr><th>Recurso</th><td>Catálogo</td><td>Scopus</td></tr>
+              <tr><th>Acceso</th><td>Libre</td><td>Con UACloud</td></tr>
+            </table>
+          </div>
+        </article>
+
+      </div>
+
+      <h2>Acordeón <small>solo si has configurado el título como acordeón o pestañas</small></h2>
+      <div class="grid">
+
+        <article class="card" style="grid-column: 1 / -1">
+          <h3>[fin-acordeón]</h3>
+          <p class="what">
+            Cierra el desplegable: lo que escribas después sigue en el apartado, pero
+            ya fuera del panel. Sin esta etiqueta, el acordeón se queda con todo el
+            texto hasta el siguiente Título&nbsp;2.
+          </p>
+          <p class="panel-label">En Word</p>
+          <pre>Texto dentro del desplegable.
+[fin-acordeón]
+Texto que continúa el apartado.</pre>
+          <p class="panel-label">Resultado</p>
+          <div class="demo">
+            <div class="acc">
+              <div class="acc-head">Título 2 del acordeón</div>
+              <div class="acc-body">Texto dentro del desplegable.</div>
+            </div>
+            <p class="fuera">Texto que continúa el apartado.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <h2>Tres reglas y ya está</h2>
+      <ul>
+        <li>
+          <strong>Mayúsculas, tildes y espacios dan igual.</strong>
+          <code>[Definición]</code>, <code>[definicion]</code> y <code>[ DEFINICION ]</code>
+          son la misma etiqueta.
+        </li>
+        <li>
+          <strong>Las cajas siempre se cierran con <code>[fin]</code></strong> y no se
+          anidan. Si falta un cierre, ConvertidoreXe te avisa al subir el documento.
+        </li>
+        <li>
+          <strong>En las líneas de recurso, los dos puntos son obligatorios.</strong>
+          <code>[enlace]</code> sin ellos no es una etiqueta: llega al curso tal cual,
+          para que puedas transcribir textos con corchetes.
+        </li>
+      </ul>
+
+      <p style="color: var(--text-soft); font-size: 0.88rem; margin-top: 1rem">
+        Los colores, los iconos y los rótulos («IMPORTANTE», «EJEMPLO»…) los pone el
+        estilo que elijas en el paso 3; aquí se muestran con la paleta BUA.
+      </p>
+
+      <footer>
+        <p>
+          BUA Convertidor ·
+          <a href="GUIA-USO.html">Guía de uso</a> ·
+          <a href="guia-temas.html">Guía de estilos</a>
+        </p>
+      </footer>
+
+    </div>
+  </body>
+</html>
