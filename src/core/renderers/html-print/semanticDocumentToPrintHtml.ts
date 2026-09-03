@@ -53,7 +53,7 @@ export interface PrintRenderOptions {
 
   /**
    * Numerar jerárquicamente los títulos de página/subpágina/sub-subpágina
-   * (1, 1.1, 1.1.1, 2…) tanto en el TOC como en el contenido. Default: false.
+   * (1., 1.1., 1.1.1., 2.…) tanto en el TOC como en el contenido. Default: false.
    */
   numberedHeadings?: boolean;
 }

@@ -40,7 +40,7 @@ interface TocEntry {
  * Generado DESDE SemanticDocument, NO parseando HTML renderizado.
  *
  * @param doc      Documento semántico fuente
- * @param options  `numbered`: prefijar cada entrada con su numeración jerárquica (1, 1.1, 1.1.1…)
+ * @param options  `numbered`: prefijar cada entrada con su numeración jerárquica (1., 1.1., 1.1.1.…)
  */
 export function renderTableOfContents(
   doc: SemanticDocument,
@@ -68,7 +68,7 @@ export function renderTableOfContents(
 }
 
 /**
- * Calcula la numeración jerárquica (1, 1.1, 1.1.1…) de las páginas de nivel 1-3,
+ * Calcula la numeración jerárquica (1., 1.1., 1.1.1.…) de las páginas de nivel 1-3,
  * indexada por el índice original del array (el mismo que usa sectionId()).
  *
  * Asume orden de documento (pre-order): cada página de nivel N reinicia los
@@ -83,7 +83,8 @@ export function computeHeadingNumbers(pages: SemanticPage[]): Map<number, string
     const levelIdx = page.level - 1;
     counters[levelIdx]++;
     for (let l = levelIdx + 1; l < counters.length; l++) counters[l] = 0;
-    numbers.set(idx, counters.slice(0, levelIdx + 1).join('.'));
+    // Punto final incluido: "1.", "1.1.", "1.1.1." (no "1", "1.1"…)
+    numbers.set(idx, `${counters.slice(0, levelIdx + 1).join('.')}.`);
   });
 
   return numbers;

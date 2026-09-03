@@ -196,7 +196,7 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
             />
             <Toggle
               label="Numerar títulos"
-              caption="1, 1.1, 1.1.1…"
+              caption="1., 1.1., 1.1.1.…"
               checked={numberedHeadings}
               onChange={() => setNumberedHeadings((v) => !v)}
             />
