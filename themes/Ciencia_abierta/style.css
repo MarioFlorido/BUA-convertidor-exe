@@ -910,7 +910,7 @@ label[for="teacher-mode-toggler"] {
 }
 
 #siteFooter-logos .logo-bua  { height: 40px; }
-#siteFooter-logos .logo-cid  { height: 32px; }
+#siteFooter-logos .logo-cid  { height: 32px; display:none;}
 #siteFooter-logos .logo-ua   { height: 28px; }
 
 /* quick-overrides:start */
