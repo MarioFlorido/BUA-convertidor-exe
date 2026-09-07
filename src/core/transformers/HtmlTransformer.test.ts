@@ -49,6 +49,29 @@ describe('applyDivClasses', () => {
     assert.equal(out, '<div class="bua_importante"><p>Contenido</p></div>');
   });
 
+  test('etiquetas en párrafos con sangría → la caja se forma igualmente', () => {
+    // DocxParser conserva la sangría manual de Word como `style` inline; la caja
+    // no puede depender de que el <p> venga pelado.
+    const input =
+      '<p style="margin-left:18pt">[importante]</p>' +
+      '<p style="margin-left:18pt">Contenido</p>' +
+      '<p style="margin-left:18pt">[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(
+      out,
+      '<div class="bua_importante"><p style="margin-left:18pt">Contenido</p></div>',
+    );
+  });
+
+  test('etiqueta inline en párrafo con sangría → se aísla conservando la sangría', () => {
+    const input = '<p style="margin-left:18pt">[importante]Contenido[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.equal(
+      out,
+      '<div class="bua_importante"><p style="margin-left:18pt">Contenido</p></div>',
+    );
+  });
+
   test('[pie] se mapea a bua_pie (Caso A)', () => {
     const input = '<p>[pie]</p><p>Figura 1. Esquema del proceso</p><p>[fin]</p>';
     const out = applyDivClasses(input);
@@ -214,6 +237,24 @@ describe('applyTableClasses', () => {
     const input = '<p>[vertical]</p><table><tr><td>x</td></tr></table>';
     const out = applyTableClasses(input);
     assert.match(out, /<table class="bua_tabla_vertical">/);
+  });
+
+  test('marcador en párrafo con sangría → clase añadida igualmente', () => {
+    // DocxParser conserva la sangría manual de Word como `style` inline: el
+    // patrón no puede exigir un <p> pelado o el marcador sale impreso.
+    const input =
+      '<p style="margin-left:18pt">[vertical]</p><table><tr><td>x</td></tr></table>';
+    const out = applyTableClasses(input);
+    assert.match(out, /<table class="bua_tabla_vertical">/);
+    assert.doesNotMatch(out, /\[\s*vertical\s*\]/i);
+  });
+
+  test('sangría + texto delante del marcador → se aísla, conserva la sangría', () => {
+    const input =
+      '<p style="margin-left:18pt">Comparativa: [vertical]</p><table><tr><td>x</td></tr></table>';
+    const out = applyTableClasses(input);
+    assert.match(out, /<table class="bua_tabla_vertical">/);
+    assert.match(out, /<p style="margin-left:18pt">Comparativa:<\/p>/);
   });
 
   test('tabla con class existente: se concatena, no se reemplaza', () => {

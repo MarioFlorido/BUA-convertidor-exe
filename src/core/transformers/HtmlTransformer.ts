@@ -72,6 +72,17 @@ const ANY_MARKER_SRC = `(?:${MARKER_SRC}|${RESOURCE_MARKER_SRC})`;
 const MARKER_EXACT = new RegExp(`^${ANY_MARKER_SRC}$`, 'i');
 
 /**
+ * Etiqueta de apertura de párrafo CON sus atributos, si los tiene.
+ *
+ * No vale con `<p>` a secas: DocxParser conserva la sangría manual de Word como
+ * `style` inline (`<p style="margin-left:18pt">`), así que un marcador escrito
+ * en un párrafo sangrado —caso corriente: la tabla y su [vertical] dentro de un
+ * apartado con sangría— dejaba de casar y acababa impreso como texto literal.
+ * Sin grupo de captura: se puede interpolar sin desplazar los índices.
+ */
+export const P_OPEN_SRC = '<p(?:\\s[^>]*)?>';
+
+/**
  * Normaliza los marcadores [etiqueta] frente a la "suciedad" invisible que
  * Word deja alrededor. Es la causa del clásico "la etiqueta está bien escrita
  * pero sale [fin] como texto": parte del marcador quedó con formato (negrita,
@@ -134,24 +145,30 @@ export function normalizeSemanticMarkers(html: string): string {
   const ONLY = new RegExp(`^\\s*${MARKER_SRC}\\s*$`, 'i');
   const LEADING = new RegExp(`^\\s*(${MARKER_SRC})\\s*`, 'i');
   const TRAILING = new RegExp(`\\s*(${MARKER_SRC})\\s*$`, 'i');
-  out = out.replace(/<p>([\s\S]*?)<\/p>/gi, (full, inner: string) => {
-    if (ONLY.test(inner)) return full;
-    let rest = inner;
-    let prefix = '';
-    let suffix = '';
-    const lead = LEADING.exec(rest);
-    if (lead) {
-      prefix = `<p>${lead[1]}</p>`;
-      rest = rest.slice(lead[0].length);
-    }
-    const trail = TRAILING.exec(rest);
-    if (trail) {
-      suffix = `<p>${trail[1]}</p>`;
-      rest = rest.slice(0, trail.index);
-    }
-    if (!prefix && !suffix) return full;
-    return rest.trim() ? `${prefix}<p>${rest}</p>${suffix}` : `${prefix}${suffix}`;
-  });
+  //    El párrafo del contenido conserva su etiqueta original (y con ella la
+  //    sangría); los que solo llevan el marcador salen sin atributos, porque
+  //    las transformaciones posteriores los consumen enteros.
+  out = out.replace(
+    new RegExp(`(${P_OPEN_SRC})([\\s\\S]*?)</p>`, 'gi'),
+    (full, open: string, inner: string) => {
+      if (ONLY.test(inner)) return full;
+      let rest = inner;
+      let prefix = '';
+      let suffix = '';
+      const lead = LEADING.exec(rest);
+      if (lead) {
+        prefix = `<p>${lead[1]}</p>`;
+        rest = rest.slice(lead[0].length);
+      }
+      const trail = TRAILING.exec(rest);
+      if (trail) {
+        suffix = `<p>${trail[1]}</p>`;
+        rest = rest.slice(0, trail.index);
+      }
+      if (!prefix && !suffix) return full;
+      return rest.trim() ? `${prefix}${open}${rest}</p>${suffix}` : `${prefix}${suffix}`;
+    },
+  );
 
   return out;
 }
@@ -198,7 +215,7 @@ export function applyDivClasses(htmlValue: string): string {
   // Caso A: etiqueta en párrafo propio → consume los <p> de apertura y cierre
   let result = normalized.replace(
     new RegExp(
-      `<p>\\s*\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]\\s*</p>${CONTENT}<p>\\s*\\[fin\\]\\s*</p>`,
+      `${P_OPEN_SRC}\\s*\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]\\s*</p>${CONTENT}${P_OPEN_SRC}\\s*\\[fin\\]\\s*</p>`,
       'gi',
     ),
     (_match, delimitador, content) => {
@@ -350,13 +367,19 @@ export function applyTableClasses(htmlValue: string): string {
   const delimiters = [
     {
       // Busca <p>[horizontal]</p> seguido de tabla
-      pattern: /<p>\s*\[\s*horizontal\s*\]\s*<\/p>\s*(<table[^>]*>)/gi,
+      pattern: new RegExp(
+        `${P_OPEN_SRC}\\s*\\[\\s*horizontal\\s*\\]\\s*</p>\\s*(<table[^>]*>)`,
+        'gi',
+      ),
       class: 'bua_tabla_horizontal',
       replacement: '<p><br /></p>$1',
     },
     {
       // Busca <p>[vertical]</p> seguido de tabla
-      pattern: /<p>\s*\[\s*vertical\s*\]\s*<\/p>\s*(<table[^>]*>)/gi,
+      pattern: new RegExp(
+        `${P_OPEN_SRC}\\s*\\[\\s*vertical\\s*\\]\\s*</p>\\s*(<table[^>]*>)`,
+        'gi',
+      ),
       class: 'bua_tabla_vertical',
       replacement: '<p><br /></p>$1',
     },
@@ -430,7 +453,7 @@ export function processIframes(htmlValue: string): string {
   // Se reemplaza el <p> completo para no dejar un <div> dentro de un <p>
   // (HTML inválido que el navegador rompe).
   let result = htmlValue.replace(
-    /<p>\s*(&lt;iframe\b[\s\S]*?&lt;\/iframe&gt;)\s*<\/p>/gi,
+    new RegExp(`${P_OPEN_SRC}\\s*(&lt;iframe\\b[\\s\\S]*?&lt;/iframe&gt;)\\s*</p>`, 'gi'),
     (_m, escaped: string) => transform(escaped),
   );
 

@@ -43,6 +43,7 @@ import { stripDiacritics } from '../utils/html';
 import {
   normalizeSemanticMarkers,
   splitResourceLineBreaks,
+  P_OPEN_SRC,
 } from '../transformers/HtmlTransformer';
 
 export type SemanticBoxLabel = 'ejemplo' | 'definición' | 'importante' | 'pie';
@@ -192,7 +193,8 @@ function detectTableMarkerIssues(source: string): SemanticTagIssue[] {
     const idx = match.index ?? 0;
     const before = source.slice(0, idx);
     const after = source.slice(idx + match[0].length);
-    const wellPlaced = /<p>\s*$/i.test(before) && /^\s*<\/p>\s*<table\b/i.test(after);
+    const wellPlaced =
+      new RegExp(`${P_OPEN_SRC}\\s*$`, 'i').test(before) && /^\s*<\/p>\s*<table\b/i.test(after);
     if (!wellPlaced) {
       issues.push({
         kind: 'table-marker',

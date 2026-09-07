@@ -1,6 +1,7 @@
 import type { SemanticPage, SemanticBlock } from '../models/SemanticDocument';
 import type { DocumentStructure, H1Section } from '../../types';
 import { escapeHtml } from '../utils/html';
+import { P_OPEN_SRC } from '../transformers/HtmlTransformer';
 
 interface DocumentSection {
   level: number;
@@ -42,8 +43,9 @@ interface SectionRange {
  * como flujo normal del apartado. `_ANY` limpia cualquier resto suelto para que
  * el marcador nunca acabe impreso como texto literal.
  */
-const ACCORDION_END_PARA = /<p>\s*\[\s*fin[\s-]*acorde[oó]n\s*\]\s*<\/p>/i;
-const ACCORDION_END_PARA_G = /<p>\s*\[\s*fin[\s-]*acorde[oó]n\s*\]\s*<\/p>/gi;
+const ACCORDION_END_PARA_SRC = `${P_OPEN_SRC}\\s*\\[\\s*fin[\\s-]*acorde[oó]n\\s*\\]\\s*</p>`;
+const ACCORDION_END_PARA = new RegExp(ACCORDION_END_PARA_SRC, 'i');
+const ACCORDION_END_PARA_G = new RegExp(ACCORDION_END_PARA_SRC, 'gi');
 const ACCORDION_END_ANY = /\[\s*fin[\s-]*acorde[oó]n\s*\]/gi;
 
 /**

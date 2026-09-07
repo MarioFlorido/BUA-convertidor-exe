@@ -172,6 +172,14 @@ describe('detectSemanticTagIssues — marcadores de tabla', () => {
     assert.equal(issues[0].kind, 'table-marker');
   });
 
+  test('párrafo con sangría de Word no da falso aviso', () => {
+    // DocxParser conserva la sangría manual como `style` inline. El marcador
+    // está donde debe: el aviso era del validador, no del documento.
+    const html =
+      '<p style="margin-left:18pt">[vertical]</p><table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
   test('bookmark de Word dentro del marcador no da falso aviso', () => {
     const html =
       '<p>[hori<a id="b1"></a>zontal]</p><table><tr><td>A</td></tr></table>';
