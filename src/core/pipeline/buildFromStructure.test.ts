@@ -222,6 +222,20 @@ describe('marcador [fin-acordeón] (cerrar el desplegable y continuar el apartad
     assert.doesNotMatch(html, /fin[\s-]*acorde/i);
   });
 
+  test('el marcador funciona en un párrafo con sangría', async () => {
+    // DocxParser conserva la sangría de Word como `style` inline. Exigir un <p>
+    // pelado hacía que el grupo NO se partiera y que «cola» quedara atrapada
+    // dentro del panel — en silencio, porque el marcador se limpia igual.
+    const doc = await convert(
+      '<h1>Tema</h1><h2>AcoA</h2><p>panel A</p>' +
+        '<p style="margin-left:18pt">[fin-acordeón]</p><p>cola del apartado</p>',
+      asAccordion(0),
+    );
+    const html = doc.pages[0].blocks[0].html;
+    assert.match(html, /<\/div>\s*<p>cola del apartado<\/p>/);
+    assert.doesNotMatch(html, /fin[\s-]*acorde/i);
+  });
+
   test('el marcador es flexible: mayúsculas, acentos, guion o espacio', async () => {
     const variantes = ['[fin-acordeón]', '[Fin-Acordeon]', '[FIN ACORDEON]', '[fin  acordeón]'];
     for (const marca of variantes) {

@@ -33,6 +33,15 @@
  *   como aperturas), pero si el patrón no casa, el marcador se imprime como
  *   texto literal sin ningún aviso.
  *
+ * - 'box-not-formable': una caja bien cerrada pero repartida entre bloques que
+ *   la transformación no puede envolver (dos ítems de lista distintos, un <p> y
+ *   un <li>…). Antes salía de ahí un <div> a caballo entre bloques: HTML
+ *   inválido que el navegador deshacía dejando la caja vacía.
+ *
+ * - 'accordion-marker': un [fin acordeón] que no está solo en su párrafo. Se
+ *   limpia igual (nunca sale impreso), pero el grupo no se parte y el contenido
+ *   posterior queda atrapado dentro del último panel, sin ninguna señal.
+ *
  * - 'resource-marker': un [vídeo:]/[documento:]/[enlace:] que no abre su línea
  *   o que no tiene ningún recurso detrás. Mismo fallo silencioso que el
  *   anterior: sin aviso, el marcador acaba impreso tal cual. Exige los dos
@@ -43,6 +52,8 @@ import { stripDiacritics } from '../utils/html';
 import {
   normalizeSemanticMarkers,
   splitResourceLineBreaks,
+  applyDivClasses,
+  withoutCodeBlocks,
   P_OPEN_SRC,
 } from '../transformers/HtmlTransformer';
 
@@ -59,12 +70,14 @@ export interface SemanticTagIssue {
     | 'unclosed-box'
     | 'stray-fin'
     | 'heading-inside-box'
+    | 'box-not-formable'
+    | 'accordion-marker'
     | 'table-marker'
     | 'resource-marker';
-  /** Etiqueta afectada (en 'unclosed-box' y 'heading-inside-box'). */
+  /** Etiqueta afectada (en 'unclosed-box', 'heading-inside-box' y 'box-not-formable'). */
   label?: SemanticBoxLabel;
-  /** Marcador afectado (en 'table-marker' y 'resource-marker'). */
-  marker?: 'horizontal' | 'vertical' | 'vídeo' | 'documento' | 'enlace';
+  /** Marcador afectado (en 'table-marker', 'accordion-marker' y 'resource-marker'). */
+  marker?: 'horizontal' | 'vertical' | 'fin acordeón' | 'vídeo' | 'documento' | 'enlace';
   /** Fragmento de texto cercano para que el autor lo localice (puede ir vacío). */
   context: string;
 }
@@ -116,7 +129,11 @@ export function detectSemanticTagIssues(html: string): SemanticTagIssue[] {
   // La MISMA normalización que aplica la transformación (bookmarks, formato
   // parcial de Word dentro/alrededor del marcador, <br/>, aislamiento en
   // párrafo propio): el validador ve exactamente lo que verá el transformador.
-  const source = normalizeSemanticMarkers(html);
+  // Lo que va dentro de <pre>/<code> es código del autor: sus corchetes se
+  // conservan a propósito (ver protectingCode), así que tampoco deben generar
+  // avisos. Sin esto, un ejemplo de código con «[fin]» dentro se denunciaba
+  // como [fin] suelto.
+  const source = withoutCodeBlocks(normalizeSemanticMarkers(html));
   const marker = /\[\s*(ejemplo|definici[oó]n|importante|pie|fin)\s*\]/gi;
   const issues: SemanticTagIssue[] = [];
 
@@ -163,8 +180,78 @@ export function detectSemanticTagIssues(html: string): SemanticTagIssue[] {
     issues.push({ kind: 'unclosed-box', label: open.label, context: open.context });
   }
 
+  // Solo si no hay ya un aviso más preciso sobre las MISMAS cajas: una sin
+  // cerrar, un [fin] suelto o una que abarca un encabezado impiden igualmente
+  // formarla, y avisar dos veces del mismo problema solo despista.
+  const yaAvisado = issues.some(
+    (i) => i.kind === 'unclosed-box' || i.kind === 'stray-fin' || i.kind === 'heading-inside-box',
+  );
+  if (!yaAvisado) issues.push(...detectUnformableBoxes(source));
+
   issues.push(...detectTableMarkerIssues(source));
+  issues.push(...detectAccordionMarkerIssues(source));
   issues.push(...detectResourceMarkerIssues(source));
+
+  return issues;
+}
+
+/**
+ * Detecta un [fin acordeón] que no está solo en su propio párrafo.
+ *
+ * SemanticBuilder solo parte el grupo por un `<p>[fin acordeón]</p>`; en
+ * cualquier otro sitio (un ítem de lista, una celda) el marcador se limpia igual
+ * —para que nunca salga impreso— pero el grupo NO se parte, y el contenido que
+ * debía quedar FUERA del acordeón se queda atrapado dentro del último panel. Es
+ * el fallo más callado de todos: ni marcador visible, ni aviso, ni rastro.
+ *
+ * No se parte por un <li> a propósito: dejaría el `<ul>` de apertura en una
+ * mitad y el `</ul>` en la otra. Mejor avisar y que el autor lo mueva.
+ */
+function detectAccordionMarkerIssues(source: string): SemanticTagIssue[] {
+  const issues: SemanticTagIssue[] = [];
+  const marker = /\[\s*fin[\s-]*acorde[oó]n\s*\]/gi;
+
+  for (const match of source.matchAll(marker)) {
+    const idx = match.index ?? 0;
+    const before = source.slice(0, idx);
+    const after = source.slice(idx + match[0].length);
+    const solo = new RegExp(`${P_OPEN_SRC}\\s*$`, 'i').test(before) && /^\s*<\/p>/i.test(after);
+    if (solo) continue;
+
+    issues.push({
+      kind: 'accordion-marker',
+      marker: 'fin acordeón',
+      context: contextSnippet(source, idx + match[0].length) || contextBefore(before),
+    });
+  }
+
+  return issues;
+}
+
+/**
+ * Detecta cajas BIEN CERRADAS que la transformación no va a poder formar: la
+ * apertura y su [fin] en bloques que no son párrafos hermanos —cada una en un
+ * ítem de lista distinto, o una en un <p> y otra en un <li>—. Antes salía de
+ * ahí un <div> a caballo entre dos bloques: HTML inválido que el navegador
+ * deshacía dejando la caja vacía, y sin un solo aviso.
+ *
+ * NO se replica aquí el patrón del transformador. Duplicar la regla es
+ * exactamente lo que desincronizó validador y transformación (el fallo de los
+ * párrafos con sangría): en vez de eso se ejecuta applyDivClasses y se mira qué
+ * marcadores sobreviven. Lo que quede dentro de <pre>/<code> no cuenta: ahí los
+ * corchetes son contenido del autor y se conservan a propósito.
+ */
+function detectUnformableBoxes(source: string): SemanticTagIssue[] {
+  const restos = withoutCodeBlocks(applyDivClasses(source));
+  const issues: SemanticTagIssue[] = [];
+
+  for (const match of restos.matchAll(/\[\s*(ejemplo|definici[oó]n|importante|pie)\s*\]/gi)) {
+    issues.push({
+      kind: 'box-not-formable',
+      label: PRETTY_LABEL[normalizeLabel(match[1])],
+      context: contextSnippet(restos, (match.index ?? 0) + match[0].length),
+    });
+  }
 
   return issues;
 }
@@ -260,6 +347,12 @@ export function describeSemanticTagIssue(issue: SemanticTagIssue): string {
   }
   if (issue.kind === 'heading-inside-box') {
     return `La caja [${issue.label}] abarca el encabezado «${issue.context}». Un título no puede quedar dentro de una caja: cierra con [fin] antes del encabezado.`;
+  }
+  if (issue.kind === 'box-not-formable') {
+    return `La caja [${issue.label}] no se puede formar donde está${near}. La etiqueta y su [fin] deben ir en el mismo párrafo, o cada una en su propio párrafo: repartidas entre ítems de lista o entre bloques distintos, se imprimirán como texto.`;
+  }
+  if (issue.kind === 'accordion-marker') {
+    return `El marcador [fin acordeón] no está solo en su propio párrafo${near}. Sácalo de la lista (o del texto que lo acompaña) y déjalo en una línea para él: si no, el acordeón no se cierra ahí y lo que va después se queda dentro del último panel.`;
   }
   if (issue.kind === 'table-marker') {
     return `El marcador [${issue.marker}] no precede a una tabla${near}. Debe ir solo, en su propio párrafo, en la línea inmediatamente anterior a la tabla; si no, se imprimirá como texto.`;

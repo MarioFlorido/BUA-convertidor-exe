@@ -72,6 +72,44 @@ describe('applyDivClasses', () => {
     );
   });
 
+  test('caja repartida entre ítems de lista: NO se forma, y no genera HTML inválido', () => {
+    // Antes el Caso B cruzaba la frontera de bloque y producía
+    // «<li><div class="bua_definicion"></li>…<li></div></li>»: el navegador lo
+    // deshacía y la caja salía VACÍA. Ahora no casa y los marcadores quedan a
+    // la vista (semanticTagBalance lo avisa antes de convertir).
+    const input = '<ul><li>[definición]</li><li>Texto</li><li>[fin]</li></ul>';
+    const out = applyDivClasses(input);
+    assert.equal(out, input, 'no debe tocar nada');
+    assert.doesNotMatch(out, /<li[^>]*>\s*<div/i);
+  });
+
+  test('caja que abre en un <p> y cierra en un <li>: tampoco se forma', () => {
+    const input = '<p>[importante]</p><ul><li>Uno[fin]</li></ul>';
+    const out = applyDivClasses(input);
+    assert.doesNotMatch(out, /<li[^>]*>\s*<div/i);
+    assert.doesNotMatch(out, /<\/div>\s*<\/li>/i);
+  });
+
+  test('los corchetes dentro de <pre> son código del autor: se conservan', () => {
+    // Un curso de programación transcribe corchetes en sus ejemplos. Antes
+    // acababan envueltos en un <div> DENTRO del <pre>: HTML inválido y código
+    // alterado.
+    const input = '<pre>[importante]codigo[fin]</pre>';
+    assert.equal(applyDivClasses(input), input);
+  });
+
+  test('<code> en línea también queda protegido', () => {
+    const input = '<p>Escribe <code>[ejemplo]x[fin]</code> en el editor</p>';
+    assert.equal(applyDivClasses(input), input);
+  });
+
+  test('el código protegido no impide formar las cajas de alrededor', () => {
+    const input = '<pre>[fin]</pre><p>[importante]</p><p>Texto</p><p>[fin]</p>';
+    const out = applyDivClasses(input);
+    assert.match(out, /<div class="bua_importante"><p>Texto<\/p><\/div>/);
+    assert.match(out, /<pre>\[fin\]<\/pre>/, 'el código debe volver intacto');
+  });
+
   test('[pie] se mapea a bua_pie (Caso A)', () => {
     const input = '<p>[pie]</p><p>Figura 1. Esquema del proceso</p><p>[fin]</p>';
     const out = applyDivClasses(input);
@@ -574,6 +612,20 @@ describe('applyResourceLinks', () => {
     const out = applyResourceLinks('<p><strong>[vídeo:]</strong> Título</p>');
     assert.match(out, /class="bua_recurso bua_recurso_video"/);
     assert.doesNotMatch(out, /\[/);
+  });
+
+  test('un bookmark de Word DENTRO del marcador no lo invalida', () => {
+    // Word deja anclas vacías dentro de los corchetes al retocar el texto. El
+    // descarte rápido miraba el HTML en crudo y tiraba el documento entero
+    // antes de llegar a limpiarlas: la etiqueta salía impresa, y sin aviso.
+    const out = applyResourceLinks('<p>[víd<a id="b1"></a>eo:] <a href="u">T</a></p>');
+    assert.match(out, /class="bua_recurso bua_recurso_video"/);
+    assert.doesNotMatch(out, /\[/);
+  });
+
+  test('los corchetes de un <pre> no despiertan la transformación', () => {
+    const input = '<pre>[vídeo:] ejemplo de codigo</pre>';
+    assert.equal(applyResourceLinks(input), input);
   });
 
   test('Shift+Enter: cada línea de recurso pasa a su propio párrafo', () => {

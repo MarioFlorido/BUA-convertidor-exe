@@ -137,6 +137,90 @@ describe('detectSemanticTagIssues — encabezado dentro de una caja', () => {
   });
 });
 
+describe('detectSemanticTagIssues — cajas que no se pueden formar', () => {
+  test('caja repartida entre ítems de lista → box-not-formable', () => {
+    const html = '<ul><li>[definición]</li><li>Texto</li><li>[fin]</li></ul>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'box-not-formable');
+    assert.equal(issues[0].label, 'definición');
+  });
+
+  test('caja que abre en un <p> y cierra en un <li> → box-not-formable', () => {
+    const issues = detectSemanticTagIssues('<p>[importante]</p><ul><li>Uno[fin]</li></ul>');
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'box-not-formable');
+  });
+
+  test('los corchetes dentro de <pre> son código: no se avisa de ellos', () => {
+    assert.deepEqual(detectSemanticTagIssues('<pre>[importante]codigo[fin]</pre>'), []);
+  });
+
+  test('no duplica el aviso cuando ya hay uno más preciso', () => {
+    // Caja sin cerrar: basta con 'unclosed-box'; añadir box-not-formable
+    // sobre la misma caja solo despistaría.
+    const issues = detectSemanticTagIssues('<p>[importante]</p><p>Texto</p>');
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'unclosed-box');
+  });
+
+  test('una caja normal no dispara el aviso', () => {
+    assert.deepEqual(
+      detectSemanticTagIssues('<p>[importante]</p><p>Texto</p><p>[fin]</p>'),
+      [],
+    );
+  });
+});
+
+describe('detectSemanticTagIssues — el código no genera avisos', () => {
+  test('un [fin] dentro de <pre> no es un [fin] suelto', () => {
+    assert.deepEqual(detectSemanticTagIssues('<pre>[fin]</pre><p>texto</p>'), []);
+  });
+
+  test('un [vídeo:] dentro de <pre> no es una línea de recurso mal puesta', () => {
+    assert.deepEqual(detectSemanticTagIssues('<pre>[vídeo:] ejemplo</pre>'), []);
+  });
+
+  test('un [vertical] dentro de <code> no es un marcador de tabla', () => {
+    assert.deepEqual(detectSemanticTagIssues('<p>Escribe <code>[vertical]</code></p>'), []);
+  });
+
+  test('el código no tapa un aviso real de fuera', () => {
+    const issues = detectSemanticTagIssues('<pre>[fin]</pre><p>[importante]</p><p>x</p>');
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'unclosed-box');
+  });
+});
+
+describe('detectSemanticTagIssues — [fin acordeón]', () => {
+  test('en su propio párrafo → sin avisos', () => {
+    assert.deepEqual(
+      detectSemanticTagIssues('<p>Panel</p><p>[fin-acordeón]</p><p>Fuera</p>'),
+      [],
+    );
+  });
+
+  test('en un párrafo con sangría → sin avisos', () => {
+    const html =
+      '<p>Panel</p><p style="margin-left:18pt">[fin-acordeón]</p><p>Fuera</p>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('pegado a un texto: el paso 5 lo aísla, así que tampoco avisa', () => {
+    assert.deepEqual(detectSemanticTagIssues('<p>Panel [fin-acordeón]</p><p>F</p>'), []);
+  });
+
+  test('en un ítem de lista → accordion-marker', () => {
+    // Aquí el grupo NO se parte y el contenido posterior queda atrapado dentro
+    // del último panel, sin marcador visible: el aviso es la única señal.
+    const issues = detectSemanticTagIssues(
+      '<p>Panel</p><ul><li>[fin-acordeón]</li></ul><p>Fuera</p>',
+    );
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'accordion-marker');
+  });
+});
+
 describe('detectSemanticTagIssues — marcadores de tabla', () => {
   test('[horizontal] solo en su párrafo y pegado a la tabla → sin avisos', () => {
     const html = '<p>[horizontal]</p><table><tr><td>A</td></tr></table>';

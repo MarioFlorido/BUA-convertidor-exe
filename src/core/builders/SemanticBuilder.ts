@@ -38,10 +38,20 @@ interface SectionRange {
  *   - guion o espacio (o nada) entre «fin» y «acordeón» → `[\s-]*`
  * Así `[fin-acordeón]`, `[Fin acordeon]`, `[FIN-ACORDEON]`… funcionan igual.
  *
- * `_PARA` (marcador solo en su propio <p>) es el que PARTE el grupo: lo de antes
- * queda como cuerpo del último panel y lo de después sale FUERA del acordeón,
- * como flujo normal del apartado. `_ANY` limpia cualquier resto suelto para que
- * el marcador nunca acabe impreso como texto literal.
+ * `_PARA` (marcador solo en su propio bloque) es el que PARTE el grupo: lo de
+ * antes queda como cuerpo del último panel y lo de después sale FUERA del
+ * acordeón, como flujo normal del apartado. `_ANY` limpia cualquier resto suelto
+ * para que el marcador nunca acabe impreso como texto literal.
+ *
+ * El párrafo puede llevar atributos: DocxParser conserva la sangría de Word como
+ * `style` inline, y exigir un `<p>` pelado hacía que el grupo NO se partiera y
+ * que el contenido posterior quedara atrapado dentro del último panel — en
+ * silencio, porque `_ANY` se llevaba el marcador sin dejar rastro.
+ *
+ * Solo <p>, a propósito: partir por un <li> dejaría el `<ul>` de apertura en un
+ * lado y el `</ul>` de cierre en el otro, rompiendo la lista en dos mitades
+ * inválidas. Un marcador mal colocado lo avisa semanticTagBalance antes de
+ * convertir ('accordion-marker'), que es más seguro que partir listas.
  */
 const ACCORDION_END_PARA_SRC = `${P_OPEN_SRC}\\s*\\[\\s*fin[\\s-]*acorde[oó]n\\s*\\]\\s*</p>`;
 const ACCORDION_END_PARA = new RegExp(ACCORDION_END_PARA_SRC, 'i');

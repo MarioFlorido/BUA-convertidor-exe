@@ -83,6 +83,66 @@ const MARKER_EXACT = new RegExp(`^${ANY_MARKER_SRC}$`, 'i');
 export const P_OPEN_SRC = '<p(?:\\s[^>]*)?>';
 
 /**
+ * Frontera de bloque: cualquier etiqueta que abra o cierre un bloque.
+ *
+ * Una caja formada INLINE (Caso B de applyDivClasses) no puede atravesarla. Si
+ * lo hace, el <div> queda abierto dentro de un bloque y cerrado dentro de otro
+ * —«<li><div class="bua_definicion"></li><li>Texto</li><li></div></li>»—, HTML
+ * inválido que el navegador deshace: la caja sale VACÍA y el contenido fuera.
+ * Al no casar, los marcadores quedan como texto literal (fallo visible) y
+ * semanticTagBalance lo avisa antes de convertir ('box-not-formable').
+ */
+const BLOCK_BOUNDARY_SRC =
+  '</?(?:p|li|ul|ol|dl|dt|dd|h[1-6]|table|thead|tbody|tfoot|tr|td|th' +
+  '|div|blockquote|pre|section|article|aside|figure|figcaption|hr)\\b';
+
+/** Marca invisible para aparcar el contenido protegido (uso privado Unicode). */
+const CODE_MARK_OPEN = '\uE010';
+const CODE_MARK_CLOSE = '\uE011';
+
+/**
+ * Vacía el contenido de <pre> y <code>, para INSPECCIONAR el resto del HTML.
+ *
+ * Lo usa semanticTagBalance: un «[importante]» dentro de un ejemplo de código
+ * es contenido del autor que se conserva a propósito, así que no debe contarse
+ * como marcador sin formar. No sirve para transformar (destruye el código):
+ * solo para mirar.
+ */
+export function withoutCodeBlocks(html: string): string {
+  return html.replace(/<(pre|code)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+}
+
+/**
+ * Ejecuta `fn` sin que toque el contenido de <pre> ni de <code>.
+ *
+ * Un curso de programación o de HTML transcribe corchetes en sus ejemplos, y
+ * «[importante]…[fin]» dentro de un <pre> acababa envuelto en un <div> DENTRO
+ * del <pre>: HTML inválido y el código alterado. El contenido se aparca tras
+ * una marca invisible, se transforma el resto y se restituye.
+ *
+ * Red de seguridad: si al volver falta alguna marca (la transformación se la
+ * comió), se descarta el resultado y se repite SIN protección. Así, en el peor
+ * caso se vuelve a la conducta anterior, pero nunca se pierde contenido.
+ */
+function protectingCode(html: string, fn: (value: string) => string): string {
+  const blocks: string[] = [];
+  const masked = html.replace(
+    /<(pre|code)\b[^>]*>[\s\S]*?<\/\1>/gi,
+    (match) => `${CODE_MARK_OPEN}${blocks.push(match) - 1}${CODE_MARK_CLOSE}`,
+  );
+  if (blocks.length === 0) return fn(html);
+
+  const out = fn(masked);
+  const intactas = blocks.every((_, i) => out.includes(`${CODE_MARK_OPEN}${i}${CODE_MARK_CLOSE}`));
+  if (!intactas) return fn(html);
+
+  return out.replace(
+    new RegExp(`${CODE_MARK_OPEN}(\\d+)${CODE_MARK_CLOSE}`, 'g'),
+    (_m, i: string) => blocks[Number(i)],
+  );
+}
+
+/**
  * Normaliza los marcadores [etiqueta] frente a la "suciedad" invisible que
  * Word deja alrededor. Es la causa del clásico "la etiqueta está bien escrita
  * pero sale [fin] como texto": parte del marcador quedó con formato (negrita,
@@ -194,6 +254,11 @@ export function normalizeSemanticMarkers(html: string): string {
  * Normaliza tildes: [definición] y [definicion] son equivalentes
  */
 export function applyDivClasses(htmlValue: string): string {
+  return protectingCode(htmlValue, formSemanticBoxes);
+}
+
+/** El cuerpo de applyDivClasses, ya con el código fuente aparcado. */
+function formSemanticBoxes(htmlValue: string): string {
   const wrap = (cls: string, content: string) => `<div class="${cls}">${content}</div>`;
 
   const normalized = normalizeSemanticMarkers(htmlValue);
@@ -225,10 +290,15 @@ export function applyDivClasses(htmlValue: string): string {
     },
   );
 
-  // Caso B: etiqueta inline dentro del mismo párrafo
+  // Caso B: etiqueta inline DENTRO DE UN MISMO BLOQUE. El contenido no puede
+  // atravesar una frontera de bloque (ver BLOCK_BOUNDARY_SRC): abrir la caja en
+  // un <li> y cerrarla en otro generaba un <div> a caballo entre los dos, HTML
+  // inválido que dejaba la caja vacía. Los casos legítimos a caballo entre
+  // párrafos ya los reduce a Caso A el paso 5 de normalizeSemanticMarkers.
+  const CONTENT_INLINE = `((?:(?!${BLOCK_BOUNDARY_SRC})[\\s\\S])*?)`;
   result = result.replace(
     new RegExp(
-      `\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]${CONTENT}\\[fin\\]`,
+      `\\[\\s*${SEMANTIC_LABEL.source}\\s*\\]${CONTENT_INLINE}\\[fin\\]`,
       'gi',
     ),
     (_match, delimitador, content) => {
@@ -287,9 +357,16 @@ function normalizeResourceKind(raw: string): ResourceKind | null {
  */
 export function applyResourceLinks(htmlValue: string): string {
   if (typeof DOMParser === 'undefined') return htmlValue;
-  if (!RESOURCE_ANYWHERE.test(htmlValue)) return htmlValue;
+  // Atajo barato de verdad: sin un solo corchete no hay nada que hacer.
+  if (!htmlValue.includes('[')) return htmlValue;
 
+  // El descarte por marcador tiene que mirar el HTML YA NORMALIZADO. Mirándolo
+  // en crudo, un marcador con la suciedad que deja Word dentro de los corchetes
+  // —«[víd<a id="b"></a>eo:]», un bookmark— no casaba y se descartaba el
+  // documento entero ANTES de llegar a limpiarlo: la etiqueta acababa impresa
+  // como texto, y sin ningún aviso.
   const normalized = splitResourceLineBreaks(normalizeSemanticMarkers(htmlValue));
+  if (!RESOURCE_ANYWHERE.test(normalized)) return htmlValue;
 
   const doc = new DOMParser().parseFromString(
     `<!doctype html><html><body>${normalized}</body></html>`,
