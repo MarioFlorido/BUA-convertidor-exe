@@ -126,9 +126,27 @@ export class ElpxRenderer {
     // vehículo de estilos que sobrevive al reexport desde eXeLearning.
     const extraStyles = [
       // URLs (u otras palabras sin espacios) excesivamente largas: permitir
-      // partirlas en cualquier punto para que no desborden cajas, celdas ni
-      // iDevices. Solo actúa cuando la palabra no cabe entera en la línea.
+      // partirlas en cualquier punto para que no desborden cajas ni iDevices.
       'body{overflow-wrap:anywhere}',
+      // …pero NO dentro de una tabla. `anywhere`, a diferencia de `break-word`,
+      // SÍ cuenta al calcular el tamaño intrínseco del contenido: en una tabla
+      // con `table-layout: auto` el navegador da por bueno estrechar cualquier
+      // columna hasta UN carácter, así que en cuanto la tabla iba justa de ancho
+      // partía palabras corrientes por la mitad («Añ/o», «Artíc/ulo»,
+      // «Cerr/ado» — medidas 9 en una tabla de 6 columnas). Por eso el PDF no lo
+      // hacía y el ELPX sí: printStyles.css nunca usó `anywhere`.
+      // Con `break-word` el ancho mínimo de la celda vuelve a ser la palabra
+      // entera, y la palabra solo se parte si de verdad no cabe en su línea, que
+      // es lo que se buscaba desde el principio.
+      '.exe-content td,.exe-content th{overflow-wrap:break-word;word-break:normal}',
+      // Y que la tabla pueda ensancharse cuando el 80% del tema no le basta.
+      // El suelo mantiene EXACTAMENTE el ancho actual (una ficha de dos columnas
+      // sigue ocupando el 80%); el techo deja que una tabla de muchas columnas
+      // llegue al ancho completo del contenido en vez de apretujarse. Sin esto,
+      // quitar `anywhere` a las celdas solo cambia palabras partidas por filas
+      // más altas.
+      '.exe-content .bua_tabla_horizontal,.exe-content .bua_tabla_vertical' +
+        '{width:auto;min-width:80%;max-width:100%}',
       // Imágenes EN LÍNEA (logos junto a un título o abriendo un párrafo,
       // imágenes que son un hiperenlace). El tema aplica a TODA imagen del
       // contenido `display:block` + márgenes automáticos + sombra

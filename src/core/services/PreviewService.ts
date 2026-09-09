@@ -158,6 +158,8 @@ export class PreviewService {
 <style>
 body.exe-export.exe-web-site{min-width:0}
 body{overflow-wrap:anywhere}
+.exe-content td,.exe-content th{overflow-wrap:break-word;word-break:normal}
+.exe-content .bua_tabla_horizontal,.exe-content .bua_tabla_vertical{width:auto;min-width:80%;max-width:100%}
 .exe-content img.bua_img_inline{display:inline;vertical-align:middle;margin:0 .25em 0 0;box-shadow:none;border-radius:0}
 ${LINKED_HEADING_ICON_CSS}
 ${RESOURCE_LINK_CSS}
