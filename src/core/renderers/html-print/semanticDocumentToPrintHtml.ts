@@ -193,10 +193,10 @@ function renderBlock(block: SemanticBlock): string {
   }
 
   // Cadena de transformación del bloque, idéntica en ambas ramas: expandir
-  // acordeones → iframes a enlaces → marcar cabeceras de tabla → H2 en mayúsculas.
-  const html = upperCaseH2(
-    markHorizontalTableHeaderRows(convertIframesToLinks(expandAccordions(block.html))),
-  );
+  // acordeones → iframes a enlaces → H2 en mayúsculas. La cabecera de las tablas
+  // ya llega como <thead>/<th scope> desde normalizeTableStructure, así que aquí
+  // no hay nada que marcar.
+  const html = upperCaseH2(convertIframesToLinks(expandAccordions(block.html)));
 
   // "Contenido" es el título genérico por defecto asignado a bloques sin H2/H3.
   const isDefaultTitle = !block.title || block.title === 'Contenido';
@@ -242,22 +242,6 @@ function convertIframesToLinks(html: string): string {
  */
 function expandAccordions(html: string): string {
   return html.replace(/<details(\s|>)/gi, '<details open$1');
-}
-
-/**
- * Marca la primera fila (<tr>) de cada tabla horizontal BUA con la clase
- * `bua-hrow`, para que la cabecera se estile por CLASE y no por `tr:first-child`.
- *
- * Motivo: Paged.js, al partir una tabla larga entre páginas, clona la <table>
- * en la continuación; con `tr:first-child` la primera fila de DATOS de esa
- * continuación se teñía como cabecera (gris oscuro). Con una clase en la fila
- * real, eso ya no ocurre.
- */
-function markHorizontalTableHeaderRows(html: string): string {
-  return html.replace(
-    /(<table\b[^>]*\bbua_tabla_horizontal\b[^>]*>(?:\s*<(?:tbody|thead|colgroup)\b[^>]*>)*\s*)<tr>/gi,
-    '$1<tr class="bua-hrow">',
-  );
 }
 
 // ─── Ensamblador final ────────────────────────────────────────────────────────
@@ -450,10 +434,83 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
       window.print();
     }
 
+    // ── Reparar las tablas que Paged.js parte entre páginas ──────────────────
+    // Al fragmentar una tabla larga, Paged.js clona la <table> pero DESCARTA su
+    // <thead> (comprobado con paged.js 0.4.3: no implementa table-header-group).
+    // Consecuencias, las dos visibles en el PDF a partir de la 2ª página:
+    //
+    //   1. Las columnas se quedaban SIN NOMBRE. En una tabla de tres páginas,
+    //      dos de ellas eran cifras sin rótulo.
+    //   2. Con table-layout: auto cada fragmento reparte sus columnas por su
+    //      cuenta, así que la misma tabla cambiaba de anchos en cada página.
+    //
+    // Se repara aquí, en afterRendered, con el maquetado ya estable: es lo que
+    // permite MEDIR si lo añadido cabe. Todos los fragmentos de una tabla
+    // comparten el data-ref que asigna Paged.js, y solo el primero lleva <thead>.
+    function buaRepairSplitTables() {
+      var tables = document.querySelectorAll('.pagedjs_page table[data-ref]');
+      var groups = {};
+      var i;
+
+      for (i = 0; i < tables.length; i++) {
+        var ref = tables[i].getAttribute('data-ref');
+        if (!groups[ref]) groups[ref] = [];
+        groups[ref].push(tables[i]);
+      }
+
+      Object.keys(groups).forEach(function (ref) {
+        var group = groups[ref];
+        if (group.length < 2) return;                 // no se partió: nada que reparar
+        var origin = group[0];                        // querySelectorAll va en orden de documento
+        if (origin.hasAttribute('data-split-from') || !origin.tHead) return;
+
+        // Anchos naturales del primer fragmento, ya maquetado con table-layout:
+        // auto sobre el ancho real de la página.
+        var widths = [];
+        var originCells = origin.tHead.rows[0].cells;
+        for (i = 0; i < originCells.length; i++) {
+          widths.push(originCells[i].getBoundingClientRect().width);
+        }
+
+        group.forEach(function (fragment) {
+          var undo = [];
+
+          if (fragment !== origin && !fragment.tHead) {
+            var head = origin.tHead.cloneNode(true);
+            fragment.insertBefore(head, fragment.firstChild);
+            undo.push(function () { head.remove(); });
+          }
+
+          var cells = fragment.tHead ? fragment.tHead.rows[0].cells : null;
+          if (cells && cells.length === widths.length) {
+            for (var c = 0; c < cells.length; c++) cells[c].style.width = widths[c] + 'px';
+            fragment.style.tableLayout = 'fixed';
+            undo.push(function () {
+              fragment.style.tableLayout = '';
+              for (var k = 0; k < cells.length; k++) cells[k].style.width = '';
+            });
+          }
+
+          // Guarda: lo añadido ocupa un alto que el maquetado no había reservado.
+          // Si empuja la tabla fuera de la caja de página se deshace paso a paso
+          // —primero los anchos, la cabecera en último lugar— porque una fila
+          // recortada es peor que cualquiera de los dos arreglos.
+          var area = fragment.closest('.pagedjs_page_content') ||
+                     fragment.closest('.pagedjs_area');
+          while (area && undo.length > 0 &&
+                 fragment.getBoundingClientRect().bottom >
+                   area.getBoundingClientRect().bottom + 2) {
+            undo.pop()();
+          }
+        });
+      });
+    }
+
     class PrintAfterRender extends Paged.Handler {
       afterRendered() {
         var ov = document.getElementById('bua-print-overlay');
         if (ov) ov.remove();
+        buaRepairSplitTables();              // cabeceras de tablas partidas
         buaPrint();                          // primer print, ya sin barra en el DOM
       }
     }

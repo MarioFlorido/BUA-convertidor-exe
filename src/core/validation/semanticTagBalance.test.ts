@@ -337,3 +337,49 @@ describe('detectSemanticTagIssues — líneas de recurso', () => {
     assert.equal(issues[0].kind, 'unclosed-box');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// table-without-marker — toda tabla debe llevar [horizontal] o [vertical]
+// ─────────────────────────────────────────────────────────────────────────────
+describe('detectSemanticTagIssues — tablas sin marcador', () => {
+  test('tabla sin marcador → table-without-marker', () => {
+    const html = '<p>Texto</p><table><tr><td>Fase</td><td>Duración</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-without-marker');
+  });
+
+  test('tabla con [horizontal] bien puesto → sin avisos', () => {
+    const html = '<p>[horizontal]</p><table><tr><td>A</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('tabla con [vertical] bien puesto → sin avisos', () => {
+    const html = '<p>[vertical]</p><table><tr><td>Autor</td><td>X</td></tr></table>';
+    assert.deepEqual(detectSemanticTagIssues(html), []);
+  });
+
+  test('marcador mal colocado: solo avisa table-marker, no los dos', () => {
+    const html = '<p>[horizontal]</p><p>Texto colado</p><table><tr><td>A</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-marker');
+  });
+
+  test('la primera marcada y la segunda no: solo avisa de la segunda', () => {
+    const html =
+      '<p>[horizontal]</p><table><tr><td>A</td></tr></table>' +
+      '<p>Y ahora otra</p><table><tr><td>Fase</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 1);
+    assert.equal(issues[0].kind, 'table-without-marker');
+    assert.match(issues[0].context, /Fase/);
+  });
+
+  test('dos tablas sin marcar → dos avisos', () => {
+    const html = '<table><tr><td>A</td></tr></table><table><tr><td>B</td></tr></table>';
+    const issues = detectSemanticTagIssues(html);
+    assert.equal(issues.length, 2);
+    assert.ok(issues.every((i) => i.kind === 'table-without-marker'));
+  });
+});

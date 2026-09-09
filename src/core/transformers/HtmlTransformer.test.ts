@@ -29,6 +29,7 @@ import {
   classifyInlineImages,
   applyResourceLinks,
   applyAllTransforms,
+  normalizeTableStructure,
 } from './HtmlTransformer';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -674,5 +675,83 @@ describe('applyAllTransforms (integración)', () => {
     const out = applyAllTransforms(input);
     assert.match(out, /<h2>Título<\/h2>/);
     assert.match(out, /Contenido normal\./);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// normalizeTableStructure — cabecera según el marcador, no según Word
+// ─────────────────────────────────────────────────────────────────────────────
+describe('normalizeTableStructure', () => {
+  test('horizontal: la 1ª fila pasa a <thead> con <th scope="col">', () => {
+    const out = normalizeTableStructure(
+      '<table class="bua_tabla_horizontal"><tr><td>Fase</td><td>Duración</td></tr>' +
+        '<tr><td>Inicial</td><td>2 semanas</td></tr></table>',
+    );
+    assert.ok(out.includes('<thead><tr><th scope="col">Fase</th><th scope="col">Duración</th></tr></thead>'));
+    assert.ok(out.includes('<tbody><tr><td>Inicial</td><td>2 semanas</td></tr></tbody>'));
+  });
+
+  test('vertical: la 1ª celda de cada fila pasa a <th scope="row">, sin <thead>', () => {
+    const out = normalizeTableStructure(
+      '<table class="bua_tabla_vertical"><tr><td>Autor</td><td>Pérez</td></tr>' +
+        '<tr><td>Año</td><td>2025</td></tr></table>',
+    );
+    assert.ok(!out.includes('<thead>'));
+    assert.ok(out.includes('<th scope="row">Autor</th><td>Pérez</td>'));
+    assert.ok(out.includes('<th scope="row">Año</th><td>2025</td>'));
+  });
+
+  test('manda el marcador: una 2ª fila de cabecera de Word baja a datos', () => {
+    const out = normalizeTableStructure(
+      '<table class="bua_tabla_horizontal"><thead><tr><th>A</th><th>B</th></tr>' +
+        '<tr><th>C</th><th>D</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>',
+    );
+    assert.equal((out.match(/<tr>/g) || []).length, 3);
+    assert.ok(out.includes('<thead><tr><th scope="col">A</th><th scope="col">B</th></tr></thead>'));
+    assert.ok(out.includes('<td>C</td><td>D</td>'));
+  });
+
+  test('vertical marcada como cabecera por Word: la fila vuelve a ser de datos', () => {
+    const out = normalizeTableStructure(
+      '<table class="bua_tabla_vertical"><thead><tr><th>Autor</th><th>Pérez</th></tr></thead>' +
+        '<tbody><tr><td>Año</td><td>2025</td></tr></tbody></table>',
+    );
+    assert.ok(!out.includes('<thead>'));
+    assert.ok(out.includes('<th scope="row">Autor</th><td>Pérez</td>'));
+  });
+
+  test('sin marcador: se trata como horizontal y se le pone la clase', () => {
+    const out = normalizeTableStructure('<table><tr><td>Fase</td></tr><tr><td>Inicial</td></tr></table>');
+    assert.ok(out.includes('class="bua_tabla_horizontal"'));
+    assert.ok(out.includes('<th scope="col">Fase</th>'));
+  });
+
+  test('un documento sin tablas sale intacto (no se re-serializa)', () => {
+    const input = '<p>Hola <strong>mundo</strong><br />y adiós</p>';
+    assert.equal(normalizeTableStructure(input), input);
+  });
+
+  test('el HTML de dentro de las celdas se conserva', () => {
+    const out = normalizeTableStructure(
+      '<table class="bua_tabla_horizontal"><tr><td><strong>Fase</strong></td></tr>' +
+        '<tr><td><a href="https://ua.es">UA</a></td></tr></table>',
+    );
+    assert.ok(out.includes('<th scope="col"><strong>Fase</strong></th>'));
+    assert.ok(out.includes('<a href="https://ua.es">UA</a>'));
+  });
+
+  test('idempotente: pasarlo dos veces no cambia el resultado', () => {
+    const once = normalizeTableStructure(
+      '<table class="bua_tabla_horizontal"><tr><td>A</td></tr><tr><td>1</td></tr></table>',
+    );
+    assert.equal(normalizeTableStructure(once), once);
+  });
+
+  test('applyAllTransforms: [horizontal] deja la tabla con cabecera semántica', () => {
+    const out = applyAllTransforms(
+      '<p>[horizontal]</p><table><tr><td>Fase</td></tr><tr><td>Inicial</td></tr></table>',
+    );
+    assert.ok(out.includes('class="bua_tabla_horizontal"'));
+    assert.ok(out.includes('<th scope="col">Fase</th>'));
   });
 });

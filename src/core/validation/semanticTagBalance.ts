@@ -33,6 +33,13 @@
  *   como aperturas), pero si el patrón no casa, el marcador se imprime como
  *   texto literal sin ningún aviso.
  *
+ * - 'table-without-marker': una <table> sin [horizontal] ni [vertical] en el
+ *   párrafo inmediatamente anterior. Es el simétrico de 'table-marker' y el
+ *   fallo más caro de los dos: el tema de eXeLearning solo estiliza
+ *   `.bua_tabla_horizontal` / `.bua_tabla_vertical`, así que una tabla sin clase
+ *   sale sin bordes ni relleno —las celdas pegadas unas a otras— mientras que en
+ *   el PDF se ve correcta. Sin aviso, el autor no tenía forma de enterarse.
+ *
  * - 'box-not-formable': una caja bien cerrada pero repartida entre bloques que
  *   la transformación no puede envolver (dos ítems de lista distintos, un <p> y
  *   un <li>…). Antes salía de ahí un <div> a caballo entre bloques: HTML
@@ -64,6 +71,7 @@ export interface SemanticTagIssue {
    * 'unclosed-box': falta el [fin]. 'stray-fin': un [fin] sin caja abierta.
    * 'heading-inside-box': la caja abarca un encabezado H1–H6.
    * 'table-marker': [horizontal]/[vertical] que no precede a una tabla.
+   * 'table-without-marker': una tabla sin [horizontal] ni [vertical] delante.
    * 'resource-marker': [vídeo:]/[documento:]/[enlace:] que no abre su línea.
    */
   kind:
@@ -73,6 +81,7 @@ export interface SemanticTagIssue {
     | 'box-not-formable'
     | 'accordion-marker'
     | 'table-marker'
+    | 'table-without-marker'
     | 'resource-marker';
   /** Etiqueta afectada (en 'unclosed-box', 'heading-inside-box' y 'box-not-formable'). */
   label?: SemanticBoxLabel;
@@ -189,6 +198,7 @@ export function detectSemanticTagIssues(html: string): SemanticTagIssue[] {
   if (!yaAvisado) issues.push(...detectUnformableBoxes(source));
 
   issues.push(...detectTableMarkerIssues(source));
+  issues.push(...detectTablesWithoutMarker(source));
   issues.push(...detectAccordionMarkerIssues(source));
   issues.push(...detectResourceMarkerIssues(source));
 
@@ -295,6 +305,46 @@ function detectTableMarkerIssues(source: string): SemanticTagIssue[] {
 }
 
 /**
+ * Detecta tablas SIN marcador [horizontal] ni [vertical] delante.
+ *
+ * Simétrico de detectTableMarkerIssues: aquel avisa del marcador que no
+ * encuentra su tabla; este, de la tabla que no encuentra su marcador. La norma
+ * de redacción BUA exige uno de los dos en toda tabla, porque es el marcador
+ * —no Word— quien decide dónde está la cabecera.
+ *
+ * Recibe el HTML ya pasado por normalizeSemanticMarkers, así que la condición
+ * es exactamente la que aplicará applyTableClasses: el marcador, solo, en el
+ * párrafo inmediatamente anterior a la <table>.
+ */
+function detectTablesWithoutMarker(source: string): SemanticTagIssue[] {
+  const issues: SemanticTagIssue[] = [];
+  const markedBefore = new RegExp(
+    `${P_OPEN_SRC}\\s*\\[\\s*(?:horizontal|vertical)\\s*\\]\\s*</p>\\s*$`,
+    'i',
+  );
+
+  for (const match of source.matchAll(/<table\b[^>]*>/gi)) {
+    const idx = match.index ?? 0;
+    const before = source.slice(0, idx);
+    if (markedBefore.test(before)) continue;
+
+    // El autor SÍ escribió un marcador, pero mal colocado: de eso ya avisa
+    // 'table-marker' con instrucciones concretas, y repetirlo aquí solo
+    // despista. Se mira desde el final de la tabla anterior para no confundir
+    // el marcador de OTRA tabla con el de esta.
+    const sincePreviousTable = before.slice(before.toLowerCase().lastIndexOf('</table>') + 1);
+    if (/\[\s*(?:horizontal|vertical)\s*\]/i.test(sincePreviousTable)) continue;
+
+    issues.push({
+      kind: 'table-without-marker',
+      context: contextSnippet(source, idx + match[0].length),
+    });
+  }
+
+  return issues;
+}
+
+/**
  * Detecta marcadores de recurso ([vídeo:], [documento:], [enlace:]) que la
  * transformación NO va a reconocer. applyResourceLinks solo los acepta al
  * PRINCIPIO de un párrafo o de un ítem de lista y con algo detrás que etiquetar;
@@ -356,6 +406,9 @@ export function describeSemanticTagIssue(issue: SemanticTagIssue): string {
   }
   if (issue.kind === 'table-marker') {
     return `El marcador [${issue.marker}] no precede a una tabla${near}. Debe ir solo, en su propio párrafo, en la línea inmediatamente anterior a la tabla; si no, se imprimirá como texto.`;
+  }
+  if (issue.kind === 'table-without-marker') {
+    return `Hay una tabla sin marcador${near}. Escribe [horizontal] o [vertical], solo, en el párrafo inmediatamente anterior a la tabla: es lo que decide dónde está la cabecera. Mientras falte, se tratará como [horizontal] y la primera fila hará de cabecera.`;
   }
   if (issue.kind === 'resource-marker') {
     return `La etiqueta [${issue.marker}:] no abre una línea de recurso${near}. Debe ir al principio de la línea y con el texto del recurso detrás; si no, se imprimirá como texto.`;

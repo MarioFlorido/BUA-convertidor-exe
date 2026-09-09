@@ -428,11 +428,23 @@ function normalizeImportedNode(node: Node): string {
       if (!normalizedChildren) return '';
       return `<table${buaClassAttribute(node)}>${normalizedChildren}</table>`;
     }
+    case 'th':
+    case 'td': {
+      // scope lo pone normalizeTableStructure para que la cabecera sea
+      // navegable con lector de pantalla; colspan/rowspan no deberían existir
+      // (la norma de redacción prohíbe combinar celdas), pero si se cuelan,
+      // perderlos descuadraría la fila entera.
+      const attrs = ['scope', 'colspan', 'rowspan']
+        .map((name) => {
+          const value = (node.getAttribute(name) || '').trim();
+          return value ? ` ${name}="${escapeHtml(value)}"` : '';
+        })
+        .join('');
+      return `<${tag}${attrs}>${normalizedChildren}</${tag}>`;
+    }
     case 'thead':
     case 'tbody':
     case 'tr':
-    case 'th':
-    case 'td':
     case 'strong':
     case 'em':
     case 'u':

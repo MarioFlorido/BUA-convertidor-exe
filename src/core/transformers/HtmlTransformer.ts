@@ -492,6 +492,130 @@ export function applyTableClasses(htmlValue: string): string {
 }
 
 /**
+ * Normaliza la ESTRUCTURA de toda tabla según el marcador que escribió el autor.
+ *
+ * Norma de redacción BUA: toda tabla lleva cabecera y la define el marcador
+ * ([horizontal] → primera fila; [vertical] → primera columna), no lo que hiciera
+ * Word. Mammoth solo genera <thead>/<th> cuando el autor marcó en Word «repetir
+ * como fila de encabezado», así que la cabecera llegaba casi siempre como <td>
+ * corriente: pintada de gris por CSS, pero sin ninguna semántica. Consecuencias
+ * que esto arregla de raíz:
+ *
+ *  - Accesibilidad: un lector de pantalla veía una tabla SIN encabezados. Ahora
+ *    la cabecera va en <th> con `scope` (col en horizontales, row en verticales).
+ *  - PDF: Paged.js descarta el <thead> al partir la tabla entre páginas, pero
+ *    sin <thead> no hay siquiera qué volver a poner. repairSplitTables (en el
+ *    renderer print) lo repite página a página apoyándose en esta estructura.
+ *  - Cebreado: dependía de si Word había generado <thead> o no, porque
+ *    :nth-child se reinicia dentro de cada sección. Con la estructura siempre
+ *    igual, el resultado ya no depende del documento de origen.
+ *
+ * Una tabla SIN marcador se trata como [horizontal] y se le pone la clase (mismo
+ * criterio por defecto que el Limpiador). Es un fallo de redacción y
+ * detectSemanticTagIssues lo avisa por su cuenta, pero sin clase el tema del
+ * ELPX no la estiliza DE NINGUNA forma —no hay regla genérica para `table`— y
+ * las celdas salen pegadas unas a otras, ilegibles.
+ */
+export function normalizeTableStructure(htmlValue: string): string {
+  // Sin DOM (Node fuera de tests) o sin tablas: se devuelve intacto, sin pasar
+  // por el serializador.
+  if (typeof DOMParser === 'undefined') return htmlValue;
+  if (!/<table\b/i.test(htmlValue)) return htmlValue;
+
+  const doc = new DOMParser().parseFromString(
+    `<!doctype html><html><body>${htmlValue}</body></html>`,
+    'text/html',
+  );
+
+  for (const table of Array.from(doc.body.getElementsByTagName('table'))) {
+    const vertical = table.classList.contains('bua_tabla_vertical');
+    if (!vertical && !table.classList.contains('bua_tabla_horizontal')) {
+      table.classList.add('bua_tabla_horizontal');
+    }
+    rebuildTableSections(doc, table, vertical ? 'vertical' : 'horizontal');
+  }
+
+  return doc.body.innerHTML;
+}
+
+type TableOrientation = 'horizontal' | 'vertical';
+
+/**
+ * Reconstruye <thead>/<tbody> y re-etiqueta las celdas de cabecera.
+ * Descarta el agrupamiento que trajera Word: manda el marcador.
+ */
+function rebuildTableSections(
+  doc: Document,
+  table: HTMLTableElement,
+  orientation: TableOrientation,
+): void {
+  // `table.rows` recorre thead + tbody + tfoot en orden de documento, que es
+  // justo el orden en que se ven. Se congela en un array porque a continuación
+  // las filas cambian de padre.
+  const rows = Array.from(table.rows);
+  if (rows.length === 0) return;
+
+  // Una tabla anidada tiene sus filas en `table.rows` del ancestro sólo si no
+  // hay <table> intermedia; getElementsByTagName('table') ya las devuelve por
+  // separado, así que cada una se normaliza por su cuenta. Las filas que
+  // pertenecen a una tabla interior se descartan aquí.
+  const ownRows = rows.filter((row) => row.closest('table') === table);
+  if (ownRows.length === 0) return;
+
+  const caption = table.querySelector(':scope > caption');
+  const colgroup = table.querySelector(':scope > colgroup');
+  const thead = doc.createElement('thead');
+  const tbody = doc.createElement('tbody');
+
+  ownRows.forEach((row, rowIndex) => {
+    const isHeaderRow = orientation === 'horizontal' && rowIndex === 0;
+    Array.from(row.cells).forEach((cell, cellIndex) => {
+      const isHeaderCell = orientation === 'horizontal'
+        ? isHeaderRow
+        : cellIndex === 0;
+      retagCell(doc, cell, isHeaderCell, orientation);
+    });
+    (isHeaderRow ? thead : tbody).appendChild(row);
+  });
+
+  while (table.firstChild) table.removeChild(table.firstChild);
+  if (caption) table.appendChild(caption);
+  if (colgroup) table.appendChild(colgroup);
+  if (thead.childElementCount > 0) table.appendChild(thead);
+  if (tbody.childElementCount > 0) table.appendChild(tbody);
+}
+
+/**
+ * Deja la celda como <th scope="col|row"> o como <td>, según le toque.
+ * Si ya es del tipo correcto no se toca el nodo (sólo el atributo scope).
+ */
+function retagCell(
+  doc: Document,
+  cell: HTMLTableCellElement,
+  isHeader: boolean,
+  orientation: TableOrientation,
+): void {
+  const wantedTag = isHeader ? 'th' : 'td';
+  let target = cell;
+
+  if (cell.tagName.toLowerCase() !== wantedTag) {
+    const replacement = doc.createElement(wantedTag) as HTMLTableCellElement;
+    // La norma de redacción prohíbe combinar celdas, pero si alguna se cuela,
+    // perder el span descuadraría la fila entera: se conserva.
+    for (const attribute of ['colspan', 'rowspan']) {
+      const value = cell.getAttribute(attribute);
+      if (value) replacement.setAttribute(attribute, value);
+    }
+    while (cell.firstChild) replacement.appendChild(cell.firstChild);
+    cell.replaceWith(replacement);
+    target = replacement;
+  }
+
+  if (isHeader) target.setAttribute('scope', orientation === 'horizontal' ? 'col' : 'row');
+  else target.removeAttribute('scope');
+}
+
+/**
  * Des-escapa las entidades HTML básicas que Mammoth genera al volcar texto.
  */
 function unescapeBasicHtml(value: string): string {
@@ -806,6 +930,7 @@ function applyIntrinsicSize(img: Element, width: string | null, height: string |
  * 1. iframes embebidos (vídeos) → <iframe> real centrado
  * 2. clases semánticas [ejemplo], [definición], [importante], [pie]
  * 3. clases de tabla [horizontal], [vertical]
+ * 3b. estructura de tabla: <thead>/<th scope> según el marcador
  * 4. líneas de recurso [vídeo:], [documento:], [enlace:]
  * 5. listas numeradas interrumpidas → continuar numeración con start="N"
  * 6. autolink de URLs en texto plano (al final: re-serializa el DOM)
@@ -820,6 +945,7 @@ export const HTML_TRANSFORM_PASSES: readonly { name: string; run: (html: string)
   { name: 'iframes', run: processIframes },
   { name: 'cajas semánticas', run: applyDivClasses },
   { name: 'tablas', run: applyTableClasses },
+  { name: 'estructura de tablas', run: normalizeTableStructure },
   { name: 'líneas de recurso', run: applyResourceLinks },
   { name: 'listas numeradas', run: continueInterruptedOrderedLists },
   { name: 'autolink de URLs', run: autolinkUrls },

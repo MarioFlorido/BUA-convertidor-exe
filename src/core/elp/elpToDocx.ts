@@ -154,6 +154,27 @@ const BUA_RESOURCE_MARKERS: Record<string, string> = {
   bua_recurso_enlace: 'enlace:',
 };
 
+/**
+ * Orientación de la tabla ([horizontal] / [vertical]). A diferencia de las
+ * cajas, el marcador de tabla no tiene cierre: basta con un párrafo propio
+ * delante. Sin devolverlo, el Word resultante salía con tablas SIN marcador y,
+ * al reconvertirlo, el tema de eXeLearning no las estilizaba de ninguna forma
+ * (celdas pegadas) — el viaje de vuelta fabricaba justo el fallo que
+ * detectTablesWithoutMarker denuncia.
+ */
+const BUA_TABLE_MARKERS: Record<string, string> = {
+  bua_tabla_horizontal: 'horizontal',
+  bua_tabla_vertical: 'vertical',
+};
+
+function tableMarkerFor(el: Element): string | null {
+  for (const cls of Array.from(el.classList)) {
+    const marker = BUA_TABLE_MARKERS[cls];
+    if (marker) return marker;
+  }
+  return null;
+}
+
 function resourceMarkerFor(el: Element): string | null {
   for (const cls of Array.from(el.classList)) {
     const marker = BUA_RESOURCE_MARKERS[cls];
@@ -236,10 +257,16 @@ function blockify(container: Element, ctx: BuildContext): FileChild[] {
         flushLooseRuns();
         blocks.push(...listToParagraphs(el, ctx, 0, tag === 'ol' ? ctx.nextNumberingInstance() : null));
         break;
-      case 'table':
+      case 'table': {
         flushLooseRuns();
+        // La orientación se escribe siempre: si el .elp no la traía, la tabla
+        // vuelve a Word como [horizontal], que es el criterio por defecto del
+        // resto del pipeline. Así el Word de salida cumple la norma de
+        // redacción y se puede reconvertir sin perder la cabecera.
+        blocks.push(markerParagraph(ctx, tableMarkerFor(el) ?? 'horizontal'));
         blocks.push(tableToDocx(el, ctx));
         break;
+      }
       case 'blockquote': {
         flushLooseRuns();
         for (const inner of blockify(el, ctx)) {
@@ -478,8 +505,20 @@ function listToParagraphs(
 function tableToDocx(tableEl: Element, ctx: BuildContext): FileChild {
   const { docx } = ctx;
   const rows: InstanceType<Docx['TableRow']>[] = [];
+  // La cabecera de una tabla horizontal es su primera fila: se marca como
+  // «repetir en cada página» para que Word la repita al imprimir, igual que
+  // hace el PDF del convertidor.
+  const horizontal = tableEl.classList.contains('bua_tabla_vertical') === false;
 
-  for (const tr of Array.from(tableEl.getElementsByTagName('tr'))) {
+  // Solo las filas PROPIAS: getElementsByTagName recorre también las de una
+  // tabla anidada y las subía a la tabla exterior, descuadrándola. La norma de
+  // redacción prohíbe anidar, pero un .elp editado a mano en eXeLearning sí
+  // puede traerlas.
+  const ownRows = Array.from(tableEl.getElementsByTagName('tr')).filter(
+    (tr) => tr.closest('table') === tableEl,
+  );
+
+  for (const tr of ownRows) {
     const cells: InstanceType<Docx['TableCell']>[] = [];
     for (let cellNode = tr.firstChild; cellNode; cellNode = cellNode.nextSibling) {
       if (cellNode.nodeType !== 1) continue;
@@ -500,7 +539,12 @@ function tableToDocx(tableEl: Element, ctx: BuildContext): FileChild {
         }),
       );
     }
-    if (cells.length > 0) rows.push(new docx.TableRow({ children: cells }));
+    if (cells.length > 0) {
+      rows.push(new docx.TableRow({
+        children: cells,
+        tableHeader: horizontal && rows.length === 0,
+      }));
+    }
   }
 
   if (rows.length === 0) return new docx.Paragraph({ children: [] });

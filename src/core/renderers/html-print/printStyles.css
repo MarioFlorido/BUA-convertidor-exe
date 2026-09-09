@@ -575,6 +575,17 @@
    6. TABLAS
    ============================================================ */
 
+/* `table-layout: auto`: las columnas se reparten POR CONTENIDO, como en Word y
+   como en el ELPX. Con el reparto igualitario de `fixed` una tabla de dos
+   columnas daba 50 % a la de términos —casi siempre medio vacía— y apretaba la
+   de definiciones, y una de seis columnas dejaba 100 px por columna partiendo
+   los apellidos a mitad de palabra (medido: filas de 88 px que con `auto` bajan
+   a 50 px).
+
+   Los guardas de `max-width` y `overflow-wrap` de las celdas siguen evitando que
+   una URL larga desborde la página. Las tablas que se PARTEN entre páginas
+   vuelven a `fixed` desde repairSplitTables, con los anchos del primer
+   fragmento: si no, cada página repartiría sus columnas por su cuenta. */
 .block-html table,
 .block-html .bua_tabla_horizontal table,
 .block-html .bua_tabla_vertical table {
@@ -584,7 +595,7 @@
   margin: 10px 2px;
   font-size: 9.5pt;
   box-sizing: border-box;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 /* Una tabla larga puede partirse entre páginas (evita huecos), pero una fila
@@ -596,79 +607,65 @@
 /* Reparto de la tabla horizontal entre páginas: al menos un par de filas juntas
    a cada lado del corte; nunca el encabezado (o una fila) suelto.
 
-   1) El encabezado (`.bua-hrow`) no puede quedar SOLO al final de una página.
-      `break-after: avoid` hace que Paged.js, si la 1ª fila de datos no cabe,
-      mueva el corte ANTES del encabezado y se lo lleve entero a la página
+   1) El encabezado (la fila del <thead>) no puede quedar SOLO al final de una
+      página. `break-after: avoid` hace que Paged.js, si la 1ª fila de datos no
+      cabe, mueva el corte ANTES del encabezado y se lo lleve entero a la página
       siguiente (honra `data-previous-break-after: avoid`; ver chunker/layout.js).
       Resultado: el encabezado siempre viaja con, como mínimo, su 1ª fila de datos.
    2) La última fila no queda como "viuda" solitaria: `break-before: avoid` la
-      mantiene junto a la anterior (el corte se adelanta una fila). */
-.block-html .bua_tabla_horizontal tr.bua-hrow {
+      mantiene junto a la anterior (el corte se adelanta una fila).
+
+   En las páginas siguientes la cabecera la repone repairSplitTables (ver
+   semanticDocumentToPrintHtml): Paged.js DESCARTA el <thead> al fragmentar. */
+.block-html thead tr {
   break-after: avoid;
 }
 .block-html .bua_tabla_horizontal tr:last-child {
   break-before: avoid;
 }
 
+/* Métrica común de las celdas de cabecera. El COLOR y el filete de acento no
+   van aquí: dependen de la orientación (abajo), porque en una tabla vertical la
+   cabecera es la primera COLUMNA y un `border-bottom` de acento dibujaría una
+   raya gruesa bajo cada etiqueta. */
 .block-html th {
-  background-color: #d0d5da;
-  color: var(--color-primary, #135d87);
   font-weight: 700;
   padding: 6px 10px;
-  border: 1px solid #e5e7eb;
-  border-bottom: 3px solid var(--color-accent, #deb13c);
+  border: 1px solid #ccc;
   text-align: left;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  vertical-align: top;
   min-width: 0;
+}
+
+/* `word-break: normal` + `overflow-wrap: break-word`: con `table-layout: auto`,
+   `word-break: break-word` hacía que el min-content de la celda fuese UN
+   carácter, así que el navegador podía estrechar la columna hasta partir las
+   palabras por la mitad. Con esta combinación cada palabra es indivisible al
+   calcular el ancho (la columna crece hasta caberla) pero una palabra
+   descomunal —una URL sin espacios— sigue partiéndose antes que desbordar. */
+.block-html td,
+.block-html th {
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .block-html td {
   padding: 5px 10px;
   border: 1px solid #ccc;
   vertical-align: top;
-  word-break: break-word;
-  overflow-wrap: break-word;
   min-width: 0;
 }
 
-.block-html tr:nth-child(even) td {
-  background: #f7f7f7;
-}
-
-/* Tabla vertical: la primera columna es la cabecera (etiquetas). Con el reparto
-   igualitario de `table-layout: fixed` esa columna se lleva un 50% que casi nunca
-   necesita, dejando la columna de datos apretada. Volvemos a `auto` SOLO en las
-   verticales para que la columna de etiquetas se ajuste a su contenido y la de
-   datos ocupe el resto (como en Word y en el ELPX). Las horizontales siguen en
-   `fixed`: ahí el reparto igualitario se ve bien. Los guardas de word-break y
-   max-width del bloque general siguen evitando desbordes de página.
-   OJO: la clase va en el propio <table> (`<table class="bua_tabla_vertical">`),
-   no en un ancestro, así que el selector es `table.bua_tabla_vertical` (no
-   `.bua_tabla_vertical table`, que no casaría nada). Con 2 clases + elemento gana
-   en especificidad a `.block-html table` del bloque general. */
-.block-html table.bua_tabla_vertical {
-  table-layout: auto;
-}
-
-/* Tabla vertical: primera columna actúa como cabecera. Se cubre también
-   th:first-child (como en el CSS del tema) por si la tabla llega con <th>. */
+/* Tabla vertical: la primera columna ES la cabecera. normalizeTableStructure
+   la deja siempre como <th scope="row">; se mantiene el selector sobre
+   td:first-child por si llegara contenido antiguo sin normalizar. */
+.block-html .bua_tabla_vertical th[scope="row"],
 .block-html .bua_tabla_vertical td:first-child,
 .block-html .bua_tabla_vertical th:first-child {
   background-color: #d0d5da;
   color: var(--color-primary, #135d87);
   font-weight: 700;
   border-right: 3px solid var(--color-accent, #deb13c);
-  /* Con `table-layout: auto` la columna se ajusta a la etiqueta más ancha. La
-     regla general de `td` trae `word-break: break-word` + `overflow-wrap: break-word`,
-     que en modo auto NO ensanchan la columna (el min-content de la celda pasa a
-     ser 1 carácter) y parten la etiqueta a mitad de palabra («Editoria/l»). Al
-     normalizar ambos, cada palabra es indivisible: su min-content vuelve a ser el
-     ancho de la palabra completa, así que `auto` ensancha la columna hasta caber
-     la etiqueta más larga en una línea. Las etiquetas de varias palabras siguen
-     partiendo por los espacios. */
-  word-break: normal;
-  overflow-wrap: normal;
   /* Suelo de ancho: si la etiqueta es corta, `auto` dejaba la columna muy
      estrecha (~12%). Lo subimos a un valor más cómodo de leer, sin perder el
      comportamiento acordado: si una etiqueta es más ancha, la columna sigue
@@ -680,22 +677,27 @@
   width: 20%;
 }
 
-/* Tabla horizontal: primera fila actúa como cabecera. Las celdas llegan como
-   <td> desde Word (Mammoth no genera <th>). Se marca con la clase .bua-hrow en
-   el render (NO con tr:first-child): así, cuando Paged.js parte la tabla y clona
-   la continuación, la 1ª fila de DATOS de la página siguiente ya NO se tiñe como
-   cabecera (punto 8). */
-.block-html .bua_tabla_horizontal tr.bua-hrow td {
+/* Tabla horizontal: la cabecera es la fila del <thead>, que normalizeTableStructure
+   construye SIEMPRE a partir del marcador [horizontal] (antes se marcaba con la
+   clase .bua-hrow porque la cabecera llegaba como <td> corriente). Al estar en
+   su propia sección, la 1ª fila de DATOS de una continuación de página no puede
+   teñirse de cabecera por accidente. */
+.block-html .bua_tabla_horizontal thead th {
   background-color: #d0d5da;
   color: var(--color-primary, #135d87);
-  font-weight: 700;
   border-bottom: 3px solid var(--color-accent, #deb13c);
 }
 
-/* Cebreado de las filas de DATOS de la tabla horizontal: empieza en BLANCO tras
-   la cabecera, para que la fila siguiente no parezca otra cabecera (punto 7). */
-.block-html .bua_tabla_horizontal tr:not(.bua-hrow):nth-child(even) td { background-color: #ffffff; }
-.block-html .bua_tabla_horizontal tr:not(.bua-hrow):nth-child(odd)  td { background-color: #f7f7f7; }
+/* Cebreado de las filas de DATOS: empieza en BLANCO tras la cabecera, para que
+   la fila siguiente no parezca otra cabecera (punto 7). Se cuenta dentro del
+   <tbody>, así que ya NO depende de si Word había generado <thead> o no: antes,
+   :nth-child se reiniciaba en cada sección y el mismo documento salía con el
+   cebreado invertido según una casilla de Word.
+
+   Solo en las horizontales: en una ficha vertical el rayado no codifica nada
+   (cada fila es un campo distinto) y solo añade ruido. */
+.block-html .bua_tabla_horizontal tbody tr:nth-child(odd)  td { background-color: #ffffff; }
+.block-html .bua_tabla_horizontal tbody tr:nth-child(even) td { background-color: #f7f7f7; }
 
 
 
@@ -773,6 +775,9 @@
   line-height: 1.4;
   margin: 0.4em 0 1.2em;
   break-inside: avoid;
+  /* El pie describe lo que tiene ENCIMA (tabla o ilustración): sin esto podía
+     quedarse solo al principio de la página siguiente, separado de su tabla. */
+  break-before: avoid;
 }
 
 
