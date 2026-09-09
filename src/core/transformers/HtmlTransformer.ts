@@ -426,7 +426,7 @@ export function splitResourceLineBreaks(html: string): string {
 /**
  * Procesa delimitadores [horizontal] y [vertical] antes de tablas
  * Los delimitadores están dentro de párrafos <p>[horizontal]</p>
- * El párrafo se reemplaza por un párrafo vacío y se aplica la clase a la tabla
+ * El párrafo del marcador se elimina y la clase se aplica a la tabla
  *
  * Ejemplo en Word:
  * [horizontal]
@@ -449,7 +449,6 @@ export function applyTableClasses(htmlValue: string): string {
         'gi',
       ),
       class: 'bua_tabla_horizontal',
-      replacement: '<p><br /></p>$1',
     },
     {
       // Busca <p>[vertical]</p> seguido de tabla
@@ -458,13 +457,12 @@ export function applyTableClasses(htmlValue: string): string {
         'gi',
       ),
       class: 'bua_tabla_vertical',
-      replacement: '<p><br /></p>$1',
     },
   ];
 
   let processedHtml = normalized;
 
-  for (const { pattern, class: className, replacement } of delimiters) {
+  for (const { pattern, class: className } of delimiters) {
     processedHtml = processedHtml.replace(pattern, (_match, tableTag) => {
       // Construir el reemplazo con la clase agregada a la tabla
       let newTableTag = tableTag;
@@ -483,8 +481,11 @@ export function applyTableClasses(htmlValue: string): string {
         newTableTag = tableTag.replace('>', ` class="${className}">`);
       }
 
-      // Reemplazar el párrafo con línea vacía y la tabla con clase
-      return replacement.replace('$1', newTableTag);
+      // El párrafo del marcador desaparece entero: dejaba un <p><br /></p> que
+      // se veía como una línea en blanco de más justo encima de la tabla, y que
+      // las tablas sin marcador no tenían. El aire lo pone el margen de la
+      // propia tabla, igual en ambas salidas.
+      return newTableTag;
     });
   }
 

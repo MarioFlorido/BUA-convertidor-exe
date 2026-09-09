@@ -505,7 +505,12 @@ export class DocxCleaner {
         if (role.indexOf('table:') === 0) {
           const orient = role.split(':')[1];
           node.parentNode!.insertBefore(mkParagraph(doc, '[' + orient + ']'), node);
-          for (const h of Array.from(node.getElementsByTagName('w:tblHeader'))) h.remove();
+          // El w:tblHeader de Word («repetir como fila de encabezado») se
+          // CONSERVA. Se borraba para que Mammoth no generase <thead>, porque el
+          // CSS del tema teñía entonces dos filas de cabecera; ese fallo ya no
+          // existe: normalizeTableStructure reconstruye la cabecera a partir del
+          // marcador y descarta el agrupamiento que traiga Word, así que borrarlo
+          // solo servía para estropear el Word limpio que se lleva el autor.
         }
         return;
       }

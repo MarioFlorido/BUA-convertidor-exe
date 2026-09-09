@@ -302,10 +302,16 @@ describe('applyTableClasses', () => {
     assert.match(out, /class="foo bua_tabla_horizontal"/);
   });
 
-  test('reemplaza el párrafo del marcador por un <p><br /></p>', () => {
+  test('el párrafo del marcador desaparece, sin dejar línea en blanco', () => {
     const input = '<p>[horizontal]</p><table><tr></tr></table>';
     const out = applyTableClasses(input);
-    assert.match(out, /^<p><br \/><\/p><table/);
+    assert.match(out, /^<table class="bua_tabla_horizontal">/);
+  });
+
+  test('el texto anterior al marcador se conserva', () => {
+    const input = '<p>Como muestra la tabla:</p><p>[vertical]</p><table><tr></tr></table>';
+    const out = applyTableClasses(input);
+    assert.match(out, /^<p>Como muestra la tabla:<\/p><table class="bua_tabla_vertical">/);
   });
 
   test('<br/> dentro de [horizontal] se limpia', () => {
