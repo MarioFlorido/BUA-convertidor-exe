@@ -3,6 +3,7 @@ import { escapeHtml, stripDiacritics } from '../utils/html';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 import { RESOURCE_DIR } from '../transformers/ImageExtractor';
+import { longTitleScale, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
 
 export interface PreviewPageInfo {
   title: string;
@@ -122,6 +123,8 @@ export class PreviewService {
     const activePageInfo = pages[activeIndex];
     const activePage = this.project.pages[activeIndex];
     const assetPrefix = activeIndex === 0 ? '' : '../';
+    // Mismo ajuste de título largo que ElpxRenderer inyecta vía pp_extraHeadContent
+    const headerTitleScale = longTitleScale(this.project.title, HEADER_TITLE_COMFORTABLE_LENGTH);
     const prevPage = activeIndex > 0 ? pages[activeIndex - 1] : null;
     const nextPage = activeIndex < pages.length - 1 ? pages[activeIndex + 1] : null;
     const navItems = this.generateNavHtml(pages, activePageInfo.pageNumber, activeIndex);
@@ -165,7 +168,7 @@ ${LINKED_HEADING_ICON_CSS}
 ${RESOURCE_LINK_CSS}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}
-.page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}
+.page-content .box+.box{margin-top:1.25rem}${this.options.navExpanded ? '\n#siteNav .other-section,#siteNav li>ul{display:block!important}' : ''}${headerTitleScale < 1 ? `\n:root{--bua-title-scale:${headerTitleScale}}` : ''}
 </style>
 </head>
 <body class="exe-export exe-web-site">

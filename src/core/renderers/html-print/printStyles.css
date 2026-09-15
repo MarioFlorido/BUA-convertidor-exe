@@ -163,7 +163,8 @@
 }
 
 .cover-title {
-  font-size: 28pt;
+  /* --cover-title-scale la fija renderCoverPage cuando el título es largo */
+  font-size: calc(28pt * var(--cover-title-scale, 1));
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 16px 0;

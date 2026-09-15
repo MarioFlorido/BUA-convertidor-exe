@@ -1,6 +1,7 @@
 import type { SemanticDocument } from '../../models/SemanticDocument';
 import type { PrintThemeAssets, PrintLanguage } from './PrintThemeLoader';
 import { escHtml } from '../../utils/html';
+import { longTitleScale, COVER_TITLE_COMFORTABLE_LENGTH } from '../../utils/titleScale';
 
 // ─── Licencia Creative Commons ────────────────────────────────────────────────
 
@@ -57,6 +58,12 @@ export function renderCoverPage(
     ? `<img class="cover-logo" src="${assets.buaLogoDataUrl}" alt="Logo BUA" />`
     : '';
 
+  // Título largo (viene de «Comentarios» del Word): se reduce el cuerpo para que
+  // no pise el año ni el pie de licencia. printStyles.css multiplica sus 28 pt
+  // por esta variable; un título corto no la necesita.
+  const titleScale = longTitleScale(doc.title, COVER_TITLE_COMFORTABLE_LENGTH);
+  const titleStyle = titleScale < 1 ? ` style="--cover-title-scale:${titleScale}"` : '';
+
   const subtitleHtml = doc.subtitle
     ? `<p class="cover-subtitle">${escHtml(doc.subtitle)}</p>`
     : '';
@@ -97,7 +104,7 @@ export function renderCoverPage(
   ${overlayHtml}
   <div class="cover-content">
     ${logoHtml}
-    <h1 class="cover-title">${escHtml(doc.title)}</h1>
+    <h1 class="cover-title"${titleStyle}>${escHtml(doc.title)}</h1>
     ${subtitleHtml}
     <div class="cover-meta">
       ${authorHtml}

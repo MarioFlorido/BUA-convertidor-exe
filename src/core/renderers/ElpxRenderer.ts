@@ -6,6 +6,7 @@ import { escapeHtml, upperCaseH2 } from '../utils/html';
 import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
+import { longTitleScale, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -120,6 +121,7 @@ export class ElpxRenderer {
     const odeId = createResourceId();
     const odeVersionId = createResourceId();
     const modified = String(Date.now());
+    const headerTitleScale = longTitleScale(this.project.title, HEADER_TITLE_COMFORTABLE_LENGTH);
     // El CSS extra va escapado dentro del XML; eXeLearning lo desescapa al
     // importar y lo coloca tal cual al final del <head> exportado, después del
     // style.css del tema (misma especificidad → gana la cascada). Es el único
@@ -163,6 +165,11 @@ export class ElpxRenderer {
       // cursiva, para que la lista de recursos se distinga del cuerpo del texto
       // (ver resourceIcons.ts).
       RESOURCE_LINK_CSS,
+      // Título largo (viene de «Comentarios» del Word): la banda de cabecera de
+      // los temas mide 400 px y el título va anclado abajo, así que lo que no
+      // cabe se sale por arriba. El tema multiplica su tamaño por esta variable
+      // (ver public/themes/*/style.css); un título corto no la necesita.
+      ...(headerTitleScale < 1 ? [`:root{--bua-title-scale:${headerTitleScale}}`] : []),
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;
