@@ -17,7 +17,7 @@ import { escapeHtml } from '../utils/html';
  * del documento de forma agnóstica al formato de salida.
  */
 
-import { DocxParser } from '../parsers/DocxParser';
+import { DocxParser, type DocxParseResult } from '../parsers/DocxParser';
 import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { buildProjectFromStructure } from './buildFromStructure';
 import { HTML_TRANSFORM_PASSES } from '../transformers/HtmlTransformer';
@@ -43,6 +43,7 @@ import type {
  * @param options - Opciones de importación (heading modes)
  * @param structure - Estructura H1/H2 para parsing semántico (opcional)
  * @param onProgress - Callback para reportar progreso
+ * @param parsed - Resultado de DocxParser si el archivo ya se parseó (evita repetir mammoth)
  * @returns Promise<SemanticDocument> con la semántica del documento
  *
  * @example
@@ -61,7 +62,7 @@ export async function convertDocxToSemanticDocument(
   options: DocxImportOptions,
   structure?: DocumentStructure,
   onProgress?: (progress: DocxImportProgress) => void,
-  precomputedHtml?: string,
+  parsed?: DocxParseResult,
 ): Promise<SemanticDocument> {
   onProgress?.({
     phase: 'read',
@@ -77,23 +78,26 @@ export async function convertDocxToSemanticDocument(
   // Dejar pintar el progreso antes de bloquear el hilo con mammoth
   await yieldToBrowser();
 
-  let htmlValue: string;
-  if (precomputedHtml !== undefined) {
-    htmlValue = precomputedHtml;
-  } else {
-    const parser = new DocxParser();
-    const parseResult = await parser.parse(file);
-    htmlValue = parseResult.html;
-  }
+  const parseResult = parsed ?? (await new DocxParser().parse(file));
 
-  return convertHtmlToSemanticDocument(
-    htmlValue,
+  const project = await convertHtmlToSemanticDocument(
+    parseResult.html,
     file.name,
     options,
     onProgress,
     'progress.parseDocumentStructure',
     structure,
   );
+
+  // El título es el nombre del fichero, salvo que el autor haya escrito uno en
+  // Archivo → Información → Propiedades → Comentarios. Es la salida para los
+  // títulos que no caben en un nombre de fichero (255 caracteres, sin dos
+  // puntos); ver docxCoreProperties.ts para por qué Comentarios y no Título.
+  if (parseResult.metadata.description) {
+    project.title = parseResult.metadata.description;
+  }
+
+  return project;
 }
 
 /**

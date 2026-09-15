@@ -1,5 +1,6 @@
 import mammoth from 'mammoth';
 import { readDocxImageSizes, assignDocxImageSizes } from './docxImageSizes';
+import { readDocxCoreProperties, type DocxCoreProperties } from './docxCoreProperties';
 
 /**
  * Parser para archivos DOCX
@@ -15,10 +16,8 @@ import { readDocxImageSizes, assignDocxImageSizes } from './docxImageSizes';
 
 export interface DocxParseResult {
   html: string;
-  metadata?: {
-    title?: string;
-    author?: string;
-  };
+  /** Propiedades del documento (Archivo → Información → Propiedades). */
+  metadata: DocxCoreProperties;
 }
 
 /**
@@ -215,6 +214,7 @@ export class DocxParser {
   async parse(file: File): Promise<DocxParseResult> {
     const inputBuffer = await file.arrayBuffer();
     const imageSizes = readDocxImageSizes(inputBuffer);
+    const metadata = readDocxCoreProperties(inputBuffer);
 
     // Detectar si estamos en Node.js o en el navegador
     const mammothInput =
@@ -235,7 +235,7 @@ export class DocxParser {
 
     return {
       html: assignDocxImageSizes(applyIndentMarkers(result.value), imageSizes),
-      metadata: {}
+      metadata,
     };
   }
 }

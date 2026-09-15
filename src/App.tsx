@@ -11,7 +11,7 @@ import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/pipeline/parseStructure';
-import { DocxParser } from './core/parsers/DocxParser';
+import { DocxParser, type DocxParseResult } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
 import { yieldToBrowser } from './core/utils/yieldToBrowser';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
@@ -47,7 +47,7 @@ export function App() {
   const [structure, setStructure] = useState<DocumentStructure | null>(null);
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
   const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
-  const [parsedDocxHtml, setParsedDocxHtml] = useState<string | null>(null);
+  const [parsedDocx, setParsedDocx] = useState<DocxParseResult | null>(null);
   const [tagIssues, setTagIssues] = useState<SemanticTagIssue[]>([]);
   const [options, setOptions] = useState<DocxImportOptions>({
     heading1Mode: 'page',
@@ -98,7 +98,7 @@ export function App() {
       const parser = new DocxParser();
       const parseResult = await parser.parse(selectedFile);
 
-      setParsedDocxHtml(parseResult.html);
+      setParsedDocx(parseResult);
       await yieldToBrowser();
       setTagIssues(detectSemanticTagIssues(parseResult.html));
       await yieldToBrowser();
@@ -122,7 +122,7 @@ export function App() {
   const handleStructureCancel = () => {
     setFile(null);
     setStructure(null);
-    setParsedDocxHtml(null);
+    setParsedDocx(null);
     setTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
@@ -160,7 +160,7 @@ export function App() {
         { ...options, themeId: effectiveThemeId },
         structure,
         onProgress,
-        parsedDocxHtml ?? undefined,
+        parsedDocx ?? undefined,
       );
       setSemanticDoc(doc);
 
@@ -185,7 +185,7 @@ export function App() {
     setFile(null);
     setStructure(null);
     setSemanticDoc(null);
-    setParsedDocxHtml(null);
+    setParsedDocx(null);
     setTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
