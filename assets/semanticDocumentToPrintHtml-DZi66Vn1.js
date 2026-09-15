@@ -1,4 +1,4 @@
-import{T as C,t as T,u as _,e as z,a as c,b as E}from"./index-I8JJVO8h.js";const A=["png","jpg","jpeg","webp"],u={ejemplo:{borderColor:"#135d87",bgColor:"#fafbfc",label:"Ejemplo"},definicion:{borderColor:"#6b7280",bgColor:"#fafbfc",label:"Definición"},importante:{borderColor:"#deb13c",bgColor:"rgba(222,177,60,0.3)",label:"Importante"}};async function O(e){const t={themeId:e??"base",coverImageDataUrl:null,buaLogoDataUrl:null,uaLogoDataUrl:null,language:f(e??"base"),primaryColor:"#135d87",accentColor:"#deb13c",fontFamilyTitle:"'Georgia', serif",fontFamilyBody:"'Arial', sans-serif",buaStyles:u};if(!e||e==="base")return t;let n;try{n=await j(e)}catch{return t}return{themeId:e,coverImageDataUrl:W(n),buaLogoDataUrl:h(n,"logo_BUA")??h(n,"logo"),uaLogoDataUrl:h(n,"logo_UA"),...L(n,e)}}async function j(e){const t=C.get(e);if(t&&Object.keys(t.files).length>0)return t.files;const r=T("/BUA-convertidor-exe/",e,t==null?void 0:t.metadata.updatedAt),a=await fetch(r);if(!a.ok)throw new Error(`No se pudo cargar el tema: ${r}`);const o=await a.arrayBuffer();return _(new Uint8Array(o))}function W(e){for(const t of A){const n=`portada_pdf.${t}`;if(e[n]){const r=t==="jpg"||t==="jpeg"?"image/jpeg":t==="webp"?"image/webp":"image/png";return y(e[n],r)}}return null}function h(e,t){for(const n of["png","svg","jpg"]){const r=`img/${t}.${n}`;if(e[r]){const a=n==="svg"?"image/svg+xml":n==="jpg"?"image/jpeg":"image/png";return y(e[r],a)}}return null}function f(e,t,n){if(n)return n;if(t){const a=t.ejemplo.label.toLowerCase().trim();if(a==="exemple")return"ca";if(a==="example")return"en";if(a==="ejemplo")return"es"}const r=e.toLowerCase();return r.includes("phd")||r.includes("_en")||r.includes("-en")?"en":r.includes("doctorat")||r.includes("grau")||r.includes("màster")||r.includes("mster")||r.includes("_ca")||r.includes("_va")||r.includes("-ca")?"ca":"es"}function L(e,t){const n=z(e),r=e["style.css"];if(!r)return{primaryColor:"#135d87",accentColor:"#deb13c",fontFamilyTitle:"'Georgia', serif",fontFamilyBody:"'Arial', sans-serif",buaStyles:u,language:f(t,void 0,n)};const a=new TextDecoder().decode(r),o=B(a),i=/Paleta[:\s]+([#\w\s·,]+)/i.exec(a),l=i?[...i[1].matchAll(/#([0-9a-fA-F]{3,8})/g)].map(p=>`#${p[1]}`):[],s=/font-family:\s*'([^']+)'/.exec(a),d=/\.page-title[^{]*{[^}]*font-family:\s*'([^']+)'/s.exec(a);return{primaryColor:l[0]??"#135d87",accentColor:l[1]??"#deb13c",fontFamilyTitle:d?`'${d[1]}', sans-serif`:s?`'${s[1]}', sans-serif`:"'Georgia', serif",fontFamilyBody:s?`'${s[1]}', sans-serif`:"'Arial', sans-serif",buaStyles:o,language:f(t,o,n)}}function B(e){const t="(#[0-9a-fA-F]{3,8}|rgba?\\([^)]+\\)|hsla?\\([^)]+\\))";function n(o){const i=new RegExp(`\\.${o}\\s*\\{[^}]*border-left:[^;]*solid\\s*${t}`,"s").exec(e);return i?i[1]:null}function r(o){const i=new RegExp(`\\.${o}\\s*\\{[^}]*background(?:-color)?:\\s*${t}`,"s").exec(e);return i?i[1]:null}function a(o){const i=new RegExp(`\\.${o}::before\\s*\\{[^}]*content:\\s*["']([^"']+)["']`,"s").exec(e);return i?i[1]:null}return{ejemplo:{borderColor:n("bua_ejemplo")??u.ejemplo.borderColor,bgColor:r("bua_ejemplo")??u.ejemplo.bgColor,label:a("bua_ejemplo")??u.ejemplo.label},definicion:{borderColor:n("bua_definicion")??u.definicion.borderColor,bgColor:r("bua_definicion")??u.definicion.bgColor,label:a("bua_definicion")??u.definicion.label},importante:{borderColor:n("bua_importante")??u.importante.borderColor,bgColor:r("bua_importante")??u.importante.bgColor,label:a("bua_importante")??u.importante.label}}}function y(e,t){let n="";for(let r=0;r<e.length;r++)n+=String.fromCharCode(e[r]);return`data:${t};base64,${btoa(n)}`}const P={es:"Esta obra está bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional.",en:"This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",ca:"Aquesta obra es troba sota una llicència Creative Commons Reconeixement-CompartirIgual 4.0 Internacional."};function q(e,t,n={}){const r=t.coverImageDataUrl?M(t.coverImageDataUrl):D(t.primaryColor,t.accentColor),a=t.buaLogoDataUrl?`<img class="cover-logo" src="${t.buaLogoDataUrl}" alt="Logo BUA" />`:"",o=e.subtitle?`<p class="cover-subtitle">${c(e.subtitle)}</p>`:"",i=n.author?`<p class="cover-author">${c(n.author)}</p>`:"",l=n.organization?`<p class="cover-organization">${c(n.organization)}</p>`:"",s=n.date?`<p class="cover-date">${c(n.date)}</p>`:"",d=n.license?`<p class="cover-license">${c(n.license)}</p>`:"",p=t.coverImageDataUrl?'<div class="cover-overlay"></div>':"",m=P[t.language],g=`
+import{T as C,t as T,u as _,e as z,a as c,b as E}from"./index-CUN8K_Jh.js";const A=["png","jpg","jpeg","webp"],u={ejemplo:{borderColor:"#135d87",bgColor:"#fafbfc",label:"Ejemplo"},definicion:{borderColor:"#6b7280",bgColor:"#fafbfc",label:"Definición"},importante:{borderColor:"#deb13c",bgColor:"rgba(222,177,60,0.3)",label:"Importante"}};async function O(e){const t={themeId:e??"base",coverImageDataUrl:null,buaLogoDataUrl:null,uaLogoDataUrl:null,language:f(e??"base"),primaryColor:"#135d87",accentColor:"#deb13c",fontFamilyTitle:"'Georgia', serif",fontFamilyBody:"'Arial', sans-serif",buaStyles:u};if(!e||e==="base")return t;let n;try{n=await j(e)}catch{return t}return{themeId:e,coverImageDataUrl:W(n),buaLogoDataUrl:h(n,"logo_BUA")??h(n,"logo"),uaLogoDataUrl:h(n,"logo_UA"),...L(n,e)}}async function j(e){const t=C.get(e);if(t&&Object.keys(t.files).length>0)return t.files;const r=T("/BUA-convertidor-exe/",e,t==null?void 0:t.metadata.updatedAt),a=await fetch(r);if(!a.ok)throw new Error(`No se pudo cargar el tema: ${r}`);const o=await a.arrayBuffer();return _(new Uint8Array(o))}function W(e){for(const t of A){const n=`portada_pdf.${t}`;if(e[n]){const r=t==="jpg"||t==="jpeg"?"image/jpeg":t==="webp"?"image/webp":"image/png";return y(e[n],r)}}return null}function h(e,t){for(const n of["png","svg","jpg"]){const r=`img/${t}.${n}`;if(e[r]){const a=n==="svg"?"image/svg+xml":n==="jpg"?"image/jpeg":"image/png";return y(e[r],a)}}return null}function f(e,t,n){if(n)return n;if(t){const a=t.ejemplo.label.toLowerCase().trim();if(a==="exemple")return"ca";if(a==="example")return"en";if(a==="ejemplo")return"es"}const r=e.toLowerCase();return r.includes("phd")||r.includes("_en")||r.includes("-en")?"en":r.includes("doctorat")||r.includes("grau")||r.includes("màster")||r.includes("mster")||r.includes("_ca")||r.includes("_va")||r.includes("-ca")?"ca":"es"}function L(e,t){const n=z(e),r=e["style.css"];if(!r)return{primaryColor:"#135d87",accentColor:"#deb13c",fontFamilyTitle:"'Georgia', serif",fontFamilyBody:"'Arial', sans-serif",buaStyles:u,language:f(t,void 0,n)};const a=new TextDecoder().decode(r),o=B(a),i=/Paleta[:\s]+([#\w\s·,]+)/i.exec(a),l=i?[...i[1].matchAll(/#([0-9a-fA-F]{3,8})/g)].map(p=>`#${p[1]}`):[],s=/font-family:\s*'([^']+)'/.exec(a),d=/\.page-title[^{]*{[^}]*font-family:\s*'([^']+)'/s.exec(a);return{primaryColor:l[0]??"#135d87",accentColor:l[1]??"#deb13c",fontFamilyTitle:d?`'${d[1]}', sans-serif`:s?`'${s[1]}', sans-serif`:"'Georgia', serif",fontFamilyBody:s?`'${s[1]}', sans-serif`:"'Arial', sans-serif",buaStyles:o,language:f(t,o,n)}}function B(e){const t="(#[0-9a-fA-F]{3,8}|rgba?\\([^)]+\\)|hsla?\\([^)]+\\))";function n(o){const i=new RegExp(`\\.${o}\\s*\\{[^}]*border-left:[^;]*solid\\s*${t}`,"s").exec(e);return i?i[1]:null}function r(o){const i=new RegExp(`\\.${o}\\s*\\{[^}]*background(?:-color)?:\\s*${t}`,"s").exec(e);return i?i[1]:null}function a(o){const i=new RegExp(`\\.${o}::before\\s*\\{[^}]*content:\\s*["']([^"']+)["']`,"s").exec(e);return i?i[1]:null}return{ejemplo:{borderColor:n("bua_ejemplo")??u.ejemplo.borderColor,bgColor:r("bua_ejemplo")??u.ejemplo.bgColor,label:a("bua_ejemplo")??u.ejemplo.label},definicion:{borderColor:n("bua_definicion")??u.definicion.borderColor,bgColor:r("bua_definicion")??u.definicion.bgColor,label:a("bua_definicion")??u.definicion.label},importante:{borderColor:n("bua_importante")??u.importante.borderColor,bgColor:r("bua_importante")??u.importante.bgColor,label:a("bua_importante")??u.importante.label}}}function y(e,t){let n="";for(let r=0;r<e.length;r++)n+=String.fromCharCode(e[r]);return`data:${t};base64,${btoa(n)}`}const P={es:"Esta obra está bajo una licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional.",en:"This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.",ca:"Aquesta obra es troba sota una llicència Creative Commons Reconeixement-CompartirIgual 4.0 Internacional."};function q(e,t,n={}){const r=t.coverImageDataUrl?M(t.coverImageDataUrl):D(t.primaryColor,t.accentColor),a=t.buaLogoDataUrl?`<img class="cover-logo" src="${t.buaLogoDataUrl}" alt="Logo BUA" />`:"",o=e.subtitle?`<p class="cover-subtitle">${c(e.subtitle)}</p>`:"",i=n.author?`<p class="cover-author">${c(n.author)}</p>`:"",l=n.organization?`<p class="cover-organization">${c(n.organization)}</p>`:"",s=n.date?`<p class="cover-date">${c(n.date)}</p>`:"",d=n.license?`<p class="cover-license">${c(n.license)}</p>`:"",p=t.coverImageDataUrl?'<div class="cover-overlay"></div>':"",m=P[t.language],g=`
   <footer class="cover-footer">
     <div class="cover-cc">
       <span class="cover-cc-badge">CC BY-SA 4.0</span>
@@ -508,16 +508,26 @@ import{T as C,t as T,u as _,e as z,a as c,b as E}from"./index-I8JJVO8h.js";const
    protege que la cabecera no quede huérfana al final de página (break-after).
    ──────────────────────────────────────────────────────────────────────────── */
 .idevice-with-title {
-  /* Solo bordes laterales: al fragmentar con Paged.js, left/right se cortan
-     limpio en cada página. El borde superior lo cierra .idevice-header (que
-     solo aparece en el primer fragmento) y no hay border-bottom explícito,
-     por lo que ningún fragmento muestra borde en el punto de ruptura.
-     box-decoration-break:slice (defecto CSS) no funciona de forma fiable en
-     Paged.js 0.4.3, de ahí esta estrategia explícita. */
+  /* Solo bordes laterales aquí: al fragmentar con Paged.js, left/right se
+     cortan limpio en cada página. El borde superior lo cierra .idevice-header
+     (que solo aparece en el primer fragmento). El borde inferior NO se pone
+     en esta regla —si lo hiciera, se repetiría en cada fragmento cuando la
+     caja se parte entre páginas, porque Paged.js clona el contenedor y todos
+     los fragmentos comparten selector/clase—. box-decoration-break:slice
+     (que resolvería esto de forma nativa) no funciona de forma fiable en
+     Paged.js 0.4.3.
+     En su lugar, el script afterRendered (buaCloseIdeviceBottomBorder en
+     semanticDocumentToPrintHtml.ts) añade en tiempo de maquetado la clase
+     .idevice-bottom-close SOLO al último fragmento de cada caja (se haya
+     partido o no), que es la que dibuja el borde inferior de abajo. */
   border-left: 1px solid var(--color-primary, #135d87);
   border-right: 1px solid var(--color-primary, #135d87);
   margin: 14px 0;
   box-sizing: border-box;
+}
+
+.idevice-with-title.idevice-bottom-close {
+  border-bottom: 1px solid var(--color-primary, #135d87);
 }
 
 .idevice-header {
@@ -1176,11 +1186,38 @@ $1`):e+`
       });
     }
 
+    // ── Cerrar el borde inferior de los iDevice con título ───────────────────
+    // .idevice-with-title solo lleva border-left/right en CSS (ver comentario
+    // en printStyles.css): un border-bottom puesto ahí se repetiría en CADA
+    // fragmento cuando Paged.js parte la caja entre páginas, porque clona el
+    // contenedor y ambos fragmentos comparten el mismo data-ref (mismo
+    // mecanismo que buaRepairSplitTables). Aquí, con el maquetado ya
+    // estable, se agrupan los fragmentos por data-ref y solo al ÚLTIMO de
+    // cada grupo (se haya partido la caja o no) se le añade la clase que
+    // dibuja el border-bottom, cerrando el cuadro una sola vez.
+    function buaCloseIdeviceBottomBorder() {
+      var boxes = document.querySelectorAll('.pagedjs_page .idevice-with-title[data-ref]');
+      var groups = {};
+      var i;
+
+      for (i = 0; i < boxes.length; i++) {
+        var ref = boxes[i].getAttribute('data-ref');
+        if (!groups[ref]) groups[ref] = [];
+        groups[ref].push(boxes[i]);
+      }
+
+      Object.keys(groups).forEach(function (ref) {
+        var group = groups[ref];               // querySelectorAll: orden de documento = orden de páginas
+        group[group.length - 1].classList.add('idevice-bottom-close');
+      });
+    }
+
     class PrintAfterRender extends Paged.Handler {
       afterRendered() {
         var ov = document.getElementById('bua-print-overlay');
         if (ov) ov.remove();
         buaRepairSplitTables();              // cabeceras de tablas partidas
+        buaCloseIdeviceBottomBorder();        // borde inferior solo en el último fragmento
         buaPrint();                          // primer print, ya sin barra en el DOM
       }
     }
