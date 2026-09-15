@@ -506,11 +506,38 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
       });
     }
 
+    // ── Cerrar el borde inferior de los iDevice con título ───────────────────
+    // .idevice-with-title solo lleva border-left/right en CSS (ver comentario
+    // en printStyles.css): un border-bottom puesto ahí se repetiría en CADA
+    // fragmento cuando Paged.js parte la caja entre páginas, porque clona el
+    // contenedor y ambos fragmentos comparten el mismo data-ref (mismo
+    // mecanismo que buaRepairSplitTables). Aquí, con el maquetado ya
+    // estable, se agrupan los fragmentos por data-ref y solo al ÚLTIMO de
+    // cada grupo (se haya partido la caja o no) se le añade la clase que
+    // dibuja el border-bottom, cerrando el cuadro una sola vez.
+    function buaCloseIdeviceBottomBorder() {
+      var boxes = document.querySelectorAll('.pagedjs_page .idevice-with-title[data-ref]');
+      var groups = {};
+      var i;
+
+      for (i = 0; i < boxes.length; i++) {
+        var ref = boxes[i].getAttribute('data-ref');
+        if (!groups[ref]) groups[ref] = [];
+        groups[ref].push(boxes[i]);
+      }
+
+      Object.keys(groups).forEach(function (ref) {
+        var group = groups[ref];               // querySelectorAll: orden de documento = orden de páginas
+        group[group.length - 1].classList.add('idevice-bottom-close');
+      });
+    }
+
     class PrintAfterRender extends Paged.Handler {
       afterRendered() {
         var ov = document.getElementById('bua-print-overlay');
         if (ov) ov.remove();
         buaRepairSplitTables();              // cabeceras de tablas partidas
+        buaCloseIdeviceBottomBorder();        // borde inferior solo en el último fragmento
         buaPrint();                          // primer print, ya sin barra en el DOM
       }
     }

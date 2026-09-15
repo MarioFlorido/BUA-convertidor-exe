@@ -476,16 +476,26 @@
    protege que la cabecera no quede huérfana al final de página (break-after).
    ──────────────────────────────────────────────────────────────────────────── */
 .idevice-with-title {
-  /* Solo bordes laterales: al fragmentar con Paged.js, left/right se cortan
-     limpio en cada página. El borde superior lo cierra .idevice-header (que
-     solo aparece en el primer fragmento) y no hay border-bottom explícito,
-     por lo que ningún fragmento muestra borde en el punto de ruptura.
-     box-decoration-break:slice (defecto CSS) no funciona de forma fiable en
-     Paged.js 0.4.3, de ahí esta estrategia explícita. */
+  /* Solo bordes laterales aquí: al fragmentar con Paged.js, left/right se
+     cortan limpio en cada página. El borde superior lo cierra .idevice-header
+     (que solo aparece en el primer fragmento). El borde inferior NO se pone
+     en esta regla —si lo hiciera, se repetiría en cada fragmento cuando la
+     caja se parte entre páginas, porque Paged.js clona el contenedor y todos
+     los fragmentos comparten selector/clase—. box-decoration-break:slice
+     (que resolvería esto de forma nativa) no funciona de forma fiable en
+     Paged.js 0.4.3.
+     En su lugar, el script afterRendered (buaCloseIdeviceBottomBorder en
+     semanticDocumentToPrintHtml.ts) añade en tiempo de maquetado la clase
+     .idevice-bottom-close SOLO al último fragmento de cada caja (se haya
+     partido o no), que es la que dibuja el borde inferior de abajo. */
   border-left: 1px solid var(--color-primary, #135d87);
   border-right: 1px solid var(--color-primary, #135d87);
   margin: 14px 0;
   box-sizing: border-box;
+}
+
+.idevice-with-title.idevice-bottom-close {
+  border-bottom: 1px solid var(--color-primary, #135d87);
 }
 
 .idevice-header {
