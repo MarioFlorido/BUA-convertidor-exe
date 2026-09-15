@@ -1023,7 +1023,9 @@ body.exe-single-page {
   right: 32px !important;
   z-index: 2 !important;
   color: #ffffff !important;
-  font-size: clamp(1.5rem, 3vw, 3.1rem) !important;
+  /* --bua-title-scale la fija ConvertidoreXe (pp_extraHeadContent) cuando el
+     título es largo, para que quepa en la banda; sin ella, tamaño normal. */
+  font-size: calc(clamp(1.5rem, 3vw, 3.1rem) * var(--bua-title-scale, 1)) !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
   text-transform: uppercase !important;
