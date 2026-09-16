@@ -4,6 +4,7 @@ import { renderCoverPage, type CoverPageMeta } from './renderCoverPage';
 import { renderTableOfContents, sectionId, computeHeadingNumbers } from './renderTableOfContents';
 import { optimizeImagesForPrint } from './optimizeImagesForPrint';
 import { escHtml, upperCaseH2 } from '../../utils/html';
+import { pdfBaseName } from '../../utils/pdfFilename';
 
 // CSS importado como string raw para inyectarlo inline en el HTML generado.
 // Necesario porque el HTML se abre como blob: URL — rutas relativas no resuelven.
@@ -56,6 +57,14 @@ export interface PrintRenderOptions {
    * (1., 1.1., 1.1.1., 2.…) tanto en el TOC como en el contenido. Default: false.
    */
   numberedHeadings?: boolean;
+
+  /**
+   * Nombre del fichero de origen con extensión (`nombre.docx` o `nombre.elpx`).
+   * De él sale el nombre que el navegador propone al guardar el PDF (ver
+   * pdfFilename.ts). Si se omite, se usa el título del documento, que es lo que
+   * se hacía antes de que el título pudiera venir de «Comentarios» del Word.
+   */
+  sourceFilename?: string;
 }
 
 /**
@@ -107,6 +116,7 @@ export async function semanticDocumentToPrintHtml(
     useCoverImage = true,
     optimizeImages = true,
     numberedHeadings = false,
+    sourceFilename = '',
   } = options;
 
   // 1. Cargar assets del tema (portada_pdf.*, logos, colores)
@@ -136,6 +146,7 @@ export async function semanticDocumentToPrintHtml(
   // 3. Ensamblar documento HTML completo (Paged.js embebido inline, sin CDN)
   const html = assembleHtmlDocument({
     title: doc.title,
+    pdfFilename: pdfBaseName(sourceFilename, doc.title),
     coverHtml,
     tocHtml,
     contentHtml,
@@ -247,7 +258,10 @@ function expandAccordions(html: string): string {
 // ─── Ensamblador final ────────────────────────────────────────────────────────
 
 interface AssemblyOptions {
+  /** Título del documento — encabezado de cada página (se recorta con «…»). */
   title: string;
+  /** Nombre que el navegador propone al guardar el PDF — va en el `<title>`. */
+  pdfFilename: string;
   coverHtml: string;
   tocHtml: string;
   contentHtml: string;
@@ -308,7 +322,7 @@ function assembleHtmlDocument(opts: AssemblyOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escHtml(opts.title)}</title>
+  <title>${escHtml(opts.pdfFilename)}</title>
 
   <!-- Variables del tema inyectadas por el renderer -->
   <style>

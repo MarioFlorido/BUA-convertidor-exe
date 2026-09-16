@@ -95,6 +95,9 @@ export function DownloadButton({ result, semanticDoc, themeId, onRegenerateElpx 
         includeToc: true,
         useCoverImage,
         numberedHeadings,
+        // El PDF se llama como el .docx, no como el título: con el título de
+        // «Comentarios» salía un nombre de fichero imposible (ver pdfFilename.ts).
+        sourceFilename: result.filename,
       });
 
       const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
