@@ -27,6 +27,7 @@ g.DOMParser = jsdom.window.DOMParser;
 
 import { ElpxRenderer } from './ElpxRenderer';
 import type { SemanticDocument } from '../models/SemanticDocument';
+import { ThemeRegistry } from '../services/ThemeRegistry';
 
 /** Carga el template base (public/base.elpx) como entries descomprimidos. */
 function loadBaseTemplate(): { entries: Record<string, Uint8Array> } {
@@ -122,5 +123,83 @@ describe('ElpxRenderer — opciones de exportación', () => {
     assert.equal(odeProperty(xml, 'pp_addExeLink'), 'false');
     assert.equal(odeProperty(xml, 'pp_addPagination'), 'false');
     assert.equal(odeProperty(xml, 'pp_addMathJax'), 'false');
+  });
+});
+
+describe('ElpxRenderer — pp_subtitle y pp_lang según el idioma del tema', () => {
+  // Los materiales de la BUA no son solo en castellano: hay temas en
+  // valenciano (CID_va, Doctorat…) y en inglés (PhD, Open_Science…). El
+  // subtítulo por defecto y pp_lang (accesibilidad: lectores de pantalla)
+  // deben seguir al idioma del tema elegido, no venir fijos en castellano
+  // (ver metadata.language en themes-config.json). pp_author SÍ se deja
+  // fijo en castellano siempre: es el nombre de la institución, no se
+  // traduce.
+  const registerTestTheme = (id: string, language: string) => {
+    ThemeRegistry.register({ id, name: id, source: 'user', files: {}, metadata: { name: id, language } });
+  };
+
+  test('tema sin idioma conocido (o sin registrar) → castellano', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+    const { blobData } = await renderer.render({});
+    const xml = readContentXml(blobData);
+
+    assert.equal(odeProperty(xml, 'pp_subtitle'), 'Biblioteca Universitaria');
+    assert.equal(odeProperty(xml, 'pp_lang'), 'es');
+  });
+
+  test('tema en valenciano (ca) → "Biblioteca Universitària" y pp_lang=ca', async () => {
+    registerTestTheme('tema-test-ca', 'ca');
+    try {
+      const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+      const { blobData } = await renderer.render({ themeId: 'tema-test-ca' });
+      const xml = readContentXml(blobData);
+
+      assert.equal(odeProperty(xml, 'pp_subtitle'), 'Biblioteca Universitària');
+      assert.equal(odeProperty(xml, 'pp_lang'), 'ca');
+    } finally {
+      ThemeRegistry.remove('tema-test-ca');
+    }
+  });
+
+  test('tema en inglés (en) → "University Library" y pp_lang=en', async () => {
+    registerTestTheme('tema-test-en', 'en');
+    try {
+      const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+      const { blobData } = await renderer.render({ themeId: 'tema-test-en' });
+      const xml = readContentXml(blobData);
+
+      assert.equal(odeProperty(xml, 'pp_subtitle'), 'University Library');
+      assert.equal(odeProperty(xml, 'pp_lang'), 'en');
+    } finally {
+      ThemeRegistry.remove('tema-test-en');
+    }
+  });
+
+  test('subtitle explícito del proyecto gana al idioma del tema (pp_lang sigue al tema)', async () => {
+    registerTestTheme('tema-test-en-2', 'en');
+    try {
+      const doc = { ...makeDocument(), subtitle: 'Subtítulo a medida' };
+      const renderer = new ElpxRenderer(loadBaseTemplate(), doc);
+      const { blobData } = await renderer.render({ themeId: 'tema-test-en-2' });
+      const xml = readContentXml(blobData);
+
+      assert.equal(odeProperty(xml, 'pp_subtitle'), 'Subtítulo a medida');
+      assert.equal(odeProperty(xml, 'pp_lang'), 'en');
+    } finally {
+      ThemeRegistry.remove('tema-test-en-2');
+    }
+  });
+
+  test('pp_author se queda siempre en castellano, sea cual sea el idioma del tema', async () => {
+    registerTestTheme('tema-test-en-3', 'en');
+    try {
+      const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+      const { blobData } = await renderer.render({ themeId: 'tema-test-en-3' });
+      const xml = readContentXml(blobData);
+
+      assert.equal(odeProperty(xml, 'pp_author'), 'Biblioteca de la Universidad de Alicante');
+    } finally {
+      ThemeRegistry.remove('tema-test-en-3');
+    }
   });
 });

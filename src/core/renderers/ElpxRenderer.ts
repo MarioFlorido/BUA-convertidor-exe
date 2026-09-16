@@ -7,6 +7,34 @@ import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 import { longTitleScale, longTitleHeaderCss, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
+import { ThemeRegistry } from '../services/ThemeRegistry';
+
+/**
+ * Idioma del tema elegido (es/ca/en), para las odeProperty que dependen de él
+ * (`pp_lang`, subtítulo por defecto). Muchos materiales son en valenciano o
+ * en inglés (temas CID_va, PhD, Open_Science…): fijarlas siempre en castellano
+ * queda mal en la cabecera del ELPX y, en el caso de `pp_lang`, es además un
+ * problema de accesibilidad (lectores de pantalla). `metadata.language` del
+ * tema (ver themes-config.json y themeConfigParser) es la señal fiable;
+ * cualquier valor desconocido o ausente cae en castellano, que sigue siendo
+ * el idioma por defecto de la biblioteca.
+ */
+const KNOWN_LANGS = new Set(['es', 'ca', 'en']);
+
+function themeLanguage(themeId: string): string {
+  const lang = ThemeRegistry.get(themeId)?.metadata.language;
+  return lang && KNOWN_LANGS.has(lang) ? lang : 'es';
+}
+
+const DEFAULT_SUBTITLE_BY_LANG: Record<string, string> = {
+  es: 'Biblioteca Universitaria',
+  ca: 'Biblioteca Universitària',
+  en: 'University Library',
+};
+
+function defaultSubtitleForLang(lang: string): string {
+  return DEFAULT_SUBTITLE_BY_LANG[lang] ?? DEFAULT_SUBTITLE_BY_LANG.es;
+}
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -180,6 +208,7 @@ export class ElpxRenderer {
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;
+    const lang = themeLanguage(themeId);
     const pageIds = this.project.pages.map(() => createPageId());
     const navStructuresXml = this.project.pages
       .map((page, index) => this.generateOdeNavStructureXml(page, index, pageIds))
@@ -201,9 +230,9 @@ export class ElpxRenderer {
 </odeResources>
 <odeProperties>
   <odeProperty><key>pp_title</key><value>${escapeXml(this.project.title || 'Documento importado')}</value></odeProperty>
-  <odeProperty><key>pp_subtitle</key><value>${escapeXml(this.project.subtitle || 'Biblioteca Universitaria')}</value></odeProperty>
+  <odeProperty><key>pp_subtitle</key><value>${escapeXml(this.project.subtitle || defaultSubtitleForLang(lang))}</value></odeProperty>
   <odeProperty><key>pp_author</key><value>Biblioteca de la Universidad de Alicante</value></odeProperty>
-  <odeProperty><key>pp_lang</key><value>es</value></odeProperty>
+  <odeProperty><key>pp_lang</key><value>${escapeXml(lang)}</value></odeProperty>
   <odeProperty><key>pp_license</key><value>creative commons: attribution - non commercial - share alike 4.0</value></odeProperty>
   <odeProperty><key>pp_licenseUrl</key><value>https://creativecommons.org/licenses/by-nc-sa/4.0/</value></odeProperty>
   <odeProperty><key>pp_theme</key><value>${escapeXml(themeId)}</value></odeProperty>
