@@ -89,15 +89,42 @@ export async function convertDocxToSemanticDocument(
     structure,
   );
 
-  // El título es el nombre del fichero, salvo que el autor haya escrito uno en
-  // Archivo → Información → Propiedades → Comentarios. Es la salida para los
-  // títulos que no caben en un nombre de fichero (255 caracteres, sin dos
-  // puntos); ver docxCoreProperties.ts para por qué Comentarios y no Título.
-  if (parseResult.metadata.description) {
-    project.title = parseResult.metadata.description;
-  }
+  project.title = resolveDocumentTitle(file.name, parseResult.metadata.description).title;
 
   return project;
+}
+
+/** De dónde ha salido el título del documento. */
+export type DocumentTitleSource = 'description' | 'filename';
+
+export interface ResolvedDocumentTitle {
+  title: string;
+  source: DocumentTitleSource;
+}
+
+/**
+ * Decide el título del documento y de dónde sale.
+ *
+ * El título es el nombre del fichero, salvo que el autor haya escrito uno en
+ * Archivo → Información → Propiedades → Comentarios. Es la salida para los
+ * títulos que no caben en un nombre de fichero (255 caracteres, sin dos
+ * puntos); ver docxCoreProperties.ts para por qué Comentarios y no Título.
+ *
+ * Devuelve también el origen porque la pantalla lo enseña antes de convertir
+ * (el banner «Documento»): quien rellena Comentarios necesita ver si ha
+ * entrado mientras todavía puede corregir el Word. Es la misma función la que
+ * decide el título y la que alimenta ese aviso, para que no puedan discrepar.
+ */
+export function resolveDocumentTitle(
+  filename: string,
+  description?: string,
+): ResolvedDocumentTitle {
+  const written = description?.trim();
+  if (written) return { title: written, source: 'description' };
+  return {
+    title: stemFromFilename(filename) || 'Documento importado',
+    source: 'filename',
+  };
 }
 
 /**

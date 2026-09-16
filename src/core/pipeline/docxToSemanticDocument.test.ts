@@ -27,7 +27,11 @@ g.HTMLElement = jsdom.window.HTMLElement;
 g.Text = jsdom.window.Text;
 
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
-import { convertHtmlToSemanticDocument, convertDocxToSemanticDocument } from './docxToSemanticDocument';
+import {
+  convertHtmlToSemanticDocument,
+  convertDocxToSemanticDocument,
+  resolveDocumentTitle,
+} from './docxToSemanticDocument';
 import { parseDocumentStructure } from './parseStructure';
 import { DocxParser } from '../parsers/DocxParser';
 
@@ -110,5 +114,46 @@ describe('convertDocxToSemanticDocument — título del documento', () => {
     assert.equal(doc.title, LONG_TITLE);
     // Solo cambia el título del documento: la página sigue llamándose como su H1
     assert.equal(doc.pages[0].title, 'Tema');
+  });
+});
+
+describe('resolveDocumentTitle — título y su origen', () => {
+  // La pantalla enseña el origen antes de convertir y la pipeline decide el
+  // título al convertir. Si cada una lo calculara por su cuenta podrían contar
+  // cosas distintas, que es el fallo que este aviso viene a evitar.
+
+  test('con «Comentarios», el título sale de ahí', () => {
+    const r = resolveDocumentTitle('nombre superlargo.docx', LONG_TITLE);
+    assert.equal(r.title, LONG_TITLE);
+    assert.equal(r.source, 'description');
+  });
+
+  test('sin «Comentarios», el título sale del nombre del fichero', () => {
+    const r = resolveDocumentTitle('nombre superlargo.docx', undefined);
+    assert.equal(r.title, 'nombre superlargo');
+    assert.equal(r.source, 'filename');
+  });
+
+  test('«Comentarios» en blanco cuenta como vacío', () => {
+    for (const vacio of ['', '   ', '\n\t']) {
+      const r = resolveDocumentTitle('documento.docx', vacio);
+      assert.equal(r.title, 'documento', JSON.stringify(vacio));
+      assert.equal(r.source, 'filename', JSON.stringify(vacio));
+    }
+  });
+
+  test('sin nombre aprovechable queda el respaldo de siempre', () => {
+    const r = resolveDocumentTitle('.docx', undefined);
+    assert.equal(r.title, 'Documento importado');
+    assert.equal(r.source, 'filename');
+  });
+
+  test('lo que anuncia la pantalla es lo que acaba en el documento', async () => {
+    for (const description of [LONG_TITLE, undefined]) {
+      const file = await docxFile('nombre superlargo.docx', description);
+      const doc = await convertDocxToSemanticDocument(file, OPTIONS as any);
+      const anunciado = resolveDocumentTitle('nombre superlargo.docx', description);
+      assert.equal(doc.title, anunciado.title, String(description));
+    }
   });
 });

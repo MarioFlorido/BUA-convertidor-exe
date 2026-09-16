@@ -8,7 +8,7 @@ import { Sidebar } from './components/Sidebar';
 import { Limpiador } from './components/Limpiador';
 import { ConversorElp } from './components/ConversorElp';
 import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
-import { convertDocxToSemanticDocument } from './core/pipeline/docxToSemanticDocument';
+import { convertDocxToSemanticDocument, resolveDocumentTitle } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/pipeline/parseStructure';
 import { DocxParser, type DocxParseResult } from './core/parsers/DocxParser';
@@ -274,6 +274,28 @@ export function App() {
                 <div className="doc-title-text">
                   <span className="doc-title-label">Documento</span>
                   <span className="doc-title-name">{file.name}</span>
+                  {/* De dónde sale el título, SIEMPRE, venga de donde venga. Quien
+                      rellena «Comentarios» necesita ver aquí si ha entrado, cuando
+                      todavía puede corregir el Word; y a quien no conoce el
+                      mecanismo, esta línea se lo enseña. */}
+                  {(() => {
+                    const { title, source } = resolveDocumentTitle(
+                      file.name,
+                      parsedDocx?.metadata?.description,
+                    );
+                    const text =
+                      source === 'description'
+                        ? `Título tomado de «Comentarios» del Word: ${title}`
+                        : 'Título tomado del nombre del archivo';
+                    return (
+                      <span
+                        className={`doc-title-source doc-title-source--${source}`}
+                        title={text}
+                      >
+                        {text}
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
             )}

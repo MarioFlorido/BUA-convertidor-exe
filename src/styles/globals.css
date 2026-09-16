@@ -259,6 +259,24 @@ button {
   white-space: nowrap;
 }
 
+/* De dónde sale el título del recurso. Se muestra siempre: con «Comentarios»
+   relleno y sin él. Una sola línea con puntos suspensivos — el título largo
+   son cientos de caracteres y el banner no es el sitio para leerlo entero;
+   el atributo title lo da completo al pasar el ratón. */
+.doc-title-source {
+  font-size: 0.78rem;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 0.15rem;
+}
+
+/* Venido de «Comentarios»: es lo excepcional, y conviene que se note. */
+.doc-title-source--description {
+  color: var(--text-2);
+}
+
 /* ── Pipeline de pasos (vertical, dentro del sidebar) ─────────────────────── */
 .sidebar-pipeline {
   padding: 0.125rem 1rem 0.5rem;
