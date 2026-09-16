@@ -20,6 +20,7 @@ const jsdom = new JSDOM('<!doctype html><html><body></body></html>');
 
 import {
   longTitleScale,
+  longTitleHeaderCss,
   HEADER_TITLE_COMFORTABLE_LENGTH,
   COVER_TITLE_COMFORTABLE_LENGTH,
 } from './titleScale';
@@ -76,6 +77,36 @@ describe('cabecera del ELPX', () => {
     // El CSS va escapado dentro del XML (`{` y `:` no se escapan)
     assert.match(contentXml, /--bua-title-scale:0\.48\}/);
     assert.match(previewPages['index.html'], /:root\{--bua-title-scale:0\.48\}/);
+  });
+
+  test('título largo: el CSS inyectado no depende del tema instalado', async () => {
+    // eXeLearning exporta con SU copia del tema, que puede ser anterior a
+    // --bua-title-scale. Por eso la regla viaja entera en pp_extraHeadContent.
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument(LONG_TITLE));
+    const { blobData } = await renderer.render({});
+    const contentXml = strFromU8(unzipSync(blobData)['content.xml']);
+    // La banda crece en vez de dejar que el título se escape por arriba…
+    assert.match(contentXml, /min-height:400px !important/);
+    assert.match(contentXml, /justify-content:flex-end !important/);
+    // …y el cuerpo va ya calculado, sin pasar por la variable.
+    assert.match(contentXml, /font-size:max\(1rem, calc\(clamp\(1\.5rem, 3vw, 3\.1rem\) \* 0\.48\)\)/);
+  });
+
+  test('título corto: no se inyecta nada de la cabecera', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument('Normativa y redacción del TFM'));
+    const { blobData } = await renderer.render({});
+    const contentXml = strFromU8(unzipSync(blobData)['content.xml']);
+    assert.doesNotMatch(contentXml, /min-height:400px/);
+    assert.doesNotMatch(contentXml, /justify-content:flex-end/);
+  });
+
+  test('longTitleHeaderCss gana a las reglas del tema (body[class] sube la especificidad)', () => {
+    const css = longTitleHeaderCss(0.48);
+    for (const sel of ['body[class] #header', 'body[class] .exe-content .package-header',
+                       'body[class] #headerContent', 'body[class] .exe-content .package-title',
+                       'body[class] .exe-content .package-subtitle']) {
+      assert.ok(css.includes(sel), sel);
+    }
   });
 
   test('título corto: no se toca el tamaño del tema', async () => {

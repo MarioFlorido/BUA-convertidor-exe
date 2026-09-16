@@ -6,7 +6,7 @@ import { escapeHtml, upperCaseH2 } from '../utils/html';
 import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
-import { longTitleScale, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
+import { longTitleScale, longTitleHeaderCss, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
 
 export interface ElpxRenderOptions {
   themeId?: string;
@@ -167,9 +167,16 @@ export class ElpxRenderer {
       RESOURCE_LINK_CSS,
       // Título largo (viene de «Comentarios» del Word): la banda de cabecera de
       // los temas mide 400 px y el título va anclado abajo, así que lo que no
-      // cabe se sale por arriba. El tema multiplica su tamaño por esta variable
-      // (ver public/themes/*/style.css); un título corto no la necesita.
-      ...(headerTitleScale < 1 ? [`:root{--bua-title-scale:${headerTitleScale}}`] : []),
+      // cabe se sale por arriba.
+      //
+      // La variable la lee el style.css de nuestros temas. No basta: eXeLearning
+      // exporta con el tema que tiene INSTALADO, y si esa copia es anterior a
+      // --bua-title-scale nadie la lee. Por eso va también la regla completa
+      // (ver longTitleHeaderCss), que no depende de la versión del tema.
+      // Un título corto no necesita ninguna de las dos.
+      ...(headerTitleScale < 1
+        ? [`:root{--bua-title-scale:${headerTitleScale}}`, longTitleHeaderCss(headerTitleScale)]
+        : []),
       ...(navExpanded ? ['#siteNav .other-section{display:block}'] : []),
     ].join('');
     const extraHeadXml = `  <odeProperty><key>pp_extraHeadContent</key><value>${escapeXml(`<style>${extraStyles}</style>`)}</value></odeProperty>\n`;
