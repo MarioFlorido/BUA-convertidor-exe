@@ -11,6 +11,7 @@ import { WelcomeTour, type TourScreen } from './components/WelcomeTour';
 import { convertDocxToSemanticDocument, resolveDocumentTitle } from './core/pipeline/docxToSemanticDocument';
 import { semanticDocumentToElpx } from './core/converters/semanticDocumentToElpx';
 import { parseDocumentStructure } from './core/pipeline/parseStructure';
+import { rememberStructure, recallStructure, type RecallKind } from './core/services/structureMemory';
 import { DocxParser, type DocxParseResult } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
 import { yieldToBrowser } from './core/utils/yieldToBrowser';
@@ -45,6 +46,9 @@ export function App() {
   const [file, setFile] = useState<File | null>(null);
   const [screen, setScreen] = useState<AppScreen>('upload');
   const [structure, setStructure] = useState<DocumentStructure | null>(null);
+  // De dónde viene la estructura del paso 2: `null` = recién parseada (en
+  // blanco); si no, recuperada de la memoria del navegador (structureMemory).
+  const [structureRecall, setStructureRecall] = useState<RecallKind | null>(null);
   const [state, setState] = useState<ConversionState>({ status: 'idle' });
   const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
   const [parsedDocx, setParsedDocx] = useState<DocxParseResult | null>(null);
@@ -103,7 +107,11 @@ export function App() {
       setTagIssues(detectSemanticTagIssues(parseResult.html));
       await yieldToBrowser();
       const parsedStructure = await parseDocumentStructure(parseResult.html);
-      setStructure(parsedStructure);
+      // Si este Word (o su traducción) ya se configuró en este navegador, el
+      // paso 2 se abre con aquella configuración en vez de en blanco.
+      const recalled = recallStructure(parsedStructure);
+      setStructure(recalled?.structure ?? parsedStructure);
+      setStructureRecall(recalled?.kind ?? null);
       setScreen('structure');
       setState({ status: 'idle' });
     } catch (error) {
@@ -116,12 +124,14 @@ export function App() {
 
   const handleStructureConfirm = (configuredStructure: DocumentStructure) => {
     setStructure(configuredStructure);
+    rememberStructure(configuredStructure);
     setScreen('theme');
   };
 
   const handleStructureCancel = () => {
     setFile(null);
     setStructure(null);
+    setStructureRecall(null);
     setParsedDocx(null);
     setTagIssues([]);
     setScreen('upload');
@@ -184,6 +194,7 @@ export function App() {
   const handleReset = () => {
     setFile(null);
     setStructure(null);
+    setStructureRecall(null);
     setSemanticDoc(null);
     setParsedDocx(null);
     setTagIssues([]);
@@ -310,6 +321,7 @@ export function App() {
             {screen === 'structure' && structure && (
               <StructureConfigurator
                 structure={structure}
+                recall={structureRecall}
                 tagIssues={tagIssues}
                 onConfirm={handleStructureConfirm}
                 onCancel={handleStructureCancel}

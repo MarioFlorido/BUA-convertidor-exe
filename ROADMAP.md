@@ -35,6 +35,8 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 - [ ] ⚪ **Recordar preferencias de conversión** (`localStorage`). Si se
   convierten documentos parecidos a menudo, recordar las últimas elecciones
   (tipo de H2 por defecto, tema, índice plegado/desplegado) ahorra clics.
+  _Hecho para la estructura del paso 2 (`structureMemory`): el mismo Word o su
+  traducción recuperan el árbol configurado. Queda lo demás (tema, índice)._
 
 - [ ] 🟡 **Modo mantenimiento activable desde el panel de admin.** Un toggle
   en `OfficialThemeAdmin` que escribe `public/maintenance.json`

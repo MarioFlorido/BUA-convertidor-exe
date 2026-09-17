@@ -18,6 +18,10 @@ Transforma documentos Word en cursos eXeLearning listos para usar. Sin servidore
 
 El documento nunca sale de tu navegador. ConvertidoreXe procesa todo localmente.
 
+Si vuelves a cargar un Word que ya configuraste en este navegador —o una versión
+en otro idioma con los mismos encabezados—, el paso 2 se abre con la estructura
+de la última vez. No hay que hacer nada: si el documento es otro, sale en blanco.
+
 ¿Tienes cursos del **eXeLearning clásico** (archivos `.elp` de la versión 2.x)? La utilidad
 **Conversor de elp antiguo a docx** (menú lateral) los convierte en un Word con su texto e imágenes,
 listo para revisarlo y pasarlo por este mismo flujo. Lo que Word no puede representar

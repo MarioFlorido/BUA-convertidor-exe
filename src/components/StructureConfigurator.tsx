@@ -4,10 +4,17 @@ import {
   describeSemanticTagIssue,
   type SemanticTagIssue,
 } from '../core/validation/semanticTagBalance';
+import type { RecallKind } from '../core/services/structureMemory';
 import { ContentTreeView } from './ContentTreeView';
 
 interface StructureConfiguratorProps {
   structure: DocumentStructure;
+  /**
+   * Si la estructura viene ya rellena desde la memoria del navegador (el
+   * mismo Word o su traducción, configurados antes), de qué tipo es la
+   * coincidencia; `null` si es la recién parseada, en blanco.
+   */
+  recall?: RecallKind | null;
   /** Avisos (no bloqueantes) de cajas semánticas [ejemplo]/[fin] mal cerradas. */
   tagIssues?: SemanticTagIssue[];
   onConfirm: (structure: DocumentStructure) => void;
@@ -84,7 +91,19 @@ const BLOCK2: { option: H2StructureOption; label: string }[] = [
   { option: 'tabs',      label: 'Pestañas' },
 ];
 
-export function StructureConfigurator({ structure, tagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
+/**
+ * Una sola frase de ayuda. Si el árbol viene ya relleno de la memoria, esa
+ * frase dice de dónde sale en vez de explicar cómo rellenarlo: quien ya lo
+ * configuró una vez no necesita la explicación, y sí saber por qué no está en
+ * blanco. Nada que pulsar: la estructura se edita igual que siempre.
+ */
+const HELP_TEXT: Record<RecallKind | 'none', string> = {
+  none: 'Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.',
+  same: 'Estructura recuperada de la última vez que configuraste este documento en este navegador.',
+  similar: 'Estructura recuperada de un documento con los mismos encabezados que configuraste antes en este navegador.',
+};
+
+export function StructureConfigurator({ structure, recall = null, tagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
   const [localStructure, setLocalStructure] = useState(structure);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
@@ -179,9 +198,7 @@ export function StructureConfigurator({ structure, tagIssues = [], onConfirm, on
       )}
 
       <div className="structure-top-bar">
-        <p className="help-text">
-          Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.
-        </p>
+        <p className="help-text">{HELP_TEXT[recall ?? 'none']}</p>
         <div className="expand-collapse-bar">
           <button
             className="btn-expand-all"
