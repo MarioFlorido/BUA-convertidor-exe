@@ -1079,7 +1079,7 @@ button {
   gap: 0.45rem;
   padding: 0.4rem 0.7rem;
   background: var(--blue-light);
-  border: 1px solid var(--blue-border);
+  border: 3px solid var(--blue-border);
   border-radius: var(--radius-sm);
   color: var(--blue-active);
   font-weight: 500;
