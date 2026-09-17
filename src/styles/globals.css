@@ -1070,6 +1070,28 @@ button {
   margin-top: 0.2rem;
 }
 
+/* Estructura recuperada de la memoria del navegador: la frase de ayuda cambia
+   de sentido («no está en blanco porque…») y tiene que verse. Mismo lenguaje
+   que .alert-info, pero en línea: sigue siendo una sola frase, sin bloque. */
+.help-text--recall {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem;
+  background: var(--blue-light);
+  border: 1px solid var(--blue-border);
+  border-radius: var(--radius-sm);
+  color: var(--blue-active);
+  font-weight: 500;
+}
+
+.help-text--recall svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--blue);
+}
+
 .expand-collapse-bar {
   display: flex;
   align-items: center;
