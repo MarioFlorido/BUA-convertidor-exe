@@ -15,6 +15,7 @@
  */
 
 import type { ParsedElp } from './elpParser';
+import { ELP_CONVERSION_DESCRIPTION } from '../parsers/docxCoreProperties';
 import { sniffImageSize } from '../utils/imageSize';
 import type { FileChild, ISectionOptions, Paragraph, ParagraphChild } from 'docx';
 
@@ -82,7 +83,7 @@ export async function convertParsedElpToDocx(parsed: ParsedElp): Promise<ElpDocx
   const document = new docx.Document({
     creator: parsed.author || 'ConvertidoreXe',
     title: parsed.title,
-    description: 'Convertido desde eXeLearning clásico (.elp) por ConvertidoreXe',
+    description: ELP_CONVERSION_DESCRIPTION,
     numbering: {
       config: [
         {
