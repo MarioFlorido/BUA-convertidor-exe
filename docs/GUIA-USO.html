@@ -410,7 +410,7 @@
 
     <h3 class="paso-title"><span class="paso-label">Paso 3</span>Etiquetas semánticas</h3>
 
-    <p>Se escriben entre corchetes y hay dos familias: las <strong>cajas</strong>, que envuelven un bloque de texto y se cierran con <code>[fin]</code>, y las <strong>líneas de recurso</strong>, que marcan una sola línea y no se cierran.</p>
+    <p>Se escriben entre corchetes y hay dos familias: las <strong>cajas</strong>, que envuelven un bloque de texto y se cierran con <code>[fin]</code>, y las <strong>líneas de recurso</strong>, que marcan una sola línea y no se cierran. Aparte quedan tres marcadores sueltos, también sin cierre: los de tabla (<code>[horizontal]</code> y <code>[vertical]</code>, en el Paso 4) y el que cierra un acordeón (<code>[fin-acordeón]</code>, más abajo).</p>
 
     <h4>Cajas de contenido</h4>
 
@@ -450,6 +450,17 @@ Contenido del ejemplo...
 
     <p>A diferencia de las cajas, <strong>no llevan <code>[fin]</code></strong>: afectan a su línea y a nada más. Funcionan tanto en un párrafo como en un elemento de una lista, que es la forma natural de escribir una lista de recursos. Si la etiqueta se queda sola, sin texto detrás, se deja sin transformar a propósito: al verla impresa sabes que ahí falta el recurso.</p>
 
+    <h4>Cierre de un acordeón o de unas pestañas</h4>
+
+    <p>Esta etiqueta se escribe en Word, pero solo actúa si en el paso de estructura de ConvertidoreXe configuras ese Título 2 como <strong>Acordeón</strong> o <strong>Pestañas</strong>. Un acordeón se queda con <em>todo</em> el texto que le sigue hasta el próximo Título 2; si quieres que el apartado continúe con texto normal, fuera del desplegable, escribe <code>[fin-acordeón]</code> solo, en un párrafo propio, en el punto donde el acordeón debe terminar:</p>
+
+    <pre>Título 2 (configurado como Acordeón)
+Contenido del panel...
+[fin-acordeón]
+Este párrafo ya sale fuera del desplegable, como texto normal del apartado.</pre>
+
+    <p>No lleva <code>[fin]</code> y admite las mismas variantes que el resto (<code>[fin acordeón]</code>, <code>[Fin acordeon]</code>, <code>[FIN-ACORDEON]</code>…). Tiene que ir <strong>solo en su párrafo</strong>: dentro de un elemento de lista o compartiendo línea con otro texto no corta el acordeón, y ConvertidoreXe te avisa antes de convertir. Si lo escribes en un apartado que al final no configuras como acordeón ni pestañas, se elimina sin dejar rastro.</p>
+
     <h3 class="paso-title"><span class="paso-label">Paso 4</span>Tablas</h3>
 
     <p>Para que ConvertidoreXe sepa cómo pintar los encabezados de una tabla, añade uno de estos marcadores en un párrafo justo encima (sin <code>[fin]</code> de cierre):</p>
@@ -470,7 +481,7 @@ Contenido del ejemplo...
     <h3 class="paso-title"><span class="paso-label">Paso 2</span>Estructura</h3>
     <p>Cada Título 1 aparece como una sección expandible. Para cada uno (salvo el primero, fijo como página principal) elige el nivel (<strong>Página principal</strong>, <strong>Subpágina</strong> o <strong>3er nivel</strong>) y, dentro, configura cada Título 2 como <strong>Título de iDevice</strong>, <strong>Cabecera 2 en texto</strong>, o como efecto especial: <strong>Acordeón</strong> o <strong>Pestañas</strong>.</p>
 
-    <p>Un acordeón (o grupo de pestañas) se queda con <em>todo</em> el texto que le sigue hasta el próximo Título 2. Si quieres que, tras el desplegable, el apartado <strong>continúe</strong> con texto normal (no dentro del panel), escribe en Word <code>[fin-acordeón]</code> en un párrafo propio, en el punto donde el acordeón debe terminar: lo que vaya después saldrá fuera del desplegable. Como los demás marcadores, es indiferente a mayúsculas, tildes y al guion o espacio (<code>[Fin acordeon]</code> también vale) y no necesita <code>[fin]</code>.</p>
+    <p>Un acordeón (o grupo de pestañas) se queda con <em>todo</em> el texto que le sigue hasta el próximo Título 2. Si quieres que, tras el desplegable, el apartado <strong>continúe</strong> con texto normal (no dentro del panel), escribe en Word <code>[fin-acordeón]</code> en un párrafo propio, en el punto donde el acordeón debe terminar: lo que vaya después saldrá fuera del desplegable. Como los demás marcadores, es indiferente a mayúsculas, tildes y al guion o espacio (<code>[Fin acordeon]</code> también vale) y no necesita <code>[fin]</code>. La etiqueta se explica con el resto en el <a href="#preparar">Eje 1, Paso 3</a>.</p>
 
     <p>Al pulsar <strong>Continuar con esta estructura</strong>, la configuración se guarda en tu navegador. Si vuelves a cargar el mismo Word —o una versión en otro idioma con los mismos encabezados—, este paso se abre ya con la estructura de la última vez y puedes retocarla o seguir adelante. Si el documento es otro, sale en blanco como siempre.</p>
 
