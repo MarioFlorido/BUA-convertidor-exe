@@ -350,6 +350,13 @@ flowchart TD
       </ul>
       <p>No se cierran con <code>[fin]</code>: afectan solo a su línea. Valen en un párrafo o en un elemento de lista. Los dos puntos son obligatorios — un <code>[enlace]</code> sin ellos llega al curso tal cual, para poder transcribir textos con corchetes.</p>
 
+      <h3>Cierre de acordeón o pestañas</h3>
+      <p>Un Título 2 configurado como <strong>Acordeón</strong> o <strong>Pestañas</strong> en el paso de estructura se queda con todo el texto hasta el siguiente Título 2. Para que el apartado continúe fuera del desplegable, escribe el marcador solo, en un párrafo propio, donde el acordeón deba terminar:</p>
+      <ul>
+        <li><code>[fin-acordeón]</code> → Lo anterior queda dentro del panel; lo posterior sale fuera, como texto normal del apartado</li>
+      </ul>
+      <p>No lleva <code>[fin]</code> y admite las variantes habituales (<code>[fin acordeón]</code>, <code>[Fin acordeon]</code>, <code>[FIN-ACORDEON]</code>…). Tiene que ir solo en su párrafo —ni en un elemento de lista ni junto a otro texto—; si no, no corta el acordeón y ConvertidoreXe avisa antes de convertir. Donde no hay acordeón se elimina sin dejar rastro.</p>
+
       <p>Aparte de estas etiquetas, un <strong>título con hiperenlace</strong> (Título 2, 3 o 4) conserva el enlace y se marca solo con un icono de enlace externo.</p>
 
       <hr>

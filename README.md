@@ -70,6 +70,19 @@ ellos no hay etiqueta. Así, un texto que transcriba corchetes —los prompts de
 curso sobre IA, por ejemplo: «resume el [texto] y añade el [enlace]»— llega al
 curso tal cual, sin que nada se convierta en icono.
 
+Si en el paso de estructura configuras un Título 2 como **Acordeón** o **Pestañas**,
+el desplegable se queda con todo el texto hasta el siguiente Título 2. Para que el
+apartado continúe fuera del desplegable, escribe este marcador solo, en un párrafo
+propio, donde el acordeón deba terminar:
+
+```
+[fin-acordeón]   → cierra el acordeón; lo que sigue sale fuera, como texto normal
+```
+
+Tampoco se cierra con `[fin]`. Si va dentro de una lista o junto a otro texto no corta
+el acordeón (la app avisa antes de convertir), y si el apartado no acaba siendo acordeón
+ni pestañas, el marcador se elimina sin más.
+
 El tema que elijas aporta los colores y las etiquetas. ConvertidoreXe es bastante robusto: no le importan mayúsculas/minúsculas, tildes o cosas raras que Word inserta. Funciona.
 
 ---
