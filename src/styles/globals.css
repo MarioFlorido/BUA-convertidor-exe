@@ -181,31 +181,11 @@ button {
   color: inherit;
 }
 
-/* Etiqueta de la acción: encoge y envuelve antes que empujar el badge NEW
-   fuera de la fila o del botón. */
+/* Etiqueta de la acción: encoge y envuelve antes que desbordar la fila
+   o el botón. */
 .sidebar-action-label {
   flex: 1;
   min-width: 0;
-}
-
-/* Distintivo «NEW» para utilidades recién estrenadas del menú — elemento propio
-   de la fila (flex), no superíndice dentro del texto: se alinea solo, a la
-   misma altura que la etiqueta, sin desplazamientos manuales que se descuadran
-   al cambiar el tamaño de letra o el ancho del sidebar. Mismo idioma visual
-   que .limpiador-chip; quitarlo cuando dejen de ser novedad. */
-.sidebar-action-new {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  line-height: 1;
-  color: var(--blue);
-  background: var(--blue-light);
-  border: 1px solid var(--blue-border);
-  padding: 0.15rem 0.32rem;
-  border-radius: 4px;
 }
 
 /* Fila del toggle "Tour" en el sidebar — mismo padding que .sidebar-action

@@ -149,7 +149,6 @@ export function Sidebar({
           >
             <BroomIcon />
             <span className="sidebar-action-label">Limpiador de Word</span>
-            <span className="sidebar-action-new">NEW</span>
           </button>
         )}
 
@@ -161,7 +160,6 @@ export function Sidebar({
           >
             <ConvertFileIcon />
             <span className="sidebar-action-label">Conversor de elp antiguo a docx</span>
-            <span className="sidebar-action-new">NEW</span>
           </button>
         )}
 
