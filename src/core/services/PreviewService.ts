@@ -1,6 +1,7 @@
 import type { SemanticDocument, SemanticBlock } from '../models/SemanticDocument';
 import { escapeHtml, stripDiacritics } from '../utils/html';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
+import { BOLD_LINK_COLOR_CSS } from '../utils/boldLinkColor';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 import { RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { longTitleScale, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
@@ -165,6 +166,7 @@ body{overflow-wrap:anywhere}
 .exe-content .bua_tabla_horizontal,.exe-content .bua_tabla_vertical{width:auto;min-width:80%;max-width:100%}
 .exe-content img.bua_img_inline{display:inline;vertical-align:middle;margin:0 .25em 0 0;box-shadow:none;border-radius:0}
 ${LINKED_HEADING_ICON_CSS}
+${BOLD_LINK_COLOR_CSS}
 ${RESOURCE_LINK_CSS}
 .idevice_node.text .exe-text-template>:first-child{margin-top:0}
 .idevice_node.text .exe-text-template>:last-child{margin-bottom:0}

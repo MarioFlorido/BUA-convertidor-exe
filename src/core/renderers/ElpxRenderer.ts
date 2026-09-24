@@ -5,6 +5,7 @@ import { extractImages, RESOURCE_DIR } from '../transformers/ImageExtractor';
 import { escapeHtml, upperCaseH2 } from '../utils/html';
 import { yieldToBrowser } from '../utils/yieldToBrowser';
 import { LINKED_HEADING_ICON_CSS } from '../utils/externalLinkIcon';
+import { BOLD_LINK_COLOR_CSS } from '../utils/boldLinkColor';
 import { RESOURCE_LINK_CSS } from '../utils/resourceIcons';
 import { longTitleScale, longTitleHeaderCss, HEADER_TITLE_COMFORTABLE_LENGTH } from '../utils/titleScale';
 import { ThemeRegistry } from '../services/ThemeRegistry';
@@ -189,6 +190,9 @@ export class ElpxRenderer {
       // Encabezado (H2/H3/H4) que ADEMÁS es un enlace: icono de «enlace externo»
       // en superíndice detrás del texto enlazado (ver externalLinkIcon.ts).
       LINKED_HEADING_ICON_CSS,
+      // Enlace en negrita: que el strong del tema no le quite el color de
+      // enlace (ver boldLinkColor.ts).
+      BOLD_LINK_COLOR_CSS,
       // Líneas de recurso ([vídeo:], [documento:], [enlace:]): icono delante y
       // cursiva, para que la lista de recursos se distinga del cuerpo del texto
       // (ver resourceIcons.ts).

@@ -1,5 +1,6 @@
 /**
- * Tests de DocxParser — conservación de SANGRÍAS de párrafo (MLA/APA).
+ * Tests de DocxParser — conservación de SANGRÍAS de párrafo (MLA/APA) y
+ * reparación de los enlaces pegados con opciones (\t, \o).
  *
  * Runner: node:test vía tsx (sin dependencias extra).
  *   npm test            → ejecuta todos los *.test.ts
@@ -13,6 +14,7 @@
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert/strict';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { zipSync, strToU8 } from 'fflate';
 import { DocxParser } from './DocxParser';
 
 // 720 twips = 0.5in = 36pt ; 480 twips = 24pt
@@ -96,5 +98,83 @@ describe('DocxParser — sin sangrías', () => {
       new Paragraph({ children: [new TextRun('Dos.')] }),
     ]);
     assert.equal(html, '<p>Uno.</p><p>Dos.</p>');
+  });
+});
+
+/**
+ * Enlaces pegados (código de campo HYPERLINK) con opciones detrás de la URL.
+ * La librería `docx` no genera códigos de campo, así que el DOCX se monta a
+ * mano: solo lo imprescindible para que Mammoth lo abra.
+ */
+async function parseDocumentXml(bodyXml: string): Promise<string> {
+  const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  const zip = zipSync({
+    '[Content_Types].xml': strToU8(
+      '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+        '<Default Extension="xml" ContentType="application/xml"/>' +
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>',
+    ),
+    '_rels/.rels': strToU8(
+      '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
+    ),
+    'word/document.xml': strToU8(
+      `<?xml version="1.0" encoding="UTF-8"?><w:document ${W}><w:body>${bodyXml}</w:body></w:document>`,
+    ),
+  });
+  const file = new File([zip], 'test.docx', {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  });
+  const { html } = await new DocxParser().parse(file);
+  return html;
+}
+
+/** Párrafo con un enlace en negrita hecho con código de campo. */
+function fieldLinkParagraph(instr: string, text: string): string {
+  const bold = '<w:rPr><w:b/></w:rPr>';
+  return (
+    `<w:p><w:r>${bold}<w:fldChar w:fldCharType="begin"/></w:r>` +
+    `<w:r>${bold}<w:instrText xml:space="preserve">${instr}</w:instrText></w:r>` +
+    `<w:r>${bold}<w:fldChar w:fldCharType="separate"/></w:r>` +
+    `<w:r>${bold}<w:t>${text}</w:t></w:r>` +
+    `<w:r>${bold}<w:fldChar w:fldCharType="end"/></w:r></w:p>`
+  );
+}
+
+describe('DocxParser — enlaces pegados con opciones', () => {
+  test('\\t "_blank" detrás de la URL no se cuela en el href', async () => {
+    // Caso real: «Fuentes de información especializada para el TFG en Ciencias».
+    const html = await parseDocumentXml(
+      fieldLinkParagraph(
+        ' HYPERLINK "https://www.ams.org/publications/journals/journals" \\t "_blank" ',
+        'American Mathematical Society',
+      ),
+    );
+    assert.equal(
+      html,
+      '<p><strong><a href="https://www.ams.org/publications/journals/journals">American Mathematical Society</a></strong></p>',
+    );
+  });
+
+  test('\\o "información" detrás de la URL tampoco', async () => {
+    const html = await parseDocumentXml(
+      fieldLinkParagraph(' HYPERLINK "https://dialnet.unirioja.es/tesis" \\o "Dialnet" ', 'Dialnet Plus'),
+    );
+    assert.match(html, /<a href="https:\/\/dialnet\.unirioja\.es\/tesis">Dialnet Plus<\/a>/);
+  });
+
+  test('ancla interna (\\l) con opciones → solo el nombre del marcador', async () => {
+    const html = await parseDocumentXml(
+      fieldLinkParagraph(' HYPERLINK \\l "_Toc123" \\o "Ir al apartado" ', 'Apartado'),
+    );
+    assert.match(html, /<a href="#_Toc123">Apartado<\/a>/);
+  });
+
+  test('un enlace pegado sin opciones sale igual que con Mammoth', async () => {
+    const html = await parseDocumentXml(
+      fieldLinkParagraph(' HYPERLINK "https://aquadocs.org/" ', 'Aqua Docs'),
+    );
+    assert.equal(html, '<p><strong><a href="https://aquadocs.org/">Aqua Docs</a></strong></p>');
   });
 });

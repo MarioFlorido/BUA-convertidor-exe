@@ -28,6 +28,7 @@ g.DOMParser = jsdom.window.DOMParser;
 import { ElpxRenderer } from './ElpxRenderer';
 import type { SemanticDocument } from '../models/SemanticDocument';
 import { ThemeRegistry } from '../services/ThemeRegistry';
+import { BOLD_LINK_COLOR_CSS } from '../utils/boldLinkColor';
 
 /** Carga el template base (public/base.elpx) como entries descomprimidos. */
 function loadBaseTemplate(): { entries: Record<string, Uint8Array> } {
@@ -123,6 +124,24 @@ describe('ElpxRenderer — opciones de exportación', () => {
     assert.equal(odeProperty(xml, 'pp_addExeLink'), 'false');
     assert.equal(odeProperty(xml, 'pp_addPagination'), 'false');
     assert.equal(odeProperty(xml, 'pp_addMathJax'), 'false');
+  });
+});
+
+describe('ElpxRenderer — enlaces en negrita', () => {
+  // El tema pinta `.exe-content strong` en gris: sin esta regla, un enlace
+  // hecho con Ctrl+K sobre texto en negrita (<a><strong>) salía gris y sin
+  // subrayar, igual que una negrita cualquiera (ver boldLinkColor.ts).
+  test('content.xml: la negrita dentro de un enlace hereda el color del enlace', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+    const { blobData } = await renderer.render({});
+    const extraHead = odeProperty(readContentXml(blobData), 'pp_extraHeadContent') ?? '';
+    assert.ok(extraHead.includes(BOLD_LINK_COLOR_CSS), 'la regla debe viajar en pp_extraHeadContent');
+  });
+
+  test('preview: las páginas del ZIP llevan la misma regla', async () => {
+    const renderer = new ElpxRenderer(loadBaseTemplate(), makeDocument());
+    const { previewPages } = await renderer.render({});
+    assert.ok(previewPages['index.html'].includes(BOLD_LINK_COLOR_CSS));
   });
 });
 

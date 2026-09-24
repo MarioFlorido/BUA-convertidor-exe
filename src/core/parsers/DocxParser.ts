@@ -8,10 +8,10 @@ import { readDocxCoreProperties, type DocxCoreProperties } from './docxCorePrope
  * Responsabilidad única: Convertir DOCX → HTML semántico
  * Usa Mammoth.js como librería de parsing con configuración estándar
  *
- * IMPORTANTE: salvo la conservación de sangrías y la anotación del tamaño de las
- * imágenes (ambas más abajo), el HTML de salida es idéntico al de Mammoth.js
- * puro. Un párrafo sin sangría manual y un documento sin imágenes salen
- * byte-identical con Mammoth.
+ * IMPORTANTE: salvo la conservación de sangrías, la anotación del tamaño de las
+ * imágenes y la reparación de los enlaces pegados con opciones (las tres más
+ * abajo), el HTML de salida es idéntico al de Mammoth.js puro. Un párrafo sin
+ * sangría manual y un documento sin imágenes salen byte-identical con Mammoth.
  */
 
 export interface DocxParseResult {
@@ -73,7 +73,10 @@ const INDENT_MARK_CLOSE = '\uE001';
 
 // Los typings de mammoth no declaran `transforms` aunque existe en runtime.
 const mammothTransforms = (mammoth as unknown as {
-  transforms: { paragraph: (fn: (p: any) => any) => (element: any) => any };
+  transforms: {
+    paragraph: (fn: (p: any) => any) => (element: any) => any;
+    getDescendantsOfType: (element: any, type: string) => any[];
+  };
 }).transforms;
 
 /** Convierte twips de Word (1/20 de punto) a puntos CSS, redondeados. */
@@ -142,6 +145,38 @@ function markParagraphIndent(paragraph: any) {
       ...paragraph.children,
     ],
   };
+}
+
+/**
+ * Reparación de los ENLACES PEGADOS con opciones (códigos de campo HYPERLINK)
+ * ---------------------------------------------------------------------------
+ * Un enlace pegado desde la web u otro documento no llega como <w:hyperlink>
+ * sino como código de campo, y a menudo con opciones detrás de la URL:
+ *
+ *   HYPERLINK "https://www.ams.org/…/journals" \t "_blank"
+ *
+ * Mammoth (1.12) lee la URL con una expresión voraz, `"(.*)"`, que llega hasta
+ * la ÚLTIMA comilla: el href salía como `https://…/journals" \t "_blank` y el
+ * enlace llevaba a una página inexistente. Igual con `\o "información"` o con un
+ * ancla (`\l "marcador" \o …`).
+ *
+ * Una URL o un nombre de marcador no pueden llevar comillas sin escapar
+ * (serían `%22`), así que todo lo que hay desde la primera comilla es resto de
+ * las opciones y se descarta. La apertura en pestaña nueva ya la pone
+ * openExternalLinksInNewTab a todo enlace externo.
+ */
+function cutAtQuote(value: string | null | undefined): string | null | undefined {
+  if (!value || !value.includes('"')) return value;
+  return value.slice(0, value.indexOf('"')).trim();
+}
+
+/** Transform de Mammoth: recorta las opciones coladas en href/ancla. */
+function repairFieldHyperlinks(paragraph: any) {
+  for (const link of mammothTransforms.getDescendantsOfType(paragraph, 'hyperlink')) {
+    link.href = cutAtQuote(link.href);
+    link.anchor = cutAtQuote(link.anchor);
+  }
+  return paragraph;
 }
 
 /** Traduce el payload del marcador (`"36|-36"`) a declaraciones CSS. */
@@ -227,7 +262,9 @@ export class DocxParser {
       includeDefaultStyleMap: true,
       ignoreEmptyParagraphs: true,
       styleMap: DOCX_STYLE_MAP,
-      transformDocument: mammothTransforms.paragraph(markParagraphIndent),
+      transformDocument: mammothTransforms.paragraph((paragraph) =>
+        markParagraphIndent(repairFieldHyperlinks(paragraph)),
+      ),
       convertImage: mammoth.images.imgElement(async (image) => ({
         src: `data:${image.contentType};base64,${await image.readAsBase64String()}`,
       })),
