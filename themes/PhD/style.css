@@ -716,7 +716,7 @@ label[for="teacher-mode-toggler"] {
 .bua_tabla_horizontal > tbody:first-child > tr:first-child > td,
 .bua_tabla_horizontal > tr:first-child > th,
 .bua_tabla_horizontal > tr:first-child > td {
-    background: #f5f6f7;
+    background: #ced4da;
     color: #135d87;
     font-weight: 600;
     border-bottom: 3px solid #deb13c;
@@ -728,7 +728,7 @@ label[for="teacher-mode-toggler"] {
 
 .bua_tabla_vertical tr td:first-child,
 .bua_tabla_vertical tr th:first-child {
-    background: #f5f6f7;
+    background: #ced4da;
     color: #135d87;
     font-weight: 600;
     border-right: 3px solid #deb13c;
