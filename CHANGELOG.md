@@ -2,6 +2,10 @@
 
 ## Sin publicar — Julio-Septiembre 2026
 
+### El deploy deja de depender de acciones en Node 20
+- GitHub está retirando Node 20 de los runners. `deploy.yml` usaba `actions/checkout@v4`, `actions/setup-node@v4` y `peaceiris/actions-gh-pages@v3`, todas en `node20`: hoy solo daba aviso (el runner las forzaba a Node 24), pero el deploy habría fallado al retirarlo del todo.
+- Subidas a `actions/checkout@v7`, `actions/setup-node@v7` y `peaceiris/actions-gh-pages@v4`; se comprobó en su `action.yml` que las tres declaran `using: node24`. Los parámetros no cambian y se sigue publicando en `gh-pages`, así que la configuración de Pages del repo queda igual.
+
 ### Los enlaces en negrita vuelven a verse como enlaces en el ELPX
 - **Lo destapó** «Fuentes de información especializada para el TFG en Ciencias»: en una misma lista de recursos, unos nombres enlazados salían azules y otros gris oscuro, indistinguibles de una negrita normal. En Word todos se ven igual (estilo «Hipervínculo» más negrita).
 - **La causa**: Word guarda un enlace de dos formas y Mammoth las anida al revés. Insertar vínculo (Ctrl+K) da `<a><strong>…</strong></a>`; un enlace pegado (código de campo HYPERLINK) da `<strong><a>…</a></strong>`. Los temas pintan `.exe-content strong` en `#2a2a2a` y el `base.css` de eXeLearning quita el subrayado a los enlaces, así que en la primera forma el gris del `strong` tapaba el color del enlace. En aquel documento había 57 del primer tipo (grises) y 7 del segundo (azules). Pasaba sobre todo en las viñetas solo porque es donde se pone en negrita el nombre del recurso.
