@@ -1,12 +1,14 @@
 # Changelog
 
+> **[Formato]** marca los cambios que afectan a lo que recibes: el Word convertido, el curso eXeLearning (ELPX) o el PDF. El resto son mejoras de la aplicación.
+
 ## v0.4.0 — Octubre 2026
 
 ### El deploy deja de depender de acciones en Node 20
 - GitHub está retirando Node 20 de los runners. `deploy.yml` usaba `actions/checkout@v4`, `actions/setup-node@v4` y `peaceiris/actions-gh-pages@v3`, todas en `node20`: hoy solo daba aviso (el runner las forzaba a Node 24), pero el deploy habría fallado al retirarlo del todo.
 - Subidas a `actions/checkout@v7`, `actions/setup-node@v7` y `peaceiris/actions-gh-pages@v4`; se comprobó en su `action.yml` que las tres declaran `using: node24`. Los parámetros no cambian y se sigue publicando en `gh-pages`, así que la configuración de Pages del repo queda igual.
 
-### Los enlaces en negrita vuelven a verse como enlaces en el ELPX
+### [Formato] Los enlaces en negrita vuelven a verse como enlaces en el ELPX
 - **Lo destapó** «Fuentes de información especializada para el TFG en Ciencias»: en una misma lista de recursos, unos nombres enlazados salían azules y otros gris oscuro, indistinguibles de una negrita normal. En Word todos se ven igual (estilo «Hipervínculo» más negrita).
 - **La causa**: Word guarda un enlace de dos formas y Mammoth las anida al revés. Insertar vínculo (Ctrl+K) da `<a><strong>…</strong></a>`; un enlace pegado (código de campo HYPERLINK) da `<strong><a>…</a></strong>`. Los temas pintan `.exe-content strong` en `#2a2a2a` y el `base.css` de eXeLearning quita el subrayado a los enlaces, así que en la primera forma el gris del `strong` tapaba el color del enlace. En aquel documento había 57 del primer tipo (grises) y 7 del segundo (azules). Pasaba sobre todo en las viñetas solo porque es donde se pone en negrita el nombre del recurso.
 - **Arreglo** (`src/core/utils/boldLinkColor.ts`): `.exe-content a strong,.exe-content a b{color:inherit}` en el CSS extra del ELPX y de la vista previa, junto al icono de los títulos enlazados. Vale para los nueve temas sin republicarlos y cubre también el enlace en negrita solo en parte (`<a><strong>Enlace</strong> (PDF)</a>`), que salía mitad gris, mitad azul. El PDF no lo necesitaba: la hoja de impresión no da color al `strong`.
@@ -20,7 +22,7 @@
 - **Alcance**: la memoria es la del navegador de cada persona, no viaja con el Word. El primer compañero que configura un documento en cada equipo lo hace una vez; los siguientes usos de ese documento y de sus traducciones en ese navegador ya salen hechos.
 - Verificado en el navegador con `multipage.docx`: primera carga en blanco; recarga de la página y segunda carga con el árbol recuperado; una copia con los títulos traducidos recuperada como «similar»; un Word distinto en blanco.
 
-### Auditoría de etiquetas: cinco fallos silenciosos más, y un validador que no se desincroniza
+### [Formato] Auditoría de etiquetas: cinco fallos silenciosos más, y un validador que no se desincroniza
 - **Lo destapó un aviso falso**: un `[vertical]` perfectamente colocado —solo en su párrafo, justo antes de la tabla— avisaba de que «no precede a una tabla» y, de haberse convertido, habría salido impreso como texto. La causa no estaba en el documento: `DocxParser` conserva la sangría manual de Word como `style` en línea (`<p style="margin-left:18pt">`) y los patrones de marcador exigían un `<p>` pelado, sin atributos. Basta con que el autor sangre el párrafo —o con que pegue contenido de una web, que arrastra sangrías propias— para que la etiqueta deje de reconocerse. Nuevo `P_OPEN_SRC` (un `<p>` que admite atributos) aplicado a los **siete sitios que compartían el fallo**: el validador de marcadores de tabla, `applyTableClasses`, las cajas de `applyDivClasses`, el aislamiento de marcadores de `normalizeSemanticMarkers`, los iframes embebidos y el `[fin acordeón]` de `SemanticBuilder`. Cuatro eran latentes: habrían fallado en silencio en cuanto una caja o un vídeo cayeran en un apartado con sangría.
 - **Y obligó a auditar las cinco familias a fondo**, esta vez sin suponer qué HTML produce Word: se generó un `.docx` con todos los escenarios y se pasó por el parser real. Aparecieron cinco fallos más, todos con la misma forma —la conversión hace algo mal y el autor no se entera—, que es la razón de esta entrada: ninguno daba la cara.
 - **Caja repartida entre bloques** (una `[definición]` en un ítem de lista y su `[fin]` en otro, o una en un `<p>` y otra en un `<li>`): el Caso B de `applyDivClasses` no sabía qué es una frontera de bloque y envolvía a caballo entre dos, `<li><div></li>…<li></div></li>`. El navegador lo deshacía y la caja salía **vacía**, sin un solo aviso. Ahora el contenido inline no puede cruzar un bloque (`BLOCK_BOUNDARY_SRC`) y, cuando la caja no se puede formar, avisa el validador (`box-not-formable`) con la indicación de qué colocación sí funciona.
@@ -51,7 +53,7 @@
 - Se retiran de `BuiltInThemeProvider` el unzip, la validación en arranque y los Object URLs de miniaturas (con su revocación), que ya no tienen función: −150 líneas. El pipeline, los renderers y el PDF no se tocan.
 - **Medido en el navegador**: 0 ZIP y ~4 KB de catálogo en el arranque (antes 8 ZIP y 22,7 MB); conversión completa de `multipage.docx` con tema Doctorado en 1,0 s **incluyendo** la descarga del ZIP, con un único ZIP pedido y el `?v=` correcto; vista previa de PDF sin errores. Nota: un mismo tema se descarga dos veces si se genera ELPX y luego PDF, porque `ThemeService` y `PrintThemeLoader` mantienen cachés separadas (`ThemeService` prefija con `theme/`); la segunda la sirve la caché del navegador, así que no hay tráfico extra.
 
-### Etiquetas de recurso: `[vídeo:]` · `[documento:]` · `[enlace:]`
+### [Formato] Etiquetas de recurso: `[vídeo:]` · `[documento:]` · `[enlace:]`
 - **Tres etiquetas nuevas para señalar los enlaces a recursos.** Escribiendo `[vídeo:] Título del recurso` al principio de la línea, el convertidor sustituye la etiqueta por el icono del tipo de recurso y pone la línea en cursiva. El material BUA enlaza constantemente a vídeos, PDF y webs, y todos esos enlaces se veían igual que cualquier otro enlace del texto: el lector no sabía qué le esperaba al otro lado hasta hacer clic.
 - **No llevan cierre**, a diferencia de las cajas: afectan a su línea y a nada más, así que no hay `[fin]` que olvidar. `applyResourceLinks` (HtmlTransformer) las reconoce al principio de un párrafo o de un ítem de lista —una lista de recursos es lo natural— y deja en el contenido solo la clase `bua_recurso bua_recurso_video|documento|enlace`.
 - **Los dos puntos son obligatorios**, y son lo único que no admite variantes. El material puede ser un curso sobre IA en el que se transcriban prompts con corchetes —«resume el [texto]», «pega aquí el [enlace]»—, y ese literal tiene que llegar intacto al curso: sin los dos puntos no es una etiqueta, así que ni se transforma ni genera aviso.
@@ -61,14 +63,14 @@
 - **Aviso antes de convertir si la etiqueta está mal puesta** (`semanticTagBalance`, nuevo `resource-marker`): un marcador en mitad del párrafo o sin ningún recurso detrás no lo reconoce la transformación y acabaría impreso como texto literal, sin más pista. Mismo fallo silencioso que ya cubría `[horizontal]`/`[vertical]`.
 - 20 tests nuevos (12 en `HtmlTransformer.test.ts`, 8 en `semanticTagBalance.test.ts`) y 1 en `elpToDocx.test.ts` para el viaje de vuelta. Entre ellos, dos que fijan que `[texto]`, `[enlace]` o `[enlace]:` sin los dos puntos dentro de los corchetes llegan intactos.
 
-### Encabezados que además son un enlace
+### [Formato] Encabezados que además son un enlace
 - **El hiperenlace de un título ya no se pierde en la conversión.** `SemanticBuilder` reconstruía los encabezados desde `escapeHtml(texto)` — solo texto plano —, así que un H2/H3/H4 que el autor había enlazado en Word llegaba al curso y al PDF como texto muerto. Nueva `extractHeadingTextHtml` en `buildFromStructure.ts`: guarda el título con sus `<a href>` intactos (y el resto de etiquetas disuelto; las imágenes siguen viajando por `extractHeadingMedia`, que ya existía, para que un logo enlazado no se duplique). Conserva enlaces parciales: si el autor enlazó dos palabras del título, solo esas dos quedan enlazadas.
 - **Salida idéntica cuando no hay enlaces**: la función devuelve `''` si el encabezado no lleva ningún enlace con texto, y el encabezado se escribe por el camino de siempre. Los documentos sin títulos enlazados salen byte a byte como antes.
 - **Icono de «enlace externo» en superíndice detrás del título enlazado** (H2 en modo HTML, H3, H4): dentro de un título grande, en negrita y en mayúsculas, el color de enlace se confunde con el color propio del título y el lector no llega a saber que ahí hay algo que abrir. Se dibuja por CSS —no como etiqueta dentro del contenido— para no ensuciar lo que el autor edita después en eXeLearning. Nuevo `src/core/utils/externalLinkIcon.ts` con el dibujo y la regla en un único sitio, usado por el `content.xml` vía `pp_extraHeadContent` (`ElpxRenderer`, sin republicar los temas) y por las páginas de vista previa del ZIP (`PreviewService`); el PDF lleva su copia en `printStyles.css`, que siendo un `.css` no puede importar del módulo. Es una máscara pintada con `currentColor`, así que toma el color del enlace en cualquier tema; el SVG va percent-encodeado para atravesar intacto el escapado XML del `content.xml`. Solo marca los enlaces `http(s)`: `mailto:` y las anclas internas se conservan sin icono.
 - **Los títulos que el `content.xml` guarda como texto plano siguen perdiendo el enlace** (nombre de página desde H1, título de iDevice, paneles de acordeón/pestañas): ahí eXeLearning solo admite texto y no hay dónde ponerlo. Decisión consciente, con test que lo deja documentado.
 - 8 tests nuevos en `buildFromStructure.test.ts` (título entero enlazado, enlace parcial, `mailto:`, adornos disueltos, logo y texto bajo el mismo enlace, título de iDevice, control sin enlace).
 
-### Caja de búsqueda activada de serie en los ELPX
+### [Formato] Caja de búsqueda activada de serie en los ELPX
 - **Los cursos exportados desde eXeLearning ya incluyen buscador sin configurar nada**: `ElpxRenderer` escribe `pp_addSearchBox` a `true` en el `content.xml` del ELPX (antes `false`). eXeLearning lee esa propiedad al importar el paquete, así que la casilla «Añadir caja de búsqueda» de las propiedades del proyecto llega ya marcada y el sitio web resultante sale con el buscador.
 - **No hace falta tocar nada más.** Analizando dos exportaciones reales de eXeLearning v4.0.2 (con y sin la opción) se comprobó que el motor de búsqueda viaja **siempre** en toda exportación: `$exeExport.searchBar` en `libs/exe_export.js` (búsqueda sin distinción de tildes, resaltado con `<mark>`, deep-linking), los estilos `#exe-client-search-*` de `theme/style.css` y el botón de lupa que inyecta `theme/style.js`. Lo único condicional es el disparador: el contenedor `#exe-client-search` en cada página y el índice `search_index.js`, que genera el propio eXeLearning al exportar. Sin ese contenedor, `searchBar.init()` sale sin hacer nada y el CSS mantiene la lupa oculta (`display: none` salvo `body.exe-search-on`).
 - **Los 8 temas oficiales de la BUA ya lo soportan** (CID_es, CID_va, Ciencia_abierta, Ciencia_oberta, Doctorado, Doctorat, Open_Science, PhD): todos traen las 14 reglas CSS y las 4 referencias JS de `#exe-client-search`. Cero trabajo de tema.
@@ -76,7 +78,7 @@
 - **Las páginas de vista previa del ZIP no llevan el buscador, y da igual**: eXeLearning las regenera y descarta al exportar. Lo que sobrevive al viaje es el `content.xml`.
 - 2 tests nuevos en `ElpxRenderer.test.ts`: uno fija el buscador en `true`, otro deja constancia de que el resto de extras de exportación siguen desactivados (para que un cambio accidental salte).
 
-### Acordeones y pestañas: `[fin-acordeón]` para cerrar el desplegable y seguir el apartado
+### [Formato] Acordeones y pestañas: `[fin-acordeón]` para cerrar el desplegable y seguir el apartado
 - **El problema**: un Título 2 configurado como Acordeón o Pestañas se quedaba con *todo* el texto que le seguía hasta el próximo Título 2, así que los párrafos de cierre del apartado —una conclusión, una lista de lecturas— acababan atrapados dentro del último panel. No había forma de decir «el desplegable termina aquí».
 - **Nuevo marcador `[fin-acordeón]`**, escrito en Word solo en su propio párrafo (`SemanticBuilder.splitAccordionEnd`): lo anterior queda como cuerpo del panel y lo posterior sale FUERA del `<div>` del acordeón, como flujo normal del apartado. Vale igual para pestañas. Tolerante a mayúsculas, tildes y guion/espacio (`[Fin acordeon]`, `[FIN-ACORDEON]`), y no lleva `[fin]`. Sin marcador, el comportamiento no cambia.
 - **Donde no hay acordeón se elimina en silencio** (H2 como iDevice, como cabecera en texto, o fuera de todo H2): nunca sale impreso como texto literal.
@@ -100,7 +102,7 @@
 - **Zona principal del paso 1**: al soltar un `.elp` se explica qué es y se ofrece saltar al conversor (antes decía solo «El archivo debe ser .docx»; de paso, el selector de archivo no validaba la extensión — ahora sí).
 - **Validado con el corpus real de la BUA** (3 cursos 2025-26: 27 páginas, 50 iDevices, 70 recursos): estructura íntegra, imágenes incluidas y round-trip verificado — el Word generado se re-importa limpio en el propio convertidor (mammoth). 12 tests nuevos con fixture sintético de eXe 2.9 (`elpFixture.ts`; sin materiales reales en el repo).
 
-### Etiquetado semántico — robustez y validación
+### [Formato] Etiquetado semántico — robustez y validación
 - **Resuelto el "misterio" de las etiquetas que fallan pese a estar bien escritas** (nueva `normalizeSemanticMarkers` en `HtmlTransformer`, compartida con el validador): Word deja formato invisible en los marcadores — parte de la etiqueta en negrita/cursiva (`<strong>[fin]</strong>`, `[f<em>in</em>]`), bookmarks, `<br/>` de Shift+Enter — y las regex no casaban; borrar y reescribir la etiqueta lo "arreglaba" porque limpiaba esos restos. Ahora se normalizan: se quita el formato dentro y alrededor del marcador (solo si el texto resultante es un marcador reconocido) antes de transformar y de validar.
 - **Etiquetas que comparten párrafo con el contenido**: cada marcador al inicio o final de un `<p>` se aísla en su propio párrafo antes de transformar. Con ello funcionan los casos mixtos que antes fallaban (apertura en párrafo propio + `[fin]` inline, o al revés), el inline puro deja de generar HTML inválido (`<div>` dentro de `<p>`) — ahora produce el mismo HTML que el Caso A — y `[horizontal]`/`[vertical]` admiten texto delante en el mismo párrafo.
 - **El validador usa la misma normalización que el transformador**: un documento que convierte bien nunca da aviso falso, y viceversa.
@@ -111,7 +113,7 @@
 - **PDF, extracción de estilos del tema** (`PrintThemeLoader.extractBuaStyles`): acepta colores `rgb()/rgba()/hsl()/hsla()` además de `#hex` en `border-left` y `background`; un tema con esos formatos ya no cae en silencio a los colores del fallback.
 - Panel de avisos del configurador generalizado (ya no habla solo de cierres con `[fin]`).
 
-### PDF — nitidez de imágenes (capturas de pantalla)
+### [Formato] PDF — nitidez de imágenes (capturas de pantalla)
 - **Política PNG-primero en `optimizeImagesForPrint.ts`**: las capturas de pantalla ya **no** se recomprimen a JPEG (que emborronaba el texto de menús y diálogos). El contenido se clasifica midiendo la fracción de píxeles «planos» (idénticos ±2 a su vecino): capturas y diagramas → PNG sin pérdida; solo lo fotográfico (fotos de cámara) → JPEG 0.82. Una PNG dentro de límites que se queda en PNG no se recodifica: conserva sus bytes originales.
 - **Límites de redimensionado ampliados** de 1600×2200 a 2000×2800 px (~320 DPI a ancho útil de A4), y el reescalado se hace **por mitades sucesivas con `imageSmoothingQuality: 'high'`** (antes un único `drawImage` con suavizado por defecto, que emborronaba las capturas Retina).
 - **Borde fino en lugar de `drop-shadow`** en las imágenes del PDF: cualquier `filter` CSS obliga a Chrome a rasterizar la imagen a ~300 DPI al imprimir (medido: una captura de 2880 px quedaba re-muestreada a 1893 px). Sin filtro, el PDF incrusta cada imagen a su resolución íntegra.
@@ -119,17 +121,17 @@
 - **Imágenes más altas que la página**: `max-height: 235mm` en `printStyles.css` — una captura vertical larga se reescala para caber en la página en lugar de recortarse por abajo.
 - **Deduplicación y secuencialidad** en el optimizador: cada data URL única se procesa una sola vez (imágenes repetidas) y en secuencia (acota el pico de memoria con documentos muy fotográficos).
 
-### URLs excesivamente largas (PDF y eXeLearning)
+### [Formato] URLs excesivamente largas (PDF y eXeLearning)
 - Las URLs (o cualquier palabra sin espacios) que no caben en su contenedor ya **no se desbordan ni se pierden por el margen**: se parten en el punto necesario (`overflow-wrap: anywhere`, solo actúa cuando la palabra no cabe entera).
 - Aplicado en los dos sitios: en el PDF (`printStyles.css`, regla heredada a todo el contenido) y en eXeLearning vía `pp_extraHeadContent` en el `content.xml` (`ElpxRenderer.ts`), el único vehículo de estilos que sobrevive al reexport desde eXeLearning — la propiedad ahora se emite siempre, con la regla del índice desplegado añadida cuando corresponde. Las páginas de preview del ZIP (`PreviewService.ts`) llevan la misma regla.
 
 ## v0.3.0 — Junio 2026
 
-### PDF — motor y rendimiento
+### [Formato] PDF — motor y rendimiento
 - **Paged.js embebido** (dep `pagedjs@0.4.3`, importado como `?raw`): el motor de paginación ya **no** se descarga de un CDN. El PDF se genera 100% offline. El polyfill va en su propio chunk lazy (carga diferida desde `DownloadButton`).
 - **Optimización automática de imágenes** antes de generar el PDF (`optimizeImagesForPrint.ts`): redimensionado (máx. 1600×2200) y recompresión (JPEG 0.82; PNG si hay transparencia). Nunca empeora el original. Reduce el peso del PDF y acelera la paginación.
 
-### PDF — maquetación
+### [Formato] PDF — maquetación
 - Portada a una página exacta (`297mm`) sin página en blanco.
 - Índice con puntos líderes + número de página (técnica flex, porque Paged.js 0.4.3 no soporta `leader()`).
 - `break-inside` ajustado: iDevices, tablas, cajas y acordeones pueden partir entre páginas (sin huecos); imágenes y figuras se mantienen unidas. Protecciones para cabeceras y filas.
@@ -163,7 +165,7 @@
   activo, el globo de cada pantalla reaparece en cada visita; el botón
   «Entendido» solo cierra esa visita concreta, no el conjunto.
 
-### Contenido — Etiquetas semánticas
+### [Formato] Contenido — Etiquetas semánticas
 - **Cuarta etiqueta semántica: `[pie]`** — pie polivalente para ilustraciones,
   tablas y leyendas. Se aplica igual que `[ejemplo]`, `[definición]` e
   `[importante]` (envuelve contenido entre `[pie]` y `[fin]`). En el PDF se
@@ -234,13 +236,13 @@
 
 ## v1.1 — Enero 2026
 
-- Renderer HTML Print / PDF (Paged.js)
-- Portada con imagen, logos BUA/UA y licencia CC multilingüe
-- Índice con paginación automática via Paged.js
-- Cabecera y pie de página con logos en PDF
-- Metadatos ELPX: autoría BUA + licencia CC BY-NC-SA
+- [Formato] Renderer HTML Print / PDF (Paged.js)
+- [Formato] Portada con imagen, logos BUA/UA y licencia CC multilingüe
+- [Formato] Índice con paginación automática via Paged.js
+- [Formato] Cabecera y pie de página con logos en PDF
+- [Formato] Metadatos ELPX: autoría BUA + licencia CC BY-NC-SA
 - Detección de idioma del tema en 3 capas (CSS > ID > fallback)
-- Opción H2 "Pestañas" en el configurador de estructura
+- [Formato] Opción H2 "Pestañas" en el configurador de estructura
 
 ---
 
