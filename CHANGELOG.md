@@ -1,6 +1,6 @@
 # Changelog
 
-## Sin publicar — Julio-Septiembre 2026
+## v0.4.0 — Octubre 2026
 
 ### El deploy deja de depender de acciones en Node 20
 - GitHub está retirando Node 20 de los runners. `deploy.yml` usaba `actions/checkout@v4`, `actions/setup-node@v4` y `peaceiris/actions-gh-pages@v3`, todas en `node20`: hoy solo daba aviso (el runner las forzaba a Node 24), pero el deploy habría fallado al retirarlo del todo.
