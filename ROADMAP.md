@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **26 oct 2026**
+> Última actualización: **12 nov 2026**
 
 ---
 
@@ -102,9 +102,100 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
   Decidir si el beneficio de accesibilidad compensa; quizá ofrecerlo como
   casilla opcional en el paso 3 en lugar de activarlo de serie.
 
+- [ ] ⚪ **Etiquetas semánticas en valenciano e inglés.** Hoy `[ejemplo]`,
+  `[definición]`, `[importante]`, `[pie]`, `[fin]`, `[fin-acordeón]`,
+  `[horizontal]`, `[vertical]`, `[vídeo:]`, `[documento:]` y `[enlace:]` solo se
+  reconocen en castellano: están fijadas como expresiones regulares en
+  `HtmlTransformer.ts` y `semanticTagBalance.ts`, sin alias. Un `[exemple]` o un
+  `[example]` llega al curso como texto literal. Para implementarlo habría que
+  ampliar esas expresiones con los sinónimos (p. ej. `exemple`/`example`,
+  `definició`/`definition`, `peu`/`caption`, `fi`/`end`) y aplicar el mismo cambio
+  al validador, para que los avisos coincidan con lo que se transforma. Pendiente
+  de decidir: quién define los sinónimos oficiales y si se aceptan los dos idiomas
+  a la vez. Surgió al preparar el documento «Funciones de edición del
+  ConvertidoreXe».
+
 ---
 
 ## 2. Mejoras internas (desarrollo)
+
+### Estilos en eXeLearning
+
+- [ ] 🔴 **Un estilo actualizado no llega a quien ya tenía la versión anterior.**
+  El `.elpx` lleva el estilo bueno en `theme/`, pero si el profesor ya tiene
+  instalado un estilo con el mismo nombre, eXeLearning se queda con su copia:
+  el curso se ve, se previsualiza y **se exporta** con la versión vieja. Casos
+  reales: `6c44467` (contraste de las cabeceras de tabla, 25 sep 2026) y
+  `1812687` (título largo) cambiaron el `style.css` de los temas sin tocar el
+  nombre ni el `<version>`. Analizado el 12 nov 2026:
+  - **Cómo decide eXeLearning.** Verificado en su código fuente, igual desde
+    v4.0.0-rc3 hasta v4.0.6 y en `main` a 11 nov 2026
+    (`_checkAndImportTheme` en `public/app/yjs/YjsProjectBridge.js`). Toma el
+    nombre del `theme` de `content.xml`, que es nuestro `themeId`
+    («Doctorado», «CID_en»), y: 1) si hay un estilo del sistema con ese nombre,
+    lo usa; 2) si hay un estilo importado con ese nombre en IndexedDB, carga
+    esa copia y **no mira la carpeta `theme/` del paquete**; 3) solo si no
+    existe, pregunta «¿Quieres instalarlo?». No compara `<version>` ni
+    contenido en ningún paso. Al exportar usa la copia instalada, así que si el
+    profesor reexporta o reenvía el curso, la versión vieja se va con él
+    (deducido leyendo el código; cuadra con lo observado en `titleScale.ts`).
+  - **Nuestros comentarios dicen otra cosa y hay que corregirlos.**
+    `themeVersion.ts` y `GitHubThemePublisher.ts` dicen que eXeLearning
+    identifica el estilo por `<name>` y que detecta la revisión si sube
+    `<version>`. En la v4 no es así: `<name>` solo es el nombre visible y
+    `<version>` no se compara. Subirlo al publicar no hace daño, pero no
+    resuelve esto.
+  - **Otros hallazgos** (no causan el fallo, pero cuentan para el arreglo):
+    - Lo que se cambia directamente en git, sin pasar por el panel de admin,
+      no sube `<version>` ni `updatedAt`. Un número que hay que acordarse de
+      subir nunca será fiable.
+    - Borrar y volver a publicar un tema reinicia la versión: CID_es bajó de
+      5 a 3 (`9ace62a` → `fa92268`).
+    - El `<name>` del `config.xml` no coincide con el id en varios temas:
+      `CID_en` dice `CID_es`, `CID_va` dice `CID-va` y `Doctorado` dice
+      `Doctorado_26-27`. Con el `.elpx` da igual (manda `content.xml`), pero el
+      gestor de estilos de eXeLearning, al instalar un ZIP a mano, usa el
+      `<name>` en minúsculas como clave (`cid_es` para CID_en), que no coincide
+      con la del `.elpx`. Además, ese gestor rechaza un nombre repetido («Ya
+      existe un estilo con este nombre»), así que tampoco sirve para actualizar.
+  - **Opciones:**
+    1. **Nombre con revisión automática (recomendada).** Escribir en
+       `content.xml` (`theme` y `pp_theme`) `«id»_r«hash»`, con un hash corto
+       del contenido del tema. Si el tema no cambia, el nombre tampoco y no se
+       pregunta nada; con cualquier cambio sale un nombre nuevo y eXeLearning
+       pregunta una vez y lo instala. No depende de acordarse de nada y
+       funciona con la v4 actual. Cómo: calcular el hash con `crypto.subtle` al
+       cargar el tema en `ThemeService` (los archivos ya están en memoria);
+       separar en `ElpxRenderer` el id interno (idioma, `ThemeRegistry`) del
+       nombre que va al XML; reescribir en `theme/config.xml` el `<name>` con el
+       nombre nuevo y añadir la revisión al `<title>` («… · rev. 3f9a2c»),
+       porque la lista «Importados» de eXeLearning muestra el `<title>` y, si
+       no, salen filas idénticas. `base` no se toca. Sirve igual para los temas
+       que sube el usuario, y el CSS de los temas solo usa rutas relativas, así
+       que el cambio de nombre no rompe nada. **Contras:** la biblioteca de
+       estilos acumula revisiones (2,4-3,3 MB cada una) que el profesor tiene
+       que borrar a mano; si responde «No», eXeLearning pone el estilo por
+       defecto, no la versión que ya tenía; y un `.elpx` antiguo pedirá
+       instalar su revisión antigua.
+    2. **Borrar el estilo antes de abrir el curso nuevo** (Estilos → Importados
+       → ⋮ → Eliminar; abrir el `.elpx` → «Sí»). Funciona hoy sin tocar código,
+       pero el profesor tiene que saber que el estilo ha cambiado. Vale como
+       **remedio inmediato** y para la ayuda, no como solución.
+    3. **Meter el retoque en `pp_extraHeadContent`**, como ya se hace con el
+       título largo; sobrevive al reexport. Solo sirve para CSS pequeño (no
+       imágenes, fuentes ni `style.js`), duplica reglas entre tema y
+       convertidor y crece con cada parche. Inyectar el `style.css` entero no
+       funciona: sus `url()` relativas apuntan a `theme/` y se resolverían desde
+       la página. Útil para una urgencia, no como sistema.
+    4. **Proponer el cambio a eXeLearning:** en el paso 2 de
+       `_checkAndImportTheme`, si el paquete trae `theme/` y es distinto de la
+       copia instalada, preguntar si se quiere actualizar. Es el arreglo de
+       fondo, pero no depende de nosotros ni de cuándo actualice cada profesor.
+       Mejor comparar contenido que `<version>` (ver lo de CID_es). Compatible
+       con la opción 1.
+  - **Pendiente de decidir:** si se adopta la 1 (y si en el `<title>` va el
+    hash o algo más legible, como la fecha de publicación) y si se abre una
+    incidencia en `github.com/exelearning/exelearning`.
 
 ### Rendimiento / build
 
