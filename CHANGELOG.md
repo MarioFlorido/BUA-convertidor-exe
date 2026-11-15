@@ -2,6 +2,21 @@
 
 > **[Formato]** marca los cambios que afectan a lo que recibes: el Word convertido, el curso eXeLearning (ELPX) o el PDF. El resto son mejoras de la aplicación.
 
+## Sin publicar
+
+### [Formato] La estructura del paso 2 puede venir escrita en el Word
+- **El problema**: quien trabaja con plantillas convierte muchos documentos con la misma estructura y la rehacía a mano en el paso 2. `structureMemory` ayudaba, pero solo recuerda en el navegador de cada uno: no viaja entre compañeros.
+- **Etiqueta entre corchetes al final del título** (`src/core/pipeline/headingTags.ts`). Título 1: `[Página principal]`, `[Subpágina]`, `[3er nivel]`. Título 2: `[Título de iDevice]`, `[Cabecera 2 en texto]`, `[Acordeón]`, `[Pestañas]`. Los mismos literales del paso 2. Solo al final, con espacios y un punto final tolerados detrás; valen mayúsculas, tildes, espacios de más, singular/plural y `3er`/`3.er`/`3º`/`tercer`. Un corchete que no es una etiqueta («Normativa [2024]») se queda como texto.
+- **Sin etiquetas, nada cambia**: el HTML sale byte a byte como antes y la estructura no lleva ningún campo nuevo. Las etiquetas son solo el valor inicial; el usuario tiene la última palabra en el paso 2.
+- **Se quitan en un único punto**: `stripHeadingTags` corre dentro de `DocxParser`, antes de que nadie vea el HTML, y deja la etiqueta anotada en el encabezado (`data-bua-estructura`). Estructura y contenido ven el mismo título limpio, así que no sale en títulos de página, rótulos de acordeón/pestaña, índice, PDF ni huella de memoria, y no se toca el emparejado posicional de `structureContentSymmetry.test`. Trabaja con regex sobre el string, sin reserializar el HTML de Mammoth, y aguanta la etiqueta partida entre runs de Word (`[Sub<strong>página</strong>]`).
+- **Avisos en el paso 2**, en un bloque propio: corchete casi igual a una etiqueta (errata, se deja como texto), etiqueta de otro nivel (`[Acordeón]` en un Título 1: se quita y no se aplica; también en Título 3 o inferior), título que solo tiene la etiqueta (se deja como está: quitarla dejaría un encabezado vacío y su contenido se fundiría con el apartado anterior) y etiqueta distinta de principal en el primer apartado (se ignora). Una estructura no válida (`[3er nivel]` tras una principal) se aplica igual y la señala la validación de siempre.
+- **Frente a la memoria, manda el Word**: las etiquetas entran en la huella (`tags`, aparte de los títulos). Si no han cambiado, se respeta lo ajustado en el paso 2 —también en una traducción con las mismas etiquetas—; si el coordinador las cambia, la entrada deja de coincidir y mandan las nuevas. «Todo por defecto» pasa a ser «lo que dice el Word»: solo se guarda lo que el usuario cambió respecto a eso. Las entradas ya guardadas siguen valiendo.
+- **En el paso 2**: la frase de ayuda dice que la estructura sale de las etiquetas, la opción que pedía el Word lleva la marca «Word» (se ve aunque se haya elegido otra) y «Volver a lo que dice el Word» deshace los cambios.
+- **El conversor de .elp antiguo escribe las etiquetas** (`elpToDocx`): todas las páginas salen como Título 1 y la profundidad va en `[Subpágina]` / `[3er nivel]`. Antes las subpáginas salían como Título 2 y, al re-importar el Word, quedaban como apartados dentro de la página anterior.
+- **El Limpiador no toca las etiquetas**: revisado `docxCleaner.ts`, solo borra párrafos que son enteros una etiqueta de caja y los delimitadores `<<`/`>>`; nunca reescribe el texto de un título.
+- 31 tests nuevos (22 en `headingTags.test.ts`, 7 en `structureMemory.test.ts`, 2 en `DocxParser.test.ts` con un `.docx` real) y 1 adaptado en `elpToDocx.test.ts`; 373 en total. Verificado en el navegador con un Word etiquetado: estructura inicial, avisos, marca «Word», vuelta al Word y memoria.
+- Documentado en `README.md` y en la guía de uso. Queda pendiente la plantilla de ejemplo (ver `ROADMAP.md`).
+
 ## v0.4.0 — Octubre 2026
 
 ### El deploy deja de depender de acciones en Node 20

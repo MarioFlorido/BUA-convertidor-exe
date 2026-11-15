@@ -18,6 +18,7 @@ import {
   recallStructure,
   structureShape,
   structureTitles,
+  structureTags,
   type StorageLike,
 } from './structureMemory';
 
@@ -222,5 +223,81 @@ describe('structureMemory', () => {
 
     assert.equal(recallStructure(parsed(ES), null), null);
     rememberStructure(configure(parsed(ES), LEVELS, OPTIONS), null);
+  });
+
+  // ── Etiquetas de estructura en los títulos del Word: manda el Word ─────────
+
+  /** Estructura parseada de un Word con etiquetas: nace con lo que piden. */
+  function tagged(
+    sections: [string, string[]][],
+    levels: (1 | 2 | 3 | undefined)[],
+    options: (H2StructureOption | undefined)[],
+  ): DocumentStructure {
+    let h2Index = 0;
+    const base = parsed(sections);
+    return {
+      h1Sections: base.h1Sections.map((h1, i) => ({
+        ...h1,
+        ...(levels[i] ? { wordLevel: levels[i], level: i === 0 ? 1 : levels[i]! } : {}),
+        h2Items: h1.h2Items.map((h2) => {
+          const option = options[h2Index++];
+          return option ? { ...h2, wordOption: option, option } : h2;
+        }),
+      })),
+    };
+  }
+
+  const WORD_LEVELS: (1 | 2 | 3 | undefined)[] = [undefined, 2, 2];
+  const WORD_OPTIONS: (H2StructureOption | undefined)[] = ['accordion', 'accordion', undefined, undefined];
+
+  test('la huella de etiquetas es vacía sin etiquetas y cambia con ellas', () => {
+    assert.equal(structureTags(parsed(ES)), '');
+    assert.equal(structureTags(tagged(ES, WORD_LEVELS, WORD_OPTIONS)), '-,2,accordion,accordion,-,2,-');
+  });
+
+  test('un Word con etiquetas, sin tocar nada en el paso 2, no guarda nada', () => {
+    rememberStructure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), storage);
+    assert.equal(recallStructure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), storage), null);
+  });
+
+  test('etiquetas sin cambiar: se respeta lo ajustado en el paso 2', () => {
+    const word = tagged(ES, WORD_LEVELS, WORD_OPTIONS);
+    rememberStructure(configure(word, LEVELS, OPTIONS), storage);
+
+    const recalled = recallStructure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), storage);
+    assert.ok(recalled);
+    assert.equal(recalled.kind, 'same');
+    assert.deepEqual(
+      recalled.structure.h1Sections.flatMap((h1) => h1.h2Items.map((h2) => h2.option)),
+      OPTIONS,
+    );
+    // Lo que dice el Word sigue disponible para «Volver a lo que dice el Word».
+    assert.equal(recalled.structure.h1Sections[1].wordLevel, 2);
+  });
+
+  test('una traducción con las mismas etiquetas también lo recupera', () => {
+    rememberStructure(configure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), LEVELS, OPTIONS), storage);
+    const recalled = recallStructure(tagged(VA, WORD_LEVELS, WORD_OPTIONS), storage);
+    assert.equal(recalled?.kind, 'similar');
+  });
+
+  test('si el coordinador cambia las etiquetas, mandan las nuevas', () => {
+    rememberStructure(configure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), LEVELS, OPTIONS), storage);
+    const changed = tagged(ES, [undefined, 2, 3], WORD_OPTIONS);
+    assert.equal(recallStructure(changed, storage), null);
+  });
+
+  test('añadir etiquetas a un Word ya recordado sin ellas: manda el Word', () => {
+    rememberStructure(configure(parsed(ES), LEVELS, OPTIONS), storage);
+    assert.equal(recallStructure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), storage), null);
+    // …y el mismo Word sin etiquetas sigue recuperando lo suyo.
+    assert.equal(recallStructure(parsed(ES), storage)?.kind, 'same');
+  });
+
+  test('dejar todo por defecto en un Word con etiquetas SÍ se guarda (difiere del Word)', () => {
+    const word = tagged(ES, WORD_LEVELS, WORD_OPTIONS);
+    rememberStructure(configure(word, [1, 1, 1], ['html', 'html', 'html', 'html']), storage);
+    const recalled = recallStructure(tagged(ES, WORD_LEVELS, WORD_OPTIONS), storage);
+    assert.deepEqual(recalled?.structure.h1Sections.map((h1) => h1.level), [1, 1, 1]);
   });
 });

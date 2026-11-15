@@ -5,6 +5,13 @@ import {
   type SemanticTagIssue,
 } from '../core/validation/semanticTagBalance';
 import type { RecallKind } from '../core/services/structureMemory';
+import {
+  applyWordStructure,
+  describeHeadingTagIssue,
+  hasWordStructure,
+  matchesWordStructure,
+  type HeadingTagIssue,
+} from '../core/pipeline/headingTags';
 import { ContentTreeView } from './ContentTreeView';
 
 interface StructureConfiguratorProps {
@@ -17,6 +24,8 @@ interface StructureConfiguratorProps {
   recall?: RecallKind | null;
   /** Avisos (no bloqueantes) de cajas semánticas [ejemplo]/[fin] mal cerradas. */
   tagIssues?: SemanticTagIssue[];
+  /** Avisos (no bloqueantes) de las etiquetas de estructura de los títulos. */
+  headingTagIssues?: HeadingTagIssue[];
   onConfirm: (structure: DocumentStructure) => void;
   onCancel: () => void;
 }
@@ -91,23 +100,39 @@ const BLOCK2: { option: H2StructureOption; label: string }[] = [
   { option: 'tabs',      label: 'Pestañas' },
 ];
 
+/** Marca de la opción que pide la etiqueta del título en el Word. */
+function WordMark() {
+  return (
+    <span className="word-mark" title="Es lo que dice la etiqueta del título en el Word">
+      Word
+    </span>
+  );
+}
+
 /**
  * Una sola frase de ayuda. Si el árbol viene ya relleno de la memoria, esa
  * frase dice de dónde sale en vez de explicar cómo rellenarlo: quien ya lo
  * configuró una vez no necesita la explicación, y sí saber por qué no está en
  * blanco. Nada que pulsar: la estructura se edita igual que siempre.
  */
-const HELP_TEXT: Record<RecallKind | 'none', string> = {
+const HELP_TEXT: Record<RecallKind | 'none' | 'word', string> = {
   none: 'Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.',
+  word: 'Estructura leída de las etiquetas de los títulos del Word. Puedes cambiarla aquí.',
   same: 'Estructura recuperada de la última vez que configuraste este documento en este navegador.',
   similar: 'Estructura recuperada de un documento con los mismos encabezados que configuraste antes en este navegador.',
 };
 
-export function StructureConfigurator({ structure, recall = null, tagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
+export function StructureConfigurator({ structure, recall = null, tagIssues = [], headingTagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
   const [localStructure, setLocalStructure] = useState(structure);
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
   const validation = useMemo(() => validateStructure(localStructure), [localStructure]);
+
+  // Etiquetas de estructura en los títulos del Word: son solo el valor inicial,
+  // pero se señala qué pedía el Word y se puede volver a ello de un clic.
+  const fromWord = useMemo(() => hasWordStructure(structure), [structure]);
+  const asWordSays = useMemo(() => matchesWordStructure(localStructure), [localStructure]);
+  const helpKind: RecallKind | 'none' | 'word' = recall ?? (fromWord ? 'word' : 'none');
 
   const errorH1Ids = useMemo(() => {
     const ids = new Set<string>(Object.keys(validation.h1Errors));
@@ -197,20 +222,53 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
         </div>
       )}
 
+      {headingTagIssues.length > 0 && (
+        <div className="alert alert-warning" role="alert">
+          <strong>Revisa las etiquetas de estructura de los títulos.</strong>{' '}
+          {headingTagIssues.length === 1
+            ? 'Hay una que no se ha podido aplicar'
+            : `Hay ${headingTagIssues.length} que no se han podido aplicar`}
+          . Puedes ajustar la estructura aquí mismo, o corregir el Word y volver a
+          subirlo:
+          <ul className="tag-issue-list">
+            {headingTagIssues.map((issue, i) => (
+              <li key={i}>{describeHeadingTagIssue(issue)}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="structure-top-bar">
-        {recall ? (
+        {helpKind !== 'none' ? (
           <p className="help-text help-text--recall" role="status">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M3 12a9 9 0 1 0 3-6.7" />
               <polyline points="3 3 3 9 9 9" />
               <polyline points="12 7 12 12 15.5 14" />
             </svg>
-            {HELP_TEXT[recall]}
+            {HELP_TEXT[helpKind]}
           </p>
         ) : (
           <p className="help-text">{HELP_TEXT.none}</p>
         )}
         <div className="expand-collapse-bar">
+          {fromWord && (
+            <>
+              <button
+                className="btn-expand-all"
+                onClick={() => setLocalStructure(applyWordStructure(localStructure))}
+                disabled={asWordSays}
+                title={
+                  asWordSays
+                    ? 'La estructura ya es la que dicen las etiquetas del Word'
+                    : 'Descarta los cambios y aplica lo que dicen las etiquetas de los títulos'
+                }
+              >
+                Volver a lo que dice el Word
+              </button>
+              <span className="expand-sep" aria-hidden="true">·</span>
+            </>
+          )}
           <button
             className="btn-expand-all"
             onClick={expandAll}
@@ -278,6 +336,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                             onChange={() => handleH1LevelChange(h1.id, level)}
                           />
                           {LEVEL_LABELS[level]}
+                          {h1.wordLevel === level && <WordMark />}
                         </label>
                       ))}
                     </div>
@@ -350,6 +409,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                                   onChange={() => handleH2OptionChange(h1.id, h2.id, option)}
                                 />
                                 {label}
+                                {h2.wordOption === option && <WordMark />}
                               </label>
                             ))}
                           </div>
@@ -370,6 +430,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                                   onChange={() => handleH2OptionChange(h1.id, h2.id, option)}
                                 />
                                 {label}
+                                {h2.wordOption === option && <WordMark />}
                               </label>
                             ))}
                           </div>

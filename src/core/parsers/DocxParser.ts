@@ -1,6 +1,7 @@
 import mammoth from 'mammoth';
 import { readDocxImageSizes, assignDocxImageSizes } from './docxImageSizes';
 import { readDocxCoreProperties, type DocxCoreProperties } from './docxCoreProperties';
+import { stripHeadingTags, type HeadingTagIssue } from '../pipeline/headingTags';
 
 /**
  * Parser para archivos DOCX
@@ -9,15 +10,19 @@ import { readDocxCoreProperties, type DocxCoreProperties } from './docxCorePrope
  * Usa Mammoth.js como librería de parsing con configuración estándar
  *
  * IMPORTANTE: salvo la conservación de sangrías, la anotación del tamaño de las
- * imágenes y la reparación de los enlaces pegados con opciones (las tres más
- * abajo), el HTML de salida es idéntico al de Mammoth.js puro. Un párrafo sin
- * sangría manual y un documento sin imágenes salen byte-identical con Mammoth.
+ * imágenes, la reparación de los enlaces pegados con opciones (las tres más
+ * abajo) y la retirada de las etiquetas de estructura de los títulos
+ * («… [Subpágina]», ver pipeline/headingTags.ts), el HTML de salida es idéntico
+ * al de Mammoth.js puro. Un párrafo sin sangría manual, un documento sin
+ * imágenes y un título sin etiqueta salen byte-identical con Mammoth.
  */
 
 export interface DocxParseResult {
   html: string;
   /** Propiedades del documento (Archivo → Información → Propiedades). */
   metadata: DocxCoreProperties;
+  /** Avisos de las etiquetas de estructura de los títulos (erratas, nivel equivocado…). */
+  headingTagIssues: HeadingTagIssue[];
 }
 
 /**
@@ -270,9 +275,17 @@ export class DocxParser {
       })),
     });
 
+    // ÚNICO punto en el que se quitan las etiquetas de estructura de los
+    // títulos: todo lo que viene después (estructura, contenido, validación,
+    // PDF) ve ya el título limpio.
+    const stripped = stripHeadingTags(
+      assignDocxImageSizes(applyIndentMarkers(result.value), imageSizes),
+    );
+
     return {
-      html: assignDocxImageSizes(applyIndentMarkers(result.value), imageSizes),
+      html: stripped.html,
       metadata,
+      headingTagIssues: stripped.issues,
     };
   }
 }

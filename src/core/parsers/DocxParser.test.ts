@@ -13,7 +13,7 @@
 
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx';
 import { zipSync, strToU8 } from 'fflate';
 import { DocxParser } from './DocxParser';
 
@@ -176,5 +176,40 @@ describe('DocxParser — enlaces pegados con opciones', () => {
       fieldLinkParagraph(' HYPERLINK "https://aquadocs.org/" ', 'Aqua Docs'),
     );
     assert.equal(html, '<p><strong><a href="https://aquadocs.org/">Aqua Docs</a></strong></p>');
+  });
+});
+
+describe('DocxParser — etiquetas de estructura en los títulos', () => {
+  async function parseFile(children: Paragraph[]) {
+    const buffer = await Packer.toBuffer(new Document({ sections: [{ children }] }));
+    return new DocxParser().parse(new File([buffer], 'test.docx'));
+  }
+
+  test('la etiqueta se quita del título al parsear y se anota en el encabezado', async () => {
+    const { html, headingTagIssues } = await parseFile([
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun('Presentación')] }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        // Word parte el texto en runs a su antojo: la etiqueta a caballo de dos.
+        children: [new TextRun('Gestores [Sub'), new TextRun({ text: 'página]', bold: true })],
+      }),
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('Qué son [Acordeón].')] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('Normativa [2024]')] }),
+      new Paragraph({ children: [new TextRun('Texto.')] }),
+    ]);
+
+    assert.match(html, /<h1>Presentación<\/h1>/);
+    assert.match(html, /<h1 data-bua-estructura="subpagina">Gestores(<strong><\/strong>)?<\/h1>/);
+    assert.match(html, /<h2 data-bua-estructura="acordeon">Qué son<\/h2>/);
+    assert.match(html, /<h2>Normativa \[2024\]<\/h2>/);
+    assert.deepEqual(headingTagIssues, []);
+  });
+
+  test('una errata en la etiqueta llega como aviso', async () => {
+    const { html, headingTagIssues } = await parseFile([
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun('Gestores [Subpagna]')] }),
+    ]);
+    assert.match(html, /Gestores \[Subpagna\]/);
+    assert.deepEqual(headingTagIssues.map((i) => i.kind), ['heading-tag-typo']);
   });
 });

@@ -13,7 +13,7 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 (sin depender de la conversación donde surgieron). Prioridad orientativa:
 🔴 alta · 🟡 media · ⚪ baja / cuando apetezca.
 
-> Última actualización: **12 nov 2026**
+> Última actualización: **15 nov 2026**
 
 ---
 
@@ -21,39 +21,11 @@ corresponda, con una o dos líneas de contexto para que se entiendan en frío
 
 ### Diseñadas, pendientes de implementar
 
-- [ ] 🟡 **Estructura del paso 2 dentro del Word, con etiquetas al final de los
-  títulos.** Para quien trabaja con plantillas: todos los documentos comparten
-  estructura y hoy cada editor la rehace en el paso 2 (`structureMemory` solo
-  recuerda en su navegador, no viaja entre compañeros). Diseño cerrado el
-  30 sep 2026:
-  - **Sintaxis:** etiqueta entre corchetes **solo al final** del título, p. ej.
-    «Los Gestores Bibliográficos [Página principal]». Tolerar espacios y un
-    punto final detrás.
-  - **Título 1:** `[Página principal]` · `[Subpágina]` · `[3er nivel]` (nivel 1/2/3).
-    **Título 2:** `[Título de iDevice]` · `[Cabecera 2 en texto]` · `[Acordeón]` ·
-    `[Pestañas]`. Son los mismos literales del paso 2 (`StructureConfigurator`).
-  - **Variantes admitidas:** mayúsculas, tildes, espacios de más dentro del
-    corchete, singular/plural (`[Pestaña]`) y `3er`/`3.er`/`3º`/`tercer`.
-  - **Sin etiquetas, nada cambia.** Las etiquetas son solo el valor inicial: el
-    usuario tiene siempre la última palabra en el paso 2.
-  - **Frente a `structureMemory`, manda el Word:** las etiquetas entran en la
-    huella del documento. Si no cambian, se respeta lo ajustado en el paso 2; si
-    el coordinador las cambia, mandan las nuevas.
-  - **Quitar la etiqueta en un único punto**, antes de separar estructura y
-    contenido: no debe salir en títulos de página, rótulos de acordeón/pestaña,
-    índice, PDF ni huella de memoria (si no, se rompe la simetría que vigila
-    `structureContentSymmetry.test`).
-  - **Avisos** (con el sistema de `semanticTagBalance`): corchete final casi
-    igual a una etiqueta (errata), etiqueta de otro nivel (`[Acordeón]` en un
-    Título 1), título que solo tiene la etiqueta, y etiqueta distinta de
-    principal en el primer Título 1 (se ignora). Un corchete que no se parece a
-    ninguna etiqueta («Normativa [2024]») se deja como texto, sin aviso.
-    Estructuras no válidas (`[3er nivel]` tras una principal…) se aplican igual
-    y las señala la validación del paso 2, como si se eligieran a mano.
-  - **Fases:** 1) leer, quitar y aplicar, con tests; 2) avisos; 3) memoria y
-    marca «del Word» en el paso 2 (+ «Volver a lo que dice el Word»); 4) ayuda,
-    plantilla de ejemplo, que `elpToDocx` escriba `[Subpágina]`/`[3er nivel]` y
-    comprobar que el Limpiador no borra las etiquetas.
+- [ ] ⚪ **Plantilla de ejemplo con etiquetas de estructura.** Un `.docx`
+  descargable desde la ayuda con los títulos ya etiquetados (`[Subpágina]`,
+  `[Acordeón]`…), para que un coordinador parta de él. Es lo único que quedó
+  sin hacer de «Estructura del paso 2 dentro del Word» (ver «Cerrado
+  recientemente» y `CHANGELOG.md`).
 
 - [ ] 🟡 **Modo demostración / tutorial auto-reproducible.** Botón
   «▶ Ver demostración» que carga un documento de ejemplo incluido en la app y
@@ -270,6 +242,12 @@ sesiones previas o notas sueltas).
 
 Para no volver a proponer lo ya hecho. Detalle técnico en `CHANGELOG.md`.
 
+- [x] **Estructura del paso 2 dentro del Word, con etiquetas al final de los
+  títulos** (nov 2026): «Los gestores bibliográficos [Subpágina]», «Qué son
+  [Acordeón]». Leídas y retiradas en un único punto (`headingTags.ts`, dentro
+  de `DocxParser`), con avisos, memoria en la que manda el Word, marca «Word» y
+  «Volver a lo que dice el Word» en el paso 2, y `elpToDocx` escribiendo
+  `[Subpágina]`/`[3er nivel]`. Pendiente solo la plantilla de ejemplo (§1).
 - [x] **Workflow de deploy fuera de Node 20** (26 oct 2026): `actions/checkout@v7`,
   `actions/setup-node@v7` y `peaceiris/actions-gh-pages@v4`, las tres con
   `using: node24`. Se mantiene la publicación en la rama `gh-pages`; no se tocó

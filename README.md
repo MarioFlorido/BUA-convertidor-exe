@@ -83,6 +83,28 @@ Tampoco se cierra con `[fin]`. Si va dentro de una lista o junto a otro texto no
 el acordeón (la app avisa antes de convertir), y si el apartado no acaba siendo acordeón
 ni pestañas, el marcador se elimina sin más.
 
+### Estructura dentro del propio Word (opcional)
+
+La estructura del curso se decide en el paso 2 de la app, pero puedes dejarla
+escrita en el Word con una etiqueta **al final** de cada título. Pensado para
+plantillas: todos los documentos comparten estructura y así viaja con el Word, de
+un compañero a otro.
+
+```
+Título 1:   Los gestores bibliográficos [Subpágina]
+            [Página principal] · [Subpágina] · [3er nivel]
+
+Título 2:   Qué son [Acordeón]
+            [Título de iDevice] · [Cabecera 2 en texto] · [Acordeón] · [Pestañas]
+```
+
+Son los mismos nombres que ves en el paso 2. La etiqueta no sale en el curso ni en
+el PDF, y solo es el punto de partida: en el paso 2 puedes cambiar lo que quieras
+(la opción que pedía el Word queda señalada, y hay un «Volver a lo que dice el
+Word»). Un título sin etiqueta se comporta como siempre, y un corchete que no es
+una etiqueta —«Normativa [2024]»— se queda como texto. Si la etiqueta tiene una
+errata o no corresponde a ese título, la app avisa.
+
 El tema que elijas aporta los colores y las etiquetas. ConvertidoreXe es bastante robusto: no le importan mayúsculas/minúsculas, tildes o cosas raras que Word inserta. Funciona.
 
 ---

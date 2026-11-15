@@ -31,12 +31,16 @@ async function docxEntriesFromFixture(rootHtml?: string) {
 }
 
 describe('convertParsedElpToDocx — OOXML generado', () => {
-  test('páginas como Título 1/2 según profundidad, con el texto y las negritas', async () => {
+  test('páginas como Título 1, con la profundidad en una etiqueta de estructura', async () => {
     const { entries } = await docxEntriesFromFixture();
     const documentXml = strFromU8(entries['word/document.xml']);
 
     assert.match(documentXml, /<w:pStyle w:val="Heading1"\/>/);
-    assert.match(documentXml, /<w:pStyle w:val="Heading2"\/>/);
+    // La subpágina ya no es un Título 2 (que al re-importar quedaría dentro de
+    // la página anterior): es un Título 1 con su etiqueta.
+    assert.doesNotMatch(documentXml, /<w:pStyle w:val="Heading2"\/>/);
+    assert.match(documentXml, /Unidad 1 \[Subpágina\]/);
+    assert.doesNotMatch(documentXml, /Presentación \[/);
     assert.match(documentXml, /Presentación/);
     assert.match(documentXml, /Unidad 1/);
     assert.match(documentXml, /Bienvenida al/);

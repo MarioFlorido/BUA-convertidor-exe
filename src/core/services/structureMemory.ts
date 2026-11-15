@@ -23,9 +23,21 @@
  *
  * Una estructura con todo por defecto no se guarda (y borra la que hubiera
  * del mismo documento): recuperarla no cambiaría nada y solo añadiría ruido.
+ *
+ * Etiquetas de estructura en los títulos del Word («… [Subpágina]», ver
+ * pipeline/headingTags.ts): frente a esta memoria MANDA EL WORD. Las etiquetas
+ * forman parte de la huella del documento (`tags`), aparte de los títulos:
+ *  - Si no han cambiado desde que se guardó, se respeta lo ajustado en el
+ *    paso 2 (también en una traducción, que lleva las mismas etiquetas).
+ *  - Si el coordinador las cambia en el Word, la entrada deja de coincidir y
+ *    el paso 2 se abre con lo que dicen las nuevas.
+ * «Por defecto» pasa a ser «lo que dice el Word»: solo se guarda lo que el
+ * usuario cambió respecto a eso. Un documento sin etiquetas se comporta
+ * exactamente como antes, y las entradas ya guardadas siguen valiendo.
  */
 
 import type { DocumentStructure, H2StructureOption } from '../../types';
+import { matchesWordStructure } from '../pipeline/headingTags';
 
 const STORAGE_KEY = 'bua-structure-memory-v1';
 const MAX_ENTRIES = 20;
@@ -38,6 +50,11 @@ interface StoredEntry {
   shape: string;
   /** Huella de la secuencia normalizada de títulos H1/H2. */
   titles: string;
+  /**
+   * Etiquetas de estructura del Word, en orden; ausente o «» si no lleva
+   * ninguna (y en las entradas anteriores a las etiquetas).
+   */
+  tags?: string;
   /** Nivel de cada H1, en orden. */
   levels: (1 | 2 | 3)[];
   /** Opción de cada H2, en orden del documento. */
@@ -78,6 +95,20 @@ export function structureTitles(structure: DocumentStructure): string {
   return fnv1a(titles.join('\n'));
 }
 
+/**
+ * Huella de las etiquetas de estructura del Word: lo que pide cada título, en
+ * orden («-» donde no hay etiqueta). Cadena vacía si el documento no lleva
+ * ninguna, para que coincida con las entradas guardadas antes de que existieran.
+ */
+export function structureTags(structure: DocumentStructure): string {
+  const tags: string[] = [];
+  for (const h1 of structure.h1Sections) {
+    tags.push(h1.wordLevel === undefined ? '-' : String(h1.wordLevel));
+    for (const h2 of h1.h2Items) tags.push(h2.wordOption ?? '-');
+  }
+  return tags.some((tag) => tag !== '-') ? tags.join(',') : '';
+}
+
 function normalizeTitle(text: string): string {
   return text
     .normalize('NFD')
@@ -97,11 +128,6 @@ function fnv1a(text: string): string {
   return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
-function isDefault(structure: DocumentStructure): boolean {
-  return structure.h1Sections.every(
-    (h1) => h1.level === 1 && h1.h2Items.every((h2) => h2.option === 'html'),
-  );
-}
 
 function readEntries(storage: StorageLike): StoredEntry[] {
   try {
@@ -128,6 +154,7 @@ function isValidEntry(value: unknown): value is StoredEntry {
   return (
     typeof entry.shape === 'string' &&
     typeof entry.titles === 'string' &&
+    (entry.tags === undefined || typeof entry.tags === 'string') &&
     Array.isArray(entry.levels) && entry.levels.every((l) => LEVELS.has(l as number)) &&
     Array.isArray(entry.options) && entry.options.every((o) => OPTIONS.has(o as H2StructureOption)) &&
     typeof entry.at === 'number'
@@ -158,14 +185,18 @@ export function rememberStructure(
     (entry) => !(entry.shape === shape && entry.titles === titles),
   );
 
-  if (isDefault(structure)) {
+  // Nada que recordar si está tal y como lo pide el Word (sin etiquetas: todo
+  // por defecto): recuperarlo no cambiaría nada.
+  if (matchesWordStructure(structure)) {
     writeEntries(storage, others);
     return;
   }
 
+  const tags = structureTags(structure);
   const entry: StoredEntry = {
     shape,
     titles,
+    ...(tags ? { tags } : {}),
     levels: structure.h1Sections.map((h1) => h1.level),
     options: structure.h1Sections.flatMap((h1) => h1.h2Items.map((h2) => h2.option)),
     at: Date.now(),
@@ -186,7 +217,12 @@ export function recallStructure(
 
   const shape = structureShape(structure);
   const titles = structureTitles(structure);
-  const candidates = readEntries(storage).filter((entry) => entry.shape === shape);
+  const tags = structureTags(structure);
+  // Manda el Word: una entrada guardada con otras etiquetas (o sin ellas) ya
+  // no vale para este documento, ni como «el mismo» ni como traducción.
+  const candidates = readEntries(storage).filter(
+    (entry) => entry.shape === shape && (entry.tags ?? '') === tags,
+  );
   if (candidates.length === 0) return null;
 
   // Las entradas están de más reciente a más antigua: la primera que coincida

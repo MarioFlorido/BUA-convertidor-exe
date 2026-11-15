@@ -2,7 +2,12 @@
  * Generador de Word (.docx) a partir de un .elp parseado (ver elpParser.ts).
  *
  * Convención de salida, pensada para re-importar el Word en el convertidor:
- *   - Título de página → Título 1..4 según su profundidad en el árbol.
+ *   - Título de página → siempre Título 1; la profundidad en el árbol va en una
+ *     etiqueta de estructura al final: «… [Subpágina]» o «… [3er nivel]» (ver
+ *     pipeline/headingTags.ts). Así el paso 2 se abre ya con el árbol original.
+ *     Antes las subpáginas salían como Título 2 y, al re-importar, se quedaban
+ *     como apartados DENTRO de la página anterior. eXe admite más de tres
+ *     niveles y el convertidor no: lo más profundo se queda en 3er nivel.
  *   - Encabezados internos del contenido → se conservan (un h1 interno baja a
  *     Título 2 para no fabricar páginas fantasma al re-importar).
  *   - Título propio de un iDevice (si el autor puso uno) → párrafo en negrita.
@@ -60,8 +65,8 @@ export async function convertParsedElpToDocx(parsed: ParsedElp): Promise<ElpDocx
 
     children.push(
       new docx.Paragraph({
-        heading: headingForDepth(docx, page.depth),
-        children: [new docx.TextRun(page.title)],
+        heading: docx.HeadingLevel.HEADING_1,
+        children: [new docx.TextRun(page.title + structureTagForDepth(page.depth))],
       }),
     );
 
@@ -105,14 +110,10 @@ export async function convertParsedElpToDocx(parsed: ParsedElp): Promise<ElpDocx
   return { blob, warnings: [...new Set(warnings)] };
 }
 
-function headingForDepth(docx: Docx, depth: number): (typeof docx.HeadingLevel)[keyof typeof docx.HeadingLevel] {
-  const levels = [
-    docx.HeadingLevel.HEADING_1,
-    docx.HeadingLevel.HEADING_2,
-    docx.HeadingLevel.HEADING_3,
-    docx.HeadingLevel.HEADING_4,
-  ];
-  return levels[Math.min(depth, levels.length - 1)];
+/** Etiqueta de estructura que reproduce la profundidad de la página en el árbol. */
+function structureTagForDepth(depth: number): string {
+  if (depth <= 0) return '';
+  return depth === 1 ? ' [Subpágina]' : ' [3er nivel]';
 }
 
 // ── HTML → bloques de Word ────────────────────────────────────────────────────

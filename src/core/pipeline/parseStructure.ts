@@ -1,5 +1,6 @@
 import type { DocumentStructure, H1Section, H2Item } from '../../types';
 import { normalizeText } from '../utils/html';
+import { readHeadingTag } from './headingTags';
 
 /**
  * ¿El elemento aporta contenido real aunque no tenga texto?
@@ -58,6 +59,14 @@ export async function parseDocumentStructure(htmlContent: string): Promise<Docum
         level: 1,
         h2Items: [],
       };
+      // Etiqueta de estructura del Word («… [Subpágina]»): valor inicial del
+      // nivel. El primer apartado es siempre página principal; ahí la etiqueta
+      // se guarda (para avisar) pero no se aplica.
+      const tag = readHeadingTag(element);
+      if (tag?.heading === 1) {
+        currentH1Section.wordLevel = tag.level;
+        if (h1Sections.length > 0) currentH1Section.level = tag.level;
+      }
       h1Sections.push(currentH1Section);
     } else if (tag === 'h2') {
       if (!text) continue; // encabezado vacío (restos de Word): se ignora
@@ -67,6 +76,12 @@ export async function parseDocumentStructure(htmlContent: string): Promise<Docum
         text: text,
         option: 'html', // default option
       };
+      // Etiqueta de estructura del Word («… [Acordeón]»): valor inicial.
+      const tag = readHeadingTag(element);
+      if (tag?.heading === 2) {
+        h2Item.wordOption = tag.option;
+        h2Item.option = tag.option;
+      }
       // Un H2 antes del primer H1 cuelga de la sección sintética
       (currentH1Section ?? ensureSynthetic()).h2Items.push(h2Item);
     } else if (!currentH1Section && hasVisibleContent(element, text)) {

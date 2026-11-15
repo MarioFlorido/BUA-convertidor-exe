@@ -1387,6 +1387,27 @@ button {
   color: var(--blue);
 }
 
+/* Marca «Word»: la opción que pide la etiqueta del título en el Word
+   («… [Subpágina]»). Va dentro de la opción, así que se ve tanto si sigue
+   elegida como si el usuario la ha cambiado. */
+.word-mark {
+  margin-left: 0.4rem;
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  background: var(--blue-light);
+  color: var(--blue-active);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+.level-option--active .word-mark,
+.h2-option--active .word-mark {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
 .h1-toggle {
   display: flex;
   align-items: center;

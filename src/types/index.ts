@@ -44,12 +44,24 @@ export interface H2Item {
   id: string;
   text: string;
   option: H2StructureOption;
+  /**
+   * Opción que pide el Word con una etiqueta al final del título
+   * («Qué son [Acordeón]»). Ausente si el título no lleva etiqueta.
+   * Ver core/pipeline/headingTags.ts.
+   */
+  wordOption?: H2StructureOption;
 }
 
 export interface H1Section {
   id: string;
   title: string;
   level: 1 | 2 | 3;
+  /**
+   * Nivel que pide el Word con una etiqueta al final del título
+   * («Gestores [Subpágina]»). Ausente si el título no lleva etiqueta. En el
+   * primer apartado se conserva lo escrito aunque `level` sea siempre 1.
+   */
+  wordLevel?: 1 | 2 | 3;
   h2Items: H2Item[];
   /**
    * Sección creada por el parser (no proviene de un H1 del documento):

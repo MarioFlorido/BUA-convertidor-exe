@@ -14,6 +14,7 @@ import { parseDocumentStructure } from './core/pipeline/parseStructure';
 import { rememberStructure, recallStructure, type RecallKind } from './core/services/structureMemory';
 import { DocxParser, type DocxParseResult } from './core/parsers/DocxParser';
 import { detectSemanticTagIssues, type SemanticTagIssue } from './core/validation/semanticTagBalance';
+import { detectFirstPageTagIssue, type HeadingTagIssue } from './core/pipeline/headingTags';
 import { yieldToBrowser } from './core/utils/yieldToBrowser';
 import { ThemeRegistry } from './core/services/ThemeRegistry';
 import type {
@@ -53,6 +54,8 @@ export function App() {
   const [semanticDoc, setSemanticDoc] = useState<SemanticDocument | null>(null);
   const [parsedDocx, setParsedDocx] = useState<DocxParseResult | null>(null);
   const [tagIssues, setTagIssues] = useState<SemanticTagIssue[]>([]);
+  // Avisos de las etiquetas de estructura de los títulos («… [Subpágina]»).
+  const [headingTagIssues, setHeadingTagIssues] = useState<HeadingTagIssue[]>([]);
   const [options, setOptions] = useState<DocxImportOptions>({
     heading1Mode: 'page',
     heading2Mode: 'page',
@@ -106,9 +109,16 @@ export function App() {
       await yieldToBrowser();
       setTagIssues(detectSemanticTagIssues(parseResult.html));
       await yieldToBrowser();
+      // Si los títulos llevan etiquetas de estructura, la estructura ya sale
+      // con lo que pide el Word en vez de con todo por defecto.
       const parsedStructure = await parseDocumentStructure(parseResult.html);
-      // Si este Word (o su traducción) ya se configuró en este navegador, el
-      // paso 2 se abre con aquella configuración en vez de en blanco.
+      setHeadingTagIssues([
+        ...parseResult.headingTagIssues,
+        ...detectFirstPageTagIssue(parsedStructure),
+      ]);
+      // Si este Word (o su traducción) ya se configuró en este navegador —y sus
+      // etiquetas no han cambiado desde entonces—, el paso 2 se abre con
+      // aquella configuración.
       const recalled = recallStructure(parsedStructure);
       setStructure(recalled?.structure ?? parsedStructure);
       setStructureRecall(recalled?.kind ?? null);
@@ -134,6 +144,7 @@ export function App() {
     setStructureRecall(null);
     setParsedDocx(null);
     setTagIssues([]);
+    setHeadingTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -198,6 +209,7 @@ export function App() {
     setSemanticDoc(null);
     setParsedDocx(null);
     setTagIssues([]);
+    setHeadingTagIssues([]);
     setScreen('upload');
     setState({ status: 'idle' });
   };
@@ -323,6 +335,7 @@ export function App() {
                 structure={structure}
                 recall={structureRecall}
                 tagIssues={tagIssues}
+                headingTagIssues={headingTagIssues}
                 onConfirm={handleStructureConfirm}
                 onCancel={handleStructureCancel}
               />
