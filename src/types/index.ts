@@ -35,6 +35,8 @@ export interface ConversionState {
   status: 'idle' | 'loading' | 'processing' | 'complete' | 'error';
   progress?: DocxImportProgress;
   error?: string;
+  /** Frase en negrita que encabeza el error; sin ella se muestra «Error:». */
+  errorTitle?: string;
   result?: ImportToElpxResult;
 }
 

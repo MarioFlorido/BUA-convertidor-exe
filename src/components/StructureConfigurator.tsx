@@ -62,7 +62,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const prev = index > 0 ? sections[index - 1] : null;
       if (!prev || (prev.level !== 2 && prev.level !== 3)) {
         h1Errors[section.id] =
-          'No se puede saltar de Página principal a un 3er nivel.';
+          'No se puede saltar de Página principal a un 3er nivel. Tiene que ir después de una Subpágina. Marca como Subpágina la página anterior, o cambia esta a Subpágina.';
       }
     }
 
@@ -72,7 +72,7 @@ export function validateStructure(structure: DocumentStructure): StructureValida
       const next = section.h2Items[i + 1];
       if (next && next.option !== 'idevice-title') {
         h2Errors[h2.id] =
-          'Un «Título de iDevice» crea un iDevice con ese título en la cabecera y un marco contenedor. Debe ser el último H2 de la sección o ir seguido de otro iDevice con título';
+          'Un «Título de iDevice» crea un iDevice con ese título en la cabecera y un marco contenedor. Debe ser el último encabezamiento de la sección o ir seguido de otro iDevice con título.';
       }
     });
   });
@@ -103,7 +103,7 @@ const BLOCK2: { option: H2StructureOption; label: string }[] = [
 /** Marca de la opción que pide la etiqueta del título en el Word. */
 function WordMark() {
   return (
-    <span className="word-mark" title="Es lo que dice la etiqueta del título en el Word">
+    <span className="word-mark" title="Opción indicada por la etiqueta de este título en el Word">
       Word
     </span>
   );
@@ -116,10 +116,10 @@ function WordMark() {
  * blanco. Nada que pulsar: la estructura se edita igual que siempre.
  */
 const HELP_TEXT: Record<RecallKind | 'none' | 'word', string> = {
-  none: 'Cada H1 genera una página. Abre cada sección para configurar sus apartados H2.',
-  word: 'Estructura leída de las etiquetas de los títulos del Word. Puedes cambiarla aquí.',
-  same: 'Estructura recuperada de la última vez que configuraste este documento en este navegador.',
-  similar: 'Estructura recuperada de un documento con los mismos encabezados que configuraste antes en este navegador.',
+  none: 'Cada Título 1 del Word será una página del curso. Despliega cada página para elegir cómo se muestran sus Título 2.',
+  word: 'Se ha aplicado la estructura que indican las etiquetas de los títulos del Word. Puedes cambiar lo que quieras.',
+  same: 'Se ha recuperado la estructura guardada en este navegador que elegiste la última vez para este documento.',
+  similar: 'Se ha recuperado la estructura de otro documento con los mismos títulos que configuraste antes en este navegador. Revísala por si algo cambia.',
 };
 
 export function StructureConfigurator({ structure, recall = null, tagIssues = [], headingTagIssues = [], onConfirm, onCancel }: StructureConfiguratorProps) {
@@ -207,13 +207,14 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
     <div className="structure-configurator">
       {tagIssues.length > 0 && (
         <div className="alert alert-warning" role="alert">
-          <strong>Revisa el etiquetado semántico antes de continuar.</strong> Se
+          <strong>Revisa las etiquetas entre corchetes del Word.</strong>{' '}
           {tagIssues.length === 1
-            ? ' ha detectado un problema'
-            : ` han detectado ${tagIssues.length} problemas`}{' '}
-          con las etiquetas <code>[…]</code> del documento. Si conviertes así, el contenido
-          puede mezclarse o aparecer la etiqueta como texto. Corrige el documento
-          de Word y vuelve a subirlo:
+            ? 'Hay una etiqueta mal colocada'
+            : `Hay ${tagIssues.length} etiquetas mal colocadas`}
+          . Si continúas así, parte del contenido puede quedar fuera de su sitio o
+          la etiqueta puede verse tal cual en el curso.{' '}
+          {tagIssues.length === 1 ? 'Corrígela' : 'Corrígelas'} en el Word y vuelve
+          a subirlo:
           <ul className="tag-issue-list">
             {tagIssues.map((issue, i) => (
               <li key={i}>{describeSemanticTagIssue(issue)}</li>
@@ -224,12 +225,12 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
 
       {headingTagIssues.length > 0 && (
         <div className="alert alert-warning" role="alert">
-          <strong>Revisa las etiquetas de estructura de los títulos.</strong>{' '}
+          <strong>Algunas etiquetas de los títulos no se han aplicado.</strong>{' '}
           {headingTagIssues.length === 1
-            ? 'Hay una que no se ha podido aplicar'
-            : `Hay ${headingTagIssues.length} que no se han podido aplicar`}
-          . Puedes ajustar la estructura aquí mismo, o corregir el Word y volver a
-          subirlo:
+            ? 'Una etiqueta no se ha podido aplicar'
+            : `${headingTagIssues.length} etiquetas no se han podido aplicar`}
+          . Puedes elegir la estructura aquí mismo, o corregir el Word y volver a
+          subirlo para que la próxima vez salga bien:
           <ul className="tag-issue-list">
             {headingTagIssues.map((issue, i) => (
               <li key={i}>{describeHeadingTagIssue(issue)}</li>
@@ -260,11 +261,11 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                 disabled={asWordSays}
                 title={
                   asWordSays
-                    ? 'La estructura ya es la que dicen las etiquetas del Word'
-                    : 'Descarta los cambios y aplica lo que dicen las etiquetas de los títulos'
+                    ? 'La estructura ya coincide con las etiquetas del Word'
+                    : 'Deshace tus cambios y vuelve a aplicar las etiquetas de los títulos del Word'
                 }
               >
-                Volver a lo que dice el Word
+                Volver a las etiquetas definidas en el Word
               </button>
               <span className="expand-sep" aria-hidden="true">·</span>
             </>
@@ -347,12 +348,12 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                     className="h1-toggle"
                     onClick={() => toggleSection(h1.id)}
                     aria-expanded={isOpen}
-                    title={isOpen ? 'Cerrar sección' : 'Abrir sección'}
+                    title={isOpen ? 'Ocultar sus Título 2' : 'Ver sus Título 2'}
                   >
                     {h2ErrorCount > 0 && (
                       <span
                         className="h1-error-badge"
-                        title={`${h2ErrorCount} H2 con errores`}
+                        title={`${h2ErrorCount} Título 2 por corregir`}
                       >
                         <svg className="badge-warn-icon" viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -363,7 +364,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                       </span>
                     )}
                     <span className="h1-toggle-count">
-                      {h1.h2Items.length} H2
+                      {h1.h2Items.length} Título 2
                     </span>
                     <svg
                       className={`chevron${isOpen ? ' chevron--open' : ''}`}
@@ -385,7 +386,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
                 <div className="h2-list-clip">
                 <div className="h2-list">
                   {h1.h2Items.length === 0 ? (
-                    <p className="no-h2">No contiene encabezamientos H2</p>
+                    <p className="no-h2">Esta página no tiene Título 2</p>
                   ) : (
                     h1.h2Items.map((h2) => {
                       const h2Error = validation.h2Errors[h2.id];
@@ -459,7 +460,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
 
       {validation.hasErrors && (
         <p className="structure-error-summary" role="alert">
-          Hay errores de estructura que debes corregir antes de continuar.
+          Corrige lo que está marcado en rojo para poder continuar.
         </p>
       )}
 
@@ -468,7 +469,7 @@ export function StructureConfigurator({ structure, recall = null, tagIssues = []
           onClick={handleConfirm}
           className="btn-confirm"
           disabled={validation.hasErrors}
-          title={validation.hasErrors ? 'Corrige los errores de estructura para continuar' : undefined}
+          title={validation.hasErrors ? 'Corrige lo marcado en rojo para poder continuar' : undefined}
         >
           Continuar con esta estructura
         </button>

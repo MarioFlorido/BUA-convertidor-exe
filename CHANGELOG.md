@@ -4,6 +4,12 @@
 
 ## Sin publicar
 
+### Avisos y errores del paso 2 redactados de nuevo
+- **Todos los textos de aviso y error del paso 2**, revisados uno a uno para que digan qué hacer y no solo qué está mal: los dos recuadros de etiquetas (`describeSemanticTagIssue`, `describeHeadingTagIssue`), los errores de estructura en rojo, la frase de ayuda, botones, marcas y textos al pasar el ratón (`StructureConfigurator`, `ContentTreeView`) y el origen del título del curso.
+- **Un solo vocabulario**: «Título 1 / Título 2» (los estilos del Word) en lugar de H1/H2, encabezado o apartado, y «se verá como texto en el curso» en lugar de «se imprimirá». El botón pasa a llamarse «Volver a las etiquetas definidas en el Word» (README y guía de uso actualizados).
+- **Error al leer el Word**: en vez del mensaje técnico de Mammoth/JSZip, el banner dice «No se ha podido leer el documento.» y qué comprobar; el detalle queda en la consola. El error inesperado de conversión también tiene frase propia; los errores con mensaje propio (p. ej. un tema no disponible) se siguen mostrando tal cual.
+- **Maquetación para los textos más largos**: la línea del origen del título se parte en dos en vez de cortarse con «…», y en pantallas estrechas los botones de la barra del paso 2 bajan a otra línea en vez de estrujar la frase de ayuda.
+
 ### [Formato] La estructura del paso 2 puede venir escrita en el Word
 - **El problema**: quien trabaja con plantillas convierte muchos documentos con la misma estructura y la rehacía a mano en el paso 2. `structureMemory` ayudaba, pero solo recuerda en el navegador de cada uno: no viaja entre compañeros.
 - **Etiqueta entre corchetes al final del título** (`src/core/pipeline/headingTags.ts`). Título 1: `[Página principal]`, `[Subpágina]`, `[3er nivel]`. Título 2: `[Título de iDevice]`, `[Cabecera 2 en texto]`, `[Acordeón]`, `[Pestañas]`. Los mismos literales del paso 2. Solo al final, con espacios y un punto final tolerados detrás; valen mayúsculas, tildes, espacios de más, singular/plural y `3er`/`3.er`/`3º`/`tercer`. Un corchete que no es una etiqueta («Normativa [2024]») se queda como texto.

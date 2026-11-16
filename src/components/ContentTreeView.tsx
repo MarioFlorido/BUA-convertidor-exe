@@ -87,7 +87,7 @@ export function ContentTreeView({ structure, errorH1Ids, onPageClick }: ContentT
         key={`page-${section.id}`}
         onClick={onPageClick ? () => onPageClick(section.id) : undefined}
         className={onPageClick ? 'tree-page-node' : undefined}
-        aria-label={onPageClick ? `Ir a sección: ${section.title}` : undefined}
+        aria-label={onPageClick ? `Ir a la página ${section.title}` : undefined}
         role={onPageClick ? 'button' : undefined}
       >
         {onPageClick && (

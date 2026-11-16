@@ -125,9 +125,14 @@ export function App() {
       setScreen('structure');
       setState({ status: 'idle' });
     } catch (error) {
+      // El mensaje de mammoth/JSZip («Can't find end of central directory…») no
+      // le dice nada a quien sube el Word: se le explica qué comprobar y el
+      // detalle técnico queda en la consola.
+      console.error('No se ha podido leer el documento:', error);
       setState({
         status: 'error',
-        error: error instanceof Error ? error.message : 'Error al parsear el documento',
+        errorTitle: 'No se ha podido leer el documento.',
+        error: 'Comprueba que es un archivo .docx de Word y que no está dañado ni protegido con contraseña.',
       });
     }
   };
@@ -195,10 +200,18 @@ export function App() {
       setState({ status: 'complete', result });
       setScreen('result');
     } catch (error) {
-      setState({
-        status: 'error',
-        error: error instanceof Error ? error.message : 'Error desconocido durante la conversión',
-      });
+      // Los errores propios de la conversión (p. ej. «Tema … no está
+      // disponible») ya se entienden y se muestran tal cual; lo inesperado, con
+      // la frase genérica.
+      setState(
+        error instanceof Error
+          ? { status: 'error', error: error.message }
+          : {
+              status: 'error',
+              errorTitle: 'La conversión ha fallado por un motivo inesperado.',
+              error: 'Vuelve a intentarlo; si se repite, avisa a quien mantiene el convertidor y adjunta el Word.',
+            },
+      );
     }
   };
 
@@ -277,7 +290,7 @@ export function App() {
         {/* ── Error ── */}
         {isError && !isProcessing && (
           <div className="error-message">
-            <p><strong>Error:</strong> {state.error}</p>
+            <p><strong>{state.errorTitle ?? 'Error:'}</strong> {state.error}</p>
           </div>
         )}
 
@@ -308,8 +321,8 @@ export function App() {
                     );
                     const text =
                       source === 'description'
-                        ? `Título tomado de «Comentarios» del Word: ${title}`
-                        : 'Título tomado del nombre del archivo';
+                        ? `Título del curso: ${title} (tomado de «Comentarios», en las propiedades del Word)`
+                        : 'Título tomado del nombre del archivo. Para poner otro, escríbelo en «Comentarios», en las propiedades del Word.';
                     return (
                       <span
                         className={`doc-title-source doc-title-source--${source}`}

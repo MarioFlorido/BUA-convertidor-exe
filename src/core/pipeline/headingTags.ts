@@ -356,19 +356,21 @@ export function describeHeadingTagIssue(issue: HeadingTagIssue): string {
   const headingName = HEADING_NAME[issue.heading] ?? `Título ${issue.heading}`;
 
   if (issue.kind === 'heading-tag-typo') {
-    return `El corchete [${issue.written}]${where} se parece a la etiqueta [${issue.label}], pero no lo es. Si querías esa etiqueta, corrígela en el Word; tal como está, se imprimirá como parte del título.`;
+    const inTitle = issue.context ? `, en el título «${issue.context}»,` : '';
+    return `«[${issue.written}]»${inTitle} parece una etiqueta mal escrita. ¿Querías poner [${issue.label}]? Corrígela en el Word; tal como está, se verá como parte del título.`;
   }
   if (issue.kind === 'heading-tag-only') {
-    return `Hay un ${headingName} que solo contiene la etiqueta [${issue.written}], sin texto. Escribe el título delante de la etiqueta; tal como está, se usará «[${issue.written}]» como título.`;
+    return `Hay un ${headingName} que solo tiene la etiqueta [${issue.written}] y le falta el texto. Escribe el título delante de la etiqueta; si no, en el curso aparecerá «[${issue.written}]» como título.`;
   }
   if (issue.kind === 'heading-tag-first-page') {
-    return `La etiqueta [${issue.label}]${where} se ha ignorado: el primer apartado del documento es siempre una página principal.`;
+    return `No se ha aplicado la etiqueta [${issue.label}]${where}: el primer Título 1 del documento es siempre una página principal. Puedes quitarla o cambiarla por [Página principal].`;
   }
   const valid =
     issue.heading === 1
-      ? ' En un Título 1 valen [Página principal], [Subpágina] y [3er nivel].'
+      ? ' En un Título 1 puedes usar [Página principal], [Subpágina] o [3er nivel].'
       : issue.heading === 2
-        ? ' En un Título 2 valen [Título de iDevice], [Cabecera 2 en texto], [Acordeón] y [Pestañas].'
-        : ' Las etiquetas de estructura solo valen en Título 1 y Título 2.';
-  return `La etiqueta [${issue.label}]${where} no corresponde a un ${headingName} y se ha ignorado.${valid}`;
+        ? ' En un Título 2 puedes usar [Título de iDevice], [Cabecera 2 en texto], [Acordeón] o [Pestañas].'
+        : ' Estas etiquetas solo funcionan en párrafos con el estilo Título 1 o Título 2.';
+  const toTitle = issue.context ? ` al título «${issue.context}»` : '';
+  return `La etiqueta [${issue.label}] no sirve en un ${headingName}, así que no se ha aplicado${toTitle}.${valid}`;
 }

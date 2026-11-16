@@ -100,8 +100,8 @@ Título 2:   Qué son [Acordeón]
 
 Son los mismos nombres que ves en el paso 2. La etiqueta no sale en el curso ni en
 el PDF, y solo es el punto de partida: en el paso 2 puedes cambiar lo que quieras
-(la opción que pedía el Word queda señalada, y hay un «Volver a lo que dice el
-Word»). Un título sin etiqueta se comporta como siempre, y un corchete que no es
+(la opción que pedía el Word queda señalada, y hay un «Volver a las etiquetas
+definidas en el Word»). Un título sin etiqueta se comporta como siempre, y un corchete que no es
 una etiqueta —«Normativa [2024]»— se queda como texto. Si la etiqueta tiene una
 errata o no corresponde a ese título, la app avisa.
 

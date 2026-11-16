@@ -243,12 +243,12 @@ button {
    relleno y sin él. Una sola línea con puntos suspensivos — el título largo
    son cientos de caracteres y el banner no es el sitio para leerlo entero;
    el atributo title lo da completo al pasar el ratón. */
+/* Se parte en líneas en vez de cortarse con «…»: lo que importa (de dónde
+   sale el título y cómo cambiarlo) va al final de la frase. */
 .doc-title-source {
   font-size: 0.78rem;
   color: var(--text-3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.4;
   margin-top: 0.15rem;
 }
 
@@ -1046,8 +1046,18 @@ button {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
   margin-top: 0.2rem;
+}
+
+/* Si no caben en una línea, los botones bajan en vez de estrujar la ayuda. */
+.structure-top-bar > .help-text {
+  flex: 1 1 20rem;
+}
+
+.structure-top-bar > .expand-collapse-bar {
+  margin-left: auto;
 }
 
 /* Estructura recuperada de la memoria del navegador: la frase de ayuda cambia

@@ -391,27 +391,28 @@ export function hasSemanticTagIssues(html: string): boolean {
 
 /** Mensaje legible para mostrar en la UI a partir de un problema detectado. */
 export function describeSemanticTagIssue(issue: SemanticTagIssue): string {
-  const near = issue.context ? ` (cerca de: «${issue.context}»)` : '';
+  const near = issue.context ? ` (cerca de «${issue.context}»)` : '';
   if (issue.kind === 'stray-fin') {
-    return `Hay un [fin] que no cierra ninguna caja abierta${near}. ¿Sobra, o falta su etiqueta de apertura?`;
+    const nearText = issue.context ? ` (cerca del texto «${issue.context}»)` : '';
+    return `Sobra un [fin]${nearText}: no cierra ninguna caja. Bórralo, o escribe antes la etiqueta que abre la caja.`;
   }
   if (issue.kind === 'heading-inside-box') {
-    return `La caja [${issue.label}] abarca el encabezado «${issue.context}». Un título no puede quedar dentro de una caja: cierra con [fin] antes del encabezado.`;
+    return `La caja [${issue.label}] sigue abierta al llegar al título «${issue.context}», y un título no puede ir dentro de una caja. Escribe [fin] antes de ese título o revisa dónde debería terminar la caja.`;
   }
   if (issue.kind === 'box-not-formable') {
-    return `La caja [${issue.label}] no se puede formar donde está${near}. La etiqueta y su [fin] deben ir en el mismo párrafo, o cada una en su propio párrafo: repartidas entre ítems de lista o entre bloques distintos, se imprimirán como texto.`;
+    return `No se puede crear la caja [${issue.label}]${near}: la etiqueta y su [fin] están en elementos distintos de una lista o en bloques distintos. Ponlas en el mismo párrafo, o cada una en un párrafo propio. Si no, se verán como texto en el curso.`;
   }
   if (issue.kind === 'accordion-marker') {
-    return `El marcador [fin acordeón] no está solo en su propio párrafo${near}. Sácalo de la lista (o del texto que lo acompaña) y déjalo en una línea para él: si no, el acordeón no se cierra ahí y lo que va después se queda dentro del último panel.`;
+    return `La etiqueta [fin acordeón]${near} tiene que ir sola en un párrafo, fuera de cualquier lista. Si no, el acordeón no se cierra ahí y todo lo que va después queda dentro del último desplegable.`;
   }
   if (issue.kind === 'table-marker') {
-    return `El marcador [${issue.marker}] no precede a una tabla${near}. Debe ir solo, en su propio párrafo, en la línea inmediatamente anterior a la tabla; si no, se imprimirá como texto.`;
+    return `La etiqueta [${issue.marker}]${near} no está justo encima de una tabla. Escríbela sola en el párrafo que va inmediatamente antes de la tabla; si no, se verá como texto en el curso.`;
   }
   if (issue.kind === 'table-without-marker') {
-    return `Hay una tabla sin marcador${near}. Escribe [horizontal] o [vertical], solo, en el párrafo inmediatamente anterior a la tabla: es lo que decide dónde está la cabecera. Mientras falte, se tratará como [horizontal] y la primera fila hará de cabecera.`;
+    return `Una tabla${near} no indica dónde está su cabecera. Escribe [horizontal] (cabecera en la primera fila) o [vertical] (cabecera en la primera columna), solo, en el párrafo justo antes de la tabla. Si no lo haces, la primera fila hará de cabecera.`;
   }
   if (issue.kind === 'resource-marker') {
-    return `La etiqueta [${issue.marker}:] no abre una línea de recurso${near}. Debe ir al principio de la línea y con el texto del recurso detrás; si no, se imprimirá como texto.`;
+    return `La etiqueta [${issue.marker}:]${near} tiene que ir al principio de la línea, seguida del texto del recurso. Tal como está, se verá como texto en el curso.`;
   }
-  return `Falta el [fin] que cierra la caja [${issue.label}]${near}.`;
+  return `Falta el [fin] de la caja [${issue.label}]${near}. Escríbelo donde quieras que termine la caja.`;
 }
